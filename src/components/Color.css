@@ -1,0 +1,15 @@
+.color-swatch {
+  height: 3rem;
+  width: 3rem;
+  border-radius: 50%;
+  margin: 2rem;
+}
+
+.compare {
+  display: flex;
+}
+
+.color-compare {
+  height: 50px;
+  flex: 1;
+}

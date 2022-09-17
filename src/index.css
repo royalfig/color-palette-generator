@@ -1,0 +1,23 @@
+html {
+  font-size: clamp(1rem, 1rem + 2vw, 22px);
+  font-family: system-ui;
+  line-height: 1.6;
+}
+
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+input {
+  margin-bottom: 10rem;
+}
