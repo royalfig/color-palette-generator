@@ -1,4 +1,69 @@
-.colors {
+.App {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  gap: 4vmax;
+  padding: 4vmax;
+}
+
+.header {
+  margin: 0 0 2rem;
+}
+
+input[type="color"] {
+}
+
+.sample {
+  margin: 1rem;
+  background-color: var(--_50);
+  border-radius: 4px;
+}
+.sample-navbar {
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+.sample-navbar ul {
+  list-style: none;
   display: flex;
   gap: 1rem;
+}
+
+.sample-navbar a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.sample-header {
+  background-color: hsl(var(--h) var(--s) var(--l));
+  padding: 2rem;
+  text-align: center;
+}
+
+.sample-cta {
+  background-color: hsl(var(--adjacent-2) var(--s) var(--l));
+  color: inherit;
+  text-decoration: none;
+  border-radius: 1em;
+  padding: 0.5rem 1rem;
+  margin-block-start: 1rem;
+  display: block;
+  width: fit-content;
+  margin-inline: auto;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  font-size: 16px;
+}
+
+.sample-body {
+  padding: 1rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.sample-image {
+  width: 100%;
+  aspect-ratio: 1;
+  background-color: hsl(var(--adjacent-1) var(--s) var(--l));
+  margin-block-end: 0.5rem;
 }

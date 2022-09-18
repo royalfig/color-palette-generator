@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@jaames/iro": "^5.5.2",
     "colorjs.io": "^0.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

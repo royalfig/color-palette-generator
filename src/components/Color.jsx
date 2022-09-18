@@ -1,62 +1,40 @@
 import "./Color.css";
 
 export default function Color({ color, corrected }) {
-  console.log(corrected);
-
-  return corrected ? (
+  console.log(color);
+  return !corrected ? (
     <div className="">
       <div className="colors">
-        {Object.keys(color).map((key, index) => {
+        {color.map((c, index) => {
           return (
             <div key={index} className="color">
               <div
                 className="color-swatch"
-                style={{ backgroundColor: color[key].hex }}
+                style={{ backgroundColor: c.hex }}
               ></div>
-              <p>{color[key].hex}</p>
-              <p>{color[key].rgb}</p>
-              <p>{color[key].hsl}</p>
+              <p>{c.hex}</p>
+              <p>{c.rgb}</p>
+              <p>{c.hsl}</p>
             </div>
-          );
-        })}
-      </div>
-      <div className="compare">
-        {Object.keys(color).map((key, index) => {
-          return (
-            <div
-              key={index}
-              className="color-compare"
-              style={{ backgroundColor: color[key].hex }}
-            ></div>
           );
         })}
       </div>
     </div>
   ) : (
     <div className="">
+      <h2>corrected</h2>
       <div className="colors">
-        {Object.keys(color).map((key, index) => {
+        {color.map((c, index) => {
           return (
             <div key={index} className="color">
               <div
                 className="color-swatch"
-                style={{ backgroundColor: color[key].hex }}
+                style={{ backgroundColor: c.corrected.hex }}
               ></div>
-              <p>{color[key].hex}</p>
-              <p>{color[key].rgb}</p>
-              <p>{color[key].hsl}</p>
+              <p>{c.corrected.hex}</p>
+              <p>{c.corrected.rgb}</p>
+              <p>{c.corrected.hsl}</p>
             </div>
-          );
-        })}
-      </div>
-      <div className="compare">
-        {Object.keys(color).map((key, index) => {
-          return (
-            <div
-              key={index}
-              className="color-compare"
-              style={{ backgroundColor: color[key].hex }}
-            ></div>
           );
         })}
       </div>

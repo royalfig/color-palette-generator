@@ -1,15 +1,30 @@
-.color-swatch {
-  height: 3rem;
-  width: 3rem;
-  border-radius: 50%;
-  margin: 2rem;
+.color-container {
+  background-color: var(--_50);
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 3rem;
 }
 
-.compare {
+.colors {
   display: flex;
+  gap: 1rem;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
-.color-compare {
-  height: 50px;
-  flex: 1;
+.color {
+  flex-shrink: 1;
+}
+
+.color-swatch {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  margin: 1rem auto;
+}
+
+.colors p {
+  font-size: 15px;
+  font-family: monospace;
+  text-align: center;
 }
