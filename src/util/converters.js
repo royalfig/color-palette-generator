@@ -2,13 +2,17 @@ import Color from "colorjs.io";
 
 function colorFactory(colors) {
   return colors.map(({ color, corrected }) => ({
-    hex: color.toString({}),
+    hex: color.toString({ format: "hex" }),
     rgb: color.to("srgb").toString({ precision: 2 }),
     hsl: color.to("hsl").toString({ precision: 2 }),
+    black: color.contrast("black", "wcag21"),
+    white: color.contrast("white", "wcag21"),
     corrected: {
       hex: corrected.toString({ format: "hex" }),
       rgb: corrected.to("srgb").toString({ precision: 2 }),
       hsl: corrected.to("hsl").toString({ precision: 2 }),
+      black: color.contrast("black", "wcag21"),
+      white: color.contrast("white", "wcag21"),
     },
   }));
 }

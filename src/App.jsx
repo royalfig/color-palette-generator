@@ -16,7 +16,7 @@ function App() {
   const [color, setColor] = useState("#ff0000");
   const [corrected, setCorrected] = useState(false);
   const complement = createComplement(color);
-  const adjacent = createAdjacent(color);
+  const analogous = createAdjacent(color);
   const triad = createTriad(color);
   const tetrad = createTetrad(color);
   const mono = createMonochromatic(color);
@@ -51,32 +51,32 @@ function App() {
           </label>
         </div>
 
-        <div className="color-container">
+        <div className="palette">
           <h2>Complement</h2>
           <Color color={complement} corrected={corrected} />
         </div>
 
-        <div className="color-container">
-          <h2>Adjacent</h2>
-          <Color color={adjacent} corrected={corrected} />
+        <div className="palette">
+          <h2>Analagous</h2>
+          <Color color={analogous} corrected={corrected} />
         </div>
 
-        <div className="color-container">
+        <div className="palette">
           <h2>Triad</h2>
           <Color color={triad} corrected={corrected} />
         </div>
 
-        <div className="color-container">
+        <div className="palette">
           <h2>Tetradic</h2>
           <Color color={tetrad} corrected={corrected} />
         </div>
 
-        <div className="color-container">
+        <div className="palette">
           <h2>Tones</h2>
           <Color color={mono} corrected={corrected} />
         </div>
 
-        <div className="color-container">
+        <div className="palette">
           <h2>Shades & Tints</h2>
           <Color color={shades} corrected={corrected} />
         </div>

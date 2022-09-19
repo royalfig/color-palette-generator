@@ -13,7 +13,7 @@
 }
 
 .color {
-  flex-shrink: 1;
+  flex: 1;
 }
 
 .color-swatch {
@@ -25,6 +25,6 @@
 
 .colors p {
   font-size: 15px;
-  font-family: monospace;
+
   text-align: center;
 }

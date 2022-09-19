@@ -1,9 +1,9 @@
 import "./Color.css";
+import { ColorName } from "./ColorName";
 
 export default function Color({ color, corrected }) {
-  console.log(color);
   return !corrected ? (
-    <div className="">
+    <div className="color-container">
       <div className="colors">
         {color.map((c, index) => {
           return (
@@ -12,16 +12,14 @@ export default function Color({ color, corrected }) {
                 className="color-swatch"
                 style={{ backgroundColor: c.hex }}
               ></div>
-              <p>{c.hex}</p>
-              <p>{c.rgb}</p>
-              <p>{c.hsl}</p>
+              <ColorName hex={c.hex} />
             </div>
           );
         })}
       </div>
     </div>
   ) : (
-    <div className="">
+    <div className="color-container">
       <h2>corrected</h2>
       <div className="colors">
         {color.map((c, index) => {

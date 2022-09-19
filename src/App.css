@@ -10,8 +10,28 @@
 }
 
 input[type="color"] {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  box-shadow: 5px 5px 1em hsl(var(--h) var(--s) 15% / 0.25);
 }
 
+input[type="color"]:hover {
+  transform: scale(1.1);
+}
+::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+::-webkit-color-swatch {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  border: none;
+  display: block;
+  line-height: 0;
+}
 .sample {
   margin: 1rem;
   background-color: var(--_50);
