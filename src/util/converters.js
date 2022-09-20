@@ -18,27 +18,24 @@ function colorFactory(colors) {
 }
 
 function corrector(color, adjustment) {
-  const original = new Color(color);
+  const originalColor = new Color(color);
+  const newColor = new Color(color);
+  newColor.hsl.h += adjustment;
 
-  const [originalY] = original.lch;
+  const [y0] = originalColor.lch;
 
-  const adjusted = new Color(original);
+  const [y1] = newColor.lch;
 
-  adjusted.hsl.h += adjustment;
+  const percentChange = (y1 - y0) / y0;
 
-  adjusted.lch.l = originalY;
+  if (percentChange > 0) {
+    newColor.hsl.l -= y1 * percentChange;
+  } else {
+    newColor.hsl.l *= Math.abs(percentChange) + 1;
+  }
+  console.log(y0, y1, percentChange);
 
-  // console.log(original.hsl, adjusted.hsl);
-
-  const x = new Color(color);
-  x.hsl.h += adjustment;
-
-  const corrected = new Color(color);
-  const [y] = corrected.lch;
-  corrected.hsl.l = y;
-  corrected.hsl.h += adjustment;
-
-  return corrected;
+  return newColor;
 }
 
 function createComplement(hex) {

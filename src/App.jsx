@@ -1,6 +1,6 @@
 import { useState } from "react";
-
 import Color from "./components/Color";
+
 import "./App.css";
 import {
   createAdjacent,
@@ -22,7 +22,9 @@ function App() {
   const mono = createMonochromatic(color);
   const shades = createShades(color);
   generateCss(color);
+
   function handleChange(e) {
+    console.log(e.target.value);
     setColor(e.target.value);
   }
 
@@ -45,6 +47,7 @@ function App() {
 
         <div className="color-selection">
           <input type="color" onChange={handleChange} value={color}></input>
+          <p>Pick a color</p>
           <label>
             <input type="checkbox" onChange={toggleY} value={corrected}></input>
             Relative luminance

@@ -9,17 +9,35 @@
   margin: 0 0 2rem;
 }
 
+.color-selection {
+  display: flex;
+  justify-content: space-between;
+  background-color: hsl(var(--h) var(--s) var(--l) / 0.15);
+  padding: 3rem;
+  border-radius: 4px;
+}
+
 input[type="color"] {
   height: 2rem;
   width: 2rem;
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  box-shadow: 5px 5px 1em hsl(var(--h) var(--s) 15% / 0.25);
+  box-shadow: -5px -5px 1em hsl(var(--h) var(--s) 95% / 0.25),
+    2px 2px 2px hsl(var(--h) var(--s) 95% / 0.85),
+    3px 3px 3px hsl(var(--h) var(--s) 15% / 0.25),
+    7px 7px 17px hsl(var(--h) var(--s) 15% / 0.15);
+  transition: box-shadow 0.3s;
 }
 
 input[type="color"]:hover {
-  transform: scale(1.1);
+  box-shadow: inset 2px 2px 2px hsl(var(--h) var(--s) 15% / 0.25),
+    3px 3px 4px hsl(var(--h) var(--s) 15% / 0.15);
+}
+
+input[type="color"]:active {
+  box-shadow: -3px -3px 3px hsl(var(--h) var(--s) 15% / 0.25),
+    1px 1px 1px hsl(var(--h) var(--s) 15% / 0.85);
 }
 ::-webkit-color-swatch-wrapper {
   padding: 0;
