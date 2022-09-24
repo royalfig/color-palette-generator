@@ -5,51 +5,6 @@
   padding: 4vmax;
 }
 
-.header {
-  margin: 0 0 2rem;
-}
-
-.color-selection {
-  display: flex;
-  justify-content: space-between;
-  background-color: hsl(var(--h) var(--s) var(--l) / 0.15);
-  padding: 3rem;
-  border-radius: 4px;
-}
-
-input[type="color"] {
-  height: 2rem;
-  width: 2rem;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  box-shadow: -5px -5px 1em hsl(var(--h) var(--s) 95% / 0.25),
-    2px 2px 2px hsl(var(--h) var(--s) 95% / 0.85),
-    3px 3px 3px hsl(var(--h) var(--s) 15% / 0.25),
-    7px 7px 17px hsl(var(--h) var(--s) 15% / 0.15);
-  transition: box-shadow 0.3s;
-}
-
-input[type="color"]:hover {
-  box-shadow: inset 2px 2px 2px hsl(var(--h) var(--s) 15% / 0.25),
-    3px 3px 4px hsl(var(--h) var(--s) 15% / 0.15);
-}
-
-input[type="color"]:active {
-  box-shadow: -3px -3px 3px hsl(var(--h) var(--s) 15% / 0.25),
-    1px 1px 1px hsl(var(--h) var(--s) 15% / 0.85);
-}
-::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
-::-webkit-color-swatch {
-  height: 2rem;
-  width: 2rem;
-  border-radius: 50%;
-  border: none;
-  display: block;
-  line-height: 0;
-}
 .sample {
   margin: 1rem;
   background-color: var(--_50);
@@ -104,4 +59,17 @@ input[type="color"]:active {
   aspect-ratio: 1;
   background-color: hsl(var(--adjacent-1) var(--s) var(--l));
   margin-block-end: 0.5rem;
+}
+
+.badge {
+  background-color: hsl(var(--h) var(--s) 80% / 50%);
+  border-radius: 5px;
+  font-size: 0.5em;
+  padding: 2px 5px;
+  vertical-align: baseline;
+  font-weight: normal;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }

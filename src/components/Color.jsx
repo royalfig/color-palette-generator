@@ -1,41 +1,49 @@
-import "./Color.css";
-import { ColorName } from "./ColorName";
+import "../css/Color.css";
+import { y } from "../util";
 
 export default function Color({ color, corrected }) {
-  return !corrected ? (
-    <div className="color-container">
-      <div className="colors">
-        {color.map((c, index) => {
-          return (
-            <div key={index} className="color">
-              <div
-                className="color-swatch"
-                style={{ backgroundColor: c.hex }}
-              ></div>
-              <ColorName hex={c.hex} />
-            </div>
-          );
-        })}
+  if (!color)
+    return (
+      <div>
+        <p>...</p>
       </div>
+    );
+
+  return !corrected ? (
+    <div className="colors">
+      {color.map((c, index) => {
+        return (
+          <article key={index}>
+            <div
+              className="color-swatch"
+              style={{ backgroundColor: c.hex }}
+            ></div>
+            <footer>
+              <p>
+                {c.y} / {c.l}
+              </p>
+            </footer>
+          </article>
+        );
+      })}
     </div>
   ) : (
-    <div className="color-container">
-      <h2>corrected</h2>
-      <div className="colors">
-        {color.map((c, index) => {
-          return (
-            <div key={index} className="color">
-              <div
-                className="color-swatch"
-                style={{ backgroundColor: c.corrected.hex }}
-              ></div>
-              <p>{c.corrected.hex}</p>
-              <p>{c.corrected.rgb}</p>
-              <p>{c.corrected.hsl}</p>
-            </div>
-          );
-        })}
-      </div>
+    <div className="colors">
+      {color.map((c, index) => {
+        return (
+          <article key={index}>
+            <div
+              className="color-swatch"
+              style={{ backgroundColor: c.corrected.hex }}
+            ></div>
+            <footer>
+              <p>
+                {c.corrected.y} / {c.corrected.l}
+              </p>
+            </footer>
+          </article>
+        );
+      })}
     </div>
   );
 }

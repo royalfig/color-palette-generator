@@ -1,0 +1,97 @@
+.color-selector {
+  border-top-right-radius: var(--radius);
+  border-top-left-radius: var(--radius);
+  padding: 2rem 0 2rem 2rem;
+  background-color: var(--_100);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--_100);
+}
+
+.color-input,
+.color-details {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.color-input input {
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.color-input ::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-input ::-webkit-color-swatch {
+  border: none;
+}
+
+.color-input p {
+  font-weight: 700;
+  font-size: 1.2rem;
+  font-family: Archivo, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  flex-shrink: 0;
+}
+
+.color-input .gradients {
+  display: flex;
+  gap: 3px;
+  flex-direction: column;
+  width: 100%;
+}
+
+.color-input .gradient {
+  height: 2px;
+  background-image: linear-gradient(
+    to right,
+    transparent,
+    hsl(calc(var(--h) + 180) var(--s) var(--l))
+  );
+  width: 100%;
+}
+
+.color-details {
+  margin-block-start: 2rem;
+  justify-content: space-between;
+  padding-inline-end: 1.5rem;
+}
+
+.color-details p {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.background-color-name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: flex-end;
+
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.background-color-name p {
+  font-weight: 900;
+  font-size: 100px;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  line-height: 1;
+  background: -webkit-linear-gradient(
+    hsl(var(--h) var(--s) var(--l) / 0.75),
+    hsl(var(--h) var(--s) var(--l) / 0.25)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

@@ -1,45 +1,104 @@
 import Color from "colorjs.io";
 
+import {
+  adjustHue,
+  getLuminance,
+  toHex,
+  toHsla,
+  toRgba,
+  readableColor,
+} from "color2k";
+
+export function hex3to6(color) {
+  const hex = color.toString({ format: "hex" }).substring(1);
+
+  if (hex.length === 3) {
+    const [a, b, c] = hex;
+    return a + a + b + b + c + c;
+  }
+
+  return hex;
+}
+
+export function linearRGB(num) {
+  if (num > 0.03928) {
+    return num + 0.055;
+  }
+
+  return num / 12.92;
+}
+
+export function y(num) {
+  let { r, g, b } = num.srgb;
+  console.log(r, g, b);
+  // r /= 255;
+  // g /= 255;
+  // b / 255;
+
+  const rL = linearRGB(r);
+  const gL = linearRGB(g);
+  const bL = linearRGB(b);
+
+  return 0.2126 * rL + 0.7152 * gL + 0.0722 * bL;
+}
+
 function colorFactory(colors) {
-  return colors.map(({ color, corrected }) => ({
-    hex: color.toString({ format: "hex" }),
-    rgb: color.to("srgb").toString({ precision: 2 }),
-    hsl: color.to("hsl").toString({ precision: 2 }),
-    black: color.contrast("black", "wcag21"),
-    white: color.contrast("white", "wcag21"),
-    corrected: {
-      hex: corrected.toString({ format: "hex" }),
-      rgb: corrected.to("srgb").toString({ precision: 2 }),
-      hsl: corrected.to("hsl").toString({ precision: 2 }),
-      black: color.contrast("black", "wcag21"),
-      white: color.contrast("white", "wcag21"),
-    },
-  }));
+  // request color names?
+  /* {
+    palette: 
+    colors: []
+  }
+*/
+  return colors.map(({ color, corrected }) => {
+    return {
+      hex: color.toString({ format: "hex" }),
+      rgb: color.to("srgb").toString({ precision: 2 }),
+      hsl: color.to("hsl").toString({ precision: 2 }),
+      contrastColor:
+        color.contrast("black", "wcag21") > color.contrast("white", "wcag21")
+          ? "#000"
+          : "#fff",
+      l: color.lch.l,
+      y: y(color.to("srgb")),
+      corrected: {
+        hex: corrected.toString({ format: "hex" }),
+        rgb: corrected.to("srgb").toString({ precision: 2 }),
+        hsl: corrected.to("hsl").toString({ precision: 2 }),
+        l: corrected.lch.l,
+        y: y(corrected.to("srgb")),
+        contrastColor:
+          corrected.contrast("black", "wcag21") >
+          corrected.contrast("white", "wcag21")
+            ? "#000"
+            : "#fff",
+      },
+    };
+  });
 }
 
 function corrector(color, adjustment) {
   const originalColor = new Color(color);
   const newColor = new Color(color);
   newColor.hsl.h += adjustment;
-
   const [y0] = originalColor.lch;
-
   const [y1] = newColor.lch;
-
-  const percentChange = (y1 - y0) / y0;
-
-  if (percentChange > 0) {
-    newColor.hsl.l -= y1 * percentChange;
-  } else {
-    newColor.hsl.l *= Math.abs(percentChange) + 1;
-  }
-  console.log(y0, y1, percentChange);
-
+  const percentChange = y0 - y1;
+  newColor.lch.l += percentChange;
   return newColor;
 }
 
 function createComplement(hex) {
   const base = new Color(hex);
+
+  console.log({
+    hex: hex,
+    hue: adjustHue(hex, 180),
+    rgb: toRgba(hex),
+    hsl: toHsla(hex),
+    y: getLuminance(hex),
+    contrast: readableColor(hex),
+  });
+
   const complement = new Color(hex);
   complement.hsl.h += 180;
 

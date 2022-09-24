@@ -1,0 +1,28 @@
+.colors {
+  display: flex;
+  width: 100%;
+}
+
+.colors article {
+  flex: 1;
+}
+
+.color-swatch {
+  height: 8rem;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.colors footer {
+  background-color: var(--_100);
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+}
+
+.colors footer p {
+  font-size: 16px;
+  letter-spacing: -0.02px;
+}

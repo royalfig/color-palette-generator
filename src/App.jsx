@@ -1,7 +1,11 @@
-import { useState } from "react";
+import "./css/App.css";
+import { useEffect, useMemo, useState } from "react";
+import Header from "./components/Header";
 import Color from "./components/Color";
+import Palette from "./components/Palette";
+import Panel from "./components/Panel";
+import "./css/App.css";
 
-import "./App.css";
 import {
   createAdjacent,
   createComplement,
@@ -11,125 +15,119 @@ import {
   createShades,
   generateCss,
 } from "./util";
+import ColorSelector from "./components/ColorSelector";
 
 function App() {
   const [color, setColor] = useState("#ff0000");
   const [corrected, setCorrected] = useState(false);
+
   const complement = createComplement(color);
   const analogous = createAdjacent(color);
   const triad = createTriad(color);
   const tetrad = createTetrad(color);
   const mono = createMonochromatic(color);
   const shades = createShades(color);
+
   generateCss(color);
 
   function handleChange(e) {
-    console.log(e.target.value);
+    console.log("running parents");
     setColor(e.target.value);
   }
 
   function toggleY(e) {
+    console.log(e);
     setCorrected(e.target.checked);
   }
 
+  const [palette, setPalette] = useState("complement");
+
+  const paletteSelect = (e) => {
+    setPalette(e.target.value);
+  };
+
   return (
-    <div className="App">
-      <section className="left">
-        <header className="header">
-          <h1>Color Palette Generator</h1>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda
-            accusamus voluptatum et, eius corrupti, vitae iste ut voluptates
-            voluptatem, adipisci asperiores culpa. Voluptas molestias totam
-            ratione quis, aspernatur voluptatibus magnam.
-          </p>
-        </header>
+    <div className="container">
+      <div className="inner-container">
+        <main className="app">
+          <section className="left">
+            <Header />
 
-        <div className="color-selection">
-          <input type="color" onChange={handleChange} value={color}></input>
-          <p>Pick a color</p>
-          <label>
-            <input type="checkbox" onChange={toggleY} value={corrected}></input>
-            Relative luminance
-          </label>
-        </div>
+            <ColorSelector setColor={handleChange} color={color}>
+              <Panel setCorrected={toggleY} corrected={corrected} />
+            </ColorSelector>
 
-        <div className="palette">
-          <h2>Complement</h2>
-          <Color color={complement} corrected={corrected} />
-        </div>
+            <Palette palette={complement} name="Complementary">
+              <Color color={complement} corrected={corrected} />
+            </Palette>
 
-        <div className="palette">
-          <h2>Analagous</h2>
-          <Color color={analogous} corrected={corrected} />
-        </div>
+            <Palette palette={analogous} name="Analogous">
+              <Color color={analogous} corrected={corrected} />
+            </Palette>
 
-        <div className="palette">
-          <h2>Triad</h2>
-          <Color color={triad} corrected={corrected} />
-        </div>
+            <Palette palette={triad} name="Triad">
+              <Color color={triad} corrected={corrected} />
+            </Palette>
 
-        <div className="palette">
-          <h2>Tetradic</h2>
-          <Color color={tetrad} corrected={corrected} />
-        </div>
+            <Palette palette={tetrad} name="Tetrad">
+              <Color color={tetrad} corrected={corrected} />
+            </Palette>
 
-        <div className="palette">
-          <h2>Tones</h2>
-          <Color color={mono} corrected={corrected} />
-        </div>
+            <Palette palette={mono} name="Monochrome">
+              <Color color={mono} corrected={corrected} />
+            </Palette>
 
-        <div className="palette">
-          <h2>Shades & Tints</h2>
-          <Color color={shades} corrected={corrected} />
-        </div>
-      </section>
-
-      <section className="right">
-        <div className="sample">
-          <div className="sample-navbar">
-            <div>
-              <ul>
-                <li>
-                  <a href="#">Test</a>
-                </li>
-                <li>
-                  <a href="#">Test</a>
-                </li>
-                <li>
-                  <a href="#">Test</a>
-                </li>
-              </ul>
+            <Palette palette={shades} name="Shades & Tints">
+              <Color color={shades} corrected={corrected} />
+            </Palette>
+          </section>
+          <section className="right">
+            <div className="sample">
+              <div className="sample-navbar">
+                <div>
+                  <ul>
+                    <li>
+                      <a href="#">Test</a>
+                    </li>
+                    <li>
+                      <a href="#">Test</a>
+                    </li>
+                    <li>
+                      <a href="#">Test</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div className="sample-header">
+                <h2>Color Palette Generator</h2>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Officiis minima praesentium, assumenda, quibusdam odio fuga
+                  quas explicabo aspernatur veritatis quo delectus quae ullam
+                  eum deleniti iure libero facilis esse velit.
+                </p>
+                <a href="#" className="sample-cta">
+                  Read the article
+                </a>
+              </div>
+              <div className="sample-body">
+                <article className="sample-article">
+                  <div className="sample-image"></div>
+                  <h3>Sample text</h3>
+                </article>
+                <article className="sample-article">
+                  <div className="sample-image"></div>
+                  <h3>Sample text</h3>
+                </article>
+                <article className="sample-article">
+                  <div className="sample-image"></div>
+                  <h3>Sample text</h3>
+                </article>
+              </div>
             </div>
-          </div>
-          <div className="sample-header">
-            <h2>Color Palette Generator</h2>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis
-              minima praesentium, assumenda, quibusdam odio fuga quas explicabo
-              aspernatur veritatis quo delectus quae ullam eum deleniti iure
-              libero facilis esse velit.
-            </p>
-            <a href="#" className="sample-cta">
-              Read the article
-            </a>
-          </div>
-          <div className="sample-body">
-            <article className="sample-article">
-              <div className="sample-image"></div>
-              <h3>Sample text</h3>
-            </article>
-            <article className="sample-article">
-              <div className="sample-image"></div>
-              <h3>Sample text</h3>
-            </article>
-            <article className="sample-article">
-              <div className="sample-image"></div>
-              <h3>Sample text</h3>
-            </article>
-          </div>
-        </div>
-      </section>
+          </section>
+        </main>
+      </div>
     </div>
   );
 }
