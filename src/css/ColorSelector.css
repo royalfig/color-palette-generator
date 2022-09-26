@@ -68,30 +68,3 @@
   font-size: 15px;
   font-weight: 600;
 }
-
-.background-color-name {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  align-items: flex-end;
-
-  opacity: 0.25;
-  pointer-events: none;
-}
-
-.background-color-name p {
-  font-weight: 900;
-  font-size: 100px;
-  text-transform: uppercase;
-  white-space: nowrap;
-
-  line-height: 1;
-  background: -webkit-linear-gradient(
-    hsl(var(--h) var(--s) var(--l) / 0.75),
-    hsl(var(--h) var(--s) var(--l) / 0.25)
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}

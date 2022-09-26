@@ -9,6 +9,11 @@
   box-sizing: content-box;
 }
 
+.panel-controls {
+  display: flex;
+  gap: 1rem;
+}
+
 .y-selector {
   display: flex;
   gap: 5px;
@@ -57,4 +62,19 @@
 .y-selector input:focus-visible {
   outline: max(2px, 0.15em) solid currentColor;
   outline-offset: max(2px, 0.15em);
+}
+
+.panel-color-name {
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  line-height: 1;
+  background: -webkit-linear-gradient(
+    hsl(var(--h) 35% 45% / 0.85),
+    hsl(var(--h) 35% 45% / 0.25)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

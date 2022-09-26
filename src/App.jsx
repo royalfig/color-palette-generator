@@ -36,7 +36,6 @@ function App() {
   }
 
   function toggleY(e) {
-    console.log(e);
     setCorrected(e.target.checked);
   }
 
@@ -44,6 +43,12 @@ function App() {
 
   const paletteSelect = (e) => {
     setPalette(e.target.value);
+  };
+
+  const [selected, setSelected] = useState("hex");
+
+  const handleSelect = (e) => {
+    setSelected(e.target.value);
   };
 
   return (
@@ -54,11 +59,35 @@ function App() {
             <Header />
 
             <ColorSelector setColor={handleChange} color={color}>
-              <Panel setCorrected={toggleY} corrected={corrected} />
+              <Panel
+                setCorrected={toggleY}
+                corrected={corrected}
+                color={color}
+              />
             </ColorSelector>
 
             <Palette palette={complement} name="Complementary">
-              <Color color={complement} corrected={corrected} />
+              <Color
+                color={complement}
+                corrected={corrected}
+                selected={selected}
+              />
+              <div className="controls">
+                <select
+                  name="pets"
+                  id="pet-select"
+                  value={selected}
+                  onChange={handleSelect}
+                >
+                  <option value="name">Name</option>
+                  <option value="hex">Hex</option>
+                  <option value="rgb">Rgb</option>
+                  <option value="hsl">Hsl</option>
+                  <option value="lch">Lch</option>
+                  <option value="contrast">Contrast</option>
+                  <option value="y">Luminance</option>
+                </select>
+              </div>
             </Palette>
 
             <Palette palette={analogous} name="Analogous">

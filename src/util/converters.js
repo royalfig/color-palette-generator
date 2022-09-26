@@ -1,14 +1,5 @@
 import Color from "colorjs.io";
 
-import {
-  adjustHue,
-  getLuminance,
-  toHex,
-  toHsla,
-  toRgba,
-  readableColor,
-} from "color2k";
-
 export function hex3to6(color) {
   const hex = color.toString({ format: "hex" }).substring(1);
 
@@ -30,7 +21,7 @@ export function linearRGB(num) {
 
 export function y(num) {
   let { r, g, b } = num.srgb;
-  console.log(r, g, b);
+
   // r /= 255;
   // g /= 255;
   // b / 255;
@@ -54,7 +45,8 @@ function colorFactory(colors) {
       hex: color.toString({ format: "hex" }),
       rgb: color.to("srgb").toString({ precision: 2 }),
       hsl: color.to("hsl").toString({ precision: 2 }),
-      contrastColor:
+      lch: color.to("lch").toString({ precision: 2 }),
+      contrast:
         color.contrast("black", "wcag21") > color.contrast("white", "wcag21")
           ? "#000"
           : "#fff",
@@ -64,9 +56,10 @@ function colorFactory(colors) {
         hex: corrected.toString({ format: "hex" }),
         rgb: corrected.to("srgb").toString({ precision: 2 }),
         hsl: corrected.to("hsl").toString({ precision: 2 }),
+        lch: corrected.to("lch").toString({ precision: 2 }),
         l: corrected.lch.l,
         y: y(corrected.to("srgb")),
-        contrastColor:
+        contrast:
           corrected.contrast("black", "wcag21") >
           corrected.contrast("white", "wcag21")
             ? "#000"
@@ -79,25 +72,26 @@ function colorFactory(colors) {
 function corrector(color, adjustment) {
   const originalColor = new Color(color);
   const newColor = new Color(color);
-  newColor.hsl.h += adjustment;
-  const [y0] = originalColor.lch;
-  const [y1] = newColor.lch;
-  const percentChange = y0 - y1;
-  newColor.lch.l += percentChange;
+  newColor.lch.h += adjustment;
+  // console.log("before: ", y(originalColor), y(newColor));
+
+  // const y0 = originalColor.lch.l;
+  // const y1 = newColor.lch.l;
+
+  // const dx = (y0 - y1) / y1;
+  // const pc = y1 * dx + y1;
+
+  // console.log(pc);
+
+  // newColor.lch.l = Math.min(100, pc);
+
+  // console.log("after: ", y(originalColor), y(newColor));
+
   return newColor;
 }
 
 function createComplement(hex) {
   const base = new Color(hex);
-
-  console.log({
-    hex: hex,
-    hue: adjustHue(hex, 180),
-    rgb: toRgba(hex),
-    hsl: toHsla(hex),
-    y: getLuminance(hex),
-    contrast: readableColor(hex),
-  });
 
   const complement = new Color(hex);
   complement.hsl.h += 180;
@@ -168,15 +162,11 @@ function createMonochromatic(hex) {
 }
 
 function createShades(hex) {
-  const t = new Color(hex);
-
   const colors = [];
 
   for (let index = 0; index < 10; index++) {
     const color = new Color(hex);
-    // color.hsl.l = 0;
     color.hsl.l = index * 10 + 5;
-
     colors.push({ color: color, corrected: color });
   }
 

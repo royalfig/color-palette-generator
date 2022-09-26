@@ -1,7 +1,9 @@
 import "../css/Color.css";
 import { y } from "../util";
 
-export default function Color({ color, corrected }) {
+export default function Color({ color, corrected, selected }) {
+  console.log(selected);
+
   if (!color)
     return (
       <div>
@@ -19,9 +21,7 @@ export default function Color({ color, corrected }) {
               style={{ backgroundColor: c.hex }}
             ></div>
             <footer>
-              <p>
-                {c.y} / {c.l}
-              </p>
+              <p>{c[selected]}</p>
             </footer>
           </article>
         );
@@ -37,9 +37,7 @@ export default function Color({ color, corrected }) {
               style={{ backgroundColor: c.corrected.hex }}
             ></div>
             <footer>
-              <p>
-                {c.corrected.y} / {c.corrected.l}
-              </p>
+              <p>{c.corrected.hex}</p>
             </footer>
           </article>
         );
