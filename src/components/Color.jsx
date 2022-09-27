@@ -1,15 +1,7 @@
 import "../css/Color.css";
-import { y } from "../util";
 
-export default function Color({ color, corrected, selected }) {
-  console.log(selected);
-
-  if (!color)
-    return (
-      <div>
-        <p>...</p>
-      </div>
-    );
+export default function Color({ color, corrected, selected, names }) {
+  const correctedNames = names.slice(names.length / 2);
 
   return !corrected ? (
     <div className="colors">
@@ -21,7 +13,7 @@ export default function Color({ color, corrected, selected }) {
               style={{ backgroundColor: c.hex }}
             ></div>
             <footer>
-              <p>{c[selected]}</p>
+              <p>{selected === "name" ? names[index].name : c[selected]}</p>
             </footer>
           </article>
         );
@@ -37,7 +29,11 @@ export default function Color({ color, corrected, selected }) {
               style={{ backgroundColor: c.corrected.hex }}
             ></div>
             <footer>
-              <p>{c.corrected.hex}</p>
+              <p>
+                {selected === "name"
+                  ? correctedNames[index].name
+                  : c.corrected[selected]}
+              </p>
             </footer>
           </article>
         );

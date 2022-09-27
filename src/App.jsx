@@ -5,28 +5,13 @@ import Color from "./components/Color";
 import Palette from "./components/Palette";
 import Panel from "./components/Panel";
 import "./css/App.css";
+import { generateCss } from "./util";
 
-import {
-  createAdjacent,
-  createComplement,
-  createTetrad,
-  createTriad,
-  createMonochromatic,
-  createShades,
-  generateCss,
-} from "./util";
 import ColorSelector from "./components/ColorSelector";
 
 function App() {
   const [color, setColor] = useState("#ff0000");
   const [corrected, setCorrected] = useState(false);
-
-  const complement = createComplement(color);
-  const analogous = createAdjacent(color);
-  const triad = createTriad(color);
-  const tetrad = createTetrad(color);
-  const mono = createMonochromatic(color);
-  const shades = createShades(color);
 
   generateCss(color);
 
@@ -45,12 +30,6 @@ function App() {
     setPalette(e.target.value);
   };
 
-  const [selected, setSelected] = useState("hex");
-
-  const handleSelect = (e) => {
-    setSelected(e.target.value);
-  };
-
   return (
     <div className="container">
       <div className="inner-container">
@@ -66,49 +45,46 @@ function App() {
               />
             </ColorSelector>
 
-            <Palette palette={complement} name="Complementary">
-              <Color
-                color={complement}
-                corrected={corrected}
-                selected={selected}
-              />
-              <div className="controls">
-                <select
-                  name="pets"
-                  id="pet-select"
-                  value={selected}
-                  onChange={handleSelect}
-                >
-                  <option value="name">Name</option>
-                  <option value="hex">Hex</option>
-                  <option value="rgb">Rgb</option>
-                  <option value="hsl">Hsl</option>
-                  <option value="lch">Lch</option>
-                  <option value="contrast">Contrast</option>
-                  <option value="y">Luminance</option>
-                </select>
-              </div>
-            </Palette>
+            <Palette
+              type="comp"
+              corrected={corrected}
+              name="Complementary"
+              hex={color}
+            />
 
-            <Palette palette={analogous} name="Analogous">
-              <Color color={analogous} corrected={corrected} />
-            </Palette>
+            <Palette
+              type="adjacent"
+              name="Adjacent"
+              corrected={corrected}
+              hex={color}
+            />
 
-            <Palette palette={triad} name="Triad">
-              <Color color={triad} corrected={corrected} />
-            </Palette>
+            <Palette
+              type="triad"
+              name="Triad"
+              corrected={corrected}
+              hex={color}
+            />
+            <Palette
+              type="tetrad"
+              name="Tetrad"
+              corrected={corrected}
+              hex={color}
+            />
 
-            <Palette palette={tetrad} name="Tetrad">
-              <Color color={tetrad} corrected={corrected} />
-            </Palette>
+            <Palette
+              type="shades"
+              name="Tints &amp; Shades"
+              corrected={corrected}
+              hex={color}
+            />
 
-            <Palette palette={mono} name="Monochrome">
-              <Color color={mono} corrected={corrected} />
-            </Palette>
-
-            <Palette palette={shades} name="Shades & Tints">
-              <Color color={shades} corrected={corrected} />
-            </Palette>
+            <Palette
+              type="mono"
+              name="Monochromatic"
+              corrected={corrected}
+              hex={color}
+            />
           </section>
           <section className="right">
             <div className="sample">
