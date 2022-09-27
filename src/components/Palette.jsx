@@ -20,22 +20,21 @@ export default function Palette({ type, hex, corrected, name }) {
     switch (type) {
       case "comp":
         return createComplement(color);
-        break;
+
       case "adjacent":
         return createAdjacent(color);
-        break;
+
       case "tetrad":
         return createTetrad(color);
-        break;
+
       case "triad":
         return createTriad(color);
-        break;
+
       case "mono":
         return createMonochromatic(color);
-        break;
+
       case "shades":
         return createShades(color);
-        break;
     }
   }
 
