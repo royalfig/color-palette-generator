@@ -17,7 +17,7 @@
 .y-selector {
   display: flex;
   gap: 5px;
-  align-items: baseline;
+  align-items: center;
 }
 
 .y-selector input {
@@ -31,11 +31,12 @@
   margin: 0;
 
   font: inherit;
-  color: currentColor;
-  width: 1.15em;
-  height: 1.15em;
+  font-size: var(--small);
+  color: var(--_700);
+  width: 1.5em;
+  height: 1.5em;
   border: 1px solid currentColor;
-  border-radius: var(--radius);
+
   transform: translateY(-0.075em);
 
   display: grid;
@@ -44,8 +45,8 @@
 
 .y-selector input::before {
   content: "";
-  width: 0.65em;
-  height: 0.65em;
+  width: 0.75em;
+  height: 0.75em;
   clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
   transform: scale(0);
   transform-origin: bottom left;
@@ -71,8 +72,8 @@
 
   line-height: 1;
   background: -webkit-linear-gradient(
-    hsl(var(--h) 35% 45% / 0.85),
-    hsl(var(--h) 35% 45% / 0.25)
+    hsl(var(--h) 55% 25% / 0.85),
+    hsl(var(--h) 55% 45% / 0.45)
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -93,14 +94,14 @@
   appearance: none;
   background-color: transparent;
   border: none;
-  padding: 0 1em 0 0;
+  /* padding: 0 1em 0 0; */
   margin: 0;
 
   font-family: inherit;
   font-size: inherit;
   cursor: inherit;
   line-height: inherit;
-
+  text-transform: uppercase;
   z-index: 1;
   outline: none;
 }
@@ -111,14 +112,12 @@
   position: relative;
   min-width: 15ch;
   max-width: fit-content;
-  border: 1px solid var(--select-border);
-  border-radius: 4px;
-  padding: 0.25em 0.5em;
-  font-size: 0.9rem;
+  border: 1px solid var(--_700);
+
+  padding: var(--button-padding);
+  font-size: var(--small);
+
   cursor: pointer;
-  line-height: 1.1;
-  background-color: #fff;
-  background-image: linear-gradient(to top, #f9f9f9, #fff 33%);
 }
 .select select,
 .select::after {
@@ -172,8 +171,11 @@
 }
 
 .panel label {
-  font-size: 1.125rem;
-  font-weight: 500;
+  font-size: 1rem;
+  text-transform: uppercase;
+  font-size: var(--small);
+  letter-spacing: 0.2px;
+  color: var(--_900);
 }
 
 .select + label {

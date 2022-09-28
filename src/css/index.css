@@ -21,6 +21,7 @@
   --x-small: min(0.75rem, 14px);
 
   --radius: 4px;
+  --button-padding: 2px 4px;
 }
 
 html {
@@ -102,11 +103,11 @@ button {
   padding: 3px 6px;
   cursor: pointer;
   letter-spacing: 1.2px;
-  color: var(--_500);
+  color: var(--_700);
   transition: background-color 0.3s, color 0.3s;
 }
 
 button:hover {
   background-color: var(--_200);
-  color: var(--_800);
+  color: var(--_700);
 }
