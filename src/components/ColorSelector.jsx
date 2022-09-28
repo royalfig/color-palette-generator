@@ -7,6 +7,7 @@ export default function ColorSelector({ setColor, color, children }) {
   const hex = colorData.toString({ format: "hex" });
   const rgb = colorData.toString({ format: "srgb", precision: 2 });
   const hsl = colorData.to("hsl").toString({ precision: 2 });
+  const lch = colorData.to("lch").toString({ precision: 2 });
 
   return (
     <div>
@@ -24,6 +25,7 @@ export default function ColorSelector({ setColor, color, children }) {
           <p>{hex}</p>
           <p>{rgb}</p>
           <p>{hsl}</p>
+          <p>{lch}</p>
         </div>
       </div>
       {children}

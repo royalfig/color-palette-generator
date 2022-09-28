@@ -1,0 +1,19 @@
+.palette-container {
+  margin-block-start: 3rem;
+}
+
+.palette {
+  border: 1px solid hsl(var(--h) 15% 80%);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.palette-container header {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.palette-container h2 {
+  margin-block: 1rem;
+}

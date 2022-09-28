@@ -3,38 +3,37 @@ import "../css/Color.css";
 export default function Color({ color, corrected, selected, names }) {
   const correctedNames = names.slice(names.length / 2);
 
-  return !corrected ? (
-    <div className="colors">
+  function getValue(c, index) {
+    if (corrected && selected === "name") {
+      return correctedNames[index].name;
+    }
+
+    if (!corrected & (selected === "name")) {
+      return names[index].name;
+    }
+
+    if (!corrected) {
+      return c[selected];
+    }
+
+    if (corrected) {
+      return c.corrected[selected];
+    }
+  }
+
+  return (
+    <div className={"colors colors-" + color.length}>
       {color.map((c, index) => {
         return (
-          <article key={index}>
-            <div
-              className="color-swatch"
-              style={{ backgroundColor: c.hex }}
-            ></div>
-            <footer>
-              <p>{selected === "name" ? names[index].name : c[selected]}</p>
-            </footer>
-          </article>
-        );
-      })}
-    </div>
-  ) : (
-    <div className="colors">
-      {color.map((c, index) => {
-        return (
-          <article key={index}>
-            <div
-              className="color-swatch"
-              style={{ backgroundColor: c.corrected.hex }}
-            ></div>
-            <footer>
-              <p>
-                {selected === "name"
-                  ? correctedNames[index].name
-                  : c.corrected[selected]}
-              </p>
-            </footer>
+          <article
+            key={index}
+            className="color-swatch"
+            style={{
+              backgroundColor: !corrected ? c.hex : c.corrected.hex,
+              color: !corrected ? c.contrast : c.corrected.contrast,
+            }}
+          >
+            <p>{getValue(c, index)}</p>
           </article>
         );
       })}

@@ -50,11 +50,7 @@
 
 .color-input .gradient {
   height: 2px;
-  background-image: linear-gradient(
-    to right,
-    transparent,
-    hsl(calc(var(--h) + 180) var(--s) var(--l))
-  );
+  background-image: linear-gradient(to right, transparent, var(--_500));
   width: 100%;
 }
 

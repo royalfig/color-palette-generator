@@ -1,6 +1,21 @@
 .colors {
-  display: flex;
-  width: 100%;
+  display: grid;
+}
+
+.colors-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.colors-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.colors-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.colors-10 {
+  grid-template-columns: repeat(5, 1fr);
 }
 
 .colors article {
@@ -11,18 +26,14 @@
   height: 8rem;
   flex: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.colors footer {
-  background-color: var(--_100);
-  display: flex;
-  justify-content: space-around;
+  justify-content: flex-end;
+  align-items: flex-end;
   padding: 1rem;
+  font-size: var(--small);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: right;
 }
 
-.colors footer p {
-  font-size: 16px;
-  letter-spacing: -0.02px;
+.color-swatch p {
 }

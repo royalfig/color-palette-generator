@@ -2,20 +2,25 @@
   --gap: max(1.5rem, 3vh);
   --radius: 4px;
 
-  --_50: hsl(var(--h) 5% 99%);
-  --_100: hsl(var(--h) 5% 95%);
-  --_200: hsl(var(--h) 5% 65%);
-  --_300: hsl(var(--h) 5% 55%);
-  --_4100: hsl(var(--h) 5% 45%);
-  --_500: hsl(var(--h) 5% 35%);
-  --_600: hsl(var(--h) 5% 15%);
-  --_700: hsl(var(--h) 5% 15%);
-  --_800: hsl(var(--h) 5% 10%);
-  --_900: hsl(var(--h) 5% 5%);
+  --_50: hsl(var(--h) 85% 95%);
+  --_100: hsl(var(--h) 85% 85%);
+  --_200: hsl(var(--h) 85% 75%);
+  --_300: hsl(var(--h) 85% 65%);
+  --_400: hsl(var(--h) 85% 55%);
+  --_500: hsl(var(--h) 85% 45%);
+  --_600: hsl(var(--h) 85% 35%);
+  --_700: hsl(var(--h) 85% 25%);
+  --_800: hsl(var(--h) 85% 15%);
+  --_900: hsl(var(--h) 85% 5%);
 
   --complement-h: calc(var(--h) + 180);
   --adjacent-1: calc(var(--h) + 150);
   --adjacent-2: calc(var(--h) + 210);
+
+  --small: 0.83rem;
+  --x-small: min(0.75rem, 14px);
+
+  --radius: 4px;
 }
 
 html {
@@ -39,9 +44,15 @@ body {
   background-color: var(--_50);
 }
 
-h1,h2,h3,h4,h5,h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 3rem 0 1.38rem;
-  font-family: Archivo, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
+  font-family: Archivo, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   font-weight: 700;
   line-height: 1.3;
 }
@@ -79,4 +90,23 @@ small,
 .inner-container {
   max-width: 64rem;
   margin-inline: auto;
+}
+
+button {
+  font-family: inherit;
+  font-size: var(--small);
+  text-transform: uppercase;
+  border: 1px solid;
+  border-radius: 0;
+  background: none;
+  padding: 3px 6px;
+  cursor: pointer;
+  letter-spacing: 1.2px;
+  color: var(--_500);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+button:hover {
+  background-color: var(--_200);
+  color: var(--_800);
 }

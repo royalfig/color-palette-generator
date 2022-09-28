@@ -10,25 +10,19 @@ import { generateCss } from "./util";
 import ColorSelector from "./components/ColorSelector";
 
 function App() {
-  const [color, setColor] = useState("#ff0000");
+  const [color, setColor] = useState("#21a623");
   const [corrected, setCorrected] = useState(false);
+  const [selected, setSelected] = useState("hex");
 
   generateCss(color);
 
   function handleChange(e) {
-    console.log("running parents");
     setColor(e.target.value);
   }
 
   function toggleY(e) {
     setCorrected(e.target.checked);
   }
-
-  const [palette, setPalette] = useState("complement");
-
-  const paletteSelect = (e) => {
-    setPalette(e.target.value);
-  };
 
   return (
     <div className="container">
@@ -42,6 +36,8 @@ function App() {
                 setCorrected={toggleY}
                 corrected={corrected}
                 color={color}
+                selected={selected}
+                setSelected={setSelected}
               />
             </ColorSelector>
 
@@ -50,12 +46,14 @@ function App() {
               corrected={corrected}
               name="Complementary"
               hex={color}
+              selected={selected}
             />
 
             <Palette
               type="adjacent"
               name="Adjacent"
               corrected={corrected}
+              selected={selected}
               hex={color}
             />
 
@@ -63,12 +61,14 @@ function App() {
               type="triad"
               name="Triad"
               corrected={corrected}
+              selected={selected}
               hex={color}
             />
             <Palette
               type="tetrad"
               name="Tetrad"
               corrected={corrected}
+              selected={selected}
               hex={color}
             />
 
@@ -76,6 +76,7 @@ function App() {
               type="shades"
               name="Tints &amp; Shades"
               corrected={corrected}
+              selected={selected}
               hex={color}
             />
 
@@ -83,6 +84,7 @@ function App() {
               type="mono"
               name="Monochromatic"
               corrected={corrected}
+              selected={selected}
               hex={color}
             />
           </section>

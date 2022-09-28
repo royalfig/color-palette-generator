@@ -52,6 +52,7 @@ function colorFactory(colors) {
           : "#fff",
       l: color.lch.l,
       y: y(color.to("srgb")),
+      point: color.hsl,
       corrected: {
         hex: corrected.toString({ format: "hex" }),
         rgb: corrected.to("srgb").toString({ precision: 2 }),
@@ -59,6 +60,7 @@ function colorFactory(colors) {
         lch: corrected.to("lch").toString({ precision: 2 }),
         l: corrected.lch.l,
         y: y(corrected.to("srgb")),
+        point: color.hsl,
         contrast:
           corrected.contrast("black", "wcag21") >
           corrected.contrast("white", "wcag21")

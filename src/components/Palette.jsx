@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Color from "./Color";
 import Controls from "./Controls";
+import Circle from "./Circle";
 import {
   createAdjacent,
   createComplement,
@@ -11,7 +12,9 @@ import {
   hex3to6,
 } from "../util";
 
-export default function Palette({ type, hex, corrected, name }) {
+import "../css/Palette.css";
+
+export default function Palette({ type, hex, corrected, name, selected }) {
   const [names, setNames] = useState([]);
   const [palette, setPalette] = useState("");
   const colors = createColorPalette(type, hex);
@@ -57,24 +60,21 @@ export default function Palette({ type, hex, corrected, name }) {
     getColorName();
   }, [hex]);
 
-  const [selected, setSelected] = useState("hex");
-
   return (
-    <div className="palette">
+    <div className="palette-container">
       <header>
+        <Circle colors={colors} />
         <h2>{name}</h2>
       </header>
-      <Color
-        corrected={corrected}
-        color={colors}
-        selected={selected}
-        names={names}
-      />
-      <Controls
-        setSelected={setSelected}
-        selected={selected}
-        palette={palette}
-      />
+      <div className="palette">
+        <Color
+          corrected={corrected}
+          color={colors}
+          selected={selected}
+          names={names}
+        />
+        <Controls palette={palette} />
+      </div>
     </div>
   );
 }
