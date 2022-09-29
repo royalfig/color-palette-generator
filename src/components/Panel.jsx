@@ -1,60 +1,62 @@
 import "../css/Panel.css";
-import { useState, useEffect } from "react";
-import { hex3to6 } from "../util";
+
 export default function Panel({
   setCorrected,
   corrected,
   selected,
   setSelected,
-  color,
 }) {
-  const [colorName, setColorName] = useState("");
-
-  const hexToSend = hex3to6(color);
-  const handleSelect = (e) => {
-    setSelected(e.target.value);
-  };
-  useEffect(() => {
-    async function getColorName(color) {
-      const res = await fetch(`https://api.color.pizza/v1/${color}`);
-      const name = await res.json();
-      console.log(name);
-      setColorName(name.colors[0].name);
-    }
-
-    getColorName(hexToSend);
-  }, [color]);
-
   return (
     <div className="panel">
-      <div className="panel-controls">
-        <div className="y-selector">
-          <input
-            id="y"
-            type="checkbox"
-            onChange={setCorrected}
-            checked={corrected}
-          />
-          <label htmlFor="y">Enable relative luminance</label>
-        </div>
-
-        <div className="select">
-          <select value={selected} onChange={handleSelect}>
-            <option value="name">Name</option>
-            <option value="hex">Hex</option>
-            <option value="rgb">Rgb</option>
-            <option value="hsl">Hsl</option>
-            <option value="lch">Lch</option>
-            <option value="contrast">Contrast</option>
-            <option value="y">Luminance</option>
-          </select>
-        </div>
-
-        <div className="css-copy">
-          <button>Copy CSS</button>
-        </div>
+      <div className="panel-left">
+        <button
+          onClick={() => setCorrected(!corrected)}
+          className={corrected ? "active" : undefined}
+        >
+          Relative luminance
+        </button>
+        <button>Copy CSS</button>
+        <button>Copy Palette</button>
       </div>
-      <p className="panel-color-name">{colorName}</p>
+
+      <div className="selected-group">
+        <button
+          className={selected === "name" ? "active" : undefined}
+          onClick={() => setSelected("name")}
+        >
+          Name
+        </button>
+        <button
+          className={selected === "hex" ? "active" : undefined}
+          onClick={() => setSelected("hex")}
+        >
+          Hex
+        </button>
+        <button
+          className={selected === "rgb" ? "active" : undefined}
+          onClick={() => setSelected("rgb")}
+        >
+          Rgb
+        </button>
+        <button
+          className={selected === "hsl" ? "active" : undefined}
+          onClick={() => setSelected("hsl")}
+        >
+          Hsl
+        </button>
+        <button
+          className={selected === "lch" ? "active" : undefined}
+          onClick={() => setSelected("lch")}
+        >
+          Lch
+        </button>
+        <button
+          className={selected === "contrast" ? "active" : undefined}
+          onClick={() => setSelected("contrast")}
+        >
+          Contrast
+        </button>
+      </div>
     </div>
   );
 }

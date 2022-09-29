@@ -1,16 +1,15 @@
-import { sizing } from "@mui/system";
 import "../css/Circle.css";
 export default function Circle({ colors }) {
   return (
     <div className="circle">
-      <svg viewBox="-100 -100 200 200">
+      <svg viewBox="-120 -120 240 240">
         <circle
           cx="0"
           cy="0"
-          r="80"
+          r="100"
           fill="none"
-          stroke="black"
-          strokeWidth="1"
+          stroke="rgb(0 0 0 /.5)"
+          strokeWidth="3"
         />
 
         {colors.map((color, idx) => {
@@ -21,7 +20,6 @@ export default function Circle({ colors }) {
 
           const x = sRadians * Math.sin(hRadians);
           const y = sRadians * Math.cos(hRadians);
-          console.log({ h, s, x, y });
 
           const xr = x;
           const yr = y * -1;

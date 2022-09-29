@@ -2,10 +2,10 @@
   border-top-right-radius: var(--radius);
   border-top-left-radius: var(--radius);
   padding: 2rem 0 2rem 2rem;
-  background-color: var(--_100);
+  background-color: var(--mono-9);
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--_100);
+  border: 1px solid var(--mono-8);
 }
 
 .color-input,
@@ -41,19 +41,6 @@
   flex-shrink: 0;
 }
 
-.color-input .gradients {
-  display: flex;
-  gap: 3px;
-  flex-direction: column;
-  width: 100%;
-}
-
-.color-input .gradient {
-  height: 2px;
-  background-image: linear-gradient(to right, transparent, var(--_500));
-  width: 100%;
-}
-
 .color-details {
   margin-block-start: 2rem;
   justify-content: space-between;
@@ -63,4 +50,18 @@
 .color-details p {
   font-size: 15px;
   font-weight: 600;
+}
+
+.gradients {
+  display: flex;
+  gap: 3px;
+  flex-direction: column;
+  width: 100%;
+  opacity: 0.5;
+}
+
+.gradient {
+  height: 2px;
+  background-image: linear-gradient(to right, transparent, var(--shades-5));
+  width: 100%;
 }

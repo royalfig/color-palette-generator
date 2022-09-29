@@ -2,21 +2,6 @@
   --gap: max(1.5rem, 3vh);
   --radius: 4px;
 
-  --_50: hsl(var(--h) 85% 95%);
-  --_100: hsl(var(--h) 85% 85%);
-  --_200: hsl(var(--h) 85% 75%);
-  --_300: hsl(var(--h) 85% 65%);
-  --_400: hsl(var(--h) 85% 55%);
-  --_500: hsl(var(--h) 85% 45%);
-  --_600: hsl(var(--h) 85% 35%);
-  --_700: hsl(var(--h) 85% 25%);
-  --_800: hsl(var(--h) 85% 15%);
-  --_900: hsl(var(--h) 85% 5%);
-
-  --complement-h: calc(var(--h) + 180);
-  --adjacent-1: calc(var(--h) + 150);
-  --adjacent-2: calc(var(--h) + 210);
-
   --small: 0.83rem;
   --x-small: min(0.75rem, 14px);
 
@@ -26,7 +11,7 @@
 
 html {
   font-size: 1rem;
-  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.25rem);
+  font-size: clamp(1rem, 0.975rem + 0.125vw, 1.125rem);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   line-height: 1.6;
@@ -42,7 +27,7 @@ html {
 
 body {
   min-height: 100vh;
-  background-color: var(--_50);
+  background-color: var(--mono-10);
 }
 
 h1,
@@ -84,15 +69,6 @@ small,
   font-size: 0.833rem;
 }
 
-.container {
-  padding-inline: var(--gap);
-}
-
-.inner-container {
-  max-width: 64rem;
-  margin-inline: auto;
-}
-
 button {
   font-family: inherit;
   font-size: var(--small);
@@ -103,11 +79,16 @@ button {
   padding: 3px 6px;
   cursor: pointer;
   letter-spacing: 1.2px;
-  color: var(--_700);
+  color: var(--shades-3);
   transition: background-color 0.3s, color 0.3s;
 }
 
 button:hover {
-  background-color: var(--_200);
-  color: var(--_700);
+  background-color: var(--shades-7);
+  color: var(--shades-7-contrast);
+}
+
+button.active {
+  background-color: var(--shades-5);
+  color: var(--shades-5-contrast);
 }

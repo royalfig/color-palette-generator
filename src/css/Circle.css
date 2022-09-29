@@ -1,4 +1,11 @@
 .circle {
   height: 5rem;
   width: 5rem;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.circle svg {
+  display: block;
 }

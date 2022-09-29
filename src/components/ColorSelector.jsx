@@ -1,9 +1,23 @@
 import "../css/ColorSelector.css";
+import { useState, useEffect } from "react";
 import Color from "colorjs.io";
+import { hex3to6 } from "../util";
 
 export default function ColorSelector({ setColor, color, children }) {
-  const colorData = new Color(color);
+  const [colorName, setColorName] = useState("");
 
+  const colorData = new Color(color);
+  const hexToSend = hex3to6(color);
+
+  useEffect(() => {
+    async function getColorName(color) {
+      const res = await fetch(`https://api.color.pizza/v1/${color}`);
+      const name = await res.json();
+      setColorName(name.colors[0].name);
+    }
+
+    getColorName(hexToSend);
+  }, [color]);
   const hex = colorData.toString({ format: "hex" });
   const rgb = colorData.toString({ format: "srgb", precision: 2 });
   const hsl = colorData.to("hsl").toString({ precision: 2 });
@@ -22,6 +36,7 @@ export default function ColorSelector({ setColor, color, children }) {
           </div>
         </div>
         <div className="color-details">
+          <p>{colorName}</p>
           <p>{hex}</p>
           <p>{rgb}</p>
           <p>{hsl}</p>

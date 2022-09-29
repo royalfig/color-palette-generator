@@ -1,10 +1,53 @@
 import Color from "colorjs.io";
+import {
+  createAdjacent,
+  createComplement,
+  createMonochromatic,
+  createTriad,
+  createShades,
+  createTetrad,
+} from "./converters";
+
+function cssWriter(args) {
+  return args
+    .map(([palette, name]) => {
+      return palette
+        .map((color, idx) => {
+          return `--${name}-${idx + 1}: ${color.hsl};
+          --${name}-${idx + 1}-contrast: ${color.contrast};`;
+        })
+        .join("\n");
+    })
+    .join("\n");
+}
 
 function generateCss(hex) {
   const color = new Color(hex);
   const [h, s, l] = color.hsl;
 
-  document.documentElement.style = `--h: ${h}; --s: ${s}%; --l: ${l}%`;
+  const complement = createComplement(color);
+  const adjacent = createAdjacent(color);
+  const tetrad = createTetrad(color);
+  const triad = createTriad(color);
+  const mono = createMonochromatic(color);
+  const shades = createShades(color);
+
+  const css = cssWriter([
+    [complement, "complement"],
+    [adjacent, "adjacent"],
+    [triad, "triad"],
+    [tetrad, "tetrad"],
+    [mono, "mono"],
+    [shades, "shades"],
+  ]);
+
+  const styleTag = document.querySelector("#colors");
+  styleTag && styleTag.remove();
+  const style = document.createElement("style");
+  style.id = "colors";
+  style.textContent = `:root {--h: ${h}; --s: ${s}%; --l: ${l}%;` + css + "}";
+
+  document.head.append(style);
 }
 
-export { generateCss };
+export { generateCss, cssWriter };

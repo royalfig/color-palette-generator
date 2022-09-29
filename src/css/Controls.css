@@ -1,5 +1,13 @@
 .controls {
   padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.controls-buttons {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .palette-name {

@@ -3,17 +3,19 @@
 }
 
 .palette {
-  border: 1px solid hsl(var(--h) 15% 80%);
+  border: 1px solid var(--mono-9);
   border-radius: var(--radius);
   overflow: hidden;
 }
 
 .palette-container header {
   display: flex;
-  gap: 15px;
   align-items: center;
+  margin-block-end: 0.5rem;
 }
 
 .palette-container h2 {
-  margin-block: 1rem;
+  margin: 0;
+  translate: -1rem;
+  line-height: 1;
 }

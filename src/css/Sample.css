@@ -1,0 +1,176 @@
+.sample-selector {
+  display: flex;
+}
+.sample-selector button {
+  flex: 1;
+}
+.sample-selector button:not(:last-child) {
+  border-right: none;
+}
+
+.sample {
+  background-color: var(--mono-9);
+
+  border-left: 1px solid;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+}
+.sample-navbar {
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+.sample-navbar ul {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+}
+
+.sample-navbar a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.sample-header {
+  padding: 2rem;
+  text-align: center;
+}
+
+.sample-cta {
+  color: inherit;
+  text-decoration: none;
+  border-radius: 1em;
+  padding: 0.5rem 1rem;
+  margin-block-start: 1rem;
+  display: block;
+  width: fit-content;
+  margin-inline: auto;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  font-size: 16px;
+}
+
+.sample-body {
+  padding: 2rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.sample-image {
+  width: 100%;
+  aspect-ratio: 1;
+
+  margin-block-end: 0.5rem;
+}
+
+.sample-listings {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 0 2rem 3rem;
+}
+
+.card {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-block-end: 1rem;
+}
+
+.card-image {
+  width: 3rem;
+  height: 3rem;
+  flex-shrink: 0;
+}
+
+.card h3 {
+  margin: 0;
+}
+
+.complement :where(.sample-header, .card-image) {
+  background-color: var(--complement-1);
+  color: var(--complement-1-contrast);
+}
+
+.complement .sample-cta {
+  background-color: var(--complement-2);
+  color: var(--complement-2-contrast);
+}
+
+.complement .sample-image {
+  background-color: var(--complement-2);
+}
+
+.adjacent :where(.sample-header, .card-image) {
+  background-color: var(--adjacent-2);
+  color: var(--adjacent-2-contrast);
+}
+
+.adjacent .sample-cta {
+  background-color: var(--adjacent-1);
+  color: var(--adjacent-1-contrast);
+}
+
+.adjacent .sample-image {
+  background-color: var(--adjacent-3);
+}
+
+.triad :where(.sample-header, .card-image) {
+  background-color: var(--triad-2);
+  color: var(--triad-2-contrast);
+}
+
+.triad .sample-cta {
+  background-color: var(--triad-1);
+  color: var(--triad-1-contrast);
+}
+
+.triad .sample-image {
+  background-color: var(--triad-3);
+}
+
+.tetrad .sample-header {
+  background-color: var(--tetrad-2);
+  color: var(--tetrad-2-contrast);
+}
+
+.tetrad .sample-cta {
+  background-color: var(--tetrad-1);
+  color: var(--tetrad-1-contrast);
+}
+
+.tetrad .sample-image {
+  background-color: var(--tetrad-3);
+}
+
+.tetrad .card-image {
+  background-color: var(--tetrad-4);
+}
+
+.tints :where(.sample-header, .card-image) {
+  background-color: var(--shades-2);
+  color: var(--shades-2-contrast);
+}
+
+.tints .sample-cta {
+  background-color: var(--shades-1);
+  color: var(--shades-1-contrast);
+}
+
+.tints .sample-image {
+  background-color: var(--shades-2);
+}
+
+.mono :where(.sample-header, .card-image) {
+  background-color: var(--mono-2);
+  color: var(--mono-2-contrast);
+}
+
+.mono .sample-cta {
+  background-color: var(--mono-1);
+  color: var(--mono-1-contrast);
+}
+.mono .sample-image {
+  background-color: var(--mono-3);
+}

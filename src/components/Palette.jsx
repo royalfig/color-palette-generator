@@ -65,6 +65,11 @@ export default function Palette({ type, hex, corrected, name, selected }) {
       <header>
         <Circle colors={colors} />
         <h2>{name}</h2>
+        <div className="gradients">
+          <div className="gradient"></div>
+          <div className="gradient"></div>
+          <div className="gradient"></div>
+        </div>
       </header>
       <div className="palette">
         <Color
