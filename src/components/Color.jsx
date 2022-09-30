@@ -1,4 +1,5 @@
 import "../css/Color.css";
+import Copy from "./Copy";
 
 export default function Color({ color, corrected, selected, names }) {
   const correctedNames = names.slice(names.length / 2);
@@ -33,7 +34,7 @@ export default function Color({ color, corrected, selected, names }) {
               color: !corrected ? c.contrast : c.corrected.contrast,
             }}
           >
-            <p>{getValue(c, index)}</p>
+            <Copy text={getValue(c, index)} />
           </article>
         );
       })}

@@ -75,7 +75,7 @@ small,
   font-size: 0.833rem;
 }
 
-button {
+button:not(.ctc) {
   font-family: inherit;
   font-size: var(--small);
   text-transform: uppercase;
@@ -89,12 +89,12 @@ button {
   transition: background-color 0.3s, color 0.3s;
 }
 
-button:hover {
+button:not(.ctc):hover {
   background-color: var(--shades-7);
   color: var(--shades-7-contrast);
 }
 
-button.active {
+button:not(.ctc).active {
   background-color: var(--shades-5);
   color: var(--shades-5-contrast);
 }
