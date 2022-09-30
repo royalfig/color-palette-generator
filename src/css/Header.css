@@ -4,13 +4,10 @@
 
 .header h1 {
   text-align: center;
+  font-weight: 400;
   font-size: 3.488rem;
   -webkit-background-clip: text;
-  background-image: linear-gradient(
-    to bottom,
-    var(--shades-8),
-    var(--shades-6)
-  );
+  background-image: linear-gradient(to bottom, var(--mono-9), var(--mono-8));
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 2px 1px var(--shades-3));
   letter-spacing: 0.15em;

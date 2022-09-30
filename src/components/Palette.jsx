@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Color from "./Color";
 import Controls from "./Controls";
 import Circle from "./Circle";
@@ -13,6 +13,7 @@ import {
 } from "../util";
 
 import "../css/Palette.css";
+import { debounce } from "lodash-es";
 
 export default function Palette({ type, hex, corrected, name, selected }) {
   const [names, setNames] = useState([]);
@@ -46,8 +47,8 @@ export default function Palette({ type, hex, corrected, name, selected }) {
     .map((color) => hex3to6(color.corrected.hex))
     .join();
 
-  useEffect(() => {
-    async function getColorName() {
+  const deb = useCallback(
+    debounce(async function getColorName() {
       const res = await fetch(
         `https://api.color.pizza/v1/${colorNames},${correctedColorNames}`
       );
@@ -55,9 +56,12 @@ export default function Palette({ type, hex, corrected, name, selected }) {
 
       setNames(names.colors);
       setPalette(names.paletteTitle);
-    }
+    }, 1000),
+    []
+  );
 
-    getColorName();
+  useEffect(() => {
+    deb();
   }, [hex]);
 
   return (

@@ -1,0 +1,9 @@
+.ctc {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: var(--small);
+  font-weight: 700;
+  cursor: pointer;
+  color: inherit;
+}

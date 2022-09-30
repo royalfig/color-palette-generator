@@ -6,7 +6,7 @@ import Panel from "./components/Panel";
 import "./css/App.css";
 import { generateCss } from "./util";
 import Sample from "./components/Sample";
-
+import { Toaster } from "react-hot-toast";
 import ColorSelector from "./components/ColorSelector";
 
 function App() {
@@ -23,6 +23,18 @@ function App() {
   return (
     <div className={corrected ? "corrected" : undefined}>
       <Header />
+
+      <Toaster
+        toastOptions={{
+          style: {
+            border: "1px solid var(--border-color)",
+            backgroundColor: "var(--shades-10)",
+            color: "var(--shades-1)",
+            borderRadius: 0,
+            padding: "var(--button-padding)",
+          },
+        }}
+      />
       <main className="app">
         <section className="left">
           <ColorSelector setColor={handleChange} color={color}>
