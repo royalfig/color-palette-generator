@@ -21,71 +21,72 @@ function App() {
   }
 
   return (
-    <main className="app">
-      <section className="left">
-        <Header />
+    <div className={corrected ? "corrected" : undefined}>
+      <Header />
+      <main className="app">
+        <section className="left">
+          <ColorSelector setColor={handleChange} color={color}>
+            <Panel
+              setCorrected={setCorrected}
+              corrected={corrected}
+              color={color}
+              selected={selected}
+              setSelected={setSelected}
+            />
+          </ColorSelector>
 
-        <ColorSelector setColor={handleChange} color={color}>
-          <Panel
-            setCorrected={setCorrected}
+          <Palette
+            type="comp"
             corrected={corrected}
-            color={color}
+            name="Complementary"
+            hex={color}
             selected={selected}
-            setSelected={setSelected}
           />
-        </ColorSelector>
 
-        <Palette
-          type="comp"
-          corrected={corrected}
-          name="Complementary"
-          hex={color}
-          selected={selected}
-        />
+          <Palette
+            type="adjacent"
+            name="Adjacent"
+            corrected={corrected}
+            selected={selected}
+            hex={color}
+          />
 
-        <Palette
-          type="adjacent"
-          name="Adjacent"
-          corrected={corrected}
-          selected={selected}
-          hex={color}
-        />
+          <Palette
+            type="triad"
+            name="Triad"
+            corrected={corrected}
+            selected={selected}
+            hex={color}
+          />
+          <Palette
+            type="tetrad"
+            name="Tetrad"
+            corrected={corrected}
+            selected={selected}
+            hex={color}
+          />
 
-        <Palette
-          type="triad"
-          name="Triad"
-          corrected={corrected}
-          selected={selected}
-          hex={color}
-        />
-        <Palette
-          type="tetrad"
-          name="Tetrad"
-          corrected={corrected}
-          selected={selected}
-          hex={color}
-        />
+          <Palette
+            type="shades"
+            name="Tints &amp; Shades"
+            corrected={corrected}
+            selected={selected}
+            hex={color}
+          />
 
-        <Palette
-          type="shades"
-          name="Tints &amp; Shades"
-          corrected={corrected}
-          selected={selected}
-          hex={color}
-        />
-
-        <Palette
-          type="mono"
-          name="Monochromatic"
-          corrected={corrected}
-          selected={selected}
-          hex={color}
-        />
-      </section>
-      <section className="right">
-        <Sample />
-      </section>
-    </main>
+          <Palette
+            type="mono"
+            name="Monochromatic"
+            corrected={corrected}
+            selected={selected}
+            hex={color}
+          />
+        </section>
+        <section className="right">
+          <Sample />
+        </section>
+      </main>
+    </div>
   );
 }
 

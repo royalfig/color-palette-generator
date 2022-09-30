@@ -1,11 +1,11 @@
 .panel {
-  padding: 1rem 2rem;
+  padding: var(--box-padding);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-left: 1px solid var(--mono-9);
-  border-right: 1px solid var(--mono-9);
-  border-bottom: 1px solid var(--mono-9);
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
   box-sizing: content-box;
   height: 100%;
 }
@@ -14,13 +14,6 @@
   display: flex;
   gap: 0.5rem;
   height: 100%;
-}
-
-.panel {
-  border: 1px solid var(--mono-9);
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
 }
 
 .selected-group {

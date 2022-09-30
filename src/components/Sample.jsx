@@ -1,7 +1,17 @@
 import "../css/Sample.css";
 import { useState } from "react";
+
+const titleText = {
+  complement: "The dynamic duo",
+  adjacent: "Thick as thieves",
+  triad: "Did someone say thruple?",
+  tetrad: "Four play",
+  tints: "One color's all it takes",
+  mono: "Don't be garish",
+};
+
 export default function Sample() {
-  const [palette, setPalette] = useState("comp");
+  const [palette, setPalette] = useState("complement");
 
   function clickHandler(e) {
     setPalette(e.target.dataset.value);
@@ -70,7 +80,7 @@ export default function Sample() {
           </div>
         </div>
         <div className="sample-header">
-          <h2>Color Palette Generator</h2>
+          <h2>{titleText[palette]}</h2>
           <p>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis
             minima praesentium, assumenda, quibusdam odio fuga quas explicabo

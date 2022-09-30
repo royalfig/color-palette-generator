@@ -1,11 +1,9 @@
 .color-selector {
-  border-top-right-radius: var(--radius);
-  border-top-left-radius: var(--radius);
   padding: 2rem 0 2rem 2rem;
   background-color: var(--mono-9);
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--mono-8);
+  border: 1px solid var(--border-color);
 }
 
 .color-input,

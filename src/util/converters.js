@@ -155,7 +155,7 @@ function createMonochromatic(hex) {
 
   for (let index = 0; index < 10; index++) {
     const color = new Color(hex);
-    color.hsl.s = 5;
+    color.hsl.s = 15;
     color.hsl.l = index * 10 + 5;
     colors.push({ color: color, corrected: color });
   }

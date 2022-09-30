@@ -3,8 +3,8 @@
 }
 
 .palette {
-  border: 1px solid var(--mono-9);
-  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+
   overflow: hidden;
 }
 

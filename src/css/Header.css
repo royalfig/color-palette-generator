@@ -1,3 +1,18 @@
 .header {
-  margin: 2rem 0;
+  padding-block: 2rem 4rem;
+}
+
+.header h1 {
+  text-align: center;
+  font-size: 3.488rem;
+  -webkit-background-clip: text;
+  background-image: linear-gradient(
+    to bottom,
+    var(--shades-8),
+    var(--shades-6)
+  );
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 1px var(--shades-3));
+  letter-spacing: 0.15em;
+  /* -webkit-text-stroke: 1px black; */
 }

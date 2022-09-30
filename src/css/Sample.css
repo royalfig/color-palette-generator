@@ -11,12 +11,11 @@
 .sample {
   background-color: var(--mono-9);
 
-  border-left: 1px solid;
-  border-right: 1px solid;
-  border-bottom: 1px solid;
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 }
 .sample-navbar {
-  margin-bottom: 1rem;
   padding: 1rem;
 }
 .sample-navbar ul {
@@ -31,15 +30,19 @@
 }
 
 .sample-header {
-  padding: 2rem;
+  padding: 3rem 1rem;
   text-align: center;
+}
+
+.sample-header > *:not(:last-child) {
+  margin-bottom: 1rem;
 }
 
 .sample-cta {
   color: inherit;
   text-decoration: none;
   border-radius: 1em;
-  padding: 0.5rem 1rem;
+  padding: var(--box-padding);
   margin-block-start: 1rem;
   display: block;
   width: fit-content;
@@ -51,7 +54,8 @@
 }
 
 .sample-body {
-  padding: 2rem;
+  padding: 1rem;
+  margin-bottom: 2rem;
   display: grid;
   gap: 1rem;
   grid-template-columns: 1fr 1fr 1fr;
@@ -68,7 +72,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 1rem;
-  padding: 0 2rem 3rem;
+  padding: var(--box-padding);
 }
 
 .card {
@@ -93,13 +97,27 @@
   color: var(--complement-1-contrast);
 }
 
+.corrected .complement :where(.sample-header, .card-image) {
+  background-color: var(--complement-1-corrected);
+  color: var(--complement-1-contrast-corrected);
+}
+
 .complement .sample-cta {
   background-color: var(--complement-2);
   color: var(--complement-2-contrast);
 }
 
+.corrected .complement .sample-cta {
+  background-color: var(--complement-2-corrected);
+  color: var(--complement-2-contrast-corrected);
+}
+
 .complement .sample-image {
   background-color: var(--complement-2);
+}
+
+.corrected .complement .sample-image {
+  background-color: var(--complement-2-corrected);
 }
 
 .adjacent :where(.sample-header, .card-image) {
@@ -107,13 +125,27 @@
   color: var(--adjacent-2-contrast);
 }
 
+.corrected .adjacent :where(.sample-header, .card-image) {
+  background-color: var(--adjacent-2-corrected);
+  color: var(--adjacent-2-contrast-corrected);
+}
+
 .adjacent .sample-cta {
   background-color: var(--adjacent-1);
   color: var(--adjacent-1-contrast);
 }
 
+.corrected .adjacent .sample-cta {
+  background-color: var(--adjacent-1-corrected);
+  color: var(--adjacent-1-contrast-corrected);
+}
+
 .adjacent .sample-image {
   background-color: var(--adjacent-3);
+}
+
+.corrected .adjacent .sample-image {
+  background-color: var(--adjacent-3-corrected);
 }
 
 .triad :where(.sample-header, .card-image) {
@@ -121,13 +153,27 @@
   color: var(--triad-2-contrast);
 }
 
+.correctted .triad :where(.sample-header, .card-image) {
+  background-color: var(--triad-2-corrected);
+  color: var(--triad-2-contrast-corrected);
+}
+
 .triad .sample-cta {
   background-color: var(--triad-1);
   color: var(--triad-1-contrast);
 }
 
+.corrected .triad .sample-cta {
+  background-color: var(--triad-1-corrected);
+  color: var(--triad-1-contrast-corrected);
+}
+
 .triad .sample-image {
   background-color: var(--triad-3);
+}
+
+.corrected .triad .sample-image {
+  background-color: var(--triad-3-corrected);
 }
 
 .tetrad .sample-header {
@@ -135,17 +181,35 @@
   color: var(--tetrad-2-contrast);
 }
 
+.corrected .tetrad .sample-header {
+  background-color: var(--tetrad-2-corrected);
+  color: var(--tetrad-2-contrast-corrected);
+}
+
 .tetrad .sample-cta {
   background-color: var(--tetrad-1);
   color: var(--tetrad-1-contrast);
+}
+
+.corrected .tetrad .sample-cta {
+  background-color: var(--tetrad-1-corrected);
+  color: var(--tetrad-1-contrast-corrected);
 }
 
 .tetrad .sample-image {
   background-color: var(--tetrad-3);
 }
 
+.corrected .tetrad .sample-image {
+  background-color: var(--tetrad-3-corrected);
+}
+
 .tetrad .card-image {
   background-color: var(--tetrad-4);
+}
+
+.corrected .tetrad .card-image {
+  background-color: var(--tetrad-4-corrected);
 }
 
 .tints :where(.sample-header, .card-image) {
@@ -154,23 +218,23 @@
 }
 
 .tints .sample-cta {
-  background-color: var(--shades-1);
-  color: var(--shades-1-contrast);
+  background-color: var(--shades-5);
+  color: var(--shades-5-contrast);
 }
 
 .tints .sample-image {
-  background-color: var(--shades-2);
+  background-color: var(--shades-8);
 }
 
 .mono :where(.sample-header, .card-image) {
-  background-color: var(--mono-2);
-  color: var(--mono-2-contrast);
+  background-color: var(--mono-3);
+  color: var(--mono-3-contrast);
 }
 
 .mono .sample-cta {
-  background-color: var(--mono-1);
-  color: var(--mono-1-contrast);
+  background-color: var(--mono-6);
+  color: var(--mono-6-contrast);
 }
 .mono .sample-image {
-  background-color: var(--mono-3);
+  background-color: var(--mono-7);
 }

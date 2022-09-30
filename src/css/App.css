@@ -2,5 +2,5 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4vmax;
-  padding: 4vmax;
+  padding: 0 4vmax 4vmax;
 }

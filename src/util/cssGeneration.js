@@ -14,7 +14,11 @@ function cssWriter(args) {
       return palette
         .map((color, idx) => {
           return `--${name}-${idx + 1}: ${color.hsl};
-          --${name}-${idx + 1}-contrast: ${color.contrast};`;
+          --${name}-${idx + 1}-contrast: ${color.contrast};
+          --${name}-${idx + 1}-corrected: ${color.corrected.hsl};
+          --${name}-${idx + 1}-contrast-corrected: ${
+            color.corrected.contrast
+          };`;
         })
         .join("\n");
     })
