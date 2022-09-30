@@ -13,7 +13,7 @@
     "@emotion/styled": "^11.10.4",
     "@headlessui/react": "^1.7.2",
     "@jaames/iro": "^5.5.2",
-    "@mui/material": "^5.10.6",
+    "@mui/material": "5.10.7",
     "color-name-list": "^9.21.0",
     "color2k": "^2.0.0",
     "colorjs.io": "^0.4.0",
