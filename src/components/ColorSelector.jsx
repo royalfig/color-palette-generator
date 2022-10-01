@@ -10,6 +10,7 @@ export default function ColorSelector({ setColor, color, children }) {
 
   const colorData = new Color(color);
   const hexToSend = hex3to6(color);
+  console.log("INIT", new Date());
 
   const deb = useCallback(
     debounce(async function getColorName(color) {
