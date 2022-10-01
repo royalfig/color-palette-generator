@@ -3,27 +3,20 @@ import { useState, useEffect, useCallback } from "react";
 import Color from "colorjs.io";
 import { hex3to6 } from "../util";
 
-import { debounce } from "lodash-es";
-
 export default function ColorSelector({ setColor, color, children }) {
   const [colorName, setColorName] = useState("");
 
   const colorData = new Color(color);
   const hexToSend = hex3to6(color);
-  console.log("INIT", new Date());
 
-  const deb = useCallback(
-    debounce(async function getColorName(color) {
-      console.log("called", new Date());
-      const res = await fetch(`https://api.color.pizza/v1/${color}`);
-      const name = await res.json();
-      setColorName(name.colors[0].name);
-    }, 1000),
-    []
-  );
+  async function getColorName(color) {
+    const res = await fetch(`https://api.color.pizza/v1/${color}`);
+    const name = await res.json();
+    setColorName(name.colors[0].name);
+  }
 
   useEffect(() => {
-    deb(hexToSend);
+    getColorName(hexToSend);
   }, [color]);
 
   const hex = colorData.toString({ format: "hex" });
@@ -35,7 +28,14 @@ export default function ColorSelector({ setColor, color, children }) {
     <div>
       <div className="color-selector">
         <div className="color-input">
-          <input type="color" onChange={setColor} value={color}></input>
+          <input
+            type="color"
+            onChange={(e) => {
+              console.log(e.target.value);
+              setColor(e.target.value);
+            }}
+            value={color}
+          ></input>
           <p>Pick a color, any color</p>
           <div className="gradients">
             <div className="gradient"></div>

@@ -1,5 +1,5 @@
 import "./css/App.css";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Header from "./components/Header";
 import Palette from "./components/Palette";
 import Panel from "./components/Panel";
@@ -8,6 +8,7 @@ import { generateCss } from "./util";
 import Sample from "./components/Sample";
 import { Toaster } from "react-hot-toast";
 import ColorSelector from "./components/ColorSelector";
+import { debounce } from "lodash-es";
 
 function App() {
   const [color, setColor] = useState("#21a623");
@@ -16,8 +17,15 @@ function App() {
 
   generateCss(color);
 
+  const debouncedHandler = useCallback(
+    debounce((e) => {
+      return handleChange(e);
+    }, 500),
+    []
+  );
+
   function handleChange(e) {
-    setColor(e.target.value);
+    setColor(e);
   }
 
   return (
@@ -37,7 +45,7 @@ function App() {
       />
       <main className="app">
         <section className="left">
-          <ColorSelector setColor={handleChange} color={color}>
+          <ColorSelector setColor={debouncedHandler} color={color}>
             <Panel
               setCorrected={setCorrected}
               corrected={corrected}

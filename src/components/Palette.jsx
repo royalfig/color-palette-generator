@@ -47,20 +47,17 @@ export default function Palette({ type, hex, corrected, name, selected }) {
     .map((color) => hex3to6(color.corrected.hex))
     .join();
 
-  const deb = useCallback(
-    debounce(async function getColorName(cNames, crNames) {
+  useEffect(() => {
+    async function getColorName(cNames, crNames) {
       const res = await fetch(
         `https://api.color.pizza/v1/${cNames},${crNames}`
       );
       const names = await res.json();
       setNames(names.colors);
       setPalette(names.paletteTitle);
-    }, 1000),
-    []
-  );
+    }
 
-  useEffect(() => {
-    deb(colorNames, correctedColorNames);
+    getColorName(colorNames, correctedColorNames);
   }, [hex]);
 
   return (
