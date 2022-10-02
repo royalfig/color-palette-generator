@@ -1,5 +1,5 @@
 import "../css/Circle.css";
-export default function Circle({ colors }) {
+export default function Circle({ colors, type }) {
   return (
     <div className="circle">
       <svg viewBox="-120 -120 240 240">
@@ -11,7 +11,6 @@ export default function Circle({ colors }) {
           stroke="rgb(0 0 0 /.5)"
           strokeWidth="3"
         />
-
         {colors.map((color, idx) => {
           const [h, s] = color.point;
 
@@ -27,7 +26,8 @@ export default function Circle({ colors }) {
           return (
             <circle key={idx} cx={xr} cy={yr} r="20" fill={color.hex}></circle>
           );
-        })}
+        })}{" "}
+        :
       </svg>
     </div>
   );
