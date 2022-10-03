@@ -17,11 +17,19 @@
 }
 .sample-navbar {
   padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
+.sample-navbar p {
+  font-weight: 500;
+}
+
 .sample-navbar ul {
   list-style: none;
   display: flex;
   gap: 1rem;
+  font-size: var(--small);
 }
 
 .sample-navbar a {
@@ -53,6 +61,16 @@
   font-size: 16px;
 }
 
+.sample h3 {
+  font-size: 1.2rem;
+  text-transform: none;
+}
+
+.sample h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .sample-body {
   padding: 1rem;
   margin-bottom: 2rem;
@@ -64,8 +82,15 @@
 .sample-image {
   width: 100%;
   aspect-ratio: 1;
-
   margin-block-end: 0.5rem;
+}
+
+.sample-image img {
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+  display: block;
+  mix-blend-mode: luminosity;
 }
 
 .sample-listings {
@@ -146,6 +171,34 @@
 
 .corrected .adjacent .sample-image {
   background-color: var(--adjacent-3-corrected);
+}
+
+.split :where(.sample-header, .card-image) {
+  background-color: var(--split-2);
+  color: var(--split-2-contrast);
+}
+
+.corrected .split :where(.sample-header, .card-image) {
+  background-color: var(--split-2-corrected);
+  color: var(--split-2-contrast-corrected);
+}
+
+.split .sample-cta {
+  background-color: var(--split-1);
+  color: var(--split-1-contrast);
+}
+
+.corrected .split .sample-cta {
+  background-color: var(--split-1-corrected);
+  color: var(--split-1-contrast-corrected);
+}
+
+.split .sample-image {
+  background-color: var(--split-3);
+}
+
+.corrected .split .sample-image {
+  background-color: var(--split-3-corrected);
 }
 
 .triad :where(.sample-header, .card-image) {

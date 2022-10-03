@@ -6,6 +6,7 @@ import {
   createTriad,
   createShades,
   createTetrad,
+  createSplit,
 } from "./converters";
 
 function cssWriter(args) {
@@ -35,6 +36,7 @@ function generateCss(hex) {
   const triad = createTriad(color);
   const mono = createMonochromatic(color);
   const shades = createShades(color);
+  const split = createSplit(color);
 
   const css = cssWriter([
     [complement, "complement"],
@@ -43,6 +45,7 @@ function generateCss(hex) {
     [tetrad, "tetrad"],
     [mono, "mono"],
     [shades, "shades"],
+    [split, "split"],
   ]);
 
   const styleTag = document.querySelector("#colors");

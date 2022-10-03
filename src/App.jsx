@@ -3,9 +3,9 @@ import { useState, useCallback } from "react";
 import Header from "./components/Header";
 import Palette from "./components/Palette";
 import Panel from "./components/Panel";
-import "./css/App.css";
+
 import { generateCss } from "./util";
-import Sample from "./components/Sample";
+import Sample from "./components/sample/Sample";
 import { Toaster } from "react-hot-toast";
 import ColorSelector from "./components/ColorSelector";
 import { debounce } from "lodash-es";
@@ -20,7 +20,7 @@ function App() {
   const debouncedHandler = useCallback(
     debounce((e) => {
       return handleChange(e);
-    }, 500),
+    }, 1000),
     []
   );
 
@@ -34,10 +34,11 @@ function App() {
 
       <Toaster
         toastOptions={{
+          position: "top-right",
           style: {
             border: "1px solid var(--border-color)",
-            backgroundColor: "var(--shades-10)",
-            color: "var(--shades-1)",
+            backgroundColor: "var(--mono-10)",
+            color: "var(--mono-1)",
             borderRadius: 0,
             padding: "var(--button-padding)",
           },
@@ -64,6 +65,14 @@ function App() {
           />
 
           <Palette
+            type="split"
+            corrected={corrected}
+            name="Split Complementary"
+            hex={color}
+            selected={selected}
+          />
+
+          <Palette
             type="adjacent"
             name="Adjacent"
             corrected={corrected}
@@ -85,7 +94,9 @@ function App() {
             selected={selected}
             hex={color}
           />
-
+        </section>
+        <section className="right">
+          <Sample />
           <Palette
             type="shades"
             name="Tints &amp; Shades"
@@ -101,9 +112,6 @@ function App() {
             selected={selected}
             hex={color}
           />
-        </section>
-        <section className="right">
-          <Sample />
         </section>
       </main>
     </div>

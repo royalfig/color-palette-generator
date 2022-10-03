@@ -75,19 +75,6 @@ function corrector(color, adjustment) {
   const originalColor = new Color(color);
   const newColor = new Color(color);
   newColor.lch.h += adjustment;
-  // console.log("before: ", y(originalColor), y(newColor));
-
-  // const y0 = originalColor.lch.l;
-  // const y1 = newColor.lch.l;
-
-  // const dx = (y0 - y1) / y1;
-  // const pc = y1 * dx + y1;
-
-  // console.log(pc);
-
-  // newColor.lch.l = Math.min(100, pc);
-
-  // console.log("after: ", y(originalColor), y(newColor));
 
   return newColor;
 }
@@ -104,7 +91,7 @@ function createComplement(hex) {
   ]);
 }
 
-function createTriad(hex) {
+function createSplit(hex) {
   const base = new Color(hex);
   const triad1 = new Color(hex);
   const triad2 = new Color(hex);
@@ -115,6 +102,20 @@ function createTriad(hex) {
     { color: triad1, corrected: corrector(hex, 150) },
     { color: base, corrected: base },
     { color: triad2, corrected: corrector(hex, 210) },
+  ]);
+}
+
+function createTriad(hex) {
+  const base = new Color(hex);
+  const triad1 = new Color(hex);
+  const triad2 = new Color(hex);
+  triad1.hsl.h += 120;
+  triad2.hsl.h += 240;
+
+  return colorFactory([
+    { color: triad1, corrected: corrector(hex, 120) },
+    { color: base, corrected: base },
+    { color: triad2, corrected: corrector(hex, 240) },
   ]);
 }
 
@@ -191,6 +192,7 @@ export {
   createAdjacent,
   createTriad,
   createTetrad,
+  createSplit,
   createMonochromatic,
   createShades,
 };

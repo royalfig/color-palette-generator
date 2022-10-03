@@ -4,3 +4,11 @@
   gap: 4vmax;
   padding: 0 4vmax 4vmax;
 }
+
+.left,
+.right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--gap);
+}

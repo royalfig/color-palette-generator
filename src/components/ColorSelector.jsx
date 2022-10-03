@@ -31,7 +31,6 @@ export default function ColorSelector({ setColor, color, children }) {
           <input
             type="color"
             onChange={(e) => {
-              console.log(e.target.value);
               setColor(e.target.value);
             }}
             value={color}

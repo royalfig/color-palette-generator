@@ -1,4 +1,13 @@
 import "../css/Panel.css";
+import {
+  BracesAsterisk,
+  Lightbulb,
+  LightbulbFill,
+  Palette,
+  MoonStars,
+  Sun,
+} from "react-bootstrap-icons";
+import toast from "react-hot-toast";
 
 export default function Panel({
   setCorrected,
@@ -6,17 +15,32 @@ export default function Panel({
   selected,
   setSelected,
 }) {
+  let dark = false;
+
+  function handleCorrected() {
+    setCorrected(!corrected);
+    const state = !corrected ? "enabled" : "disabled";
+    toast(`Relative luminance ${state}`, { icon: "💡" });
+  }
+
   return (
     <div className="panel">
       <div className="panel-left">
         <button
-          onClick={() => setCorrected(!corrected)}
-          className={corrected ? "active" : undefined}
+          onClick={handleCorrected}
+          className={corrected ? "active icon-button" : "icon-button"}
         >
-          Relative luminance
+          {corrected ? <LightbulbFill /> : <Lightbulb />}
         </button>
-        <button>Copy CSS</button>
-        <button>Copy Palette</button>
+        <button className="icon-button">
+          <BracesAsterisk />
+        </button>
+        <button className="icon-button">
+          <Palette />
+        </button>
+        <button className="icon-button">
+          {dark ? <Sun /> : <MoonStars />}
+        </button>
       </div>
 
       <div className="selected-group">

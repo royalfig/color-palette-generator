@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Color from "./Color";
 import Controls from "./Controls";
 import Circle from "./Circle";
@@ -9,11 +9,11 @@ import {
   createTriad,
   createMonochromatic,
   createShades,
+  createSplit,
   hex3to6,
 } from "../util";
 
 import "../css/Palette.css";
-import { debounce } from "lodash-es";
 
 export default function Palette({ type, hex, corrected, name, selected }) {
   const [names, setNames] = useState([]);
@@ -24,6 +24,9 @@ export default function Palette({ type, hex, corrected, name, selected }) {
     switch (type) {
       case "comp":
         return createComplement(color);
+
+      case "split":
+        return createSplit(color);
 
       case "adjacent":
         return createAdjacent(color);
@@ -63,7 +66,10 @@ export default function Palette({ type, hex, corrected, name, selected }) {
   return (
     <div className="palette-container">
       <header>
-        <Circle colors={colors} />
+        <Circle
+          colors={colors}
+          type={type === "mono" || type === "shades" ? "circle" : "standard"}
+        />
         <h2>{name}</h2>
         <div className="gradients">
           <div className="gradient"></div>

@@ -15,7 +15,7 @@
 html {
   font-size: 1rem;
   font-size: clamp(1rem, 0.975rem + 0.125vw, 1.125rem);
-  font-family: "Open Sans", system-ui, -apple-system, BlinkMacSystemFont,
+  font-family: "Work Sans", system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
     sans-serif;
   line-height: 1.6;
@@ -42,10 +42,10 @@ h4,
 h5,
 h6 {
   margin: 0;
-  font-family: "Open Sans", system-ui, -apple-system, BlinkMacSystemFont,
+  font-family: "Work Sans", system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
     sans-serif;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.1;
   text-transform: uppercase;
 }
@@ -82,11 +82,12 @@ button:not(.ctc) {
   border: 1px solid var(--border-color);
   border-radius: 0;
   background: none;
-  padding: 3px 6px;
+  padding: 6px;
   cursor: pointer;
   letter-spacing: 1.2px;
   color: var(--shades-3);
   transition: background-color 0.3s, color 0.3s;
+  line-height: 1;
 }
 
 button:not(.ctc):hover {
@@ -97,4 +98,9 @@ button:not(.ctc):hover {
 button:not(.ctc).active {
   background-color: var(--shades-5);
   color: var(--shades-5-contrast);
+}
+
+.icon-button svg {
+  line-height: 1;
+  display: block;
 }
