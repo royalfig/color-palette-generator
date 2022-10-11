@@ -1,6 +1,6 @@
 import "./css/App.css";
 import { useState, useCallback } from "react";
-import Header from "./components/Header";
+// import Header from "./components/Header";
 import Palette from "./components/Palette";
 import Panel from "./components/Panel";
 
@@ -20,7 +20,7 @@ function App() {
   const debouncedHandler = useCallback(
     debounce((e) => {
       return handleChange(e);
-    }, 1000),
+    }, 100),
     []
   );
 
@@ -30,7 +30,7 @@ function App() {
 
   return (
     <div className={corrected ? "corrected" : undefined}>
-      <Header />
+      {/* <Header /> */}
 
       <Toaster
         toastOptions={{
@@ -46,7 +46,11 @@ function App() {
       />
       <main className="app">
         <section className="left">
-          <ColorSelector setColor={debouncedHandler} color={color}>
+          <ColorSelector
+            setColor={debouncedHandler}
+            color={color}
+            selected={selected}
+          >
             <Panel
               setCorrected={setCorrected}
               corrected={corrected}

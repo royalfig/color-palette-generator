@@ -1,36 +1,58 @@
 .color-selector {
-  padding: 2rem 0 2rem 2rem;
+  padding: var(--box-padding);
+  padding-inline-end: 0;
   background-color: var(--mono-9);
   position: relative;
   overflow: hidden;
   border: 1px solid var(--border-color);
 }
 
-.color-input,
-.color-details {
+.color-input-heading {
   display: flex;
   gap: 1rem;
   align-items: center;
+  margin-bottom: 2rem;
+}
+
+.color-input-heading h1 {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.color-input .react-colorful {
+  width: 100%;
 }
 
 .color-input input {
   border: none;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  overflow: hidden;
-  cursor: pointer;
+  padding: var(--button-padding);
+  font-family: inherit;
+  font-size: 1rem;
+  text-align: center;
   flex-shrink: 0;
+  /* width: max-content; */
+
+  background-color: var(--mono-10);
+  border: 1px solid var(--border-color);
 }
 
-.color-input ::-webkit-color-swatch-wrapper {
-  padding: 0;
+.color-input input:focus-visible {
+  border: 1px solid var(--complement-2);
+  outline: 0;
 }
 
-.color-input ::-webkit-color-swatch {
-  border: none;
+.color-input input::before {
+  content: "#";
 }
-
+.color-input-container {
+  margin-inline-end: 1rem;
+}
+.color-input-container.values {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-start: 1rem;
+}
 .color-input p {
   font-weight: 700;
   font-size: 1.2rem;
@@ -40,13 +62,13 @@
 }
 
 .color-details {
-  margin-block-start: 2rem;
-  justify-content: space-between;
-  padding-inline-end: 1.5rem;
+  margin-block-start: 1rem;
+  padding-inline-end: 2rem;
+  text-align: right;
 }
 
-.color-details p {
-  font-size: 15px;
+.color-input-container.values p {
+  font-size: var(--small);
   font-weight: 600;
 }
 
