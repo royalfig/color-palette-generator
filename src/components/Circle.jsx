@@ -8,7 +8,7 @@ export default function Circle({ colors, type }) {
           cy="0"
           r="100"
           fill="none"
-          stroke="rgb(0 0 0 /.5)"
+          stroke="var(--border-color)"
           strokeWidth="3"
         />
         {type !== "circle"

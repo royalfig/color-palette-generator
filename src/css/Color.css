@@ -23,11 +23,11 @@
 }
 
 .color-swatch {
-  height: 8rem;
-  flex: 1;
   display: flex;
-  justify-content: flex-end;
+  flex: 1;
   align-items: flex-end;
+  justify-content: flex-end;
+  height: 8rem;
   padding: 1rem;
   font-size: var(--small);
   font-weight: 600;

@@ -2,13 +2,15 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4vmax;
-  padding: 4vmax;
+  max-width: 2000px;
+  padding: 2vmax 4vmax;
+  margin-inline: auto;
 }
 
 .left,
 .right {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   gap: var(--gap);
+  justify-content: space-between;
 }

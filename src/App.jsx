@@ -8,7 +8,7 @@ import { generateCss } from "./util";
 import Sample from "./components/sample/Sample";
 import { Toaster } from "react-hot-toast";
 import ColorSelector from "./components/ColorSelector";
-import { debounce } from "lodash-es";
+import { debounce, size } from "lodash-es";
 
 function App() {
   const [color, setColor] = useState("#21a623");
@@ -41,6 +41,8 @@ function App() {
             color: "var(--mono-1)",
             borderRadius: 0,
             padding: "var(--button-padding)",
+            fontSize: "var(--small)",
+            boxShadow: "2px 5px 1em rgba(0 0 0 / 0.15)",
           },
         }}
       />

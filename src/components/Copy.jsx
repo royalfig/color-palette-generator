@@ -1,14 +1,14 @@
 import "../css/Copy.css";
 import toast from "react-hot-toast";
+import { Clipboard2Check } from "react-bootstrap-icons";
 
 export default function Copy({ text }) {
   function clickHandler() {
-    navigator.clipboard.writeText(text).then(
-      () => {
-        toast.success(`${text} copied to clipboard`);
-      },
-      () => {}
-    );
+    navigator.clipboard.writeText(text).then(() => {
+      toast(`"${text}" copied to clipboard`, {
+        icon: "📋",
+      });
+    });
   }
 
   return (

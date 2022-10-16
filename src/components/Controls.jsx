@@ -1,5 +1,5 @@
 import "../css/Controls.css";
-import { BracesAsterisk, CollectionPlay, Palette } from "react-bootstrap-icons";
+import { BracesAsterisk, Palette } from "react-bootstrap-icons";
 import toast from "react-hot-toast";
 
 export default function Controls({ palette }) {

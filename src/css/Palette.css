@@ -3,9 +3,8 @@
 }
 
 .palette {
-  border: 1px solid var(--border-color);
-
   overflow: hidden;
+  border: 1px solid var(--border-color);
 }
 
 .palette-container header {

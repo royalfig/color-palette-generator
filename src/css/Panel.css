@@ -1,12 +1,12 @@
 .panel {
-  padding: var(--box-padding);
   display: flex;
-  justify-content: space-between;
+  gap: 1rem;
   align-items: center;
-  border-left: 1px solid var(--border-color);
+  justify-content: space-between;
+  padding: var(--box-padding);
   border-right: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
-  gap: 1rem;
+  border-left: 1px solid var(--border-color);
 }
 
 .panel-left {
@@ -22,4 +22,10 @@
 
 .selected-group button:not(:last-child) {
   border-right: none;
+}
+
+.panel-divider {
+  width: 1px;
+  background-color: var(--border-color);
+  margin-inline: 0.15em;
 }

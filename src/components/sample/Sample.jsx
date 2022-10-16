@@ -6,13 +6,13 @@ import one from "../../assets/1.jpg";
 import two from "../../assets/2.jpg";
 
 const titleText = {
-  complement: "The dynamic duo",
-  adjacent: "Thick as thieves",
-  triad: "Did someone say thruple?",
-  tetrad: "Four play",
-  tints: "One color's all it takes",
-  mono: "It's classy",
-  split: "Splitsville.",
+  complement: { description: "The dynamic duo", name: "Complementary" },
+  adjacent: { description: "Thick as thieves", name: "Adjacent" },
+  triad: { description: "Did someone say thruple?", name: "Triadic" },
+  tetrad: { description: "Four play", name: "Tetradic" },
+  tints: { description: "One color's all it takes", name: "Tints & Shades" },
+  mono: { description: "It's classy", name: "Monochromatic" },
+  split: { description: "Splitsville.", name: "Split Complementary" },
 };
 
 export default function Sample() {
@@ -78,7 +78,7 @@ export default function Sample() {
       </div>
       <div className={`sample ${palette}`}>
         <div className="sample-navbar">
-          <p className="sample-title"></p>
+          <p className="sample-title">{titleText[palette].name}</p>
           <div>
             <ul>
               <li>
@@ -94,7 +94,7 @@ export default function Sample() {
           </div>
         </div>
         <div className="sample-header">
-          <h2>{titleText[palette]}</h2>
+          <h2>{titleText[palette].description}</h2>
           <SampleDescription palette={palette} />
           <a href="#" className="sample-cta">
             Give me some green

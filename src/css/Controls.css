@@ -1,8 +1,9 @@
 .controls {
-  padding: 0.5rem 1rem;
   display: flex;
-  justify-content: space-between;
   gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
   border-top: 1px solid var(--border-color);
 }
 
@@ -12,8 +13,8 @@
 }
 
 .palette-name {
+  font-size: var(--small);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.2px;
-  font-size: var(--small);
 }
