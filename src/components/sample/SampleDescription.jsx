@@ -2,11 +2,14 @@ export default function SampleDescription({ palette }) {
   switch (palette) {
     case "complement":
       return (
-        <p>
-          Complementary palettes are constituted by the primary color and its
-          complement, which is on the opposite side of the color wheel
-          (180&deg;).
-        </p>
+        <>
+          <p>To make a thing outta sight.</p>
+          <p>
+            Complementary palettes are constituted by the primary color and its
+            complement, which is on the opposite side of the color wheel
+            (180&deg;).
+          </p>
+        </>
       );
     case "adjacent":
       return (
@@ -42,7 +45,10 @@ export default function SampleDescription({ palette }) {
 
     case "mono":
       return (
-        <p>10 desaturated versions of the color in varying lightnesses.</p>
+        <>
+          <p>It's bougie. It's monochromatic.</p>
+          <p>10 desaturated versions of the color in varying lightnesses.</p>
+        </>
       );
 
     case "split":

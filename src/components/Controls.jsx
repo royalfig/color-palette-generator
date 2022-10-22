@@ -1,5 +1,5 @@
 import "../css/Controls.css";
-import { BracesAsterisk, Palette } from "react-bootstrap-icons";
+import { BracesAsterisk, Palette, Share } from "react-bootstrap-icons";
 import toast from "react-hot-toast";
 
 export default function Controls({ palette }) {
@@ -12,6 +12,21 @@ export default function Controls({ palette }) {
     }
 
     toast("palette download");
+  }
+
+  async function share() {
+    const data = {
+      title: "Color Palette Pro",
+      text: "#fff",
+      url: "https://ryanfeigenbaum.com",
+    };
+
+    try {
+      await navigator.share(data);
+      toast("Shared");
+    } catch (e) {
+      toast("something went wrong");
+    }
   }
   return (
     <div className="controls">
@@ -31,6 +46,9 @@ export default function Controls({ palette }) {
           }
         >
           <Palette />
+        </button>
+        <button className="icon-button" onClick={share}>
+          <Share />
         </button>
       </div>
       <p className="palette-name">{palette}</p>

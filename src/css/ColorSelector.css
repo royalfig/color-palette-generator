@@ -20,6 +20,7 @@
 
 .color-input .react-colorful {
   width: 100%;
+  aspect-ratio: 16 / 9;
 }
 
 .color-input input {
@@ -47,13 +48,25 @@
 
 .color-input-container {
   margin-inline-end: 1rem;
+  display: flex;
+  gap: 2rem;
+  margin-block-end: 2rem;
 }
 
-.color-input-container.values {
+.color-input-container > *:first-child {
+  flex: 50%;
+}
+
+.color-selector-text-input-label {
+  display: block;
+  font-size: var(--small);
+  text-transform: uppercase;
+}
+
+.color-input-container-right {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-block-start: 1rem;
+  flex-direction: column;
+  justify-content: space-around;
 }
 
 .color-input p {
@@ -87,4 +100,11 @@
   width: 100%;
   height: 2px;
   background-image: linear-gradient(to right, transparent, var(--shades-5));
+}
+
+.eye-dropper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
 }

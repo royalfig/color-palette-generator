@@ -1,7 +1,7 @@
 :root {
   --gap: max(1.5rem, 3vh);
   --radius: 4px;
-  --small: 0.83rem;
+  --small: 0.833rem;
   --x-small: min(0.75rem, 14px);
   --button-padding: 2px 4px;
   --border-color: var(--mono-7);
@@ -67,8 +67,7 @@ h5 {
   font-size: 1.2rem;
 }
 
-small,
-.text_small {
+small {
   font-size: 0.833rem;
 }
 

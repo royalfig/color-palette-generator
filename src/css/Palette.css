@@ -17,4 +17,5 @@
   margin: 0;
   translate: -1rem;
   line-height: 1;
+  white-space: nowrap;
 }

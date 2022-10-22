@@ -26,6 +26,6 @@
 
 .panel-divider {
   width: 1px;
-  background-color: var(--border-color);
   margin-inline: 0.15em;
+  background-color: var(--border-color);
 }

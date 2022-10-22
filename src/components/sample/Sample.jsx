@@ -6,7 +6,7 @@ import one from "../../assets/1.jpg";
 import two from "../../assets/2.jpg";
 
 const titleText = {
-  complement: { description: "The dynamic duo", name: "Complementary" },
+  complement: { description: "It takes two", name: "Complementary" },
   adjacent: { description: "Thick as thieves", name: "Adjacent" },
   triad: { description: "Did someone say thruple?", name: "Triadic" },
   tetrad: { description: "Four play", name: "Tetradic" },
