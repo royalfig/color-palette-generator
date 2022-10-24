@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@types/react": "^18.0.17",
-    "@types/react-dom": "^18.0.6",
+    "@types/react-dom": "18.0.7",
     "@vitejs/plugin-react": "^2.1.0",
     "stylelint": "^14.13.0",
     "stylelint-config-prettier": "^9.0.3",
