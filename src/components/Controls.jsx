@@ -17,8 +17,8 @@ export default function Controls({ palette }) {
   async function share() {
     const data = {
       title: "Color Palette Pro",
-      text: "#fff",
-      url: "https://ryanfeigenbaum.com",
+      text: `${palette}`,
+      url: window.location.href,
     };
 
     try {
@@ -28,6 +28,7 @@ export default function Controls({ palette }) {
       toast("something went wrong");
     }
   }
+
   return (
     <div className="controls">
       <div className="controls-buttons">

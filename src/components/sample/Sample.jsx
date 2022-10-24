@@ -4,7 +4,7 @@ import SampleDescription from "./SampleDescription";
 import zero from "../../assets/0.jpg";
 import one from "../../assets/1.jpg";
 import two from "../../assets/2.jpg";
-
+import Mono from "./Mono";
 const titleText = {
   complement: { description: "It takes two", name: "Complementary" },
   adjacent: { description: "Thick as thieves", name: "Adjacent" },
@@ -76,7 +76,7 @@ export default function Sample() {
           Mono
         </button>
       </div>
-      <div className={`sample ${palette}`}>
+      {/* <div className={`sample ${palette}`}>
         <div className="sample-navbar">
           <p className="sample-title">{titleText[palette].name}</p>
           <div>
@@ -168,7 +168,8 @@ export default function Sample() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
+      <Mono />
     </div>
   );
 }

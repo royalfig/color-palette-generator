@@ -1,0 +1,73 @@
+.mono-container {
+  border: 1px solid var(--border-color);
+  border-top: none;
+}
+
+.mono-navbar {
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  font-size: var(--small);
+}
+
+.mono-navbar ul {
+  list-style-type: none;
+  display: flex;
+  gap: 1rem;
+}
+
+.mono-header {
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.mono-header h2 {
+  font-weight: 900;
+  font-size: 4rem;
+  color: var(--mono-3);
+}
+
+.mono-description {
+  margin-top: 1rem;
+}
+
+.mono-cta {
+  padding: var(--button-padding);
+  text-decoration: none;
+  border: 1px solid var(--border-color);
+  font-size: var(--small);
+  text-transform: uppercase;
+  color: inherit;
+  margin: 2rem auto 0.15rem;
+  display: inline-block;
+}
+
+.mono-cta ~ p {
+  font-size: var(--x-small);
+}
+
+.mono-featured {
+  display: grid;
+  padding: 2rem 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.mono-featured-card {
+  /* padding: 1rem; */
+}
+
+.mono-featured-image {
+  background-color: var(--mono-5);
+  height: 5rem;
+  display: block;
+  padding-block-end: 0.5em;
+}
+
+.mono-featured h3 {
+  margin-block-start: 0.5em;
+  padding-block-start: 0.5em;
+  border-top: 1px solid var(--border-color);
+  font-size: 1.5rem;
+}
