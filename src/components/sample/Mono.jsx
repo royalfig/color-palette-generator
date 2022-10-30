@@ -1,55 +1,29 @@
 import "../../css/Mono.css";
+import Featured from "./Featured";
+import Header from "./Header";
+import Nav from "./Nav";
+import List from "./List";
+import Footer from "./Footer";
 
-export default function Mono(props) {
+export default function Mono() {
+  const paletteClassName = { palette: "mono" };
+
   return (
-    <div className="mono-container">
-      <div className="mono-navbar">
-        <div className="brand">Monochromatic</div>
-        <nav>
-          <ul>
-            <li>
-              <a>About</a>
-            </li>
-            <li>
-              <a>Resources</a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-      <header className="mono-header">
-        <h2>It's classy.</h2>
+    <div className="sample-container">
+      <Nav title="Monochromatic" {...paletteClassName} />
 
-        <p>It's bougie. It's monochromatic.</p>
+      <Header
+        title="It's classy"
+        subtitle="It's bougies. It's monochromatic."
+        description="10 desaturated versions of the same color in varying lightnesses."
+        {...paletteClassName}
+      />
 
-        <p className="mono-description">
-          10 desaturated versions of the color in varying lightnesses.
-        </p>
+      <Featured {...paletteClassName} />
 
-        <a href="" className="mono-cta">
-          Show me some green
-        </a>
-        <p>Support this project</p>
-      </header>
-      <section className="mono-featured">
-        <article className="mono-featured-card">
-          <div class="mono-featured-image"></div>
-          <h3>Relative luminance: a TL;DR</h3>
-        </article>
-        <article className="mono-featured-card">
-          <div class="mono-featured-image"></div>
-          <h3>Why HSL is a liar</h3>
-        </article>
-        <article className="mono-featured-card">
-          <div class="mono-featured-image"></div>
-          <h3>The browser is dull</h3>
-        </article>
-      </section>
+      <List {...paletteClassName} />
 
-      <section className="mono-list"></section>
-
-      <footer className="mono-footer">
-        <a href="http://github.com/royalfig">GitHub</a>
-      </footer>
+      <Footer {...paletteClassName} />
     </div>
   );
 }

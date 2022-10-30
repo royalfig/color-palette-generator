@@ -1,10 +1,15 @@
 .app {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 4vmax;
   max-width: 2000px;
   padding: 2vmax 4vmax;
   margin-inline: auto;
+}
+
+@media (min-width: 1000px) {
+  .app {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .left,

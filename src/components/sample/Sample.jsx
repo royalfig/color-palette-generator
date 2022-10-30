@@ -1,10 +1,7 @@
 import "../../css/Sample.css";
 import { useState } from "react";
-import SampleDescription from "./SampleDescription";
-import zero from "../../assets/0.jpg";
-import one from "../../assets/1.jpg";
-import two from "../../assets/2.jpg";
-import Mono from "./Mono";
+import SampleDisplay from "./SampleDisplay";
+
 const titleText = {
   complement: { description: "It takes two", name: "Complementary" },
   adjacent: { description: "Thick as thieves", name: "Adjacent" },
@@ -76,100 +73,8 @@ export default function Sample() {
           Mono
         </button>
       </div>
-      {/* <div className={`sample ${palette}`}>
-        <div className="sample-navbar">
-          <p className="sample-title">{titleText[palette].name}</p>
-          <div>
-            <ul>
-              <li>
-                <a href="#">About</a>
-              </li>
-              <li>
-                <a href="#">Resources</a>
-              </li>
-              <li>
-                <a href="#">Github</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div className="sample-header">
-          <h2>{titleText[palette].description}</h2>
-          <SampleDescription palette={palette} />
-          <a href="#" className="sample-cta">
-            Give me some green
-          </a>
-        </div>
-        <div className="sample-body">
-          <article className="sample-article">
-            <div className="sample-image">
-              <img src={zero} alt="" />
-            </div>
-            <h3>
-              <a href="https://lea.verou.me/2022/06/releasing-colorjs/">
-                A library that takes color seriously
-              </a>
-            </h3>
-          </article>
-          <article className="sample-article">
-            <div className="sample-image">
-              <img src={one} alt="" />
-            </div>
-            <h3>Sample text</h3>
-          </article>
-          <article className="sample-article">
-            <div className="sample-image">
-              <img src={two} alt="" />
-            </div>
-            <h3>Sample text</h3>
-          </article>
-        </div>
-        <div className="sample-listings">
-          <div className="l">
-            <div className="card">
-              <div className="card-image"></div>
-              <h3>Test</h3>
-            </div>
-            <div className="card">
-              <div className="card-image"></div>
-              <h3>Test</h3>
-            </div>
-            <div className="card">
-              <div className="card-image"></div>
-              <h3>Test</h3>
-            </div>
-          </div>
-          <div className="c">
-            <div className="card">
-              <div className="card-image"></div>
-              <h3>Test</h3>
-            </div>
-            <div className="card">
-              <div className="card-image"></div>
-              <h3>Test</h3>
-            </div>
-            <div className="card">
-              <div className="card-image"></div>
-              <h3>Test</h3>
-            </div>
-          </div>
-          <div className="r">
-            <div className="card">
-              <div className="card-image"></div>
-              <h3>Test</h3>
-            </div>
-            <div className="card">
-              <div className="card-image"></div>
-              <h3>Test</h3>
-            </div>
-            <div className="card">
-              <div className="card-image"></div>
-              <h3>Test</h3>
-            </div>
-          </div>
-        </div>
-      </div> */}
-      <Mono />
+
+      <SampleDisplay selectedPalette={palette} />
     </div>
   );
 }
