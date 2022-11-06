@@ -1,0 +1,30 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--mono-10);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.navbar button:not(:last-child) {
+  border-right: none;
+}
+
+.navbar .left h1 {
+  font-size: 1rem;
+}
+
+.navbar .right {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+}
+
+.navbar ~ .app {
+  margin-top: 4rem;
+}

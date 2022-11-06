@@ -3,11 +3,15 @@ import { useState, useCallback } from "react";
 // import Header from "./components/Header";
 import Palette from "./components/Palette";
 import Panel from "./components/Panel";
+import Sample from "./components/sample/Sample";
+import Navbar from "./components/Navbar";
+import UserInputControls from "./components/UserInputControls";
+import ColorSelector from "./components/ColorSelector";
+import PaletteSelector from "./components/PaletteSelector";
+import Options from "./components/Options";
 
 import { generateCss } from "./util";
-import Sample from "./components/sample/Sample";
 import { Toaster } from "react-hot-toast";
-import ColorSelector from "./components/ColorSelector";
 import { debounce, size } from "lodash-es";
 import { useEffect } from "react";
 
@@ -49,6 +53,7 @@ function App() {
   return (
     <div className={corrected ? "corrected" : undefined}>
       {/* <Header /> */}
+      <Navbar></Navbar>
 
       <Toaster
         toastOptions={{
@@ -65,21 +70,20 @@ function App() {
           },
         }}
       />
+
       <main className="app">
         <section className="left">
-          <ColorSelector
-            setColor={debouncedHandler}
-            color={color}
-            selected={selected}
-          >
-            <Panel
-              setCorrected={setCorrected}
-              corrected={corrected}
+          <UserInputControls>
+            <ColorSelector
+              setColor={debouncedHandler}
               color={color}
               selected={selected}
-              setSelected={setSelected}
-            />
-          </ColorSelector>
+            ></ColorSelector>
+
+            <PaletteSelector></PaletteSelector>
+
+            <Options></Options>
+          </UserInputControls>
 
           <Palette
             type="comp"
@@ -89,7 +93,7 @@ function App() {
             selected={selected}
           />
 
-          <Palette
+          {/* <Palette
             type="split"
             corrected={corrected}
             name="Split Complementary"
@@ -118,11 +122,11 @@ function App() {
             corrected={corrected}
             selected={selected}
             hex={color}
-          />
+          /> */}
         </section>
         <section className="right">
           <Sample />
-          <Palette
+          {/* <Palette
             type="shades"
             name="Tints &amp; Shades"
             corrected={corrected}
@@ -136,7 +140,7 @@ function App() {
             corrected={corrected}
             selected={selected}
             hex={color}
-          />
+          /> */}
         </section>
       </main>
     </div>
