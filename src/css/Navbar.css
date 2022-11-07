@@ -7,14 +7,16 @@
   justify-content: space-between;
   width: 100%;
   padding: 1rem;
-  background-color: var(--mono-10);
-  border-bottom: 1px solid var(--border-color);
+  background-color: var(--complement-1);
+  border-left: 0.5rem solid var(--complement-2);
+  color: var(--complement-1-contrast);
 }
 
-.navbar button:not(:last-child) {
-  border-right: none;
+.navbar .icon-button {
+  color: var(--complement-1-contrast);
+  border: none;
+  font-size: 1rem;
 }
-
 .navbar .left h1 {
   font-size: 1rem;
 }

@@ -33,4 +33,12 @@
   font-weight: 600;
   line-height: 1.2;
   text-align: right;
+  flex-direction: column;
+}
+
+.color-swatch p {
+  font-size: var(--small);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }

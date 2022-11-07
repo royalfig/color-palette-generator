@@ -16,6 +16,6 @@
 .right {
   display: flex;
   flex-direction: column;
-  gap: var(--gap);
+  gap: 2rem;
   justify-content: space-between;
 }

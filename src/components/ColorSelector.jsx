@@ -1,7 +1,7 @@
 import "../css/ColorSelector.css";
 
 import { HexColorPicker, HexColorInput } from "react-colorful";
-import { Eyedropper } from "react-bootstrap-icons";
+import { Eyedropper, Lightbulb } from "react-bootstrap-icons";
 
 export default function ColorSelector({ setColor, color, children }) {
   async function handleEyedropper(e) {
@@ -22,7 +22,7 @@ export default function ColorSelector({ setColor, color, children }) {
       <div className="color-selector">
         <div className="color-input">
           <section className="color-input-heading">
-            <h1>Pick a color, any color</h1>
+            <h2>Pick a color, any color</h2>
             <div className="gradients">
               <div className="gradient"></div>
               <div className="gradient"></div>
@@ -47,6 +47,9 @@ export default function ColorSelector({ setColor, color, children }) {
                   <Eyedropper /> <span>Eye dropper</span>
                 </button>
               ) : undefined}
+              <button className="eye-dropper">
+                <Lightbulb /> Relative luminance
+              </button>
             </div>
           </section>
         </div>

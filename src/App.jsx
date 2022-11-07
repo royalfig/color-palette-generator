@@ -10,7 +10,16 @@ import ColorSelector from "./components/ColorSelector";
 import PaletteSelector from "./components/PaletteSelector";
 import Options from "./components/Options";
 
-import { generateCss } from "./util";
+import {
+  createAdjacent,
+  createComplement,
+  createMonochromatic,
+  createShades,
+  createSplit,
+  createTetrad,
+  createTriad,
+  generateCss,
+} from "./util";
 import { Toaster } from "react-hot-toast";
 import { debounce, size } from "lodash-es";
 import { useEffect } from "react";
@@ -24,9 +33,59 @@ function getQueryParam() {
 function App() {
   const [color, setColor] = useState(getQueryParam() || "#21a623");
   const [corrected, setCorrected] = useState(false);
-  const [selected, setSelected] = useState("hex");
+  const [darkMode, setDarkMode] = useState(false);
 
-  generateCss(color);
+  const handleDarkMode = () => {
+    setDarkMode((val) => !val);
+  };
+
+  const complementaryPalette = createComplement(color);
+  const splitComplementaryPalette = createSplit(color);
+  const analogousPalette = createAdjacent(color);
+  const triadicPalette = createTriad(color);
+  const tetradicPalette = createTetrad(color);
+  const shadesPalette = createShades(color);
+  const monochramaticPalette = createMonochromatic(color);
+
+  const [palette, setPalette] = useState(complementaryPalette);
+
+  function handlePalette(e) {
+    const name = e?.currentTarget?.dataset?.name || e;
+    switch (name) {
+      case "Complementary":
+        setPalette(complementaryPalette);
+        break;
+      case "Split Complementary":
+        setPalette(splitComplementaryPalette);
+        break;
+
+      case "Analogous":
+        setPalette(analogousPalette);
+        break;
+
+      case "Triadic":
+        setPalette(triadicPalette);
+        break;
+
+      case "Tetradic":
+        setPalette(tetradicPalette);
+        break;
+
+      case "Shades":
+        setPalette(shadesPalette);
+        break;
+
+      case "Monochromatic":
+        setPalette(monochramaticPalette);
+        break;
+    }
+  }
+
+  useEffect(() => {
+    handlePalette(palette[0].name);
+  }, [color]);
+
+  const css = generateCss(color);
 
   const debouncedHandler = useCallback(
     debounce((e) => {
@@ -53,23 +112,11 @@ function App() {
   return (
     <div className={corrected ? "corrected" : undefined}>
       {/* <Header /> */}
-      <Navbar></Navbar>
-
-      <Toaster
-        toastOptions={{
-          position: "top-right",
-          style: {
-            border: "1px solid var(--border-color)",
-            backgroundColor: "var(--mono-10)",
-            color: "var(--mono-1)",
-            borderRadius: 0,
-            padding: "var(--button-padding)",
-            fontSize: "var(--small)",
-            boxShadow:
-              "2.8px 2.8px 2.2px rgba(0, 0, 0, 0.02),6.7px 6.7px 5.3px rgba(0, 0, 0, 0.028),12.5px 12.5px 10px rgba(0, 0, 0, 0.035),22.3px 22.3px 17.9px rgba(0, 0, 0, 0.042),41.8px 41.8px 33.4px rgba(0, 0, 0, 0.05),100px 100px 80px rgba(0, 0, 0, 0.07)",
-          },
-        }}
-      />
+      <Navbar
+        setDarkMode={handleDarkMode}
+        darkMode={darkMode}
+        css={css}
+      ></Navbar>
 
       <main className="app">
         <section className="left">
@@ -77,21 +124,24 @@ function App() {
             <ColorSelector
               setColor={debouncedHandler}
               color={color}
-              selected={selected}
             ></ColorSelector>
 
-            <PaletteSelector></PaletteSelector>
-
-            <Options></Options>
+            <PaletteSelector
+              palettes={[
+                complementaryPalette,
+                splitComplementaryPalette,
+                analogousPalette,
+                tetradicPalette,
+                triadicPalette,
+                shadesPalette,
+                monochramaticPalette,
+              ]}
+              handlePalette={handlePalette}
+              palette={palette}
+            ></PaletteSelector>
           </UserInputControls>
 
-          <Palette
-            type="comp"
-            corrected={corrected}
-            name="Complementary"
-            hex={color}
-            selected={selected}
-          />
+          <Palette palette={palette} />
 
           {/* <Palette
             type="split"
@@ -125,7 +175,7 @@ function App() {
           /> */}
         </section>
         <section className="right">
-          <Sample />
+          {/* <Sample /> */}
           {/* <Palette
             type="shades"
             name="Tints &amp; Shades"

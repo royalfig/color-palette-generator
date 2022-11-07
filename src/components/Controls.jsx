@@ -32,25 +32,9 @@ export default function Controls({ palette }) {
   return (
     <div className="controls">
       <div className="controls-buttons">
-        <button
-          className="icon-button"
-          onClick={() =>
-            copyToClipboard({ type: "css", value: "{color: red}" })
-          }
-        >
-          <BracesAsterisk />
-        </button>
-        <button
-          className="icon-button"
-          onClick={() =>
-            copyToClipboard({ type: "palette", value: "{color: red}" })
-          }
-        >
-          <Palette />
-        </button>
-        <button className="icon-button" onClick={share}>
-          <Share />
-        </button>
+        <button>1</button>
+        <button>2</button>
+        <button>3</button>
       </div>
       <p className="palette-name">{palette}</p>
     </div>

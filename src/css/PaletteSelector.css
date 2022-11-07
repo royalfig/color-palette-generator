@@ -1,0 +1,30 @@
+.palette-selector {
+  /* border: 1px solid var(--border-color); */
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.palette-selector-header {
+  display: flex;
+  gap: 1rem;
+  grid-column: span 2;
+  align-items: center;
+}
+.palette-selector-header > h2 {
+  flex-shrink: 0;
+  /* font-size: 3rem; */
+}
+
+.palette-selector-card {
+  display: flex;
+  align-items: center;
+  text-align: left;
+}
+
+.palette-selector > .palette-selector-card:hover,
+.palette-selector > .palette-selector-card.active {
+  border-color: var(--complement-1);
+  color: var(--mono-9-contrast);
+  background: var(--mono-9);
+}

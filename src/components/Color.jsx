@@ -1,27 +1,8 @@
 import "../css/Color.css";
 import Copy from "./Copy";
 
-export default function Color({ color, corrected, selected, names }) {
-  const correctedNames = names.slice(names.length / 2);
-
-  function getValue(c, index) {
-    if (corrected && selected === "name") {
-      return correctedNames[index].name;
-    }
-
-    if (!corrected & (selected === "name")) {
-      return names[index].name;
-    }
-
-    if (!corrected) {
-      return c[selected];
-    }
-
-    if (corrected) {
-      return c.corrected[selected];
-    }
-  }
-
+export default function Color({ color }) {
+  const corrected = false;
   return (
     <div className={"colors colors-" + color.length}>
       {color.map((c, index) => {
@@ -34,7 +15,8 @@ export default function Color({ color, corrected, selected, names }) {
               color: !corrected ? c.contrast : c.corrected.contrast,
             }}
           >
-            <Copy text={getValue(c, index)} />
+            <Copy text={c.hex} />
+            <p>Hex</p>
           </article>
         );
       })}
