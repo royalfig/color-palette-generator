@@ -21,7 +21,7 @@ export default function ColorSelector({ setColor, color, children }) {
     <div>
       <div className="color-selector">
         <div className="color-input">
-          <section className="color-input-heading">
+          <section className="color-input-heading gradient-header">
             <h2>Pick a color, any color</h2>
             <div className="gradients">
               <div className="gradient"></div>
@@ -50,6 +50,7 @@ export default function ColorSelector({ setColor, color, children }) {
               <button className="eye-dropper">
                 <Lightbulb /> Relative luminance
               </button>
+              <p>What's relative luminance?</p>
             </div>
           </section>
         </div>

@@ -2,7 +2,7 @@ import "../css/Controls.css";
 import { BracesAsterisk, Palette, Share } from "react-bootstrap-icons";
 import toast from "react-hot-toast";
 
-export default function Controls({ palette }) {
+export default function Controls({ PaletteName }) {
   function copyToClipboard(arg) {
     const { type, value } = arg;
 
@@ -36,7 +36,7 @@ export default function Controls({ palette }) {
         <button>2</button>
         <button>3</button>
       </div>
-      <p className="palette-name">{palette}</p>
+      <p className="palette-name">palette name</p>
     </div>
   );
 }

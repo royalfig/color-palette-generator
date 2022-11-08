@@ -26,13 +26,7 @@ export default function Palette({ palette }) {
       </header>
       <div className="palette">
         <Color color={palette} />
-        {/* <Color
-          corrected={corrected}
-          color={palette}
-          
-          
-        />
-        <Controls palette={palette} /> */}
+        <Controls paletteName="" />
       </div>
     </div>
   );

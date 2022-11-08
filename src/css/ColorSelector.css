@@ -1,8 +1,10 @@
+/* stylelint-disable selector-class-pattern */
 .user-input-controls {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
+
 .color-selector {
   position: relative;
   overflow: hidden;
@@ -23,6 +25,11 @@
 .color-input .react-colorful {
   width: 100%;
   aspect-ratio: 16 / 9;
+}
+
+.color-input .react-colorful__saturation,
+.color-input .react-colorful__last-control {
+  border-radius: 0;
 }
 
 .color-input input {
@@ -52,7 +59,6 @@
   display: flex;
   gap: 2rem;
   margin-block-end: 2rem;
-  margin-inline-end: 1rem;
 }
 
 .color-input-container > *:first-child {
@@ -89,6 +95,16 @@
 .color-input-container.values p {
   font-size: var(--small);
   font-weight: 600;
+}
+
+.gradient-heading {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.gradient-heading h2 {
+  flex-shrink: 0;
 }
 
 .gradients {

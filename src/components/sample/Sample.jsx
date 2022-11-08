@@ -21,59 +21,6 @@ export default function Sample() {
 
   return (
     <div>
-      <div className="sample-selector">
-        <button
-          className={palette === "complement" ? "active" : undefined}
-          onClick={clickHandler}
-          data-value="complement"
-        >
-          Complement
-        </button>
-
-        <button
-          className={palette === "split" ? "active" : undefined}
-          onClick={clickHandler}
-          data-value="split"
-        >
-          Split
-        </button>
-        <button
-          className={palette === "adjacent" ? "active" : undefined}
-          onClick={clickHandler}
-          data-value="adjacent"
-        >
-          Adjacent
-        </button>
-        <button
-          className={palette === "triad" ? "active" : undefined}
-          onClick={clickHandler}
-          data-value="triad"
-        >
-          Triad
-        </button>
-        <button
-          className={palette === "tetrad" ? "active" : undefined}
-          onClick={clickHandler}
-          data-value="tetrad"
-        >
-          Tetrad
-        </button>
-        <button
-          className={palette === "tints" ? "active" : undefined}
-          onClick={clickHandler}
-          data-value="tints"
-        >
-          Shades
-        </button>
-        <button
-          className={palette === "mono" ? "active" : undefined}
-          onClick={clickHandler}
-          data-value="mono"
-        >
-          Mono
-        </button>
-      </div>
-
       <SampleDisplay selectedPalette={palette} />
     </div>
   );

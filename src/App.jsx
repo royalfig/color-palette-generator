@@ -141,56 +141,12 @@ function App() {
             ></PaletteSelector>
           </UserInputControls>
 
+          <Options />
+
           <Palette palette={palette} />
-
-          {/* <Palette
-            type="split"
-            corrected={corrected}
-            name="Split Complementary"
-            hex={color}
-            selected={selected}
-          />
-
-          <Palette
-            type="adjacent"
-            name="Adjacent"
-            corrected={corrected}
-            selected={selected}
-            hex={color}
-          />
-
-          <Palette
-            type="triad"
-            name="Triadic"
-            corrected={corrected}
-            selected={selected}
-            hex={color}
-          />
-          <Palette
-            type="tetrad"
-            name="Tetradic"
-            corrected={corrected}
-            selected={selected}
-            hex={color}
-          /> */}
         </section>
         <section className="right">
-          {/* <Sample /> */}
-          {/* <Palette
-            type="shades"
-            name="Tints &amp; Shades"
-            corrected={corrected}
-            selected={selected}
-            hex={color}
-          />
-
-          <Palette
-            type="mono"
-            name="Monochromatic"
-            corrected={corrected}
-            selected={selected}
-            hex={color}
-          /> */}
+          <Sample />
         </section>
       </main>
     </div>

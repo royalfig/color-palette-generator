@@ -16,7 +16,6 @@ export default function Color({ color }) {
             }}
           >
             <Copy text={c.hex} />
-            <p>Hex</p>
           </article>
         );
       })}
