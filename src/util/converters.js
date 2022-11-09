@@ -40,7 +40,7 @@ function colorFactory(colors) {
     colors: []
   }
 */
-  return colors.map(({ color, corrected, name }) => {
+  return colors.map(({ color, corrected, name, css }) => {
     return {
       name,
       hex: color.toString({ format: "hex" }),
@@ -54,6 +54,7 @@ function colorFactory(colors) {
       l: color.lch.l,
       y: y(color.to("srgb")),
       point: color.hsl,
+      css,
       corrected: {
         name,
         hex: corrected.toString({ format: "hex" }),
@@ -68,6 +69,7 @@ function colorFactory(colors) {
           corrected.contrast("white", "wcag21")
             ? "#000"
             : "#fff",
+        css,
       },
     };
   });
@@ -88,11 +90,12 @@ function createComplement(hex) {
   complement.hsl.h += 180;
 
   return colorFactory([
-    { color: base, corrected: base, name: "Complementary" },
+    { color: base, corrected: base, name: "Complementary", css: "comp-1" },
     {
       color: complement,
       corrected: corrector(hex, 180),
       name: "Complementary",
+      css: "comp-2",
     },
   ]);
 }
@@ -109,12 +112,19 @@ function createSplit(hex) {
       color: triad1,
       corrected: corrector(hex, 150),
       name: "Split Complementary",
+      css: "split-1",
     },
-    { color: base, corrected: base, name: "Split Complementary" },
+    {
+      color: base,
+      corrected: base,
+      name: "Split Complementary",
+      css: "split-1",
+    },
     {
       color: triad2,
       corrected: corrector(hex, 210),
       name: "Split Complementary",
+      css: "split-1",
     },
   ]);
 }
@@ -127,9 +137,19 @@ function createTriad(hex) {
   triad2.hsl.h += 240;
 
   return colorFactory([
-    { color: triad1, corrected: corrector(hex, 120), name: "Triadic" },
-    { color: base, corrected: base, name: "Triadic" },
-    { color: triad2, corrected: corrector(hex, 240), name: "Triadic" },
+    {
+      color: triad1,
+      corrected: corrector(hex, 120),
+      name: "Triadic",
+      css: "triadic-1",
+    },
+    { color: base, corrected: base, name: "Triadic", css: "tradic-2" },
+    {
+      color: triad2,
+      corrected: corrector(hex, 240),
+      name: "Triadic",
+      css: "triadic-3",
+    },
   ]);
 }
 
@@ -141,9 +161,19 @@ function createAdjacent(hex) {
   adjacent2.hsl.h += 30;
 
   return colorFactory([
-    { color: adjacent1, corrected: corrector(hex, -30), name: "Analogous" },
+    {
+      color: adjacent1,
+      corrected: corrector(hex, -30),
+      name: "Analogous",
+      css: "analogous-1",
+    },
     { color: base, corrected: base, name: "Analogous" },
-    { color: adjacent2, corrected: corrector(hex, 30), name: "Analogous" },
+    {
+      color: adjacent2,
+      corrected: corrector(hex, 30),
+      name: "Analogous",
+      css: "analogous-2",
+    },
   ]);
 }
 
@@ -158,10 +188,25 @@ function createTetrad(hex) {
   tetrad3.hsl.h += 90 * 3;
 
   return colorFactory([
-    { color: base, corrected: base, name: "Tetradic" },
-    { color: tetrad1, corrected: corrector(hex, 90), name: "Tetradic" },
-    { color: tetrad2, corrected: corrector(hex, 90 * 2), name: "Tetradic" },
-    { color: tetrad3, corrected: corrector(hex, 90 * 3), name: "Tetradic" },
+    { color: base, corrected: base, name: "Tetradic", css: "Tetradic-1" },
+    {
+      color: tetrad1,
+      corrected: corrector(hex, 90),
+      name: "Tetradic",
+      css: "Tetradic-2",
+    },
+    {
+      color: tetrad2,
+      corrected: corrector(hex, 90 * 2),
+      name: "Tetradic",
+      css: "Tetradic-3",
+    },
+    {
+      color: tetrad3,
+      corrected: corrector(hex, 90 * 3),
+      name: "Tetradic",
+      css: "Tetradic-4",
+    },
   ]);
 }
 
@@ -170,9 +215,14 @@ function createMonochromatic(hex) {
 
   for (let index = 0; index < 10; index++) {
     const color = new Color(hex);
-    color.hsl.s = 15;
-    color.hsl.l = index * 10 + 5;
-    colors.push({ color: color, corrected: color, name: "Monochromatic" });
+    color.hsl.s = 10;
+    color.hsl.l = index * 10 + 8;
+    colors.push({
+      color: color,
+      corrected: color,
+      name: "Monochromatic",
+      css: `mono-${index}`,
+    });
   }
 
   return colorFactory(colors);
@@ -183,22 +233,16 @@ function createShades(hex) {
 
   for (let index = 0; index < 10; index++) {
     const color = new Color(hex);
-    color.hsl.l = index * 10 + 5;
-    colors.push({ color: color, corrected: color, name: "Shades" });
+    color.hsl.l = index * 10 + 8;
+    colors.push({
+      color: color,
+      corrected: color,
+      name: "Shades",
+      css: `shades-${index}`,
+    });
   }
 
   return colorFactory(colors);
-  const correctedColors = [];
-
-  for (let index = 0; index < 10; index++) {
-    const color = new Color(hex);
-    const [y] = color.lch;
-    const delta = y - color.hsl.l;
-
-    color.hsl.l = y;
-    color.hsl.l = index * 10 + 5 + delta;
-    correctedColors.push(color);
-  }
 }
 
 export {

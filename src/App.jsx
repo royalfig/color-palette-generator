@@ -1,8 +1,6 @@
 import "./css/App.css";
 import { useState, useCallback } from "react";
-// import Header from "./components/Header";
 import Palette from "./components/Palette";
-import Panel from "./components/Panel";
 import Sample from "./components/sample/Sample";
 import Navbar from "./components/Navbar";
 import UserInputControls from "./components/UserInputControls";
@@ -23,6 +21,7 @@ import {
 import { Toaster } from "react-hot-toast";
 import { debounce, size } from "lodash-es";
 import { useEffect } from "react";
+import { Eye, Lightbulb, BracesAsterisk, Image } from "react-bootstrap-icons";
 
 function getQueryParam() {
   const params = new URLSearchParams(document.location.search);
@@ -32,8 +31,10 @@ function getQueryParam() {
 
 function App() {
   const [color, setColor] = useState(getQueryParam() || "#21a623");
-  const [corrected, setCorrected] = useState(false);
+  const [corrected, setCorrected] = useState(false); // TODO Delete
   const [darkMode, setDarkMode] = useState(false);
+  const [luminance, setLuminance] = useState("absolute");
+  const [displayValue, setDisplayValue] = useState("hex");
 
   const handleDarkMode = () => {
     setDarkMode((val) => !val);
@@ -111,7 +112,6 @@ function App() {
 
   return (
     <div className={corrected ? "corrected" : undefined}>
-      {/* <Header /> */}
       <Navbar
         setDarkMode={handleDarkMode}
         darkMode={darkMode}
@@ -139,13 +139,64 @@ function App() {
               handlePalette={handlePalette}
               palette={palette}
             ></PaletteSelector>
+
+            <Options
+              setDisplayValue={setDisplayValue}
+              displayValue={displayValue}
+            />
+
+            <div className="luminance-container">
+              <div className="luminance-header">
+                <h2>Luminance</h2>
+                <div className="gradients">
+                  <div className="gradient"></div>
+                  <div className="gradient"></div>
+                  <div className="gradient"></div>
+                </div>
+              </div>
+              <p>Luminance measures the brightness of a color.</p>
+
+              <div className="flex">
+                <button
+                  onClick={() => setLuminance("absolute")}
+                  className={
+                    luminance === "absolute"
+                      ? "icon-text-button active"
+                      : "icon-text-button"
+                  }
+                >
+                  <Lightbulb /> Absolute
+                </button>
+                <button
+                  onClick={() => setLuminance("relative")}
+                  className={
+                    luminance === "relative"
+                      ? "icon-text-button active"
+                      : "icon-text-button"
+                  }
+                >
+                  <Eye />
+                  Relative
+                </button>
+              </div>
+            </div>
+
+            <div className="preferences-container">
+              <button className="icon-text-button">
+                <BracesAsterisk /> CSS
+              </button>
+              <button className="icon-text-button">
+                <Image /> Image
+              </button>
+            </div>
           </UserInputControls>
-
-          <Options />
-
-          <Palette palette={palette} />
         </section>
         <section className="right">
+          <Palette
+            palette={palette}
+            luminance={luminance}
+            displayValue={displayValue}
+          />
           <Sample />
         </section>
       </main>

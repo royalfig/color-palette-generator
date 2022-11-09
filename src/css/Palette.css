@@ -1,5 +1,7 @@
 .palette-container {
   /* margin-block-start: 3rem; */
+  padding: 1rem;
+  background-color: var(--mono-9);
 }
 
 .palette {

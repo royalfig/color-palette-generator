@@ -5,7 +5,7 @@ export default function PaletteSelector({ palettes, handlePalette, palette }) {
   return (
     <section className="palette-selector">
       <header className="palette-selector-header">
-        <h2>Pick a palette</h2>
+        <h2>Palette</h2>
         <div className="gradients">
           <div className="gradient"></div>
           <div className="gradient"></div>
@@ -34,6 +34,7 @@ export default function PaletteSelector({ palettes, handlePalette, palette }) {
                   ? "circle"
                   : "default"
               }
+              size="small"
             />
             <p>{colors[0].name}</p>
           </button>

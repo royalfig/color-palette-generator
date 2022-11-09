@@ -1,8 +1,17 @@
 import "../css/Color.css";
 import Copy from "./Copy";
 
-export default function Color({ color }) {
-  const corrected = false;
+export default function Color({ color, luminance, displayValue, colorTitles }) {
+  console.log("color render");
+
+  if (colorTitles.length) {
+    color.forEach((c, idx) => {
+      c.title = colorTitles[idx]?.name;
+      c.corrected.title = colorTitles[idx]?.name;
+      return color;
+    });
+  }
+
   return (
     <div className={"colors colors-" + color.length}>
       {color.map((c, index) => {
@@ -11,11 +20,19 @@ export default function Color({ color }) {
             key={index}
             className="color-swatch"
             style={{
-              backgroundColor: !corrected ? c.hex : c.corrected.hex,
-              color: !corrected ? c.contrast : c.corrected.contrast,
+              backgroundColor:
+                luminance === "absolute" ? c.hex : c.corrected.hex,
+              color:
+                luminance === "absolute" ? c.contrast : c.corrected.contrast,
             }}
           >
-            <Copy text={c.hex} />
+            <Copy
+              text={
+                luminance === "absolute"
+                  ? c[displayValue]
+                  : c.corrected[displayValue]
+              }
+            />
           </article>
         );
       })}

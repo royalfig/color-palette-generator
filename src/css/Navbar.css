@@ -7,16 +7,17 @@
   justify-content: space-between;
   width: 100%;
   padding: 1rem;
+  color: var(--complement-1-contrast);
   background-color: var(--complement-1);
   border-left: 0.5rem solid var(--complement-2);
-  color: var(--complement-1-contrast);
 }
 
 .navbar .icon-button {
+  font-size: 1rem;
   color: var(--complement-1-contrast);
   border: none;
-  font-size: 1rem;
 }
+
 .navbar .left h1 {
   font-size: 1rem;
 }

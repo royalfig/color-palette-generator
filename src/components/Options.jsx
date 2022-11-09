@@ -1,10 +1,9 @@
 import "../css/Options.css";
-export default function Options() {
-  const selected = "hex";
+export default function Options({ setDisplayValue, displayValue }) {
   return (
     <div className="options">
       <div className="gradient-heading">
-        <h2>Pick Your Value</h2>
+        <h2>Display</h2>
         <div className="gradients">
           <div className="gradient"></div>
           <div className="gradient"></div>
@@ -14,40 +13,47 @@ export default function Options() {
 
       <div className="options-button-group">
         <button
-          className={selected === "hex" ? "active" : undefined}
-          onClick={() => setSelected("hex")}
+          className={displayValue === "hex" ? "active" : undefined}
+          onClick={() => setDisplayValue("hex")}
         >
           Hex
         </button>
         <button
-          className={selected === "rgb" ? "active" : undefined}
-          onClick={() => setSelected("rgb")}
+          className={displayValue === "rgb" ? "active" : undefined}
+          onClick={() => setDisplayValue("rgb")}
         >
           Rgb
         </button>
         <button
-          className={selected === "hsl" ? "active" : undefined}
-          onClick={() => setSelected("hsl")}
+          className={displayValue === "hsl" ? "active" : undefined}
+          onClick={() => setDisplayValue("hsl")}
         >
           Hsl
         </button>
         <button
-          className={selected === "lch" ? "active" : undefined}
-          onClick={() => setSelected("lch")}
+          className={displayValue === "lch" ? "active" : undefined}
+          onClick={() => setDisplayValue("lch")}
         >
           Lch
         </button>
         <button
-          className={selected === "name" ? "active" : undefined}
-          onClick={() => setSelected("name")}
+          className={displayValue === "title" ? "active" : undefined}
+          onClick={() => setDisplayValue("title")}
         >
           Name
         </button>
         <button
-          className={selected === "contrast" ? "active" : undefined}
-          onClick={() => setSelected("contrast")}
+          className={displayValue === "contrast" ? "active" : undefined}
+          onClick={() => setDisplayValue("contrast")}
         >
           Contrast
+        </button>
+
+        <button
+          className={displayValue === "css" ? "active" : undefined}
+          onClick={() => setDisplayValue("css")}
+        >
+          CSS
         </button>
       </div>
     </div>

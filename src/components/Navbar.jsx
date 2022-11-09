@@ -1,11 +1,5 @@
 import "../css/Navbar.css";
-import {
-  BracesAsterisk,
-  Palette,
-  MoonStars,
-  Sun,
-  Share,
-} from "react-bootstrap-icons";
+import { MoonStars, Sun, Share } from "react-bootstrap-icons";
 
 export default function Navbar({ setDarkMode, darkMode, css }) {
   function handleCss() {
@@ -19,12 +13,6 @@ export default function Navbar({ setDarkMode, darkMode, css }) {
       </div>
 
       <div className="right">
-        <button className="icon-button" onClick={handleCss}>
-          <BracesAsterisk />
-        </button>
-        <button className="icon-button">
-          <Palette />
-        </button>
         <button className="icon-button" onClick={setDarkMode}>
           {darkMode ? <Sun /> : <MoonStars />}
         </button>

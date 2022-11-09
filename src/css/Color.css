@@ -25,6 +25,7 @@
 .color-swatch {
   display: flex;
   flex: 1;
+  flex-direction: column;
   align-items: flex-end;
   justify-content: flex-end;
   height: 8rem;
@@ -33,7 +34,6 @@
   font-weight: 600;
   line-height: 1.2;
   text-align: right;
-  flex-direction: column;
 }
 
 .color-swatch p {

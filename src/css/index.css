@@ -98,5 +98,18 @@ button:not(.ctc).active {
 
 .icon-button svg {
   display: block;
+  width: 100%;
+  height: 100%;
   line-height: 1;
+}
+
+.icon-text-button {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.flex {
+  display: flex;
+  gap: 1rem;
 }

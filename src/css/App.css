@@ -17,5 +17,25 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  /* justify-content: space-between; */
+  justify-content: space-between;
+}
+
+.luminance-container {
+  padding: 1rem;
+  background-color: var(--mono-9);
+}
+
+.luminance-header {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.luminance-header h2 {
+  flex-shrink: 0;
+}
+
+.luminance-container p {
+  font-size: var(--small);
+  margin-block-end: 1rem;
 }

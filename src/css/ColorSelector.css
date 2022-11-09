@@ -2,12 +2,14 @@
 .user-input-controls {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--gap);
 }
 
 .color-selector {
   position: relative;
   overflow: hidden;
+  background-color: var(--mono-9);
+  padding: 1rem;
   /* border: 1px solid var(--border-color); */
 }
 
@@ -15,7 +17,7 @@
   display: flex;
   gap: 1rem;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-block-end: 2rem;
 }
 
 .color-input-heading h2 {
@@ -58,7 +60,6 @@
 .color-input-container {
   display: flex;
   gap: 2rem;
-  margin-block-end: 2rem;
 }
 
 .color-input-container > *:first-child {
@@ -66,10 +67,11 @@
 }
 
 .color-selector-text-input-label {
+  margin-inline-end: 1rem;
+
   /* display: block; */
   font-size: var(--small);
   text-transform: uppercase;
-  margin-inline-end: 1rem;
 }
 
 .color-input-container-right {
