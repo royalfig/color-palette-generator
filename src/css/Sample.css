@@ -12,6 +12,6 @@
 }
 
 .sample-container {
-  border: 1px solid var(--border-color);
-  border-top: none;
+  background-color: var(--mono-9);
+  padding: 1rem;
 }

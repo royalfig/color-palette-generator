@@ -1,6 +1,6 @@
 .app {
   display: grid;
-  gap: 4vmax;
+  gap: 2rem;
   max-width: 2000px;
   padding: 2vmax 4vmax;
   margin-inline: auto;
@@ -17,7 +17,7 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  justify-content: space-between;
+  /* justify-content: space-between; */
 }
 
 .luminance-container {
@@ -38,4 +38,10 @@
 .luminance-container p {
   font-size: var(--small);
   margin-block-end: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }

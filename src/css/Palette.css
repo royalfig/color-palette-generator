@@ -6,7 +6,6 @@
 
 .palette {
   overflow: hidden;
-  border: 1px solid var(--border-color);
 }
 
 .palette-container header {

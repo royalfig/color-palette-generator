@@ -2,11 +2,20 @@ import Mono from "./Mono";
 import Comp from "./Comp";
 
 export default function SampleDisplay({ selectedPalette }) {
-  console.log(selectedPalette);
   switch (selectedPalette) {
-    case "mono":
-      return <Mono />;
-    case "complement":
+    case "Complementary":
       return <Comp />;
+    case "Split Complementary":
+
+    case "Analogous":
+
+    case "Triadic":
+
+    case "Tetradic":
+
+    case "Shades":
+
+    case "Monochromatic":
+      return <Mono />;
   }
 }

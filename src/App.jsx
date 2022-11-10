@@ -197,7 +197,7 @@ function App() {
             luminance={luminance}
             displayValue={displayValue}
           />
-          <Sample />
+          <Sample selectedPalette={palette} />
         </section>
       </main>
     </div>

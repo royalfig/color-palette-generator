@@ -10,20 +10,12 @@ export default function Mono() {
 
   return (
     <div className="sample-container">
-      <Nav title="Monochromatic" {...paletteClassName} />
-
       <Header
         title="It's classy"
         subtitle="It's bougies. It's monochromatic."
         description="10 desaturated versions of the same color in varying lightnesses."
         {...paletteClassName}
       />
-
-      <Featured {...paletteClassName} />
-
-      <List {...paletteClassName} />
-
-      <Footer {...paletteClassName} />
     </div>
   );
 }

@@ -25,7 +25,7 @@ export default function Circle({ colors, type, size }) {
               const [h, s] = color.point;
 
               const hRadians = (h * Math.PI) / 180;
-              const sRadians = s;
+              const sRadians = sizer(s, size);
 
               const x = sRadians * Math.sin(hRadians);
               const y = sRadians * Math.cos(hRadians);

@@ -12,16 +12,18 @@ const titleText = {
   split: { description: "Splitsville.", name: "Split Complementary" },
 };
 
-export default function Sample() {
-  const [palette, setPalette] = useState("complement");
-
-  function clickHandler(e) {
-    setPalette(e.target.dataset.value);
-  }
-
+export default function Sample({ selectedPalette }) {
   return (
-    <div>
-      <SampleDisplay selectedPalette={palette} />
+    <div className="sample-container">
+      <div className="header">
+        <h2>Example</h2>
+        <div className="gradients">
+          <div className="gradient"></div>
+          <div className="gradient"></div>
+          <div className="gradient"></div>
+        </div>
+      </div>
+      <SampleDisplay selectedPalette={selectedPalette[0].name} />
     </div>
   );
 }
