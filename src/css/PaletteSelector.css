@@ -22,9 +22,9 @@
 
 .palette-selector-card {
   display: flex;
+  gap: 1rem;
   align-items: center;
   text-align: left;
-  gap: 1rem;
 }
 
 .palette-selector > .palette-selector-card:hover,

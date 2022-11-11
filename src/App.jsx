@@ -21,7 +21,13 @@ import {
 import { Toaster } from "react-hot-toast";
 import { debounce, size } from "lodash-es";
 import { useEffect } from "react";
-import { Eye, Lightbulb, BracesAsterisk, Image } from "react-bootstrap-icons";
+import {
+  Eye,
+  Lightbulb,
+  Clipboard,
+  Image,
+  BracesAsterisk,
+} from "react-bootstrap-icons";
 
 function getQueryParam() {
   const params = new URLSearchParams(document.location.search);
@@ -182,12 +188,25 @@ function App() {
             </div>
 
             <div className="preferences-container">
-              <button className="icon-text-button">
-                <BracesAsterisk /> CSS
-              </button>
-              <button className="icon-text-button">
-                <Image /> Image
-              </button>
+              <header className="preferences">
+                <h2>Export</h2>
+                <div className="gradients">
+                  <div className="gradient"></div>
+                  <div className="gradient"></div>
+                  <div className="gradient"></div>
+                </div>
+              </header>
+              <div className="preferences">
+                <button className="icon-text-button">
+                  <Clipboard /> <span>Copy CSS</span>
+                </button>
+                <button className="icon-text-button">
+                  <BracesAsterisk /> <span>Download CSS</span>
+                </button>
+                <button className="icon-text-button">
+                  <Image /> <span>Image</span>
+                </button>
+              </div>
             </div>
           </UserInputControls>
         </section>

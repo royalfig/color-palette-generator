@@ -22,12 +22,29 @@
   font-size: 1rem;
 }
 
+.navbar .left button {
+  border: none;
+  color: var(--complement-1-contrast);
+}
+
+.navbar .left,
 .navbar .right {
+  align-items: center;
   display: flex;
   flex-direction: row;
-  gap: 0;
+  gap: 1rem;
 }
 
 .navbar ~ .app {
   margin-top: 4rem;
+}
+
+.navbar .right button {
+  color: var(--complement-1-contrast);
+  border-color: currentColor;
+}
+
+.navbar .right button:hover {
+  color: var(--complement-1-contrast);
+  border-color: currentColor;
 }

@@ -17,6 +17,7 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+
   /* justify-content: space-between; */
 }
 
@@ -36,12 +37,27 @@
 }
 
 .luminance-container p {
-  font-size: var(--small);
   margin-block-end: 1rem;
+  font-size: var(--small);
 }
 
 .header {
   display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.preferences-container {
+  padding: 1rem;
+  background-color: var(--mono-9);
+}
+
+.preferences {
+  display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.preferences + .preferences {
+  margin-block-start: 1rem;
 }

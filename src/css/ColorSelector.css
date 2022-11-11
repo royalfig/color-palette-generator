@@ -7,9 +7,10 @@
 
 .color-selector {
   position: relative;
+  padding: 1rem;
   overflow: hidden;
   background-color: var(--mono-9);
-  padding: 1rem;
+
   /* border: 1px solid var(--border-color); */
 }
 

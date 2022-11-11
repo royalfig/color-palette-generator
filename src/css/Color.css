@@ -36,9 +36,10 @@
   text-align: right;
 }
 
-.color-swatch p {
-  font-size: var(--small);
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.colors-10 .color-swatch {
+  height: 4rem;
+}
+
+.colors-10 button {
+  font-size: var(--x-small);
 }

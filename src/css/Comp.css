@@ -17,13 +17,13 @@
 }
 
 .comp-header h2 {
+  margin-block-end: 1rem;
   font-size: 4rem;
   font-weight: 900;
   line-height: 1;
-  letter-spacing: -2px;
   color: var(--complement-1);
   text-shadow: 0.15em 0.15em 0 var(--complement-2);
-  margin-block-end: 1rem;
+  letter-spacing: -2px;
 }
 
 .comp-cta {

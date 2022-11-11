@@ -12,6 +12,6 @@
 }
 
 .sample-container {
-  background-color: var(--mono-9);
   padding: 1rem;
+  background-color: var(--mono-9);
 }

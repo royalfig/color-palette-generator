@@ -1,6 +1,6 @@
 .options {
-  background-color: var(--mono-9);
   padding: 1rem;
+  background-color: var(--mono-9);
 }
 
 .options-button-group {
