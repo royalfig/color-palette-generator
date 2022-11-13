@@ -41,3 +41,23 @@
 .comp-cta:hover {
   box-shadow: 0.35em 0.35em 0 var(--complement-2);
 }
+
+.comp-featured-inner {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(25rem, 30rem));
+  gap: 2rem;
+  padding: 2rem 1rem;
+}
+
+.comp-featured-image {
+  display: block;
+  height: auto;
+  aspect-ratio: 16/9;
+}
+
+.comp-featured-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

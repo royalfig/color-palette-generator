@@ -16,6 +16,7 @@ export default function Mono() {
         description="A primary color plus another color shifted 180&deg; on the color wheel."
         {...paletteClassName}
       />
+      <Featured palette={"comp"} />
     </div>
   );
 }

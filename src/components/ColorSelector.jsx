@@ -1,9 +1,37 @@
 import "../css/ColorSelector.css";
-
+import { useState } from "react";
 import { HexColorPicker, HexColorInput } from "react-colorful";
-import { Eyedropper, Lightbulb } from "react-bootstrap-icons";
+import ColorUtil from "colorjs.io";
+import { Eyedropper } from "react-bootstrap-icons";
+import { useEffect } from "react";
+import { hex3to6 } from "../util";
 
 export default function ColorSelector({ setColor, color, children }) {
+  const pickedColor = new ColorUtil(color);
+
+  const hex = pickedColor.toString({ format: "hex" });
+  const hsl = pickedColor.to("hsl").toString({ precision: 2 });
+  const rgb = pickedColor.to("srgb").toString({ precision: 2 });
+  const lch = pickedColor.to("lch").toString({ precision: 2 });
+
+  const [name, setName] = useState("");
+
+  async function getName(color) {
+    const hexFormatted = hex3to6(color);
+
+    try {
+      const res = await fetch(`https://api.color.pizza/v1/${hexFormatted}`);
+      const name = await res.json();
+      setName(name?.colors[0]?.name);
+    } catch (e) {
+      throw Error(e);
+    }
+  }
+
+  useEffect(() => {
+    getName(color);
+  });
+
   async function handleEyedropper(e) {
     const eyeDropper = new EyeDropper();
 
@@ -47,6 +75,13 @@ export default function ColorSelector({ setColor, color, children }) {
                   <Eyedropper /> <span>Eye dropper</span>
                 </button>
               ) : undefined}
+              <div className="color-input-info">
+                <p>{name}</p>
+                <p>{hex}</p>
+                <p>{hsl}</p>
+                <p>{rgb}</p>
+                <p>{lch}</p>
+              </div>
             </div>
           </section>
         </div>

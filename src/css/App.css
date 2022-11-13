@@ -1,12 +1,12 @@
 .app {
   display: grid;
   gap: 2rem;
-  max-width: 2000px;
   padding: 2vmax 4vmax;
   margin-inline: auto;
+  overflow: hidden;
 }
 
-@media (min-width: 1000px) {
+@media (min-width: 1200px) {
   .app {
     grid-template-columns: 1fr 1fr;
   }
@@ -16,7 +16,9 @@
 .right {
   display: flex;
   flex-direction: column;
+  flex-grow: 0;
   gap: 2rem;
+  overflow: hidden;
 
   /* justify-content: space-between; */
 }
@@ -54,8 +56,8 @@
 
 .preferences {
   display: flex;
-  align-items: center;
   gap: 1rem;
+  align-items: center;
 }
 
 .preferences + .preferences {

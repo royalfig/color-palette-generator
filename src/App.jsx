@@ -38,13 +38,8 @@ function getQueryParam() {
 function App() {
   const [color, setColor] = useState(getQueryParam() || "#21a623");
   const [corrected, setCorrected] = useState(false); // TODO Delete
-  const [darkMode, setDarkMode] = useState(false);
   const [luminance, setLuminance] = useState("absolute");
   const [displayValue, setDisplayValue] = useState("hex");
-
-  const handleDarkMode = () => {
-    setDarkMode((val) => !val);
-  };
 
   const complementaryPalette = createComplement(color);
   const splitComplementaryPalette = createSplit(color);
@@ -118,97 +113,93 @@ function App() {
 
   return (
     <div className={corrected ? "corrected" : undefined}>
-      <Navbar
-        setDarkMode={handleDarkMode}
-        darkMode={darkMode}
-        css={css}
-      ></Navbar>
+      <Navbar css={css}></Navbar>
 
       <main className="app">
         <section className="left">
-          <UserInputControls>
-            <ColorSelector
-              setColor={debouncedHandler}
-              color={color}
-            ></ColorSelector>
+          {/* <UserInputControls> */}
+          <ColorSelector
+            setColor={debouncedHandler}
+            color={color}
+          ></ColorSelector>
 
-            <PaletteSelector
-              palettes={[
-                complementaryPalette,
-                splitComplementaryPalette,
-                analogousPalette,
-                tetradicPalette,
-                triadicPalette,
-                shadesPalette,
-                monochramaticPalette,
-              ]}
-              handlePalette={handlePalette}
-              palette={palette}
-            ></PaletteSelector>
+          <PaletteSelector
+            palettes={[
+              complementaryPalette,
+              splitComplementaryPalette,
+              analogousPalette,
+              tetradicPalette,
+              triadicPalette,
+              shadesPalette,
+              monochramaticPalette,
+            ]}
+            handlePalette={handlePalette}
+            palette={palette}
+          ></PaletteSelector>
 
-            <Options
-              setDisplayValue={setDisplayValue}
-              displayValue={displayValue}
-            />
+          <Options
+            setDisplayValue={setDisplayValue}
+            displayValue={displayValue}
+          />
 
-            <div className="luminance-container">
-              <div className="luminance-header">
-                <h2>Luminance</h2>
-                <div className="gradients">
-                  <div className="gradient"></div>
-                  <div className="gradient"></div>
-                  <div className="gradient"></div>
-                </div>
-              </div>
-              <p>Luminance measures the brightness of a color.</p>
-
-              <div className="flex">
-                <button
-                  onClick={() => setLuminance("absolute")}
-                  className={
-                    luminance === "absolute"
-                      ? "icon-text-button active"
-                      : "icon-text-button"
-                  }
-                >
-                  <Lightbulb /> Absolute
-                </button>
-                <button
-                  onClick={() => setLuminance("relative")}
-                  className={
-                    luminance === "relative"
-                      ? "icon-text-button active"
-                      : "icon-text-button"
-                  }
-                >
-                  <Eye />
-                  Relative
-                </button>
+          <div className="luminance-container">
+            <div className="luminance-header">
+              <h2>Luminance</h2>
+              <div className="gradients">
+                <div className="gradient"></div>
+                <div className="gradient"></div>
+                <div className="gradient"></div>
               </div>
             </div>
+            <p>Luminance measures the brightness of a color.</p>
 
-            <div className="preferences-container">
-              <header className="preferences">
-                <h2>Export</h2>
-                <div className="gradients">
-                  <div className="gradient"></div>
-                  <div className="gradient"></div>
-                  <div className="gradient"></div>
-                </div>
-              </header>
-              <div className="preferences">
-                <button className="icon-text-button">
-                  <Clipboard /> <span>Copy CSS</span>
-                </button>
-                <button className="icon-text-button">
-                  <BracesAsterisk /> <span>Download CSS</span>
-                </button>
-                <button className="icon-text-button">
-                  <Image /> <span>Image</span>
-                </button>
-              </div>
+            <div className="flex">
+              <button
+                onClick={() => setLuminance("absolute")}
+                className={
+                  luminance === "absolute"
+                    ? "icon-text-button active"
+                    : "icon-text-button"
+                }
+              >
+                <Lightbulb /> Absolute
+              </button>
+              <button
+                onClick={() => setLuminance("relative")}
+                className={
+                  luminance === "relative"
+                    ? "icon-text-button active"
+                    : "icon-text-button"
+                }
+              >
+                <Eye />
+                Relative
+              </button>
             </div>
-          </UserInputControls>
+          </div>
+
+          <div className="preferences-container">
+            <header className="preferences">
+              <h2>Export</h2>
+              <div className="gradients">
+                <div className="gradient"></div>
+                <div className="gradient"></div>
+                <div className="gradient"></div>
+              </div>
+            </header>
+            <div className="preferences">
+              <button className="icon-text-button">
+                <Clipboard /> <span>Copy CSS</span>
+              </button>
+              <button className="icon-text-button">
+                <BracesAsterisk /> <span>Download CSS</span>
+              </button>
+              <button className="icon-text-button">
+                <Image /> <span>Download Image</span>
+              </button>
+            </div>
+          </div>
+          {/* </UserInputControls> */}
         </section>
         <section className="right">
           <Palette

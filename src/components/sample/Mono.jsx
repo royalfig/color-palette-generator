@@ -16,6 +16,7 @@ export default function Mono() {
         description="10 desaturated versions of the same color in varying lightnesses."
         {...paletteClassName}
       />
+      <Featured palette={"mono"} />
     </div>
   );
 }

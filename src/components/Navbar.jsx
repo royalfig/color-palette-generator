@@ -1,7 +1,10 @@
 import "../css/Navbar.css";
+import { useState } from "react";
 import { MoonStars, Sun, Share } from "react-bootstrap-icons";
 
-export default function Navbar({ setDarkMode, darkMode, css }) {
+export default function Navbar({ css }) {
+  const [darkMode, setDarkMode] = useState(false);
+
   async function handleShare() {
     const shareData = {
       title: "Color Palette Pro",
@@ -16,6 +19,13 @@ export default function Navbar({ setDarkMode, darkMode, css }) {
     }
   }
 
+  function toggleDarkMode() {
+    const dark = !darkMode;
+    setDarkMode((value) => !value);
+    const newMode = dark ? "dark" : "light";
+    document.documentElement.dataset.mode = newMode;
+  }
+
   return (
     <nav className="navbar">
       <div className="left">
@@ -27,7 +37,7 @@ export default function Navbar({ setDarkMode, darkMode, css }) {
       </div>
 
       <div className="right">
-        <button className="icon-text-button" onClick={setDarkMode}>
+        <button className="icon-text-button" onClick={toggleDarkMode}>
           {darkMode ? <Sun /> : <MoonStars />}{" "}
           <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
         </button>

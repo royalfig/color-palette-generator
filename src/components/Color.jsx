@@ -2,8 +2,6 @@ import "../css/Color.css";
 import Copy from "./Copy";
 
 export default function Color({ color, luminance, displayValue, colorTitles }) {
-  console.log("color render");
-
   if (colorTitles.length) {
     color.forEach((c, idx) => {
       c.title = colorTitles[idx]?.name;

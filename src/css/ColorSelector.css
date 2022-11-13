@@ -40,10 +40,8 @@
   padding: var(--button-padding);
   font-family: inherit;
   font-size: 1rem;
+  color: var(--mono-10-contrast);
   text-align: center;
-
-  /* width: max-content; */
-
   background-color: var(--mono-10);
   border: none;
   border: 1px solid var(--border-color);
@@ -129,4 +127,23 @@
   gap: 0.5em;
   align-items: center;
   justify-content: center;
+}
+
+.color-input-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1rem;
+}
+
+.color-input-info p {
+  font-size: var(--x-small);
+  font-weight: 400;
+}
+
+.color-input-info p:first-child {
+  grid-column: span 2;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
 }

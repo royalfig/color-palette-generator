@@ -12,27 +12,21 @@
   border-left: 0.5rem solid var(--complement-2);
 }
 
-.navbar .icon-button {
-  font-size: 1rem;
-  color: var(--complement-1-contrast);
-  border: none;
-}
-
 .navbar .left h1 {
   font-size: 1rem;
 }
 
 .navbar .left button {
-  border: none;
   color: var(--complement-1-contrast);
+  border: none;
 }
 
 .navbar .left,
 .navbar .right {
-  align-items: center;
   display: flex;
   flex-direction: row;
   gap: 1rem;
+  align-items: center;
 }
 
 .navbar ~ .app {
@@ -41,10 +35,10 @@
 
 .navbar .right button {
   color: var(--complement-1-contrast);
-  border-color: currentColor;
+  border-color: currentcolor;
 }
 
 .navbar .right button:hover {
-  color: var(--complement-1-contrast);
-  border-color: currentColor;
+  /* color: var(--complement-1-contrast); */
+  border-color: currentcolor;
 }

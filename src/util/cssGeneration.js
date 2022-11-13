@@ -9,9 +9,15 @@ import {
   createSplit,
 } from "./converters";
 
-function cssWriter(args) {
+function cssWriter(args, isReversed) {
   return args
     .map(([palette, name]) => {
+      palette =
+        isReversed && (name === "mono" || name === "shades")
+          ? [...palette].reverse()
+          : palette;
+      console.log(isReversed);
+
       return palette
         .map((color, idx) => {
           return `--${name}-${idx + 1}: ${color.hsl};
@@ -39,20 +45,34 @@ function generateCss(hex) {
   const split = createSplit(color);
 
   const css = cssWriter([
+    [mono, "mono"],
+    [shades, "shades"],
     [complement, "complement"],
     [adjacent, "adjacent"],
     [triad, "triad"],
     [tetrad, "tetrad"],
-    [mono, "mono"],
-    [shades, "shades"],
     [split, "split"],
   ]);
+
+  const darkCss = cssWriter(
+    [
+      [mono, "mono"],
+      [shades, "shades"],
+      [complement, "complement"],
+      [split, "split"],
+      [adjacent, "adjacent"],
+      [triad, "triad"],
+      [tetrad, "tetrad"],
+    ],
+    true
+  );
 
   const styleTag = document.querySelector("#colors");
   styleTag && styleTag.remove();
   const style = document.createElement("style");
   style.id = "colors";
-  style.textContent = `:root {--h: ${h}; --s: ${s}%; --l: ${l}%;` + css + "}";
+  style.textContent = `:root[data-mode="light"] {--h: ${h}; --s: ${s}%; --l: ${l}%;${css}}
+  :root[data-mode="dark"] {--h: ${h}; --s: ${s}%; --l: ${l}%;${darkCss}}`;
 
   document.head.append(style);
 }
