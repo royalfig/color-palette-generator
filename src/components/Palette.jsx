@@ -1,7 +1,7 @@
 import "../css/Palette.css";
 
 import { useState, useEffect } from "react";
-import { hex3to6 } from "../util";
+import { hex3to6 } from "../util/";
 import Color from "./Color";
 import Controls from "./Controls";
 import Circle from "./Circle";
