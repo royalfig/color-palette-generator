@@ -28,26 +28,27 @@ export default function Navbar({ css }) {
 
   return (
     <nav className="navbar">
-      <div className="left">
-        <h1>Color Palette Pro</h1>
-        <div className="links">
-          <button>About</button>
-          <button>Help</button>
+      <div className="navbar-inner">
+        <div className="left">
+          <h1>Color Palette Pro</h1>
+          <div className="links">
+            <button>About</button>
+            <button>Help</button>
+          </div>
         </div>
-      </div>
-
-      <div className="right">
-        <button className="icon-text-button" onClick={toggleDarkMode}>
-          {darkMode ? <Sun /> : <MoonStars />}{" "}
-          <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
-        </button>
-        {navigator.canShare ? (
-          <button className="icon-text-button" onClick={handleShare}>
-            <Share /> <span>Share</span>
+        <div className="right">
+          <button className="icon-text-button" onClick={toggleDarkMode}>
+            {darkMode ? <Sun /> : <MoonStars />}{" "}
+            <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
           </button>
-        ) : (
-          ""
-        )}
+          {navigator.canShare || true ? (
+            <button className="icon-text-button" onClick={handleShare}>
+              <Share /> <span>Share</span>
+            </button>
+          ) : (
+            ""
+          )}
+        </div>
       </div>
     </nav>
   );

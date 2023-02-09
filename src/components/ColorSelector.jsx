@@ -1,8 +1,9 @@
 import "../css/ColorSelector.css";
+import "../css/EyeDropper.css";
 import { useState } from "react";
 import { HexColorPicker, HexColorInput } from "react-colorful";
 import ColorUtil from "colorjs.io";
-import { Eyedropper } from "react-bootstrap-icons";
+import { Clipboard, Eyedropper } from "react-bootstrap-icons";
 import { useEffect } from "react";
 import { hex3to6 } from "../util";
 
@@ -49,39 +50,53 @@ export default function ColorSelector({ setColor, color, children }) {
     <div>
       <div className="color-selector">
         <div className="color-input">
-          <section className="color-input-heading gradient-header">
-            <h2>Color</h2>
-            <div className="gradients">
-              <div className="gradient"></div>
-              <div className="gradient"></div>
-              <div className="gradient"></div>
+          <header className="color-input-heading gradient-header">
+            <h2>Start</h2>
+            <div className="flex">
+              <p>{name}</p>
+              <Clipboard />
             </div>
-          </section>
+          </header>
 
           <section className="color-input-container">
             <HexColorPicker color={color} onChange={setColor} />
-            <div className="color-input-container-right">
-              <div>
-                <label
-                  htmlFor="hex"
-                  className="color-selector-text-input-label"
-                >
-                  Text Input
-                </label>
-                <HexColorInput id="hex" color={color} onChange={setColor} />
-              </div>
-              {window.EyeDropper ? (
-                <button className="eye-dropper" onClick={handleEyedropper}>
-                  <Eyedropper /> <span>Eye dropper</span>
-                </button>
-              ) : undefined}
-              <div className="color-input-info">
-                <p>{name}</p>
-                <p>{hex}</p>
-                <p>{hsl}</p>
-                <p>{rgb}</p>
-                <p>{lch}</p>
-              </div>
+          </section>
+
+          <section className="color-input-text">
+            <div>
+              <label htmlFor="hex" className="color-selector-text-input-label">
+                HEX
+              </label>
+              <HexColorInput id="hex" color={color} onChange={setColor} />
+            </div>
+            <div>
+              <label htmlFor="rgb" className="color-selector-text-input-label">
+                RGB
+              </label>
+              <input type="text" id="rgb" value={rgb} />
+            </div>
+            <div>
+              <label htmlFor="hsl" className="color-selector-text-input-label">
+                HSL
+              </label>
+              <input type="text" id="hsl" value={hsl} />
+            </div>
+            <div>
+              <label htmlFor="lch" className="color-selector-text-input-label">
+                LCH
+              </label>
+              <input type="text" id="lch" value={lch} />
+            </div>
+            <div className="previous">
+              <button className="eyedropper" onClick={handleEyedropper}>
+                <Eyedropper />
+              </button>
+
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
             </div>
           </section>
         </div>

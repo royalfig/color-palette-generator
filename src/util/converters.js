@@ -1,6 +1,37 @@
 import Color from "colorjs.io";
 import { hex3to6, getRandBetween, linearRGB, y, createSlug } from "./utils";
 
+/*
+
+{
+  absolute: {
+    base: {
+
+    }
+    variation1: {
+
+    }
+    variation2: {
+
+    }
+  }
+
+  relative: {
+    base: {
+
+        }
+        variation1: {
+
+        }
+        variation2: {
+          
+        }
+      }
+}
+
+
+*/
+
 function colorFactory(colors) {
   return colors.map(({ color, corrected, name, css }) => {
     return {

@@ -1,15 +1,17 @@
 .navbar {
-  position: fixed;
-  top: 0;
-  z-index: 1000;
+  width: 100%;
+  padding: 1rem;
+  color: var(--shades-4-contrast);
+  background-color: var(--shades-4);
+  margin-block-end: 2rem;
+}
+
+.navbar-inner {
+  max-width: 1200px;
+  margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  padding: 1rem;
-  color: var(--complement-1-contrast);
-  background-color: var(--complement-1);
-  border-left: 0.5rem solid var(--complement-2);
 }
 
 .navbar .left h1 {
@@ -17,8 +19,9 @@
 }
 
 .navbar .left button {
-  color: var(--complement-1-contrast);
   border: none;
+  color: inherit;
+  opacity: 0.9;
 }
 
 .navbar .left,
@@ -29,13 +32,12 @@
   align-items: center;
 }
 
-.navbar ~ .app {
-  margin-top: 4rem;
-}
-
 .navbar .right button {
-  color: var(--complement-1-contrast);
-  border-color: currentcolor;
+  color: var(--shades-7-contrast);
+  background-color: var(--shades-7);
+  border: none;
+  border-radius: 4px;
+  padding: 0.5em 0.75em;
 }
 
 .navbar .right button:hover {

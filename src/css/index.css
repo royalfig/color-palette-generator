@@ -29,7 +29,8 @@ html {
 
 body {
   min-height: 100vh;
-  background-color: var(--mono-10);
+  background-color: var(--mono-9);
+  color: var(--mono-9-contrast);
 }
 
 h1,
@@ -71,29 +72,16 @@ small {
   font-size: 0.833rem;
 }
 
-button:not(.ctc) {
-  padding: 6px;
+button {
   font-family: inherit;
   font-size: var(--small);
   line-height: 1;
-  color: var(--shades-3);
   text-transform: uppercase;
-  letter-spacing: 1.2px;
+  letter-spacing: 0.3px;
   cursor: pointer;
   background: none;
-  border: 1px solid var(--border-color);
-  border-radius: 0;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-button:not(.ctc):hover {
-  color: var(--shades-7-contrast);
-  background-color: var(--shades-7);
-}
-
-button:not(.ctc).active {
-  color: var(--shades-5-contrast);
-  background-color: var(--shades-5);
+  border: none;
+  border-radius: var(--radius);
 }
 
 .icon-button svg {

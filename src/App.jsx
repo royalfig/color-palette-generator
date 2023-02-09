@@ -57,6 +57,7 @@ function App() {
       case "Complementary":
         setPalette(complementaryPalette);
         break;
+
       case "Split Complementary":
         setPalette(splitComplementaryPalette);
         break;

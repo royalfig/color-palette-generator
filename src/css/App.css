@@ -1,7 +1,8 @@
 .app {
   display: grid;
   gap: 2rem;
-  padding: 2vmax 4vmax;
+  /* padding: 1rem; */
+  max-width: 1200px;
   margin-inline: auto;
   overflow: hidden;
 }
@@ -19,8 +20,6 @@
   flex-grow: 0;
   gap: 2rem;
   overflow: hidden;
-
-  /* justify-content: space-between; */
 }
 
 .luminance-container {
