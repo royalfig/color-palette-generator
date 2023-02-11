@@ -1,7 +1,7 @@
 import "../css/Navbar.css";
 import { useState } from "react";
 import { MoonStars, Sun, Share } from "react-bootstrap-icons";
-
+import Button from "./buttons/Button";
 export default function Navbar({ css }) {
   const [darkMode, setDarkMode] = useState(false);
 
@@ -32,19 +32,25 @@ export default function Navbar({ css }) {
         <div className="left">
           <h1>Color Palette Pro</h1>
           <div className="links">
-            <button>About</button>
-            <button>Help</button>
+            <Button type="text-btn" handler={(e) => console.log(e)}>
+              About
+            </Button>
+            <Button type="text-btn" handler={(e) => console.log(e)}>
+              Help
+            </Button>
           </div>
         </div>
         <div className="right">
-          <button className="icon-text-button" onClick={toggleDarkMode}>
-            {darkMode ? <Sun /> : <MoonStars />}{" "}
-            <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
-          </button>
+          <Button type="text-icon-btn" handler={toggleDarkMode}>
+            {darkMode ? <Sun /> : <MoonStars />}
+            {darkMode ? "Light Mode" : "Dark Mode"}
+          </Button>
+
           {navigator.canShare || true ? (
-            <button className="icon-text-button" onClick={handleShare}>
-              <Share /> <span>Share</span>
-            </button>
+            <Button type="text-icon-btn" handler={handleShare}>
+              <Share />
+              Share
+            </Button>
           ) : (
             ""
           )}

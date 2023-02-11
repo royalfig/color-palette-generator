@@ -1,10 +1,10 @@
 .eye-dropper {
-  height: 1em;
   width: 1em;
+  height: 1em;
 }
 
 .eye-dropper svg {
   display: block;
-  height: inherit;
   width: inherit;
+  height: inherit;
 }

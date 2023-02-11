@@ -1,5 +1,9 @@
+import { useState, useCallback, useEffect } from "react";
+import "./css/Reset.css";
+import "./css/Variables.css";
+import "./css/Defaults.css";
 import "./css/App.css";
-import { useState, useCallback } from "react";
+import "react-toastify/dist/ReactToastify.css";
 import Palette from "./components/Palette";
 import Sample from "./components/sample/Sample";
 import Navbar from "./components/Navbar";
@@ -19,8 +23,7 @@ import {
   generateCss,
 } from "./util";
 import { Toaster } from "react-hot-toast";
-import { debounce, size } from "lodash-es";
-import { useEffect } from "react";
+import { debounce } from "lodash-es";
 import {
   Eye,
   Lightbulb,
@@ -28,6 +31,7 @@ import {
   Image,
   BracesAsterisk,
 } from "react-bootstrap-icons";
+import { ToastContainer } from "react-toastify";
 
 function getQueryParam() {
   const params = new URLSearchParams(document.location.search);
@@ -114,6 +118,8 @@ function App() {
 
   return (
     <div className={corrected ? "corrected" : undefined}>
+      <ToastContainer />
+
       <Navbar css={css}></Navbar>
 
       <main className="app">

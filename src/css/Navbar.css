@@ -1,27 +1,16 @@
 .navbar {
-  width: 100%;
-  padding: 1rem;
+  padding: var(--box-padding);
+  margin-block-end: var(--space-after);
   color: var(--shades-4-contrast);
   background-color: var(--shades-4);
-  margin-block-end: 2rem;
 }
 
 .navbar-inner {
-  max-width: 1200px;
-  margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.navbar .left h1 {
-  font-size: 1rem;
-}
-
-.navbar .left button {
-  border: none;
-  color: inherit;
-  opacity: 0.9;
+  max-width: var(--max-viewport);
+  margin-inline: auto;
 }
 
 .navbar .left,
@@ -32,12 +21,25 @@
   align-items: center;
 }
 
+.navbar .left h1 {
+  font-size: 1.15rem;
+}
+
+.navbar .left .text-btn {
+  color: inherit;
+}
+
+.navbar .left .text-btn:hover {
+  background-color: var(--shades-7);
+  color: var(--shades-7-contrast);
+}
+
 .navbar .right button {
+  padding: 0.5em 0.75em;
   color: var(--shades-7-contrast);
   background-color: var(--shades-7);
   border: none;
   border-radius: 4px;
-  padding: 0.5em 0.75em;
 }
 
 .navbar .right button:hover {

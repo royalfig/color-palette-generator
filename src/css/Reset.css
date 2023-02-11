@@ -1,0 +1,17 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+input,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  border: 1px solid var(--mono-8);
+  padding: var(--button-padding);
+  background-color: var(--mono-10);
+  line-height: 1;
+}

@@ -1,11 +1,24 @@
+import ColorUtil from "colorjs.io";
+import { useEffect, useState } from "react";
+import { ClockHistory, Eyedropper, Clipboard } from "react-bootstrap-icons";
+import { HexColorInput, HexColorPicker } from "react-colorful";
+import { toast } from "react-toastify";
 import "../css/ColorSelector.css";
 import "../css/EyeDropper.css";
-import { useState } from "react";
-import { HexColorPicker, HexColorInput } from "react-colorful";
-import ColorUtil from "colorjs.io";
-import { Clipboard, Eyedropper } from "react-bootstrap-icons";
-import { useEffect } from "react";
 import { hex3to6 } from "../util";
+import Copy from "./buttons/Copy";
+import Button from "./buttons/Button";
+
+async function copy(textToCopy) {
+  try {
+    navigator.clipboard.writeText(textToCopy);
+    toast(`"${textToCopy}" copied!`, {
+      position: toast.POSITION.BOTTOM_LEFT,
+    });
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 export default function ColorSelector({ setColor, color, children }) {
   const pickedColor = new ColorUtil(color);
@@ -47,61 +60,61 @@ export default function ColorSelector({ setColor, color, children }) {
   }
 
   return (
-    <div>
-      <div className="color-selector">
-        <div className="color-input">
-          <header className="color-input-heading gradient-header">
-            <h2>Start</h2>
-            <div className="flex">
-              <p>{name}</p>
-              <Clipboard />
-            </div>
-          </header>
-
-          <section className="color-input-container">
-            <HexColorPicker color={color} onChange={setColor} />
-          </section>
-
-          <section className="color-input-text">
-            <div>
-              <label htmlFor="hex" className="color-selector-text-input-label">
-                HEX
-              </label>
-              <HexColorInput id="hex" color={color} onChange={setColor} />
-            </div>
-            <div>
-              <label htmlFor="rgb" className="color-selector-text-input-label">
-                RGB
-              </label>
-              <input type="text" id="rgb" value={rgb} />
-            </div>
-            <div>
-              <label htmlFor="hsl" className="color-selector-text-input-label">
-                HSL
-              </label>
-              <input type="text" id="hsl" value={hsl} />
-            </div>
-            <div>
-              <label htmlFor="lch" className="color-selector-text-input-label">
-                LCH
-              </label>
-              <input type="text" id="lch" value={lch} />
-            </div>
-            <div className="previous">
-              <button className="eyedropper" onClick={handleEyedropper}>
-                <Eyedropper />
-              </button>
-
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-            </div>
-          </section>
+    <div className="color-selector">
+      <header>
+        <h2>Start</h2>
+        <div>
+          <p>{name}</p>
+          <Button type="icon-btn" handler={copy.bind(null, name)}>
+            <Clipboard />
+          </Button>
         </div>
-      </div>
-      {children}
+      </header>
+
+      <section className="color-input-container">
+        <HexColorPicker color={color} onChange={setColor} />
+      </section>
+
+      <section className="color-input-text">
+        <div>
+          <label htmlFor="hex" className="color-selector-text-input-label">
+            HEX
+          </label>
+          <HexColorInput id="hex" color={color} onChange={setColor} />
+        </div>
+        <div>
+          <label htmlFor="rgb" className="color-selector-text-input-label">
+            RGB
+          </label>
+          <input type="text" id="rgb" value={rgb} />
+        </div>
+        <div>
+          <label htmlFor="hsl" className="color-selector-text-input-label">
+            HSL
+          </label>
+          <input type="text" id="hsl" value={hsl} />
+        </div>
+        <div>
+          <label htmlFor="lch" className="color-selector-text-input-label">
+            LCH
+          </label>
+          <input type="text" id="lch" value={lch} />
+        </div>
+        <p>Validation Error</p>
+      </section>
+
+      <footer className="previous">
+        <Button type="text-icon-btn" handler={handleEyedropper}>
+          <Eyedropper /> Eyedropper
+        </Button>
+
+        <div className="color-history">
+          <ClockHistory />
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </footer>
     </div>
   );
 }
