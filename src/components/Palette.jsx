@@ -5,8 +5,14 @@ import { hex3to6 } from "../util/";
 import Color from "./Color";
 import Controls from "./Controls";
 import Circle from "./Circle";
+import Header from "./Header";
 
-export default function Palette({ palette, luminance, displayValue }) {
+export default function Palette({
+  palette,
+  luminance,
+  displayValue,
+  setDisplayValue,
+}) {
   const [paletteTitle, setPaletteTitle] = useState("");
   const [colorTitles, setColorTitles] = useState([]);
   const colors = palette.map((color) => hex3to6(color.hex)).join();
@@ -23,8 +29,8 @@ export default function Palette({ palette, luminance, displayValue }) {
   }, [palette]);
 
   return (
-    <div className="palette-container">
-      <header>
+    <section className="palette-container">
+      <Header h2={palette[0].name} text={paletteTitle}>
         <Circle
           colors={palette}
           type={
@@ -34,13 +40,8 @@ export default function Palette({ palette, luminance, displayValue }) {
           }
           size="large"
         />
-        <h2>{palette[0].name}</h2>
-        <div className="gradients">
-          <div className="gradient"></div>
-          <div className="gradient"></div>
-          <div className="gradient"></div>
-        </div>
-      </header>
+      </Header>
+
       <div className="palette">
         <Color
           color={palette}
@@ -48,8 +49,9 @@ export default function Palette({ palette, luminance, displayValue }) {
           displayValue={displayValue}
           colorTitles={colorTitles}
         />
-        <Controls paletteTitle={paletteTitle} />
       </div>
-    </div>
+
+      <Controls paletteTitle={paletteTitle} setDisplayValue={setDisplayValue} />
+    </section>
   );
 }

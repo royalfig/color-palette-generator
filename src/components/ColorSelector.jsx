@@ -2,23 +2,11 @@ import ColorUtil from "colorjs.io";
 import { useEffect, useState } from "react";
 import { ClockHistory, Eyedropper, Clipboard } from "react-bootstrap-icons";
 import { HexColorInput, HexColorPicker } from "react-colorful";
-import { toast } from "react-toastify";
 import "../css/ColorSelector.css";
 import "../css/EyeDropper.css";
 import { hex3to6 } from "../util";
-import Copy from "./buttons/Copy";
 import Button from "./buttons/Button";
-
-async function copy(textToCopy) {
-  try {
-    navigator.clipboard.writeText(textToCopy);
-    toast(`"${textToCopy}" copied!`, {
-      position: toast.POSITION.BOTTOM_LEFT,
-    });
-  } catch (e) {
-    console.log(e);
-  }
-}
+import Header from "./Header";
 
 export default function ColorSelector({ setColor, color, children }) {
   const pickedColor = new ColorUtil(color);
@@ -61,15 +49,7 @@ export default function ColorSelector({ setColor, color, children }) {
 
   return (
     <div className="color-selector">
-      <header>
-        <h2>Start</h2>
-        <div>
-          <p>{name}</p>
-          <Button type="icon-btn" handler={copy.bind(null, name)}>
-            <Clipboard />
-          </Button>
-        </div>
-      </header>
+      <Header h2="Start" text={name} />
 
       <section className="color-input-container">
         <HexColorPicker color={color} onChange={setColor} />

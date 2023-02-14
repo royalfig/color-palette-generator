@@ -1,42 +1,56 @@
 import "../css/Controls.css";
-import { BracesAsterisk, Palette, Share } from "react-bootstrap-icons";
-import toast from "react-hot-toast";
+import Button from "./buttons/Button";
+import { useState } from "react";
 
-export default function Controls({ paletteTitle }) {
-  function copyToClipboard(arg) {
-    const { type, value } = arg;
+export default function Controls({ setDisplayValue }) {
+  const [variation, setVariation] = useState(0);
+  const [property, setProperty] = useState("hex");
 
-    if (type === "css") {
-      toast("CSS copied to clipboard");
-      return;
-    }
+  const variations = ["Original", "Cinematic", "Keel", "Languid", "Sharkbite"];
 
-    toast("palette download");
+  function handleVariation(i) {
+    setVariation(i);
   }
 
-  async function share() {
-    const data = {
-      title: "Color Palette Pro",
-      text: `${palette}`,
-      url: window.location.href,
-    };
-
-    try {
-      await navigator.share(data);
-      toast("Shared");
-    } catch (e) {
-      toast("something went wrong");
-    }
+  function handleProperty(e) {
+    const prop = e.currentTarget.innerText.toLowerCase();
+    setProperty(prop);
+    setDisplayValue(prop);
   }
 
   return (
     <div className="controls">
-      <div className="controls-buttons">
-        <button>1</button>
-        <button>2</button>
-        <button>3</button>
+      <div className="controls-variations">
+        {variations.map((v, i) => (
+          <Button
+            key={i}
+            type="text-btn"
+            handler={handleVariation.bind(null, i)}
+            classes={i === variation ? "active" : ""}
+          >
+            {i + 1}
+          </Button>
+        ))}
+        <p className="controls-variation">{variations[variation]}</p>
       </div>
-      <p className="palette-name">{paletteTitle}</p>
+
+      <div className="controls-properties">
+        <Button type="text-btn" handler={(e) => handleProperty(e)}>
+          HEX
+        </Button>
+        <Button type="text-btn" handler={(e) => handleProperty(e)}>
+          RGB
+        </Button>
+        <Button type="text-btn" handler={(e) => handleProperty(e)}>
+          HSL
+        </Button>
+        <Button type="text-btn" handler={(e) => handleProperty(e)}>
+          LCH
+        </Button>
+        <Button type="text-btn" handler={(e) => handleProperty(e)}>
+          CSS
+        </Button>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 button {
+  padding: var(--button-padding);
   font-family: inherit;
   font-size: inherit;
   line-height: 1;
@@ -8,21 +9,20 @@ button {
   background: none;
   border: none;
   border-radius: var(--radius);
-  padding: var(--button-padding);
 }
 
 button:hover,
 button:focus {
-  outline: none;
   border: none;
+  outline: none;
 }
 
 /* Icon only */
 .icon-btn {
-  height: 1rem;
-  width: 1rem;
-  padding: 0.5em;
   box-sizing: content-box;
+  width: 1rem;
+  height: 1rem;
+  padding: 0.5em;
   border-radius: 50%;
   transition: background-color 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
@@ -44,14 +44,14 @@ button:focus {
 
 .text-btn:hover,
 .text-btn:focus-visible {
-  background-color: var(--mono-9);
   color: var(--mono-9-contrast);
+  background-color: var(--mono-9);
 }
 
 /* Text and Icon */
 .text-icon-btn {
-  font-size: var(--small);
   display: flex;
-  align-items: center;
   gap: 1em;
+  align-items: center;
+  font-size: var(--small);
 }

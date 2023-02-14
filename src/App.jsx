@@ -5,12 +5,10 @@ import "./css/Defaults.css";
 import "./css/App.css";
 import "react-toastify/dist/ReactToastify.css";
 import Palette from "./components/Palette";
-import Sample from "./components/sample/Sample";
+import Sample from "./components/Sample";
 import Navbar from "./components/Navbar";
-import UserInputControls from "./components/UserInputControls";
 import ColorSelector from "./components/ColorSelector";
 import PaletteSelector from "./components/PaletteSelector";
-import Options from "./components/Options";
 
 import {
   createAdjacent,
@@ -22,15 +20,7 @@ import {
   createTriad,
   generateCss,
 } from "./util";
-import { Toaster } from "react-hot-toast";
 import { debounce } from "lodash-es";
-import {
-  Eye,
-  Lightbulb,
-  Clipboard,
-  Image,
-  BracesAsterisk,
-} from "react-bootstrap-icons";
 import { ToastContainer } from "react-toastify";
 
 function getQueryParam() {
@@ -129,7 +119,9 @@ function App() {
             setColor={debouncedHandler}
             color={color}
           ></ColorSelector>
+        </section>
 
+        <section className="right">
           <PaletteSelector
             palettes={[
               complementaryPalette,
@@ -144,79 +136,15 @@ function App() {
             palette={palette}
           ></PaletteSelector>
 
-          <Options
-            setDisplayValue={setDisplayValue}
-            displayValue={displayValue}
-          />
-
-          <div className="luminance-container">
-            <div className="luminance-header">
-              <h2>Luminance</h2>
-              <div className="gradients">
-                <div className="gradient"></div>
-                <div className="gradient"></div>
-                <div className="gradient"></div>
-              </div>
-            </div>
-            <p>Luminance measures the brightness of a color.</p>
-
-            <div className="flex">
-              <button
-                onClick={() => setLuminance("absolute")}
-                className={
-                  luminance === "absolute"
-                    ? "icon-text-button active"
-                    : "icon-text-button"
-                }
-              >
-                <Lightbulb /> Absolute
-              </button>
-              <button
-                onClick={() => setLuminance("relative")}
-                className={
-                  luminance === "relative"
-                    ? "icon-text-button active"
-                    : "icon-text-button"
-                }
-              >
-                <Eye />
-                Relative
-              </button>
-            </div>
-          </div>
-
-          <div className="preferences-container">
-            <header className="preferences">
-              <h2>Export</h2>
-              <div className="gradients">
-                <div className="gradient"></div>
-                <div className="gradient"></div>
-                <div className="gradient"></div>
-              </div>
-            </header>
-            <div className="preferences">
-              <button className="icon-text-button">
-                <Clipboard /> <span>Copy CSS</span>
-              </button>
-              <button className="icon-text-button">
-                <BracesAsterisk /> <span>Download CSS</span>
-              </button>
-              <button className="icon-text-button">
-                <Image /> <span>Download Image</span>
-              </button>
-            </div>
-          </div>
-          {/* </UserInputControls> */}
-        </section>
-        <section className="right">
           <Palette
             palette={palette}
             luminance={luminance}
             displayValue={displayValue}
+            setDisplayValue={setDisplayValue}
           />
-          <Sample selectedPalette={palette} />
         </section>
       </main>
+      <Sample selectedPalette={palette} />
     </div>
   );
 }

@@ -1,35 +1,56 @@
 .palette-selector {
-  /* border: 1px solid var(--border-color); */
+  padding: var(--box-padding);
+  background-color: var(--mono-10);
+  border-radius: var(--radius);
+}
+
+.palette-selector-container {
   display: grid;
+  flex-wrap: wrap;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 1rem;
-  padding: 1rem;
-  background-color: var(--mono-9);
 }
 
-.palette-selector-header {
+.palette-selector-card-gradient {
   display: flex;
-  grid-column: span 2;
-  gap: 1rem;
-  align-items: center;
+  position: relative;
+  padding: 2px;
 }
 
-.palette-selector-header > h2 {
-  flex-shrink: 0;
+.palette-selector-card-gradient::before {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.5s;
+  border-radius: var(--radius);
+  background-image: linear-gradient(
+    14deg,
+    var(--complement-1),
+    var(--complement-2)
+  );
+  filter: blur(3px);
+  content: "";
+  opacity: 0;
+}
 
-  /* font-size: 3rem; */
+.palette-selector-card-gradient.active::before,
+.palette-selector-card-gradient:hover::before {
+  opacity: 0.5;
 }
 
 .palette-selector-card {
   display: flex;
-  gap: 1rem;
+  position: relative;
+  gap: 0.3em;
   align-items: center;
+  color: var(--mono-9-contrast);
   text-align: left;
+  background: var(--mono-10);
+  border: 1px solid var(--mono-9);
+  font-size: var(--small);
+  flex: 1;
 }
 
-.palette-selector > .palette-selector-card:hover,
-.palette-selector > .palette-selector-card.active {
-  color: var(--mono-10-contrast);
-  background: var(--mono-10);
-  border-color: var(--complement-1);
+.palette-selector-card:hover,
+.palette-selector-card:focus-visible {
+  border: 1px solid var(--mono-9);
 }

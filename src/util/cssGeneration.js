@@ -16,7 +16,6 @@ function cssWriter(args, isReversed) {
         isReversed && (name === "mono" || name === "shades")
           ? [...palette].reverse()
           : palette;
-      console.log(isReversed);
 
       return palette
         .map((color, idx) => {

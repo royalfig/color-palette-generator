@@ -43,3 +43,29 @@
 .colors-10 button {
   font-size: var(--x-small);
 }
+
+:where(.colors-2, .colors-3, .colors-4) .color-swatch:first-of-type {
+  border-top-left-radius: var(--radius);
+  border-bottom-left-radius: var(--radius);
+}
+
+:where(.colors-2, .colors-3, .colors-4) .color-swatch:last-of-type {
+  border-top-right-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}
+
+.colors-10 .color-swatch:first-of-type {
+  border-top-left-radius: var(--radius);
+}
+
+.colors-10 .color-swatch:last-of-type {
+  border-bottom-right-radius: var(--radius);
+}
+
+.colors-10 .color-swatch:nth-of-type(5) {
+  border-top-right-radius: var(--radius);
+}
+
+.colors-10 .color-swatch:nth-of-type(6) {
+  border-bottom-left-radius: var(--radius);
+}

@@ -3,19 +3,30 @@
   gap: 1rem;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 1rem 0;
-
-  /* border-top: 1px solid var(--border-color); */
 }
 
-.controls-buttons {
+.controls-variations {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
 }
 
-.palette-name {
-  font-size: var(--small);
-  font-weight: 600;
+.controls-variations .text-btn {
+  font-weight: 700;
+  background: linear-gradient(45deg, var(--mono-9), var(--shades-10));
+}
+
+.controls-variations .text-btn.active {
+  outline: 1px solid var(--shades-5);
+}
+
+.controls-variation {
+  font-weight: 300;
   text-transform: uppercase;
-  letter-spacing: 0.2px;
+  font-size: var(--small);
+  line-height: 1;
+}
+
+.controls-properties button {
+  background: linear-gradient(45deg, var(--mono-9), var(--shades-10));
 }

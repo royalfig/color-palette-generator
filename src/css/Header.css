@@ -1,16 +1,19 @@
 .header {
-  padding-block: 2rem 4rem;
+  margin-block-end: var(--space-after);
 }
 
-.header h1 {
-  font-size: 3.488rem;
-  font-weight: 400;
-  text-align: center;
-  letter-spacing: 0.15em;
-  background-image: linear-gradient(to bottom, var(--mono-9), var(--mono-8));
-  filter: drop-shadow(0 2px 1px var(--shades-3));
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+.header,
+.header div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-  /* -webkit-text-stroke: 1px black; */
+.header h2 {
+  display: flex;
+  align-items: center;
+}
+
+.header p {
+  text-transform: uppercase;
 }

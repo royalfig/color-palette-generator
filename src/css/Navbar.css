@@ -30,8 +30,8 @@
 }
 
 .navbar .left .text-btn:hover {
-  background-color: var(--shades-7);
   color: var(--shades-7-contrast);
+  background-color: var(--shades-7);
 }
 
 .navbar .right button {

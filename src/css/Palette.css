@@ -1,22 +1,9 @@
 .palette-container {
-  /* margin-block-start: 3rem; */
-  padding: 1rem;
-  background-color: var(--mono-9);
+  padding: var(--box-padding);
+  background-color: var(--mono-10);
+  border-radius: var(--radius);
 }
 
 .palette {
-  overflow: hidden;
-}
-
-.palette-container header {
-  display: flex;
-  align-items: center;
-  margin-block-end: 0.5rem;
-}
-
-.palette-container h2 {
-  margin: 0;
-  translate: -1rem;
-  line-height: 1;
-  white-space: nowrap;
+  margin-block-end: var(--space-after);
 }

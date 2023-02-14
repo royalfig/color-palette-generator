@@ -8,10 +8,10 @@
 
 input,
 textarea {
+  padding: var(--button-padding);
   font-family: inherit;
   font-size: inherit;
-  border: 1px solid var(--mono-8);
-  padding: var(--button-padding);
-  background-color: var(--mono-10);
   line-height: 1;
+  background-color: var(--mono-10);
+  border: 1px solid var(--mono-8);
 }

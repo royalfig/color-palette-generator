@@ -1,45 +1,53 @@
 import "../css/PaletteSelector.css";
 import Circle from "./Circle";
+import Header from "./Header";
+import { useState } from "react";
 
 export default function PaletteSelector({ palettes, handlePalette, palette }) {
+  const [paletteType, setPaletteType] = useState("Complementary");
+
+  function handlePaletteType(e) {
+    handlePalette(e);
+
+    setPaletteType(e?.currentTarget?.dataset?.name);
+  }
+
   return (
     <section className="palette-selector">
-      <header className="palette-selector-header">
-        <h2>Palette</h2>
-        <div className="gradients">
-          <div className="gradient"></div>
-          <div className="gradient"></div>
-          <div className="gradient"></div>
-        </div>
-      </header>
-      {palettes.map((colors, idx) => {
-        let className = "palette-selector-card";
+      <Header h2="Palette" text={paletteType} />
 
-        if (palette[0].name === colors[0].name) {
-          className += " active";
-        }
-
-        return (
-          <button
-            key={idx}
-            className={className}
-            onClick={handlePalette}
-            data-name={colors[0].name}
-          >
-            <Circle
-              colors={colors}
-              type={
-                colors[0].name === "Monochromatic" ||
-                colors[0].name === "Shades"
-                  ? "circle"
-                  : "default"
-              }
-              size="small"
-            />
-            <p>{colors[0].name}</p>
-          </button>
-        );
-      })}
+      <div className="palette-selector-container">
+        {palettes.map((colors, idx) => {
+          return (
+            <div
+              className={`palette-selector-card-gradient ${
+                palette[0].name === colors[0].name ? "active" : ""
+              }`}
+            >
+              <button
+                key={idx}
+                className={`palette-selector-card ${
+                  palette[0].name === colors[0].name ? "active" : ""
+                }`}
+                onClick={handlePaletteType}
+                data-name={colors[0].name}
+              >
+                <Circle
+                  colors={colors}
+                  type={
+                    colors[0].name === "Monochromatic" ||
+                    colors[0].name === "Shades"
+                      ? "circle"
+                      : "default"
+                  }
+                  size="small"
+                />
+                <p>{colors[0].name}</p>
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </section>
   );
 }
