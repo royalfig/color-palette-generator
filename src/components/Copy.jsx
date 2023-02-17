@@ -1,13 +1,27 @@
 import "../css/Copy.css";
-import toast from "react-hot-toast";
-import { Clipboard2Check } from "react-bootstrap-icons";
+import { toast } from "react-toastify";
 
 export default function Copy({ text }) {
   function clickHandler() {
     navigator.clipboard.writeText(text).then(() => {
-      toast(`"${text}" copied to clipboard`, {
-        icon: "📋",
-      });
+      toast(
+        <div>
+          {text} copied to clipboard!
+          <span
+            style={{
+              backgroundColor: text,
+              height: "1em",
+              width: "1em",
+              borderRadius: 50,
+              display: "inline-block",
+              marginLeft: ".5em",
+            }}
+          ></span>
+        </div>,
+        {
+          position: "bottom-left",
+        }
+      );
     });
   }
 

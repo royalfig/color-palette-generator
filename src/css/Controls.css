@@ -21,10 +21,10 @@
 }
 
 .controls-variation {
-  font-weight: 300;
-  text-transform: uppercase;
   font-size: var(--small);
+  font-weight: 300;
   line-height: 1;
+  text-transform: uppercase;
 }
 
 .controls-properties button {

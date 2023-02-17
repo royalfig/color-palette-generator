@@ -119,6 +119,7 @@ function App() {
             setColor={debouncedHandler}
             color={color}
           ></ColorSelector>
+          <div className="idea">💡Copy most values by clicking on it</div>
         </section>
 
         <section className="right">

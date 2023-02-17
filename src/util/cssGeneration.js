@@ -19,7 +19,9 @@ function cssWriter(args, isReversed) {
 
       return palette
         .map((color, idx) => {
+          console.log(color);
           return `--${name}-${idx + 1}: ${color.hsl};
+          --${name}-${idx + 1}-val: ${color.valForCss};
           --${name}-${idx + 1}-contrast: ${color.contrast};
           --${name}-${idx + 1}-corrected: ${color.corrected.hsl};
           --${name}-${idx + 1}-contrast-corrected: ${
@@ -70,8 +72,8 @@ function generateCss(hex) {
   styleTag && styleTag.remove();
   const style = document.createElement("style");
   style.id = "colors";
-  style.textContent = `:root[data-mode="light"] {--h: ${h}; --s: ${s}%; --l: ${l}%;${css}}
-  :root[data-mode="dark"] {--h: ${h}; --s: ${s}%; --l: ${l}%;${darkCss}}`;
+  style.textContent = `:root[data-mode="light"] {--alpha: 1; --h: ${h}; --s: ${s}%; --l: ${l}%;${css}}
+  :root[data-mode="dark"] {--alpha: 1; --h: ${h}; --s: ${s}%; --l: ${l}%;${darkCss}}`;
 
   document.head.append(style);
 }

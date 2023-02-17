@@ -19,32 +19,26 @@ export default function PaletteSelector({ palettes, handlePalette, palette }) {
       <div className="palette-selector-container">
         {palettes.map((colors, idx) => {
           return (
-            <div
-              className={`palette-selector-card-gradient ${
+            <button
+              key={idx}
+              className={`palette-selector-card ${
                 palette[0].name === colors[0].name ? "active" : ""
               }`}
+              onClick={handlePaletteType}
+              data-name={colors[0].name}
             >
-              <button
-                key={idx}
-                className={`palette-selector-card ${
-                  palette[0].name === colors[0].name ? "active" : ""
-                }`}
-                onClick={handlePaletteType}
-                data-name={colors[0].name}
-              >
-                <Circle
-                  colors={colors}
-                  type={
-                    colors[0].name === "Monochromatic" ||
-                    colors[0].name === "Shades"
-                      ? "circle"
-                      : "default"
-                  }
-                  size="small"
-                />
-                <p>{colors[0].name}</p>
-              </button>
-            </div>
+              <Circle
+                colors={colors}
+                type={
+                  colors[0].name === "Monochromatic" ||
+                  colors[0].name === "Shades"
+                    ? "circle"
+                    : "default"
+                }
+                size="small"
+              />
+              <p>{colors[0].name}</p>
+            </button>
           );
         })}
       </div>
