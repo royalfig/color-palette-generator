@@ -1,13 +1,17 @@
 import "../css/Complementary.css";
-import { ArrowDownRightCircle } from "react-bootstrap-icons";
-import light from "../assets/lights.jpg";
+import { ArrowUpRight } from "react-bootstrap-icons";
+
 import { SampleNavbar } from "./SampleNavbar";
+
+import { ArticleData } from "./ArticleData";
+
 export default function Complementary() {
+  console.log(ArticleData);
   return (
     <>
       <SampleNavbar name="Complementary" />
       <svg
-        xmlns="http://www.w3.org/2000/svg"
+        className="complementary-decoration"
         width="1088"
         height="527"
         fill="none"
@@ -165,19 +169,44 @@ export default function Complementary() {
         <a href="#">Show me some green.</a>
         <p>Support this project</p>
       </div>
-
+      <div className="complementary-divider"></div>
       <div className="complementary-card-container">
-        <article className="complementary-card">
-          <img src={light} alt="" />
-          <div className="complementary-card-body">
-            <p className="complementary-card-title">
-              Relative Luminance: A TL;DR
-            </p>
-          </div>
-          <div className="complementary-card-icon">
-            <ArrowDownRightCircle />
-          </div>
-        </article>
+        {ArticleData.map((article, idx) => {
+          if (idx === 0) {
+            return (
+              <article className="complementary-card" key={article.title}>
+                <img src={article.image} alt={article.alt} />
+                <div className="complementary-card-body">
+                  <p className="complementary-card-title">{article.title}</p>
+                  <p className="complementary-card-excerpt">
+                    {article.excerpt}
+                  </p>
+                </div>
+                <a href={article.url} className="complementary-card-icon">
+                  <ArrowUpRight />
+                </a>
+              </article>
+            );
+          } else {
+            return (
+              <article
+                className="complementary-card complementary-card-horizontal"
+                key={article.title}
+              >
+                <img src={article.image} alt={article.alt} />
+                <div className="complementary-card-body">
+                  <p className="complementary-card-title">{article.title}</p>
+                  <p className="complementary-card-excerpt">
+                    {article.excerpt}
+                  </p>
+                </div>
+                <a href={article.url} className="complementary-card-icon">
+                  <ArrowUpRight />
+                </a>
+              </article>
+            );
+          }
+        })}
       </div>
     </>
   );

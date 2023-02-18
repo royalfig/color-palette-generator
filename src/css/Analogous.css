@@ -1,0 +1,141 @@
+.analogous {
+  background-color: var(--analogous-2);
+}
+
+.analogous .sample-navbar {
+  padding: 2rem;
+  color: var(--analogous-2-contrast);
+}
+
+.analogous-hero {
+  position: relative;
+  padding: 0 2rem 2rem;
+  margin: 10rem auto 8rem;
+  text-align: center;
+  border-bottom: 3px dashed var(--analogous-1);
+}
+
+.analogous-title p {
+  font-size: 5.5rem;
+  font-weight: 900;
+  line-height: 0.8;
+  color: var(--analogous-1);
+  text-transform: uppercase;
+  letter-spacing: -0.3px;
+}
+
+.analogous-bird {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin-inline: auto;
+}
+
+.analogous-bird-beak {
+  /* filter: brightness(90%); */
+  position: absolute;
+  top: 80%;
+  right: 0;
+  width: 0;
+  height: 0;
+  filter: drop-shadow(0 3px 1rem rgb(0 0 0 / 25%));
+
+  /* rotate: 1deg; */
+
+  border-color: transparent transparent transparent var(--analogous-1);
+  border-style: solid;
+  border-width: 2vw 2vw 0 4vw;
+  translate: 15% 0.35rem;
+  rotate: 60deg;
+}
+
+.analogous-bird-head {
+  position: relative;
+  z-index: 1;
+  height: 40%;
+  aspect-ratio: 1/1;
+  margin-inline: auto;
+  background-color: var(--analogous-3);
+  border-radius: 50%;
+  box-shadow: -3px 3px 1rem rgb(0 0 0 / 15%);
+  translate: 10% 5px;
+}
+
+.analogous-bird-body {
+  position: relative;
+  z-index: 0;
+  height: 80%;
+  aspect-ratio: 1 /1;
+  margin-inline: auto;
+  background-color: var(--analogous-3);
+  border-radius: 50%;
+  translate: 0 -20px;
+}
+
+.analogous-subtitle {
+  padding: 2rem;
+  font-size: 1.15rem;
+  color: var(--analogous-2-contrast);
+  text-align: center;
+}
+
+.analogous-card-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding: 5rem 2rem;
+}
+
+.analogous-card {
+  /* overflow: hidden; */
+  border-radius: 2rem;
+  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 15%), 0 2px 0.25rem rgb(0 0 0 / 20%);
+  transition: translate 0.3s, box-shadow 0.3s;
+  position: relative;
+}
+
+.analogous-card:hover {
+  translate: 0 -0.5rem;
+  box-shadow: 0 1rem 2rem rgb(0 0 0 / 15%), 0 2px 0.25rem rgb(0 0 0 / 20%);
+}
+
+.analogous-card a {
+  border-radius: 2rem;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 3 / 4;
+  text-decoration: none;
+}
+
+.analogous-card a::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background-image: linear-gradient(to top, rgb(0 0 0/ 75%), transparent);
+}
+
+.analogous-card img {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.analogous-card-body {
+  position: relative;
+  z-index: 1;
+  padding: 1rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing);
+}

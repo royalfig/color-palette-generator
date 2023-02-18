@@ -1,6 +1,6 @@
 import Color from "colorjs.io";
 import {
-  createAdjacent,
+  createAdjacent as createAnalogous,
   createComplement,
   createMonochromatic,
   createTriad,
@@ -19,7 +19,6 @@ function cssWriter(args, isReversed) {
 
       return palette
         .map((color, idx) => {
-          console.log(color);
           return `--${name}-${idx + 1}: ${color.hsl};
           --${name}-${idx + 1}-val: ${color.valForCss};
           --${name}-${idx + 1}-contrast: ${color.contrast};
@@ -38,7 +37,7 @@ function generateCss(hex) {
   const [h, s, l] = color.hsl;
 
   const complement = createComplement(color);
-  const adjacent = createAdjacent(color);
+  const analogous = createAnalogous(color);
   const tetrad = createTetrad(color);
   const triad = createTriad(color);
   const mono = createMonochromatic(color);
@@ -49,7 +48,7 @@ function generateCss(hex) {
     [mono, "mono"],
     [shades, "shades"],
     [complement, "complement"],
-    [adjacent, "adjacent"],
+    [analogous, "analogous"],
     [triad, "triad"],
     [tetrad, "tetrad"],
     [split, "split"],
@@ -61,7 +60,7 @@ function generateCss(hex) {
       [shades, "shades"],
       [complement, "complement"],
       [split, "split"],
-      [adjacent, "adjacent"],
+      [analogous, "analogous"],
       [triad, "triad"],
       [tetrad, "tetrad"],
     ],

@@ -15,7 +15,7 @@
   overflow: hidden;
 }
 
-.complementary svg {
+.complementary .complementary-decoration {
   position: absolute;
   top: 0;
   left: 10%;
@@ -25,16 +25,9 @@
 
 .complementary-hero {
   position: relative;
-  padding: 10rem 5rem;
+  padding: 10rem 5rem 3rem;
   margin-inline: auto;
   text-align: center;
-}
-
-.complementary-card-body p {
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1.3;
-  text-transform: uppercase;
 }
 
 .complementary-hero a ~ p {
@@ -63,17 +56,29 @@
   border-radius: var(--radius);
 }
 
+.complementary-divider {
+  height: 1px;
+  margin: 4rem 2rem 5rem;
+  background-color: var(--shades-3);
+  opacity: 0.35;
+}
+
 .complementary-card-container {
   display: grid;
+  grid-template-rows: repeat(2, 1fr);
   grid-template-columns: repeat(2, 1fr);
-  gap: 5rem;
+  gap: 2rem;
+  padding: 2rem 2rem 4rem;
 }
 
 .complementary-card {
   display: grid;
-  grid-template-rows: repeat(12, 1fr);
+  grid-template-rows: repeat(12, auto);
   grid-template-columns: repeat(12, 1fr);
-  aspect-ratio: 4 / 3;
+  grid-row: 1 / -1;
+
+  /* aspect-ratio: 4 / 3; */
+  grid-column: 1 / span 1;
 }
 
 .complementary-card img {
@@ -87,16 +92,76 @@
 .complementary-card-body {
   grid-row: 9 / -1;
   grid-column: 4 / 13;
+  min-height: 8rem;
   padding: var(--box-padding);
   background-color: var(--mono-10);
   outline: 1rem solid var(--shades-9);
 }
 
+.complementary-card-title {
+  margin-block-end: 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.complementary-card-excerpt {
+  max-width: 70%;
+  font-size: 1rem;
+  font-size: var(--small);
+  font-weight: 300;
+  line-height: 1.2;
+}
+
 .complementary-card-icon {
+  display: flex;
   grid-row: 12 / -1;
   grid-column: 11 / 13;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: var(--complement-2);
+  translate: 0 1rem;
 }
 
 .complementary-card-icon svg {
   position: relative;
+  color: var(--complement-2-contrast);
+}
+
+/* Horizontal card */
+.complementary-card-horizontal {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr 2fr;
+  grid-row: 1 / span 1;
+  grid-column: 2 / -1;
+}
+
+.complementary-card-horizontal:last-child {
+  grid-row: 2 / -1;
+}
+
+.complementary-card-horizontal img {
+  grid-row: 1 / -1;
+  grid-column: 1 / span 1;
+}
+
+.complementary-card-horizontal .complementary-card-body {
+  grid-row: 1 / -1;
+  grid-column: 2 / -1;
+}
+
+.complementary-card-horizontal .complementary-card-icon {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.complementary-card-horizontal .complementary-card-icon {
+  translate: -1rem 1rem;
 }

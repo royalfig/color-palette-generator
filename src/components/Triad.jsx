@@ -1,10 +1,7 @@
-import {
-  ArrowBarRight,
-  ArrowDownRightCircleFill,
-  ArrowRight,
-} from "react-bootstrap-icons";
+import { ArrowRight } from "react-bootstrap-icons";
 import "../css/Triad.css";
 import { SampleNavbar } from "./SampleNavbar";
+import { ArticleData } from "./ArticleData";
 
 export default function Triad({ props }) {
   return (
@@ -31,45 +28,18 @@ export default function Triad({ props }) {
         <p>The Steph Curry of Color Palettes</p>
       </div>
       <div className="triad-card-container">
-        <article className="triad-card">
-          <header>Relative luminance: tl:dr;</header>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis
-            deserunt quae eos delectus recusandae nobis amet sed eaque earum
-            neque commodi quia ab consectetur labore, eveniet aspernatur
-            possimus fuga? Est.
-          </p>
-          <a href="#">
-            <span>Read</span>
-            <ArrowRight />
-          </a>
-        </article>
-        <article className="triad-card">
-          <header>HSL is a liar</header>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis
-            deserunt quae eos delectus recusandae nobis amet sed eaque earum
-            neque commodi quia ab consectetur labore, eveniet aspernatur
-            possimus fuga? Est.
-          </p>
-          <a href="#">
-            <span>Read</span>
-            <ArrowRight />
-          </a>
-        </article>
-        <article className="triad-card">
-          <header>Browsers are dull</header>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis
-            deserunt quae eos delectus recusandae nobis amet sed eaque earum
-            neque commodi quia ab consectetur labore, eveniet aspernatur
-            possimus fuga? Est.
-          </p>
-          <a href="#">
-            <span>Read</span>
-            <ArrowRight />
-          </a>
-        </article>
+        {ArticleData.map((article, idx) => {
+          return (
+            <article className="triad-card" key={idx}>
+              <header>{article.title}</header>
+              <p>{article.longExcerpt}</p>
+              <a href={article.url}>
+                <span>Read</span>
+                <ArrowRight />
+              </a>
+            </article>
+          );
+        })}
       </div>
       <footer className="triad-footer">
         <p>stat</p> <p>stat</p> <p>stat</p> <p>stat</p> <p>stat</p> <p>stat</p>{" "}

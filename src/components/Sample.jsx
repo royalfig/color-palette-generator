@@ -4,15 +4,13 @@ import Complementary from "./Complementary";
 import Split from "./Split";
 import Shades from "./Shades";
 import Triad from "./Triad";
-import { SampleNavbar } from "./SampleNavbar";
+import Analogous from "./Analogous";
 
 export default function Sample({ selectedPalette }) {
   const name = selectedPalette[0].name;
-  console.log(selectedPalette);
   const slugifiedName = slugify(name);
 
   const SelectedComponent = selectComponent(slugifiedName);
-  console.log(slugifiedName, SelectedComponent);
   return (
     <section className={`sample-container ${slugifiedName}`}>
       <SelectedComponent />
@@ -25,7 +23,6 @@ export function slugify(name) {
 }
 
 function selectComponent(slug) {
-  console.log(slug === "complementary");
   switch (slug) {
     case "complementary":
       return Complementary;
@@ -35,6 +32,8 @@ function selectComponent(slug) {
       return Shades;
     case "triadic":
       return Triad;
+    case "analogous":
+      return Analogous;
     default:
       return "shades";
   }
