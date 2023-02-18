@@ -35,19 +35,39 @@ export default function Controls({ setDisplayValue }) {
       </div>
 
       <div className="controls-properties">
-        <Button type="text-btn" handler={(e) => handleProperty(e)}>
+        <Button
+          type="text-btn"
+          handler={(e) => handleProperty(e)}
+          classes={property === "hex" ? "active" : ""}
+        >
           HEX
         </Button>
-        <Button type="text-btn" handler={(e) => handleProperty(e)}>
+        <Button
+          type="text-btn"
+          handler={(e) => handleProperty(e)}
+          classes={property === "rgb" ? "active" : ""}
+        >
           RGB
         </Button>
-        <Button type="text-btn" handler={(e) => handleProperty(e)}>
+        <Button
+          type="text-btn"
+          handler={(e) => handleProperty(e)}
+          classes={property === "hsl" ? "active" : ""}
+        >
           HSL
         </Button>
-        <Button type="text-btn" handler={(e) => handleProperty(e)}>
+        <Button
+          type="text-btn"
+          handler={(e) => handleProperty(e)}
+          classes={property === "lch" ? "active" : ""}
+        >
           LCH
         </Button>
-        <Button type="text-btn" handler={(e) => handleProperty(e)}>
+        <Button
+          type="text-btn"
+          handler={(e) => handleProperty(e)}
+          classes={property === "css" ? "active" : ""}
+        >
           CSS
         </Button>
       </div>

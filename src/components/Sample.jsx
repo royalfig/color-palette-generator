@@ -1,10 +1,12 @@
 import "../css/Sample.css";
 
-import Complementary from "./Complementary";
-import Split from "./Split";
-import Shades from "./Shades";
-import Triad from "./Triad";
 import Analogous from "./Analogous";
+import Complementary from "./Complementary";
+import Shades from "./Shades";
+import Split from "./Split";
+import Tetradic from "./Tetradic";
+import Tones from "./Tones";
+import Triad from "./Triad";
 
 export default function Sample({ selectedPalette }) {
   const name = selectedPalette[0].name;
@@ -23,6 +25,7 @@ export function slugify(name) {
 }
 
 function selectComponent(slug) {
+  console.log(slug);
   switch (slug) {
     case "complementary":
       return Complementary;
@@ -34,6 +37,10 @@ function selectComponent(slug) {
       return Triad;
     case "analogous":
       return Analogous;
+    case "tetradic":
+      return Tetradic;
+    case "monochromatic":
+      return Tones;
     default:
       return "shades";
   }

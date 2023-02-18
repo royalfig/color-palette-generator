@@ -1,0 +1,98 @@
+.tetradic {
+  padding-block-end: 3rem;
+  background-color: var(--shades-9);
+}
+
+.tetradic .sample-navbar {
+  padding: 2rem;
+}
+
+.tetradic-hero {
+  display: grid;
+  gap: 2rem;
+  justify-items: center;
+  padding: 6rem 2rem 8rem;
+  text-align: center;
+}
+
+.tetradic-title {
+  font-size: 4.5rem;
+  font-weight: 700;
+  line-height: 0.9;
+  color: var(--shades-1);
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+
+.tetradic-subtitle {
+  max-width: 60ch;
+  font-size: 1.25rem;
+}
+
+.tetradic-cta {
+  display: inline-block;
+  width: fit-content;
+  padding: var(--button-padding);
+  font-weight: 700;
+  color: var(--tetrad-1-contrast);
+  text-decoration: none;
+  text-transform: uppercase;
+  background-color: var(--tetrad-1);
+  border-radius: var(--radius);
+}
+
+/* Cards */
+.tetradic-card-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.tetradic-card {
+  display: grid;
+  gap: 2rem;
+  padding: 1rem 2rem;
+  text-transform: uppercase;
+}
+
+.tetradic-card {
+  color: var(--tetrad-3-contrast-corrected);
+  background-color: var(--tetrad-3-corrected);
+}
+
+.tetradic-card:first-child {
+  color: var(--tetrad-2-contrast-corrected);
+  background-color: var(--tetrad-2-corrected);
+}
+
+.tetradic-card:last-child {
+  color: var(--tetrad-4-contrast-corrected);
+  background-color: var(--tetrad-4-corrected);
+}
+
+.tetradic-card-title {
+  font-size: 1.15rem;
+  line-height: 1.1;
+}
+
+.tetradic-card img {
+  width: 100%;
+  aspect-ratio: 3 / 3.5;
+  object-fit: cover;
+}
+
+.tetradic-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: inherit;
+  text-decoration: none;
+}
+
+.tetradic-link svg {
+  /* transition: rotate 0.1s; */
+}
+
+.tetradic-link:hover svg {
+  rotate: -15deg;
+  scale: 1.1;
+}

@@ -13,11 +13,20 @@
 
 .controls-variations .text-btn {
   font-weight: 700;
+  color: var(--mono-1);
   background: linear-gradient(45deg, var(--mono-9), var(--shades-10));
+  outline: 1px solid var(--mono-9);
+  transition: outline 0.4s cubic-bezier(0.455, 0.03, 0.515, 0.955);
 }
 
-.controls-variations .text-btn.active {
-  outline: 1px solid var(--shades-5);
+.controls-variations .text-btn:hover,
+.controls-properties button:hover {
+  outline: 1px solid var(--mono-7);
+}
+
+.controls-variations .text-btn.active,
+.controls-properties button.active {
+  outline: 1px solid var(--mono-5);
 }
 
 .controls-variation {
@@ -27,6 +36,15 @@
   text-transform: uppercase;
 }
 
+.controls-properties {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .controls-properties button {
+  color: var(--mono-1);
   background: linear-gradient(45deg, var(--mono-9), var(--shades-10));
+  outline: 1px solid var(--mono-9);
+  transition: outline 0.4s cubic-bezier(0.455, 0.03, 0.515, 0.955);
 }
