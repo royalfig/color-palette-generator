@@ -21,3 +21,7 @@
   gap: var(--space-after);
   overflow: hidden;
 }
+
+.right > section {
+  flex-grow: 1;
+}

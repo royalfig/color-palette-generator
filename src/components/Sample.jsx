@@ -41,6 +41,7 @@ function selectComponent(slug) {
       return Tetradic;
     case "monochromatic":
       return Tones;
+
     default:
       return "shades";
   }

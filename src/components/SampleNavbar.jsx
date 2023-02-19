@@ -1,4 +1,4 @@
-import { slugify } from "./Sample";
+import { Eyeglasses } from "react-bootstrap-icons";
 
 export function SampleNavbar({ name }) {
   return (
@@ -8,7 +8,9 @@ export function SampleNavbar({ name }) {
         <li>About</li>
         <li>Xyz</li>
       </ul>
-      <button>{slugify(name)}</button>
+      <button>
+        <Eyeglasses /> Specs
+      </button>
     </nav>
   );
 }
