@@ -169,7 +169,7 @@
   letter-spacing: -0.3px;
   background-color: var(--mono-10);
   border-radius: 1em;
-  box-shadow: 20px 20px 60px var(--mono-9), -20px -20px 60px #fff;
+  box-shadow: 20px 20px 60px var(--mono-9), -20px -20px 60px var(--mono-10);
   transition: padding-inline-start 0.5s;
 }
 
@@ -192,7 +192,7 @@
 }
 
 .split-title-container a:active {
-  box-shadow: 10px 10px 30px var(--mono-9), -10px -10px 30px #fff;
+  box-shadow: 10px 10px 30px var(--mono-9), -10px -10px 30px var(--mono-10);
 }
 
 .split-card {
@@ -204,7 +204,8 @@
   padding: 2rem;
   background-color: hsl(var(--mono-10-val) / 30%);
   border-radius: 1em;
-  box-shadow: 20px 20px 60px hsl(var(--mono-9-val) / 60%), -20px -20px 60px #fff;
+  box-shadow: 20px 20px 60px hsl(var(--mono-9-val) / 60%),
+    -20px -20px 60px var(--mono-10);
   backdrop-filter: blur(15px);
 }
 
@@ -226,7 +227,8 @@
   text-transform: uppercase;
   background-color: var(--mono-10);
   border-radius: 0.5rem;
-  box-shadow: 10px 10px 60px hsl(var(--mono-9-val) / 60%), -10px -10px 60px #fff;
+  box-shadow: 10px 10px 60px hsl(var(--mono-9-val) / 60%),
+    -10px -10px 60px var(--mono-10);
   transition: background-color 0.5s;
 }
 
@@ -247,4 +249,8 @@
 .split-card:last-of-type {
   grid-row: 6 / span 3;
   grid-column: 7 / span 4;
+}
+
+.specs {
+  background-color: black;
 }

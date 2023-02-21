@@ -2,18 +2,27 @@ import { ArrowRightCircle } from "react-bootstrap-icons";
 import "../css/Split.css";
 import { ArticleData } from "./ArticleData";
 import { SampleNavbar } from "./SampleNavbar";
+import { useRef, useState } from "react";
 
 export default function Split() {
+  const bg = useRef(null);
+  const [specsOn, setSpecsOn] = useState(false);
+
+  function handle() {
+    setSpecsOn(true);
+    console.log(bg.current?.getBoundingClientRect());
+  }
+
   return (
-    <div className="split">
+    <div className={specsOn ? "split specs" : "split"}>
       <div className="circle-1"></div>
-      <div className="circle-2"></div>
+      <div className="circle-2" ref={bg}></div>
       <div className="pill-1"></div>
       <div className="pill-2"></div>
       <div className="pill-3"></div>
       <div className="pill-4"></div>
 
-      <SampleNavbar name="Split Complementary" />
+      <SampleNavbar name="Split Complementary" handler={handle} />
 
       <div className="split-main">
         <div className="split-hero">

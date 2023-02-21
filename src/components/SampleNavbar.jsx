@@ -1,6 +1,6 @@
 import { Eyeglasses } from "react-bootstrap-icons";
 
-export function SampleNavbar({ name }) {
+export function SampleNavbar({ name, handler }) {
   return (
     <nav className="sample-navbar">
       <ul>
@@ -8,7 +8,7 @@ export function SampleNavbar({ name }) {
         <li>About</li>
         <li>Xyz</li>
       </ul>
-      <button>
+      <button onClick={handler}>
         <Eyeglasses /> Specs
       </button>
     </nav>

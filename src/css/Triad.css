@@ -28,7 +28,7 @@
   box-shadow: var(--shadow-md);
   transition: translate 2s;
 
-  --shadow-color: hsl(var(--mono-1-val) / 42%);
+  /* --shadow-color: hsl(var(--mono-1-val) / 42%); */
 }
 
 .triad-basketball:hover {

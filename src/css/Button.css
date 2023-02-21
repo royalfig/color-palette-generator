@@ -9,6 +9,7 @@ button {
   background: none;
   border: none;
   border-radius: var(--radius);
+  color: inherit;
 }
 
 button:hover,

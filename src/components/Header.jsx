@@ -11,9 +11,8 @@ export default function Header({ h2, text, children }) {
         {children} {h2}
       </h2>
       <div>
-        <p>{text}</p>
-        <Button type="icon-btn" handler={copy.bind(null, text)}>
-          <Clipboard />
+        <Button type="text" handler={copy.bind(null, text)}>
+          {text}
         </Button>
       </div>
     </header>

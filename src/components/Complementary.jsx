@@ -6,7 +6,6 @@ import { SampleNavbar } from "./SampleNavbar";
 import { ArticleData } from "./ArticleData";
 
 export default function Complementary() {
-  console.log(ArticleData);
   return (
     <>
       <SampleNavbar name="Complementary" />

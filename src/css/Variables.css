@@ -9,7 +9,7 @@
   --space-after: 2rem;
   --max-viewport: 65rem;
   --letter-spacing: 0.3px;
-  --shadow-color: hsl(var(--shades-1-val) / 34%);
+  --shadow-color: hsl(var(--mono-5-val) / 34%);
   --shadow-md: 0.3px 0.5px 0.7px var(--shadow-color),
     0.8px 1.6px 2px -0.8px var(--shadow-color),
     2.1px 4.1px 5.2px -1.7px var(--shadow-color),

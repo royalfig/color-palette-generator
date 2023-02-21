@@ -14,4 +14,5 @@ textarea {
   line-height: 1;
   background-color: var(--mono-10);
   border: 1px solid var(--mono-8);
+  color: inherit;
 }

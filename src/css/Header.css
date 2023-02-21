@@ -14,6 +14,7 @@
   align-items: center;
 }
 
-.header p {
-  text-transform: uppercase;
+.header button {
+  font-size: var(--small);
+  padding: 0;
 }

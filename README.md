@@ -10,8 +10,8 @@
   },
   "com": {
     "paletteType": "complementary",
+    "paletteName": "",
     "og": {
-      "paletteName": "",
       "1": {
         "code": "com-og-1",
         "hex": "",
@@ -21,10 +21,11 @@
         "contrast": "",
         "css": "",
         "cssContrast": "",
-        "cssRaw": ""
+        "cssRaw": "",
+        "name": ""
       },
       "2": {
-        "code": "",
+        "code": "com-og-1",
         "hex": "",
         "rgb": "",
         "hsl": "",
@@ -32,12 +33,13 @@
         "contrast": "",
         "css": "",
         "cssContrast": "",
-        "cssRaw": ""
+        "cssRaw": "",
+        "name": ""
       }
     },
     "ke": {
       "1": {
-        "code": "",
+        "code": "com-og-1",
         "hex": "",
         "rgb": "",
         "hsl": "",
@@ -45,10 +47,11 @@
         "contrast": "",
         "css": "",
         "cssContrast": "",
-        "cssRaw": ""
+        "cssRaw": "",
+        "name": ""
       },
       "2": {
-        "code": "",
+        "code": "com-og-1",
         "hex": "",
         "rgb": "",
         "hsl": "",
@@ -56,12 +59,13 @@
         "contrast": "",
         "css": "",
         "cssContrast": "",
-        "cssRaw": ""
+        "cssRaw": "",
+        "name": ""
       }
     },
     "ci": {
       "1": {
-        "code": "",
+        "code": "com-og-1",
         "hex": "",
         "rgb": "",
         "hsl": "",
@@ -69,10 +73,11 @@
         "contrast": "",
         "css": "",
         "cssContrast": "",
-        "cssRaw": ""
+        "cssRaw": "",
+        "name": ""
       },
       "2": {
-        "code": "",
+        "code": "com-og-1",
         "hex": "",
         "rgb": "",
         "hsl": "",
@@ -80,12 +85,13 @@
         "contrast": "",
         "css": "",
         "cssContrast": "",
-        "cssRaw": ""
+        "cssRaw": "",
+        "name": ""
       }
     },
     "sb": {
       "1": {
-        "code": "",
+        "code": "com-og-1",
         "hex": "",
         "rgb": "",
         "hsl": "",
@@ -93,10 +99,11 @@
         "contrast": "",
         "css": "",
         "cssContrast": "",
-        "cssRaw": ""
+        "cssRaw": "",
+        "name": ""
       },
       "2": {
-        "code": "",
+        "code": "com-og-1",
         "hex": "",
         "rgb": "",
         "hsl": "",
@@ -104,12 +111,13 @@
         "contrast": "",
         "css": "",
         "cssContrast": "",
-        "cssRaw": ""
+        "cssRaw": "",
+        "name": ""
       }
     },
     "la": {
       "1": {
-        "code": "",
+        "code": "com-og-1",
         "hex": "",
         "rgb": "",
         "hsl": "",
@@ -117,10 +125,11 @@
         "contrast": "",
         "css": "",
         "cssContrast": "",
-        "cssRaw": ""
+        "cssRaw": "",
+        "name": ""
       },
       "2": {
-        "code": "",
+        "code": "com-og-1",
         "hex": "",
         "rgb": "",
         "hsl": "",
@@ -128,7 +137,8 @@
         "contrast": "",
         "css": "",
         "cssContrast": "",
-        "cssRaw": ""
+        "cssRaw": "",
+        "name": ""
       }
     }
   }
