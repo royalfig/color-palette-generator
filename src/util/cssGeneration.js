@@ -1,31 +1,31 @@
 import Color from "colorjs.io";
 import {
-  createAdjacent as createAnalogous,
   createComplement,
-  createMonochromatic,
+  createAnalogous,
   createTriad,
-  createShades,
-  createTetrad,
+  createTetradic,
   createSplit,
+  createTones,
+  createTintsAndShades,
 } from "./converters";
 
 function cssWriter(args, isReversed) {
   return args
-    .map(([palette, name]) => {
-      palette =
-        isReversed && (name === "mono" || name === "shades")
-          ? [...palette].reverse()
-          : palette;
+    .map(({ name, variations }) => {
+      return variations
+        .map((variation) => {
+          variation =
+            isReversed && (name === "tones" || name === "tints and shades")
+              ? [...variation].reverse()
+              : variation;
 
-      return palette
-        .map((color, idx) => {
-          return `--${name}-${idx + 1}: ${color.hsl};
-          --${name}-${idx + 1}-val: ${color.valForCss};
-          --${name}-${idx + 1}-contrast: ${color.contrast};
-          --${name}-${idx + 1}-corrected: ${color.corrected.hsl};
-          --${name}-${idx + 1}-contrast-corrected: ${
-            color.corrected.contrast
-          };`;
+          return variation
+            .map((color) => {
+              return `--${color.code}: ${color.hsl};
+          --${color.code}-raw: ${color.cssRaw};
+          --${color.code}-c: ${color.contrast};`;
+            })
+            .join("\n");
         })
         .join("\n");
     })
@@ -38,32 +38,24 @@ function generateCss(hex) {
 
   const complement = createComplement(color);
   const analogous = createAnalogous(color);
-  const tetrad = createTetrad(color);
+  const tetrad = createTetradic(color);
   const triad = createTriad(color);
-  const mono = createMonochromatic(color);
-  const shades = createShades(color);
+  const tones = createTones(color);
+  const shades = createTintsAndShades(color);
   const split = createSplit(color);
 
   const css = cssWriter([
-    [mono, "mono"],
-    [shades, "shades"],
-    [complement, "complement"],
-    [analogous, "analogous"],
-    [triad, "triad"],
-    [tetrad, "tetrad"],
-    [split, "split"],
+    complement,
+    analogous,
+    tetrad,
+    triad,
+    tones,
+    shades,
+    split,
   ]);
 
   const darkCss = cssWriter(
-    [
-      [mono, "mono"],
-      [shades, "shades"],
-      [complement, "complement"],
-      [split, "split"],
-      [analogous, "analogous"],
-      [triad, "triad"],
-      [tetrad, "tetrad"],
-    ],
+    [complement, analogous, tetrad, triad, tones, shades, split],
     true
   );
 

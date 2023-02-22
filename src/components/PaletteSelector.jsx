@@ -22,22 +22,21 @@ export default function PaletteSelector({ palettes, handlePalette, palette }) {
             <button
               key={idx}
               className={`palette-selector-card ${
-                palette[0].name === colors[0].name ? "active" : ""
+                palette.name === colors.name ? "active" : ""
               }`}
               onClick={handlePaletteType}
-              data-name={colors[0].name}
+              data-name={colors.name}
             >
               <Circle
                 colors={colors}
                 type={
-                  colors[0].name === "Monochromatic" ||
-                  colors[0].name === "Shades"
+                  colors.name === "tones" || colors.name === "tints and shades"
                     ? "circle"
                     : "default"
                 }
                 size="small"
               />
-              <p>{colors[0].name}</p>
+              <p>{colors.name}</p>
             </button>
           );
         })}

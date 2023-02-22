@@ -1,27 +1,27 @@
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import "react-toastify/dist/ReactToastify.css";
+import ColorSelector from "./components/ColorSelector";
+import Navbar from "./components/Navbar";
+import Palette from "./components/Palette";
+import PaletteSelector from "./components/PaletteSelector";
+import Sample from "./components/Sample";
+import "./css/App.css";
+import "./css/Defaults.css";
 import "./css/Reset.css";
 import "./css/Variables.css";
-import "./css/Defaults.css";
-import "./css/App.css";
-import "react-toastify/dist/ReactToastify.css";
-import Palette from "./components/Palette";
-import Sample from "./components/Sample";
-import Navbar from "./components/Navbar";
-import ColorSelector from "./components/ColorSelector";
-import PaletteSelector from "./components/PaletteSelector";
 
+import { debounce } from "lodash-es";
+import { ToastContainer } from "react-toastify";
 import {
-  createAdjacent,
+  createAnalogous,
   createComplement,
-  createMonochromatic,
-  createShades,
+  createTintsAndShades,
   createSplit,
-  createTetrad,
+  createTetradic,
+  createTones,
   createTriad,
   generateCss,
 } from "./util";
-import { debounce } from "lodash-es";
-import { ToastContainer } from "react-toastify";
 
 function getQueryParam() {
   const params = new URLSearchParams(document.location.search);
@@ -31,58 +31,57 @@ function getQueryParam() {
 
 function App() {
   const [color, setColor] = useState(getQueryParam() || "#21a623");
-  const [corrected, setCorrected] = useState(false); // TODO Delete
-  const [luminance, setLuminance] = useState("absolute");
+  const [variation, setVariation] = useState(0);
+
   const [displayValue, setDisplayValue] = useState("hex");
 
   const complementaryPalette = createComplement(color);
   const splitComplementaryPalette = createSplit(color);
-  const analogousPalette = createAdjacent(color);
+  const analogousPalette = createAnalogous(color);
   const triadicPalette = createTriad(color);
-  const tetradicPalette = createTetrad(color);
-  const shadesPalette = createShades(color);
-  const monochramaticPalette = createMonochromatic(color);
+  const tetradicPalette = createTetradic(color);
+  const shadesPalette = createTintsAndShades(color);
+  const monochramaticPalette = createTones(color);
 
   const [palette, setPalette] = useState(complementaryPalette);
 
   function handlePalette(e) {
     const name = e?.currentTarget?.dataset?.name || e;
     switch (name) {
-      case "Complementary":
+      case "complementary":
         setPalette(complementaryPalette);
         break;
 
-      case "Split Complementary":
+      case "split complementary":
         setPalette(splitComplementaryPalette);
         break;
 
-      case "Analogous":
+      case "analogous":
         setPalette(analogousPalette);
         break;
 
-      case "Triadic":
+      case "triadic":
         setPalette(triadicPalette);
         break;
 
-      case "Tetradic":
+      case "tetradic":
         setPalette(tetradicPalette);
         break;
 
-      case "Shades":
+      case "tints and shades":
         setPalette(shadesPalette);
         break;
 
-      case "Monochromatic":
+      case "tones":
         setPalette(monochramaticPalette);
         break;
     }
   }
 
   useEffect(() => {
-    handlePalette(palette[0].name);
+    handlePalette(palette.name);
+    generateCss(color);
   }, [color]);
-
-  const css = generateCss(color);
 
   const debouncedHandler = useCallback(
     debounce((e) => {
@@ -107,10 +106,10 @@ function App() {
   }
 
   return (
-    <div className={corrected ? "corrected" : undefined}>
+    <div>
       <ToastContainer />
 
-      <Navbar css={css}></Navbar>
+      <Navbar></Navbar>
 
       <main className="app">
         <section className="left">
@@ -141,9 +140,10 @@ function App() {
 
           <Palette
             palette={palette}
-            luminance={luminance}
             displayValue={displayValue}
             setDisplayValue={setDisplayValue}
+            variation={variation}
+            setVariation={setVariation}
           />
         </section>
       </main>

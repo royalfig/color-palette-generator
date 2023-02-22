@@ -1,6 +1,6 @@
 .palette-selector {
   padding: var(--box-padding);
-  background-color: var(--mono-10);
+  background-color: var(--ton-og-10);
   border-radius: var(--radius);
 }
 
@@ -19,21 +19,21 @@
   gap: 0.3em;
   align-items: center;
   font-size: var(--small);
-  color: var(--mono-9-contrast);
+  color: var(--ton-og-9-c);
   text-align: left;
-  background-image: linear-gradient(25deg, var(--mono-9), var(--shades-10));
+  background-image: linear-gradient(25deg, var(--ton-og-9), var(--tas-og-10));
   border-radius: var(--radius);
-  outline: 1px solid var(--mono-9);
+  outline: 1px solid var(--ton-og-9);
   transition: outline 0.4s cubic-bezier(0.455, 0.03, 0.515, 0.955);
 }
 
 .palette-selector-card:hover {
-  outline: 1px solid var(--mono-7);
+  outline: 1px solid var(--ton-og-7);
 }
 
 .palette-selector-card.active {
   --alpha: 0.5;
 
   z-index: 3;
-  outline: 1px solid var(--mono-5);
+  outline: 1px solid var(--ton-og-5);
 }

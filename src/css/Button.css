@@ -30,11 +30,11 @@ button:focus {
 
 .icon-btn:hover,
 .icon-btn:focus-visible {
-  background-color: var(--mono-9);
+  background-color: var(--ton-og-9);
 }
 
 .icon-btn:active {
-  background-color: var(--mono-8);
+  background-color: var(--ton-og-8);
 }
 
 /* Text only */
@@ -45,8 +45,8 @@ button:focus {
 
 .text-btn:hover,
 .text-btn:focus-visible {
-  color: var(--mono-9-contrast);
-  background-color: var(--mono-9);
+  color: var(--ton-og-9-c);
+  background-color: var(--ton-og-9);
 }
 
 /* Text and Icon */
@@ -55,4 +55,10 @@ button:focus {
   gap: 1em;
   align-items: center;
   font-size: var(--small);
+  border: 1px solid var(--ton-og-8);
+}
+
+.text-icon-btn:hover,
+.text-icon-btn:focus {
+  border: 1px solid var(--ton-og-7);
 }

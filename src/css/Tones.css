@@ -1,16 +1,17 @@
-.sample-container.monochromatic {
-  color: var(--mono-8-contrast);
-  background-color: var(--mono-8);
+.sample-container.tones {
+  color: var(--ton-og-9-c);
+  background-color: var(--ton-og-9);
+  margin: 3rem auto;
 }
 
 .tones {
   margin: 1rem;
-  border: 1px solid var(--mono-3);
+  border: 1px solid var(--ton-og-3);
 }
 
 .tones .sample-navbar {
   padding: 1rem 2rem;
-  border-bottom: 1px solid var(--mono-3);
+  border-bottom: 1px solid var(--ton-og-3);
 }
 
 .tones-hero {
@@ -22,7 +23,7 @@
   display: flex;
   flex-direction: column;
   padding: 3rem 2rem;
-  border-right: 1px solid var(--mono-3);
+  border-right: 1px solid var(--ton-og-3);
 }
 
 .tones-right {
@@ -49,7 +50,7 @@
   flex-grow: 1;
   height: 1px;
   margin-inline-start: 0.5rem;
-  background-color: var(--mono-3);
+  background-color: var(--ton-og-3);
 }
 
 .tones-title p:first-child {
@@ -75,15 +76,15 @@
   display: inline-block;
   width: fit-content;
   padding: 1rem 1.5rem;
-  color: var(--mono-5-contrast);
+  color: var(--ton-og-5-c);
   text-decoration: none;
-  background-color: var(--mono-5);
+  background-color: var(--ton-og-5);
   transition: all 0.3s;
 }
 
 .tones-cta a:hover {
-  color: var(--mono-6-contrast);
-  background-color: var(--mono-6);
+  color: var(--ton-og-6-c);
+  background-color: var(--ton-og-6);
 }
 
 .tones-cta p {
@@ -97,7 +98,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 3rem;
   padding: 2rem;
-  border-top: 1px solid var(--mono-3);
+  border-top: 1px solid var(--ton-og-3);
 }
 
 .tones-card {
@@ -125,11 +126,11 @@
 }
 
 .tones-card-container:hover {
-  color: var(--mono-5);
+  color: var(--ton-og-5);
 }
 
 .tones-card-container .tones-card:hover {
-  color: var(--mono-8-contrast);
+  color: var(--ton-og-8-c);
 }
 
 /* Decoration */
@@ -143,89 +144,89 @@
 .tones-deco:nth-child(1) {
   background-image: linear-gradient(
     to right,
-    var(--mono-1),
+    var(--ton-og-1),
     transparent 70%,
-    var(--mono-1)
+    var(--ton-og-1)
   );
 }
 
 .tones-deco:nth-child(2) {
   background-image: linear-gradient(
     to right,
-    var(--mono-2),
+    var(--ton-og-2),
     transparent 63%,
-    var(--mono-2)
+    var(--ton-og-2)
   );
 }
 
 .tones-deco:nth-child(3) {
   background-image: linear-gradient(
     to right,
-    var(--mono-3),
+    var(--ton-og-3),
     transparent 56%,
-    var(--mono-3)
+    var(--ton-og-3)
   );
 }
 
 .tones-deco:nth-child(4) {
   background-image: linear-gradient(
     to right,
-    var(--mono-4),
+    var(--ton-og-4),
     transparent 49%,
-    var(--mono-4)
+    var(--ton-og-4)
   );
 }
 
 .tones-deco:nth-child(5) {
   background-image: linear-gradient(
     to right,
-    var(--mono-5),
+    var(--ton-og-5),
     transparent 42%,
-    var(--mono-5)
+    var(--ton-og-5)
   );
 }
 
 .tones-deco:nth-child(6) {
   background-image: linear-gradient(
     to right,
-    var(--mono-6),
+    var(--ton-og-6),
     transparent 35%,
-    var(--mono-6)
+    var(--ton-og-6)
   );
 }
 
 .tones-deco:nth-child(7) {
   background-image: linear-gradient(
     to right,
-    var(--mono-7),
+    var(--ton-og-7),
     transparent 28%,
-    var(--mono-7)
+    var(--ton-og-7)
   );
 }
 
 .tones-deco:nth-child(8) {
   background-image: linear-gradient(
     to right,
-    var(--mono-8),
+    var(--ton-og-8),
     transparent 21%,
-    var(--mono-8)
+    var(--ton-og-8)
   );
 }
 
 .tones-deco:nth-child(9) {
   background-image: linear-gradient(
     to right,
-    var(--mono-9),
+    var(--ton-og-9),
     transparent 14%,
-    var(--mono-9)
+    var(--ton-og-9)
   );
 }
 
 .tones-deco:nth-child(10) {
   background-image: linear-gradient(
     to right,
-    var(--mono-10),
+    var(--ton-og-10),
     transparent 7%,
-    var(--mono-10)
+    var(--ton-og-10)
   );
 }

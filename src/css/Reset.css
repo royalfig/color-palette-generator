@@ -12,7 +12,7 @@ textarea {
   font-family: inherit;
   font-size: inherit;
   line-height: 1;
-  background-color: var(--mono-10);
-  border: 1px solid var(--mono-8);
+  background-color: var(--ton-og-10);
+  border: 1px solid var(--ton-og-8);
   color: inherit;
 }

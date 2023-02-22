@@ -1,14 +1,15 @@
 import "../css/Circle.css";
-export default function Circle({ colors, type, size }) {
-  function sizer(num, size) {
-    if (size === "large") {
-      return num;
-    }
-
-    return num / 2;
+function sizer(num, size) {
+  if (size === "large") {
+    return num;
   }
 
+  return num / 2;
+}
+
+export default function Circle({ colors, type, size }) {
   const className = size === "large" ? "large circle" : "small circle";
+
   return (
     <div className={className}>
       <svg viewBox={size === "large" ? "-120 -120 240 240" : "-60 -60 120 120"}>
@@ -21,7 +22,7 @@ export default function Circle({ colors, type, size }) {
           strokeWidth="3"
         />
         {type !== "circle"
-          ? colors.map((color, idx) => {
+          ? colors.variations[0].map((color, idx) => {
               const [h, s] = color.point;
 
               const hRadians = (h * Math.PI) / 180;
@@ -43,7 +44,7 @@ export default function Circle({ colors, type, size }) {
                 ></circle>
               );
             })
-          : colors.map((color, idx) => {
+          : colors.variations[0].map((color, idx) => {
               const h = sizer((idx + 10) * (size === "large" ? 36 : 72), size);
 
               const hRadians = (h * Math.PI) / 180;

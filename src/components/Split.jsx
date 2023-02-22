@@ -10,7 +10,7 @@ export default function Split() {
 
   function handle() {
     setSpecsOn(true);
-    console.log(bg.current?.getBoundingClientRect());
+    // console.log(bg.current?.getBoundingClientRect());
   }
 
   return (

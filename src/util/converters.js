@@ -1,5 +1,7 @@
 import Color from "colorjs.io";
 import { hex3to6, getRandBetween, linearRGB, y, createSlug } from "./utils";
+import { toPrecision } from "./toPrecision";
+import { mix } from "colorjs.io/fn";
 
 /*
 
@@ -74,19 +76,6 @@ function colorFactory(colors) {
   });
 }
 
-export function toPrecision(n, precision) {
-  n = +n;
-  precision = +precision;
-  let integerLength = (Math.floor(n) + "").length;
-
-  if (precision > integerLength) {
-    return +n.toFixed(precision - integerLength);
-  } else {
-    let p10 = 10 ** (integerLength - precision);
-    return Math.round(n / p10) * p10;
-  }
-}
-
 function colorFactory2(colors, paletteInformation) {
   return colors.map((color, idx) => ({
     code: `${paletteInformation}-${idx + 1}`,
@@ -94,15 +83,16 @@ function colorFactory2(colors, paletteInformation) {
     rgb: color.to("srgb").toString({ precision: 3 }),
     hsl: color.to("hsl").toString({ precision: 3 }),
     lch: color.to("lch").toString({ precision: 3 }),
+    point: color.hsl,
     contrast:
       color.contrast("black", "wcag21") > color.contrast("white", "wcag21")
         ? "#000"
         : "#fff",
-    css: paletteInformation,
+    css: `${paletteInformation}-${idx + 1}`,
     cssRaw: `${toPrecision(color.to("hsl").h, 3)} ${toPrecision(
       color.to("hsl").s,
       3
-    )} ${toPrecision(color.to("hsl").l, 3)}`,
+    )}% ${toPrecision(color.to("hsl").l, 3)}%`,
   }));
 }
 
@@ -118,7 +108,7 @@ function createColor(hex) {
 
 function adjustColor(hex, valueToAdjust, adjustment, operator) {
   const color = new Color(hex);
-  console.log(color.hsl[valueToAdjust]);
+
   switch (operator) {
     case "divide":
       color.hsl[valueToAdjust] /= adjustment;
@@ -148,7 +138,6 @@ function makeCinematic(colors) {
 function makeLanguid(colors) {
   return colors.map(({ color, valueToAdjust }) => {
     const adjusted = adjustColor(color, "h", valueToAdjust);
-
     return adjusted.mix("white", 0.5, {
       space: "lch",
       outputSpace: "srgb",
@@ -157,18 +146,16 @@ function makeLanguid(colors) {
 }
 
 function makeKeel(colors) {
-  return colors.map(({ color, adjustment }) => {
-    return corrector(color, adjustment);
+  return colors.map(({ color, valueToAdjust }) => {
+    return corrector(color, valueToAdjust);
   });
 }
 
 function makeSharkBite(colors) {
   return colors.map(({ color, valueToAdjust }) => {
     const adjusted = adjustColor(color, "h", valueToAdjust);
-
     adjusted.hsl.s *= 0.7;
     adjusted.hsl.l *= 0.3;
-
     return adjusted;
   });
 }
@@ -176,40 +163,24 @@ function makeSharkBite(colors) {
 function createComplement(hex) {
   const base = new Color(hex);
   const complement = adjustColor(hex, "h", 180);
-
-  const [cinematic] = makeCinematic([{ color: hex, valueToAdjust: 180 }]);
-
-  const [keel] = makeKeel([{ color: hex, adjustment: 180 }]);
-
-  const [laBase, laComp] = makeLanguid([
-    { color: hex, valueToAdjust: 0 },
-    { color: hex, valueToAdjust: 180 },
-  ]);
-
-  const [sbComp] = makeSharkBite([{ color: hex, valueToAdjust: 180 }]);
+  const value = [{ color: hex, valueToAdjust: 180 }];
+  const [ci2] = makeCinematic(value);
+  const [ke2] = makeKeel(value);
+  const [la1, la2] = makeLanguid([{ color: hex, valueToAdjust: 0 }, ...value]);
+  const [sb2] = makeSharkBite(value);
 
   const og = colorFactory2([base, complement], "com-og");
-  const ci = colorFactory2([base, cinematic], "com-ci");
-  const ke = colorFactory2([base, keel], "com-ke");
-  const la = colorFactory2([laBase, laComp], "com-la");
-  const sb = colorFactory2([base, sbComp], "com-sb");
+  const ci = colorFactory2([base, ci2], "com-ci");
+  const ke = colorFactory2([base, ke2], "com-ke");
+  const la = colorFactory2([la1, la2], "com-la");
+  const sb = colorFactory2([base, sb2], "com-sb");
 
   const palette = {
     name: "complementary",
     variations: [og, ci, ke, la, sb],
   };
 
-  console.log(palette);
-
-  return colorFactory([
-    { color: base, corrected: base, name: "Complementary", css: "comp-1" },
-    {
-      color: complement,
-      corrected: corrector(hex, 180),
-      name: "Complementary",
-      css: createSlug("Complementary"),
-    },
-  ]);
+  return palette;
 }
 
 function createSplit(hex) {
@@ -217,23 +188,21 @@ function createSplit(hex) {
   const spl1 = adjustColor(hex, "h", 150);
   const spl2 = adjustColor(hex, "h", 210);
 
-  const [keel1, keel2] = makeKeel([
-    { color: hex, adjustment: 150 },
-    { color: hex, adjustment: 210 },
-  ]);
-
-  const [ci1, ci2] = makeCinematic([
+  const values = [
     { color: hex, valueToAdjust: 150 },
     { color: hex, valueToAdjust: 210 },
-  ]);
+  ];
+
+  const [keel1, keel2] = makeKeel(values);
+
+  const [ci1, ci2] = makeCinematic(values);
 
   const [la1, la2, la3] = makeLanguid([
     { color: hex, valueToAdjust: 0 },
-    { color: hex, valueToAdjust: 150 },
-    { color: hex, valueToAdjust: 210 },
+    ...values,
   ]);
 
-  const [sb1, sb2] = makeLanguid([
+  const [sb1, sb2] = makeSharkBite([
     { color: hex, valueToAdjust: 150 },
     { color: hex, valueToAdjust: 210 },
   ]);
@@ -248,111 +217,109 @@ function createSplit(hex) {
     name: "split complementary",
     variations: [og, ci, ke, la, sb],
   };
-  console.log(palette);
-  return colorFactory([
-    {
-      color: spl1,
-      corrected: corrector(hex, 150),
-      name: "Split Complementary",
-      css: "split-1",
-    },
-    {
-      color: base,
-      corrected: base,
-      name: "Split Complementary",
-      css: "split-1",
-    },
-    {
-      color: spl2,
-      corrected: corrector(hex, 210),
-      name: "Split Complementary",
-      css: "split-1",
-    },
-  ]);
+
+  return palette;
 }
 
 function createTriad(hex) {
-  const base = new Color(hex);
-  const triad1 = new Color(hex);
-  const triad2 = new Color(hex);
-  triad1.hsl.h += 120;
-  triad2.hsl.h += 240;
+  const tri1 = new Color(hex);
+  const tri2 = adjustColor(hex, "h", 120);
+  const tri3 = adjustColor(hex, "h", 240);
 
-  return colorFactory([
-    {
-      color: triad1,
-      corrected: corrector(hex, 120),
-      name: "Triadic",
-      css: "triadic-1",
-    },
-    { color: base, corrected: base, name: "Triadic", css: "tradic-2" },
-    {
-      color: triad2,
-      corrected: corrector(hex, 240),
-      name: "Triadic",
-      css: "triadic-3",
-    },
+  const values = [
+    { color: hex, valueToAdjust: 120 },
+    { color: hex, valueToAdjust: 240 },
+  ];
+
+  const [ci2, ci3] = makeCinematic(values);
+  const [ke2, ke3] = makeKeel(values);
+  const [la1, la2, la3] = makeLanguid([
+    { color: hex, valueToAdjust: 0 },
+    ...values,
   ]);
+  const [sb2, sb3] = makeSharkBite(values);
+
+  const og = colorFactory2([tri1, tri2, tri3], "tri-og");
+  const ci = colorFactory2([tri1, ci2, ci3], "tri-ci");
+  const ke = colorFactory2([tri1, ke2, ke3], "tri-ke");
+  const la = colorFactory2([la1, la2, la3], "tri-la");
+  const sb = colorFactory2([tri1, sb2, sb3], "tri-sb");
+
+  const palette = {
+    name: "triadic",
+    variations: [og, ci, ke, la, sb],
+  };
+
+  return palette;
 }
 
-function createAdjacent(hex) {
+function createAnalogous(hex) {
   const base = new Color(hex);
-  const adjacent1 = new Color(hex);
-  const adjacent2 = new Color(hex);
-  adjacent1.hsl.h -= 30;
-  adjacent2.hsl.h += 30;
+  const ana2 = adjustColor(hex, "h", 30, "minus");
+  const ana3 = adjustColor(hex, "h", 30);
 
-  return colorFactory([
-    {
-      color: adjacent1,
-      corrected: corrector(hex, -30),
-      name: "Analogous",
-      css: "analogous-1",
-    },
-    { color: base, corrected: base, name: "Analogous" },
-    {
-      color: adjacent2,
-      corrected: corrector(hex, 30),
-      name: "Analogous",
-      css: "analogous-2",
-    },
+  const values = [
+    { color: hex, valueToAdjust: -30 },
+    { color: hex, valueToAdjust: 30 },
+  ];
+
+  const [ci2, ci3] = makeCinematic(values);
+  const [ke2, ke3] = makeKeel(values);
+  const [la1, la2, la3] = makeLanguid([
+    { color: hex, valueToAdjust: 0 },
+    ...values,
   ]);
+  const [sb2, sb3] = makeSharkBite(values);
+
+  const og = colorFactory2([base, ana2, ana3], "ana-og");
+  const ci = colorFactory2([base, ci2, ci3], "ana-ci");
+  const ke = colorFactory2([base, ke2, ke3], "ana-ke");
+  const la = colorFactory2([la1, la2, la3], "ana-la");
+  const sb = colorFactory2([base, sb2, sb3], "ana-sb");
+
+  const palette = {
+    name: "analogous",
+    variations: [og, ci, ke, la, sb],
+  };
+
+  return palette;
 }
 
-function createTetrad(hex) {
+function createTetradic(hex) {
   const base = new Color(hex);
-  const tetrad1 = new Color(hex);
-  const tetrad2 = new Color(hex);
-  const tetrad3 = new Color(hex);
+  const tet2 = adjustColor(hex, "h", 90);
+  const tet3 = adjustColor(hex, "h", 90 * 2);
+  const tet4 = adjustColor(hex, "h", 90 * 3);
 
-  tetrad1.hsl.h += 90;
-  tetrad2.hsl.h += 90 * 2;
-  tetrad3.hsl.h += 90 * 3;
+  const values = [
+    { color: hex, valueToAdjust: 90 },
+    { color: hex, valueToAdjust: 90 * 2 },
+    { color: hex, valueToAdjust: 90 * 3 },
+  ];
 
-  return colorFactory([
-    { color: base, corrected: base, name: "Tetradic", css: "Tetradic-1" },
-    {
-      color: tetrad1,
-      corrected: corrector(hex, 90),
-      name: "Tetradic",
-      css: "Tetradic-2",
-    },
-    {
-      color: tetrad2,
-      corrected: corrector(hex, 90 * 2),
-      name: "Tetradic",
-      css: "Tetradic-3",
-    },
-    {
-      color: tetrad3,
-      corrected: corrector(hex, 90 * 3),
-      name: "Tetradic",
-      css: "Tetradic-4",
-    },
+  const [ci2, ci3, ci4] = makeCinematic(values);
+  const [ke2, ke3, ke4] = makeKeel(values);
+  const [la1, la2, la3, la4] = makeLanguid([
+    { color: hex, valueToAdjust: 0 },
+    ...values,
   ]);
+  const [sb2, sb3, sb4] = makeSharkBite(values);
+
+  const og = colorFactory2([base, tet2, tet3, tet4], "tet-og");
+  const ci = colorFactory2([base, ci2, ci3, ci4], "tet-ci");
+  const ke = colorFactory2([base, ke2, ke3, ke4], "tet-ke");
+  const la = colorFactory2([la1, la2, la3, la4], "tet-la");
+  const sb = colorFactory2([base, sb2, sb3, sb4], "tet-sb");
+
+  const palette = {
+    name: "tetradic",
+    variations: [og, ci, ke, la, sb],
+  };
+
+  return palette;
 }
 
-function createMonochromatic(hex) {
+function createTones(hex) {
   const colors = [];
 
   for (let index = 0; index < 10; index++) {
@@ -367,32 +334,121 @@ function createMonochromatic(hex) {
     });
   }
 
-  return colorFactory(colors);
+  const ogRange = [];
+
+  for (let index = 0; index < 10; index++) {
+    const color = new Color(hex);
+    color.hsl.s = 10;
+    color.hsl.l = index * 10 + 8;
+    ogRange.push(color);
+  }
+
+  const tones = [];
+
+  for (let index = 0; index < 10; index++) {
+    const color = new Color(hex);
+
+    let mixed = color.mix("gray", 0.9, {
+      space: "lch",
+      outputSpace: "srgb",
+    });
+
+    mixed.lch.l = index * 10 + 8;
+
+    tones.push(mixed);
+  }
+
+  const og = colorFactory2(ogRange, "ton-og");
+  const ci = colorFactory2(tones, "ton-ci");
+  const ke = colorFactory2(tones, "ton-ke");
+  const la = colorFactory2(tones, "ton-la");
+  const sb = colorFactory2(tones, "ton-sb");
+
+  const palette = {
+    name: "tones",
+    variations: [og, ci, ke, la, sb],
+  };
+
+  return palette;
 }
 
-function createShades(hex) {
-  const colors = [];
+function createTintsAndShades(hex) {
+  const ogRange = [];
 
   for (let index = 0; index < 10; index++) {
     const color = new Color(hex);
     color.hsl.l = index * 10 + 8;
-    colors.push({
-      color: color,
-      corrected: color,
-      name: "Shades",
-      css: `shades-${index}`,
-    });
+    ogRange.push(color);
   }
 
-  return colorFactory(colors);
+  const keRange = [];
+
+  for (let index = 0; index < 10; index++) {
+    const color = new Color(hex);
+
+    if (index < 5) {
+      // 0, 1, 2, 3, 4
+      let shade = color.mix("black", (10 - index) / 10, {
+        space: "lch",
+        outputSpace: "srgb",
+      });
+      keRange.push(shade);
+    }
+
+    if (index > 4) {
+      // 5, 6, 7, 8, 9
+      let tint = color.mix("white", index / 10, {
+        space: "lch",
+        outputSpace: "srgb",
+      });
+      keRange.push(tint);
+    }
+  }
+
+  const ciHi = new Color(hex).mix("white", 0.5, {
+    space: "lch",
+    outputSpace: "srgb",
+  });
+  const ciLo = new Color(hex).mix("black", 0.5, {
+    space: "lch",
+    outputSpace: "srgb",
+  });
+
+  const ciRange = ciLo.steps(ciHi, {
+    space: "lch",
+    outputSpace: "srgb",
+    steps: 10,
+  });
+
+  const t = ciLo.range(ciHi, { space: "lch" });
+
+  console.log(t(0.5));
+
+  const og = colorFactory2(ogRange, "tas-og");
+  const ci = colorFactory2(ciRange, "tas-ci");
+  const ke = colorFactory2(keRange, "tas-ke");
+  const la = colorFactory2(keRange, "tas-la");
+  const sb = colorFactory2(keRange, "tas-sb");
+
+  const palette = {
+    name: "tints and shades",
+    variations: [og, ci, ke, la, sb],
+  };
+
+  return palette;
 }
+
+// Todo createPolychroma, createBands
+// polychroma -> lisa frank -> steps of 36deg
+// Bands -> expanded analogous -> steps of 10
+// Ombre --> comp -< range
 
 export {
   createComplement,
-  createAdjacent,
+  createAnalogous,
   createTriad,
-  createTetrad,
+  createTetradic,
   createSplit,
-  createMonochromatic,
-  createShades,
+  createTones,
+  createTintsAndShades,
 };

@@ -1,5 +1,5 @@
 .sample-container.complementary {
-  background-color: var(--shades-9);
+  background-color: var(--tas-ke-9);
 }
 
 .complementary .sample-navbar {
@@ -7,7 +7,7 @@
 }
 
 .complementary .sample-navbar li:first-child {
-  color: var(--complement-2);
+  color: var(--com-og-2);
 }
 
 .complementary {
@@ -40,7 +40,7 @@
   font-size: 5rem;
   font-weight: 900;
   line-height: 1;
-  color: var(--complement-2);
+  color: var(--com-og-2);
   text-transform: uppercase;
 }
 
@@ -49,7 +49,7 @@
   padding: var(--button-padding);
   margin-block: 3rem 0.25rem;
   font-size: var(--small);
-  color: var(--shades-3);
+  color: var(--tas-og-3);
   text-decoration: none;
   text-transform: uppercase;
   border: 1px solid;
@@ -59,7 +59,7 @@
 .complementary-divider {
   height: 1px;
   margin: 4rem 2rem 5rem;
-  background-color: var(--shades-3);
+  background-color: var(--tas-og-3);
   opacity: 0.35;
 }
 
@@ -94,8 +94,8 @@
   grid-column: 4 / 13;
   min-height: 8rem;
   padding: var(--box-padding);
-  background-color: var(--mono-10);
-  outline: 1rem solid var(--shades-9);
+  background-color: var(--ton-og-10);
+  outline: 1rem solid var(--tas-og-9);
 }
 
 .complementary-card-title {
@@ -123,13 +123,13 @@
   justify-content: center;
   width: 2.5rem;
   height: 2.5rem;
-  background-color: var(--complement-2);
+  background-color: var(--com-og-2);
   translate: 0 1rem;
 }
 
 .complementary-card-icon svg {
   position: relative;
-  color: var(--complement-2-contrast);
+  color: var(--com-og-2-c);
 }
 
 /* Horizontal card */

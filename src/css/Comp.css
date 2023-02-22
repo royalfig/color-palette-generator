@@ -21,8 +21,8 @@
   font-size: 4rem;
   font-weight: 900;
   line-height: 1;
-  color: var(--complement-1);
-  text-shadow: 0.15em 0.15em 0 var(--complement-2);
+  color: var(--com-og-1);
+  text-shadow: 0.15em 0.15em 0 var(--com-og-2);
   letter-spacing: -2px;
 }
 
@@ -31,15 +31,15 @@
   padding: 0.5em 1em;
   margin-block: 1rem 0.5em;
   font-weight: 700;
-  color: var(--complement-1-contrast);
+  color: var(--com-og-1-c);
   text-decoration: none;
   text-transform: uppercase;
-  background-color: var(--complement-1);
+  background-color: var(--com-og-1);
   transition: box-shadow 0.2s;
 }
 
 .comp-cta:hover {
-  box-shadow: 0.35em 0.35em 0 var(--complement-2);
+  box-shadow: 0.35em 0.35em 0 var(--com-og-2);
 }
 
 .comp-featured-inner {

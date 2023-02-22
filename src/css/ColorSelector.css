@@ -1,6 +1,6 @@
 .color-selector {
   padding: var(--box-padding);
-  background-color: var(--mono-10);
+  background-color: var(--ton-og-10);
   border-radius: var(--radius);
 }
 
@@ -19,15 +19,15 @@
   padding: var(--button-padding);
   font-family: inherit;
   font-size: 1rem;
-  color: var(--mono-10-contrast);
+  color: var(--ton-og-10-c);
   text-align: center;
-  background-color: var(--mono-10);
+  background-color: var(--ton-og-10);
   border: none;
   border: 1px solid var(--border-color);
 }
 
 .color-input input:focus-visible {
-  border: 1px solid var(--complement-2);
+  border: 1px solid var(--com-og-2);
   outline: 0;
 }
 
@@ -81,7 +81,7 @@
   display: flex;
   gap: 0.5em;
   align-items: center;
-  border: 1px solid var(--mono-8);
+  border: 1px solid var(--ton-og-8);
 }
 
 .color-history {
@@ -93,14 +93,14 @@
 .color-history svg {
   width: 1.25rem;
   height: 1.25rem;
-  color: var(--mono-4);
+  color: var(--ton-og-4);
 }
 
 .color-history div {
   flex: 1;
   width: 1.5rem;
   height: 1.5rem;
-  background: var(--mono-8);
+  background: var(--ton-og-8);
   border-radius: var(--radius);
 }
 

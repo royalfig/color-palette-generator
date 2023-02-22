@@ -1,8 +1,8 @@
 .navbar {
   padding: var(--box-padding);
   margin-block-end: var(--space-after);
-  color: var(--shades-4-contrast);
-  background-color: var(--shades-4);
+  color: var(--tas-og-10-c);
+  background-color: var(--tas-og-10);
 }
 
 .navbar-inner {
@@ -29,20 +29,20 @@
   color: inherit;
 }
 
-.navbar .left .text-btn:hover {
-  color: var(--shades-7-contrast);
-  background-color: var(--shades-7);
-}
+/* .navbar .left .text-btn:hover {
+  color: var(--tas-og-7-c);
+  background-color: var(--tas-og-7);
+} */
 
-.navbar .right button {
+/* .navbar .right button {
   padding: 0.5em 0.75em;
-  color: var(--shades-7-contrast);
-  background-color: var(--shades-7);
+  color: var(--tas-og-7-c);
+  background-color: var(--tas-og-7);
   border: none;
   border-radius: 4px;
 }
 
 .navbar .right button:hover {
-  /* color: var(--complement-1-contrast); */
-  border-color: currentcolor;
-}
+  /* color: var(--com-og-1-c); */
+/* border-color: currentcolor;
+} */

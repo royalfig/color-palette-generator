@@ -7,4 +7,7 @@
   cursor: pointer;
   background: none;
   border: none;
+  text-transform: none;
+  padding: 0;
+  letter-spacing: -0.3px;
 }

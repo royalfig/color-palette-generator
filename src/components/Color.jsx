@@ -1,36 +1,26 @@
 import "../css/Color.css";
 import Copy from "./Copy";
 
-export default function Color({ color, luminance, displayValue, colorTitles }) {
+export default function Color({ color, displayValue, colorTitles, variation }) {
   if (colorTitles.length) {
-    color.forEach((c, idx) => {
+    color.variations[0].forEach((c, idx) => {
       c.title = colorTitles[idx]?.name;
-      c.corrected.title = colorTitles[idx]?.name;
       return color;
     });
   }
-
   return (
-    <div className={"colors colors-" + color.length}>
-      {color.map((c, index) => {
+    <div className={"colors colors-" + color.variations[0].length}>
+      {color.variations[variation].map((c, index) => {
         return (
           <article
             key={index}
             className="color-swatch"
             style={{
-              backgroundColor:
-                luminance === "absolute" ? c.hex : c.corrected.hex,
-              color:
-                luminance === "absolute" ? c.contrast : c.corrected.contrast,
+              backgroundColor: c.hex,
+              color: c.contrast,
             }}
           >
-            <Copy
-              text={
-                luminance === "absolute"
-                  ? c[displayValue]
-                  : c.corrected[displayValue]
-              }
-            />
+            <Copy text={c[displayValue]} />
           </article>
         );
       })}

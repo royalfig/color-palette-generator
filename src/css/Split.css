@@ -1,12 +1,12 @@
 .split {
   position: relative;
-  background-color: hsl(var(--mono-9-val) / 30%);
+  background-color: hsl(var(--ton-og-9-raw) / 30%);
   background-image: radial-gradient(
-      hsl(var(--split-1-val) / 15%),
+      hsl(var(--spl-og-1-raw) / 15%),
       transparent 70%
     ),
-    radial-gradient(hsl(var(--split-2-val) / 15%), transparent 70%),
-    radial-gradient(hsl(var(--split-3-val) / 15%), transparent 70%);
+    radial-gradient(hsl(var(--spl-og-2-raw) / 15%), transparent 70%),
+    radial-gradient(hsl(var(--spl-og-3-raw) / 15%), transparent 70%);
   background-repeat: no-repeat;
   background-position: -25% -25%, 50% 350%, 160% 50%;
   background-size: 50% 50%, 80% 80%, 50% 70%;
@@ -20,7 +20,7 @@
   height: 8rem;
   background-image: linear-gradient(
     45deg,
-    hsl(var(--split-3-val) / 25%),
+    hsl(var(--spl-og-3-raw) / 25%),
     transparent
   );
   border-radius: 50%;
@@ -35,7 +35,7 @@
   height: 12rem;
   background-image: linear-gradient(
     45deg,
-    hsl(var(--split-2-val) / 25%),
+    hsl(var(--spl-og-2-raw) / 25%),
     transparent
   );
   border-radius: 50%;
@@ -51,7 +51,7 @@
   height: 1rem;
   background-image: linear-gradient(
     -45deg,
-    hsl(var(--split-3-val) / 25%),
+    hsl(var(--spl-og-3-raw) / 25%),
     transparent
   );
   border-radius: 4em;
@@ -66,7 +66,7 @@
   height: 1.2rem;
   background-image: linear-gradient(
     -45deg,
-    hsl(var(--split-2-val) / 25%),
+    hsl(var(--spl-og-2-raw) / 25%),
     transparent
   );
   border-radius: 4em;
@@ -81,7 +81,7 @@
   height: 1.15rem;
   background-image: linear-gradient(
     -45deg,
-    hsl(var(--split-1-val) / 25%),
+    hsl(var(--spl-og-1-raw) / 25%),
     transparent
   );
   border-radius: 4em;
@@ -96,7 +96,7 @@
   height: 1rem;
   background-image: linear-gradient(
     -45deg,
-    hsl(var(--split-1-val) / 25%),
+    hsl(var(--spl-og-1-raw) / 25%),
     transparent
   );
   border-radius: 4em;
@@ -167,9 +167,9 @@
   text-decoration: none;
   text-transform: uppercase;
   letter-spacing: -0.3px;
-  background-color: var(--mono-10);
+  background-color: var(--ton-og-10);
   border-radius: 1em;
-  box-shadow: 20px 20px 60px var(--mono-9), -20px -20px 60px var(--mono-10);
+  box-shadow: 20px 20px 60px var(--ton-og-9), -20px -20px 60px var(--ton-og-10);
   transition: padding-inline-start 0.5s;
 }
 
@@ -192,7 +192,7 @@
 }
 
 .split-title-container a:active {
-  box-shadow: 10px 10px 30px var(--mono-9), -10px -10px 30px var(--mono-10);
+  box-shadow: 10px 10px 30px var(--ton-og-9), -10px -10px 30px var(--ton-og-10);
 }
 
 .split-card {
@@ -202,10 +202,10 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: 2rem;
-  background-color: hsl(var(--mono-10-val) / 30%);
+  background-color: hsl(var(--ton-og-10-raw) / 30%);
   border-radius: 1em;
-  box-shadow: 20px 20px 60px hsl(var(--mono-9-val) / 60%),
-    -20px -20px 60px var(--mono-10);
+  box-shadow: 20px 20px 60px hsl(var(--ton-og-9-raw) / 60%),
+    -20px -20px 60px var(--ton-og-10);
   backdrop-filter: blur(15px);
 }
 
@@ -225,15 +225,15 @@
   color: inherit;
   text-decoration: none;
   text-transform: uppercase;
-  background-color: var(--mono-10);
+  background-color: var(--ton-og-10);
   border-radius: 0.5rem;
-  box-shadow: 10px 10px 60px hsl(var(--mono-9-val) / 60%),
-    -10px -10px 60px var(--mono-10);
+  box-shadow: 10px 10px 60px hsl(var(--ton-og-9-raw) / 60%),
+    -10px -10px 60px var(--ton-og-10);
   transition: background-color 0.5s;
 }
 
 .split-card a:hover {
-  background-color: var(--mono-9);
+  background-color: var(--ton-og-9);
 }
 
 .split-card {

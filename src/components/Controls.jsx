@@ -2,15 +2,10 @@ import "../css/Controls.css";
 import Button from "./buttons/Button";
 import { useState } from "react";
 
-export default function Controls({ setDisplayValue }) {
-  const [variation, setVariation] = useState(0);
+export default function Controls({ setDisplayValue, variation, setVariation }) {
   const [property, setProperty] = useState("hex");
 
   const variations = ["Original", "Cinematic", "Keel", "Languid", "Sharkbite"];
-
-  function handleVariation(i) {
-    setVariation(i);
-  }
 
   function handleProperty(e) {
     const prop = e.currentTarget.innerText.toLowerCase();
@@ -25,7 +20,7 @@ export default function Controls({ setDisplayValue }) {
           <Button
             key={i}
             type="text-btn"
-            handler={handleVariation.bind(null, i)}
+            handler={setVariation.bind(null, i)}
             classes={i === variation ? "active" : ""}
           >
             {i + 1}

@@ -11,7 +11,7 @@
 .triad-hero {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  border-bottom: 1px solid var(--mono-1);
+  border-bottom: 1px solid var(--ton-og-1);
 }
 
 .triad-basketball {
@@ -22,13 +22,13 @@
   height: 4rem;
   overflow: hidden;
   cursor: grab;
-  background-image: linear-gradient(var(--shades-8), var(--triad-2));
-  border: 1px solid var(--mono-1);
+  background-image: linear-gradient(var(--tas-og-8), var(--tri-og-2));
+  border: 1px solid var(--ton-og-1);
   border-radius: 50%;
   box-shadow: var(--shadow-md);
   transition: translate 2s;
 
-  /* --shadow-color: hsl(var(--mono-1-val) / 42%); */
+  /* --shadow-color: hsl(var(--ton-og-1-raw) / 42%); */
 }
 
 .triad-basketball:hover {
@@ -38,7 +38,7 @@
 .triad-hero-left {
   padding: var(--box-padding);
   padding: 10rem 1rem 8rem;
-  border-right: 1px solid var(--mono-1);
+  border-right: 1px solid var(--ton-og-1);
 }
 
 .triad-title {
@@ -48,7 +48,7 @@
 .triad-title p:first-child {
   font-size: 1.5rem;
   line-height: 1;
-  color: var(--mono-1);
+  color: var(--ton-og-1);
   text-transform: uppercase;
   letter-spacing: -0.3px;
 }
@@ -57,7 +57,7 @@
   font-size: 5rem;
   font-weight: 900;
   line-height: 0.8;
-  color: var(--mono-3);
+  color: var(--ton-og-3);
   text-transform: uppercase;
   letter-spacing: -0.3px;
 }
@@ -65,12 +65,12 @@
 .triad-hero-right {
   display: flex;
   flex-direction: column;
-  background-color: hsl(var(--triad-3-val) / 10%);
+  background-color: hsl(var(--tri-og-3-raw) / 10%);
 }
 
 .triad-top {
   padding: 3rem 1rem;
-  border-bottom: 1px solid var(--mono-1);
+  border-bottom: 1px solid var(--ton-og-1);
 }
 
 .triad-bottom {
@@ -85,7 +85,7 @@
   font-size: 1.8rem;
   text-align: center;
   text-transform: uppercase;
-  border-bottom: 1px solid var(--mono-1);
+  border-bottom: 1px solid var(--ton-og-1);
 }
 
 .triad-card-container {
@@ -97,20 +97,20 @@
 }
 
 .triad-card {
-  border: 1px solid var(--mono-1);
+  border: 1px solid var(--ton-og-1);
 }
 
 .triad-card header {
   padding: 1rem;
   font-weight: 700;
   text-transform: uppercase;
-  background-color: hsl(var(--triad-1-val) / 10%);
-  border-bottom: 1px solid var(--mono-1);
+  background-color: hsl(var(--tri-og-1-raw) / 10%);
+  border-bottom: 1px solid var(--ton-og-1);
 }
 
 .triad-card p {
   padding: 1rem;
-  border-bottom: 1px solid var(--mono-1);
+  border-bottom: 1px solid var(--ton-og-1);
 }
 
 .triad-card a {
@@ -118,7 +118,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  color: var(--mono-3);
+  color: var(--ton-og-3);
   text-align: right;
   text-decoration: none;
   text-transform: uppercase;
@@ -127,8 +127,8 @@
 .triad-footer {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
-  background-color: hsl(var(--triad-2-val) / 10%);
-  border-top: 1px solid var(--mono-1);
+  background-color: hsl(var(--tri-og-2-raw) / 10%);
+  border-top: 1px solid var(--ton-og-1);
 }
 
 .triad-footer p {
@@ -138,5 +138,5 @@
 
 .triad-footer p:not(:last-child) {
   flex: 1;
-  border-right: 1px solid var(--mono-1);
+  border-right: 1px solid var(--ton-og-1);
 }

@@ -2,7 +2,7 @@ import "../css/Navbar.css";
 import { useState } from "react";
 import { MoonStars, Sun, Share } from "react-bootstrap-icons";
 import Button from "./buttons/Button";
-export default function Navbar({ css }) {
+export default function Navbar() {
   const [darkMode, setDarkMode] = useState(false);
 
   async function handleShare() {

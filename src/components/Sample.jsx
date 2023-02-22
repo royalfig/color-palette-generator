@@ -9,7 +9,7 @@ import Tones from "./Tones";
 import Triad from "./Triad";
 
 export default function Sample({ selectedPalette }) {
-  const name = selectedPalette[0].name;
+  const name = selectedPalette.name;
   const slugifiedName = slugify(name);
 
   const SelectedComponent = selectComponent(slugifiedName);
@@ -31,7 +31,7 @@ function selectComponent(slug) {
       return Complementary;
     case "splitcomplementary":
       return Split;
-    case "shades":
+    case "tintsandshades":
       return Shades;
     case "triadic":
       return Triad;
@@ -39,10 +39,7 @@ function selectComponent(slug) {
       return Analogous;
     case "tetradic":
       return Tetradic;
-    case "monochromatic":
+    case "tones":
       return Tones;
-
-    default:
-      return "shades";
   }
 }
