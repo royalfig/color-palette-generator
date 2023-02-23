@@ -17,7 +17,7 @@ export default function Palette({
   const [paletteTitle, setPaletteTitle] = useState("");
   const [colorTitles, setColorTitles] = useState([]);
 
-  const colors = palette.variations[0]
+  const colors = palette.variations[variation]
     .map((color) => hex3to6(color.hex))
     .join();
 
@@ -30,7 +30,7 @@ export default function Palette({
 
   useEffect(() => {
     getColorName(colors);
-  }, [palette]);
+  }, [palette, variation]);
 
   return (
     <section className="palette-container">

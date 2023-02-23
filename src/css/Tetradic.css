@@ -1,6 +1,6 @@
 .tetradic {
   padding-block-end: 3rem;
-  background-color: var(--tas-og-9);
+  background-color: var(--tas-la-9);
 }
 
 .tetradic .sample-navbar {
@@ -34,10 +34,10 @@
   width: fit-content;
   padding: var(--button-padding);
   font-weight: 700;
-  color: var(--tet-og-1-c);
+  color: var(--tet-ke-1-c);
   text-decoration: none;
   text-transform: uppercase;
-  background-color: var(--tet-og-1);
+  background-color: var(--tet-ke-1);
   border-radius: var(--radius);
 }
 
@@ -55,18 +55,18 @@
 }
 
 .tetradic-card {
-  color: var(--tet-og-3-c);
-  background-color: var(--tet-og-3);
+  color: var(--tet-ke-3-c);
+  background-color: var(--tet-ke-3);
 }
 
 .tetradic-card:first-child {
-  color: var(--tet-og-2-c);
-  background-color: var(--tet-og-2);
+  color: var(--tet-ke-2-c);
+  background-color: var(--tet-ke-2);
 }
 
 .tetradic-card:last-child {
-  color: var(--tet-og-4-c);
-  background-color: var(--tet-og-4);
+  color: var(--tet-ke-4-c);
+  background-color: var(--tet-ke-4);
 }
 
 .tetradic-card-title {

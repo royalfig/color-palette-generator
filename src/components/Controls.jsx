@@ -65,6 +65,13 @@ export default function Controls({ setDisplayValue, variation, setVariation }) {
         >
           CODE
         </Button>
+        <Button
+          type="text-btn"
+          handler={(e) => handleProperty(e)}
+          classes={property === "name" ? "active" : ""}
+        >
+          NAME
+        </Button>
       </div>
     </div>
   );

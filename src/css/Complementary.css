@@ -1,5 +1,5 @@
 .sample-container.complementary {
-  background-color: var(--tas-ke-9);
+  background-color: hsl(var(--com-ci-2-raw) / 30%);
 }
 
 .complementary .sample-navbar {
@@ -7,7 +7,7 @@
 }
 
 .complementary .sample-navbar li:first-child {
-  color: var(--com-og-2);
+  color: var(--tas-og-3);
 }
 
 .complementary {
@@ -40,7 +40,7 @@
   font-size: 5rem;
   font-weight: 900;
   line-height: 1;
-  color: var(--com-og-2);
+  color: var(--tas-og-3);
   text-transform: uppercase;
 }
 
@@ -123,7 +123,7 @@
   justify-content: center;
   width: 2.5rem;
   height: 2.5rem;
-  background-color: var(--com-og-2);
+  background-color: var(--tas-og-3);
   translate: 0 1rem;
 }
 
