@@ -4,7 +4,7 @@
   /* padding: var(--box-padding); */
   margin: 2rem auto 10rem;
   overflow: hidden;
-  background-color: var(--ton-og-10);
+  background-color: var(--surface-3);
   border-radius: var(--radius);
 }
 
@@ -39,5 +39,10 @@
   gap: 0.5rem;
   align-items: center;
   font-size: var(--small);
-  border: 1px solid;
+  border: 1px solid var(--border-1);
+  transition: border-color 0.3s;
+}
+
+.sample-navbar button:where(:hover, :focus-visible) {
+  border-color: var(--border-2);
 }

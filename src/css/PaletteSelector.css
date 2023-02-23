@@ -1,6 +1,7 @@
 .palette-selector {
   padding: var(--box-padding);
-  background-color: var(--ton-og-10);
+  background-color: var(--surface-3);
+  color: var(--element-3);
   border-radius: var(--radius);
 }
 
@@ -19,21 +20,21 @@
   gap: 0.3em;
   align-items: center;
   font-size: var(--small);
-  color: var(--ton-og-9-c);
+  color: var(--element-3);
   text-align: left;
-  background-image: linear-gradient(25deg, var(--ton-og-9), var(--tas-og-10));
+  background-image: linear-gradient(25deg, var(--surface-2), var(--surface-3));
   border-radius: var(--radius);
-  outline: 1px solid var(--ton-og-9);
+  outline: 1px solid var(--border-1);
   transition: outline 0.4s cubic-bezier(0.455, 0.03, 0.515, 0.955);
 }
 
 .palette-selector-card:hover {
-  outline: 1px solid var(--ton-og-7);
+  outline: 1px solid var(--border-2);
 }
 
 .palette-selector-card.active {
   --alpha: 0.5;
 
   z-index: 3;
-  outline: 1px solid var(--ton-og-5);
+  outline: 1px solid var(--border-3);
 }

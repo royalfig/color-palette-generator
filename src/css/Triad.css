@@ -7,11 +7,14 @@
   width: 100%;
   padding: 1rem;
 }
+.triad-container .sample-navbar button {
+  border-color: var(--border-3);
+}
 
 .triad-hero {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  border-bottom: 1px solid var(--ton-og-1);
+  border-bottom: 1px solid var(--border-3);
 }
 
 .triad-basketball {
@@ -23,7 +26,7 @@
   overflow: hidden;
   cursor: grab;
   background-image: linear-gradient(var(--tas-og-8), var(--tri-og-2));
-  border: 1px solid var(--ton-og-1);
+  border: 1px solid var(--border-3);
   border-radius: 50%;
   box-shadow: var(--shadow-md);
   transition: translate 2s;
@@ -38,7 +41,7 @@
 .triad-hero-left {
   padding: var(--box-padding);
   padding: 10rem 1rem 8rem;
-  border-right: 1px solid var(--ton-og-1);
+  border-right: 1px solid var(--border-3);
 }
 
 .triad-title {
@@ -57,7 +60,7 @@
   font-size: 5rem;
   font-weight: 900;
   line-height: 0.8;
-  color: var(--ton-og-3);
+  color: var(--ton-og-2);
   text-transform: uppercase;
   letter-spacing: -0.3px;
 }
@@ -70,7 +73,7 @@
 
 .triad-top {
   padding: 3rem 1rem;
-  border-bottom: 1px solid var(--ton-og-1);
+  border-bottom: 1px solid var(--border-3);
 }
 
 .triad-bottom {
@@ -85,7 +88,7 @@
   font-size: 1.8rem;
   text-align: center;
   text-transform: uppercase;
-  border-bottom: 1px solid var(--ton-og-1);
+  border-bottom: 1px solid var(--border-3);
 }
 
 .triad-card-container {
@@ -97,7 +100,7 @@
 }
 
 .triad-card {
-  border: 1px solid var(--ton-og-1);
+  border: 1px solid var(--border-3);
 }
 
 .triad-card header {
@@ -105,12 +108,12 @@
   font-weight: 700;
   text-transform: uppercase;
   background-color: hsl(var(--tri-og-1-raw) / 10%);
-  border-bottom: 1px solid var(--ton-og-1);
+  border-bottom: 1px solid var(--border-3);
 }
 
 .triad-card p {
   padding: 1rem;
-  border-bottom: 1px solid var(--ton-og-1);
+  border-bottom: 1px solid var(--border-3);
 }
 
 .triad-card a {
@@ -128,7 +131,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
   background-color: hsl(var(--tri-og-2-raw) / 10%);
-  border-top: 1px solid var(--ton-og-1);
+  border-top: 1px solid var(--border-3);
 }
 
 .triad-footer p {
@@ -138,5 +141,5 @@
 
 .triad-footer p:not(:last-child) {
   flex: 1;
-  border-right: 1px solid var(--ton-og-1);
+  border-right: 1px solid var(--border-3);
 }

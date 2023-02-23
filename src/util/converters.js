@@ -88,7 +88,7 @@ function colorFactory2(colors, paletteInformation) {
       color.contrast("black", "wcag21") > color.contrast("white", "wcag21")
         ? "#000"
         : "#fff",
-    css: `${paletteInformation}-${idx + 1}`,
+    css: `${paletteInformation}`,
     cssRaw: `${toPrecision(color.to("hsl").h, 3)} ${toPrecision(
       color.to("hsl").s,
       3
@@ -320,20 +320,6 @@ function createTetradic(hex) {
 }
 
 function createTones(hex) {
-  const colors = [];
-
-  for (let index = 0; index < 10; index++) {
-    const color = new Color(hex);
-    color.hsl.s = 10;
-    color.hsl.l = index * 10 + 8;
-    colors.push({
-      color: color,
-      corrected: color,
-      name: "Monochromatic",
-      css: `mono-${index}`,
-    });
-  }
-
   const ogRange = [];
 
   for (let index = 0; index < 10; index++) {
@@ -348,7 +334,7 @@ function createTones(hex) {
   for (let index = 0; index < 10; index++) {
     const color = new Color(hex);
 
-    let mixed = color.mix("gray", 0.9, {
+    let mixed = color.mix("gray", 0.95, {
       space: "lch",
       outputSpace: "srgb",
     });
@@ -421,8 +407,6 @@ function createTintsAndShades(hex) {
   });
 
   const t = ciLo.range(ciHi, { space: "lch" });
-
-  console.log(t(0.5));
 
   const og = colorFactory2(ogRange, "tas-og");
   const ci = colorFactory2(ciRange, "tas-ci");

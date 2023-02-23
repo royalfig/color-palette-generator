@@ -61,9 +61,9 @@ export default function Controls({ setDisplayValue, variation, setVariation }) {
         <Button
           type="text-btn"
           handler={(e) => handleProperty(e)}
-          classes={property === "css" ? "active" : ""}
+          classes={property === "code" ? "active" : ""}
         >
-          CSS
+          CODE
         </Button>
       </div>
     </div>

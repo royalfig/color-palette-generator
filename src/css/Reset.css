@@ -12,7 +12,18 @@ textarea {
   font-family: inherit;
   font-size: inherit;
   line-height: 1;
-  background-color: var(--ton-og-10);
-  border: 1px solid var(--ton-og-8);
-  color: inherit;
+  background-color: var(--surface-3);
+  border: 1px solid var(--border-1);
+  color: var(--element);
+  outline: none;
+}
+
+input:hover,
+textarea:hover {
+  border-color: var(--border-2);
+}
+
+input:focus-visible,
+textarea:focus-visible {
+  border-color: var(--border-3);
 }

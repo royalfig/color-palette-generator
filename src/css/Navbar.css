@@ -1,8 +1,8 @@
 .navbar {
   padding: var(--box-padding);
   margin-block-end: var(--space-after);
-  color: var(--tas-og-10-c);
-  background-color: var(--tas-og-10);
+  color: var(--element-3);
+  background-color: var(--surface-3);
 }
 
 .navbar-inner {
@@ -28,21 +28,3 @@
 .navbar .left .text-btn {
   color: inherit;
 }
-
-/* .navbar .left .text-btn:hover {
-  color: var(--tas-og-7-c);
-  background-color: var(--tas-og-7);
-} */
-
-/* .navbar .right button {
-  padding: 0.5em 0.75em;
-  color: var(--tas-og-7-c);
-  background-color: var(--tas-og-7);
-  border: none;
-  border-radius: 4px;
-}
-
-.navbar .right button:hover {
-  /* color: var(--com-og-1-c); */
-/* border-color: currentcolor;
-} */

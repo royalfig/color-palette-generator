@@ -13,20 +13,20 @@
 
 .controls-variations .text-btn {
   font-weight: 700;
-  color: var(--ton-og-1);
-  background: linear-gradient(45deg, var(--ton-og-9), var(--tas-og-10));
-  outline: 1px solid var(--ton-og-9);
+  color: var(--element-2);
+  background: linear-gradient(45deg, var(--surface-2), var(--surface-3));
+  outline: 1px solid var(--border-1);
   transition: outline 0.4s cubic-bezier(0.455, 0.03, 0.515, 0.955);
 }
 
 .controls-variations .text-btn:hover,
 .controls-properties button:hover {
-  outline: 1px solid var(--ton-og-7);
+  outline: 1px solid var(--border-2);
 }
 
 .controls-variations .text-btn.active,
 .controls-properties button.active {
-  outline: 1px solid var(--ton-og-5);
+  outline: 1px solid var(--border-3);
 }
 
 .controls-variation {
@@ -43,8 +43,8 @@
 }
 
 .controls-properties button {
-  color: var(--ton-og-1);
-  background: linear-gradient(45deg, var(--ton-og-9), var(--tas-og-10));
-  outline: 1px solid var(--ton-og-9);
+  color: var(--element-2);
+  background: linear-gradient(45deg, var(--surface-2), var(--surface-3));
+  outline: 1px solid var(--border-1);
   transition: outline 0.4s cubic-bezier(0.455, 0.03, 0.515, 0.955);
 }

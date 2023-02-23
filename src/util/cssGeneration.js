@@ -9,21 +9,52 @@ import {
   createTintsAndShades,
 } from "./converters";
 
+// dark to bright for surface / dark to light for element
+const darkStyles = `
+
+--surface-1: #000;
+--surface-2: var(--ton-og-10);
+--surface-3: var(--ton-og-9);
+
+--element-1: var(--ton-og-3);
+--element-2: var(--ton-og-2);
+--element-3: var(--ton-og-1);
+
+--border-1: var(--ton-og-8);
+--border-2: var(--ton-og-7);
+--border-3: var(--ton-og-6);
+
+`;
+
+// dark to bright for surface / light to dark for element
+const lightStyles = `
+
+--surface-1: var(--ton-og-8);
+--surface-2: var(--ton-og-9);
+--surface-3: var(--ton-og-10);
+
+--border-1: var(--ton-og-8);
+--border-2: var(--ton-og-6);
+--border-3: var(--ton-og-4);
+
+--element-1: var(--ton-og-3);
+--element-2: var(--ton-og-2);
+--element-3: var(--ton-og-1);
+`;
+
 function cssWriter(args, isReversed) {
   return args
     .map(({ name, variations }) => {
       return variations
         .map((variation) => {
-          variation =
-            isReversed && (name === "tones" || name === "tints and shades")
-              ? [...variation].reverse()
-              : variation;
-
+          if (isReversed) {
+            variation.reverse();
+          }
           return variation
-            .map((color) => {
-              return `--${color.code}: ${color.hsl};
-          --${color.code}-raw: ${color.cssRaw};
-          --${color.code}-c: ${color.contrast};`;
+            .map((color, idx) => {
+              return `--${color.css}-${idx + 1}: ${color.hsl};
+          --${color.css}-${idx + 1}-raw: ${color.cssRaw};
+          --${color.css}-${idx + 1}-c: ${color.contrast};`;
             })
             .join("\n");
         })
@@ -44,29 +75,33 @@ function generateCss(hex) {
   const shades = createTintsAndShades(color);
   const split = createSplit(color);
 
-  const css = cssWriter([
-    complement,
-    analogous,
-    tetrad,
-    triad,
-    tones,
-    shades,
-    split,
-  ]);
-
-  const darkCss = cssWriter(
+  const css = cssWriter(
     [complement, analogous, tetrad, triad, tones, shades, split],
-    true
+    false
   );
 
-  const styleTag = document.querySelector("#colors");
-  styleTag && styleTag.remove();
-  const style = document.createElement("style");
-  style.id = "colors";
-  style.textContent = `:root[data-mode="light"] {--alpha: 1; --h: ${h}; --s: ${s}%; --l: ${l}%;${css}}
-  :root[data-mode="dark"] {--alpha: 1; --h: ${h}; --s: ${s}%; --l: ${l}%;${darkCss}}`;
+  const darkCss = cssWriter([tones, shades], true);
 
-  document.head.append(style);
+  const colorsId = document.querySelector("#colors");
+  colorsId && colorsId.remove();
+  const colors = document.createElement("style");
+  colors.id = "colors";
+  colors.textContent = `:root {--alpha: 1; --h: ${h}; --s: ${s}%; --l: ${l}%;${css}}`;
+  document.head.append(colors);
+
+  const lightId = document.querySelector("#light");
+  lightId && lightId.remove();
+  const light = document.createElement("style");
+  light.id = "light";
+  light.textContent = `:root[data-mode="light"] {${lightStyles}}`;
+  document.head.append(light);
+
+  const darkId = document.querySelector("#dark");
+  darkId && darkId.remove();
+  const dark = document.createElement("style");
+  dark.id = "dark";
+  dark.textContent = `:root[data-mode="dark"] {${darkStyles} ${darkCss}}`;
+  document.head.append(dark);
 }
 
 export { generateCss, cssWriter };

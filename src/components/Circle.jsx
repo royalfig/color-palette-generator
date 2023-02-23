@@ -18,7 +18,7 @@ export default function Circle({ colors, type, size }) {
           cy="0"
           r={sizer(100, size)}
           fill="none"
-          stroke="var(--border-color)"
+          stroke="var(--border-1)"
           strokeWidth="3"
         />
         {type !== "circle"

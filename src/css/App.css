@@ -1,8 +1,6 @@
 .app {
   display: grid;
   gap: 2rem;
-
-  /* padding: 1rem; */
   max-width: var(--max-viewport);
   margin-inline: auto;
 }

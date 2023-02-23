@@ -95,7 +95,7 @@
   min-height: 8rem;
   padding: var(--box-padding);
   background-color: var(--ton-og-10);
-  outline: 1rem solid var(--tas-og-9);
+  outline: 1rem solid var(--tas--9);
 }
 
 .complementary-card-title {

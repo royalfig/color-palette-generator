@@ -1,8 +1,8 @@
-.sample-container.shades {
-  background-color: var(--tas-og-10);
+.sample-container.tintsandshades {
+  background-color: var(--surface-3);
 }
 
-.shades .sample-navbar {
+.tintsandshades .sample-navbar {
   padding: 2rem;
 }
 

@@ -1,6 +1,6 @@
 .color-selector {
   padding: var(--box-padding);
-  background-color: var(--ton-og-10);
+  background-color: var(--surface-3);
   border-radius: var(--radius);
 }
 
@@ -19,15 +19,15 @@
   padding: var(--button-padding);
   font-family: inherit;
   font-size: 1rem;
-  color: var(--ton-og-10-c);
+  color: var(--element-3);
   text-align: center;
-  background-color: var(--ton-og-10);
+  background-color: var(--surface-2);
   border: none;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-1);
 }
 
 .color-input input:focus-visible {
-  border: 1px solid var(--com-og-2);
+  border: 1px solid var(--border-2);
   outline: 0;
 }
 
@@ -68,6 +68,7 @@
   font-size: min(1rem, 16px);
   text-align: center;
   border-radius: var(--radius);
+  color: var(--element-3);
 }
 
 .previous {
@@ -81,7 +82,6 @@
   display: flex;
   gap: 0.5em;
   align-items: center;
-  border: 1px solid var(--ton-og-8);
 }
 
 .color-history {

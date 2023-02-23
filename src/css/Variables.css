@@ -4,7 +4,7 @@
   --small: 0.833rem;
   --x-small: min(0.75rem, 14px);
   --button-padding: 0.4em 0.8em;
-  --border-color: var(--ton-og-7);
+  /* --border-color: var(--ton-og-7); */
   --box-padding: 1rem;
   --space-after: 2rem;
   --max-viewport: 65rem;

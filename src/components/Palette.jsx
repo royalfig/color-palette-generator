@@ -38,7 +38,7 @@ export default function Palette({
         <Circle
           colors={palette}
           type={
-            palette.name === "tones" || palette.name === "tiots and shades"
+            palette.name === "tones" || palette.name === "tints and shades"
               ? "circle"
               : "default"
           }

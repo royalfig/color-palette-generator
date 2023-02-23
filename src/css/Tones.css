@@ -1,17 +1,17 @@
 .sample-container.tones {
-  color: var(--ton-og-9-c);
-  background-color: var(--ton-og-9);
-  margin: 3rem auto;
+  color: var(--element-1);
+  background-color: var(--surface-3);
+  margin: 2rem auto;
 }
 
 .tones {
   margin: 1rem;
-  border: 1px solid var(--ton-og-3);
+  border: 1px solid var(--border-1);
 }
 
 .tones .sample-navbar {
   padding: 1rem 2rem;
-  border-bottom: 1px solid var(--ton-og-3);
+  border-bottom: 1px solid var(--border-1);
 }
 
 .tones-hero {
@@ -23,7 +23,7 @@
   display: flex;
   flex-direction: column;
   padding: 3rem 2rem;
-  border-right: 1px solid var(--ton-og-3);
+  border-right: 1px solid var(--border-1);
 }
 
 .tones-right {
@@ -50,7 +50,7 @@
   flex-grow: 1;
   height: 1px;
   margin-inline-start: 0.5rem;
-  background-color: var(--ton-og-3);
+  background-color: var(--border-1);
 }
 
 .tones-title p:first-child {
@@ -76,15 +76,14 @@
   display: inline-block;
   width: fit-content;
   padding: 1rem 1.5rem;
-  color: var(--ton-og-5-c);
+  color: var(--ton-ke-6-c);
   text-decoration: none;
-  background-color: var(--ton-og-5);
+  background-color: var(--ton-ke-6);
   transition: all 0.3s;
 }
 
 .tones-cta a:hover {
-  color: var(--ton-og-6-c);
-  background-color: var(--ton-og-6);
+  background-color: var(--ton-ke-7);
 }
 
 .tones-cta p {
@@ -98,7 +97,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 3rem;
   padding: 2rem;
-  border-top: 1px solid var(--ton-og-3);
+  border-top: 1px solid var(--border-1);
 }
 
 .tones-card {
@@ -130,7 +129,7 @@
 }
 
 .tones-card-container .tones-card:hover {
-  color: var(--ton-og-8-c);
+  color: var(--element-3);
 }
 
 /* Decoration */

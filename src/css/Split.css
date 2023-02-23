@@ -1,12 +1,12 @@
 .split {
   position: relative;
-  background-color: hsl(var(--ton-og-9-raw) / 30%);
+  background-color: hsl(var(--ton-og-9-val) / 30%);
   background-image: radial-gradient(
-      hsl(var(--spl-og-1-raw) / 15%),
+      hsl(var(--spl-og-1-val) / 15%),
       transparent 70%
     ),
-    radial-gradient(hsl(var(--spl-og-2-raw) / 15%), transparent 70%),
-    radial-gradient(hsl(var(--spl-og-3-raw) / 15%), transparent 70%);
+    radial-gradient(hsl(var(--spl-og-2-val) / 15%), transparent 70%),
+    radial-gradient(hsl(var(--spl-og-3-val) / 15%), transparent 70%);
   background-repeat: no-repeat;
   background-position: -25% -25%, 50% 350%, 160% 50%;
   background-size: 50% 50%, 80% 80%, 50% 70%;
@@ -20,7 +20,7 @@
   height: 8rem;
   background-image: linear-gradient(
     45deg,
-    hsl(var(--spl-og-3-raw) / 25%),
+    hsl(var(--spl-og-3-val) / 25%),
     transparent
   );
   border-radius: 50%;
@@ -35,7 +35,7 @@
   height: 12rem;
   background-image: linear-gradient(
     45deg,
-    hsl(var(--spl-og-2-raw) / 25%),
+    hsl(var(--spl-og-2-val) / 25%),
     transparent
   );
   border-radius: 50%;
@@ -51,7 +51,7 @@
   height: 1rem;
   background-image: linear-gradient(
     -45deg,
-    hsl(var(--spl-og-3-raw) / 25%),
+    hsl(var(--spl-og-3-val) / 25%),
     transparent
   );
   border-radius: 4em;
@@ -66,7 +66,7 @@
   height: 1.2rem;
   background-image: linear-gradient(
     -45deg,
-    hsl(var(--spl-og-2-raw) / 25%),
+    hsl(var(--spl-og-2-val) / 25%),
     transparent
   );
   border-radius: 4em;
@@ -81,7 +81,7 @@
   height: 1.15rem;
   background-image: linear-gradient(
     -45deg,
-    hsl(var(--spl-og-1-raw) / 25%),
+    hsl(var(--spl-og-1-val) / 25%),
     transparent
   );
   border-radius: 4em;
@@ -96,7 +96,7 @@
   height: 1rem;
   background-image: linear-gradient(
     -45deg,
-    hsl(var(--spl-og-1-raw) / 25%),
+    hsl(var(--spl-og-1-val) / 25%),
     transparent
   );
   border-radius: 4em;
@@ -202,9 +202,9 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: 2rem;
-  background-color: hsl(var(--ton-og-10-raw) / 30%);
+  background-color: hsl(var(--ton-og-10-val) / 30%);
   border-radius: 1em;
-  box-shadow: 20px 20px 60px hsl(var(--ton-og-9-raw) / 60%),
+  box-shadow: 20px 20px 60px hsl(var(--ton-og-9-val) / 60%),
     -20px -20px 60px var(--ton-og-10);
   backdrop-filter: blur(15px);
 }
@@ -227,7 +227,7 @@
   text-transform: uppercase;
   background-color: var(--ton-og-10);
   border-radius: 0.5rem;
-  box-shadow: 10px 10px 60px hsl(var(--ton-og-9-raw) / 60%),
+  box-shadow: 10px 10px 60px hsl(var(--ton-og-9-val) / 60%),
     -10px -10px 60px var(--ton-og-10);
   transition: background-color 0.5s;
 }

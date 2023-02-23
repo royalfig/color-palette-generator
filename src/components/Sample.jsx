@@ -25,7 +25,6 @@ export function slugify(name) {
 }
 
 function selectComponent(slug) {
-  console.log(slug);
   switch (slug) {
     case "complementary":
       return Complementary;
