@@ -1,7 +1,7 @@
 .sample-container.tones {
+  margin: 2rem auto;
   color: var(--element-1);
   background-color: var(--surface-3);
-  margin: 2rem auto;
 }
 
 .tones {

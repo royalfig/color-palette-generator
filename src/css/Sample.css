@@ -1,4 +1,5 @@
 .sample-container {
+  position: relative;
   max-width: var(--max-viewport);
 
   /* padding: var(--box-padding); */

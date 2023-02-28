@@ -66,9 +66,9 @@
 .color-input-text > div input {
   flex: 1;
   font-size: min(1rem, 16px);
+  color: var(--element-3);
   text-align: center;
   border-radius: var(--radius);
-  color: var(--element-3);
 }
 
 .previous {

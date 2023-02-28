@@ -3,13 +3,13 @@ button {
   font-family: inherit;
   font-size: inherit;
   line-height: 1;
+  color: inherit;
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing);
   cursor: pointer;
   background: none;
   border: none;
   border-radius: var(--radius);
-  color: inherit;
 }
 
 button:hover,

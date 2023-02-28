@@ -10,6 +10,12 @@
   background-repeat: no-repeat;
   background-position: -25% -25%, 50% 350%, 160% 50%;
   background-size: 50% 50%, 80% 80%, 50% 70%;
+  --split-shadow: 20px 20px 60px rgb(56 56 56 / 15%), -20px -20px 60px #fff;
+}
+
+:root[data-mode="dark"] .split {
+  --split-shadow: 20px 20px 60px hsl(var(--tas-og-10-raw) / 35%),
+    -20px -20px 60px rgb(56 56 56 / 15%);
 }
 
 .circle-1 {
@@ -169,7 +175,7 @@
   letter-spacing: -0.3px;
   background-color: var(--surface-3);
   border-radius: 1em;
-  box-shadow: 20px 20px 60px var(--ton-og-9), -20px -20px 60px var(--ton-og-10);
+  box-shadow: var(--split-shadow);
   transition: padding-inline-start 0.5s;
 }
 
@@ -191,10 +197,6 @@
   translate: 0 0;
 }
 
-.split-title-container a:active {
-  box-shadow: 10px 10px 30px var(--ton-og-9), -10px -10px 30px var(--ton-og-10);
-}
-
 .split-card {
   position: relative;
   display: flex;
@@ -204,8 +206,7 @@
   padding: 2rem;
   background-color: hsl(var(--ton-og-10-raw) / 30%);
   border-radius: 1em;
-  box-shadow: 20px 20px 60px hsl(var(--ton-og-9-raw) / 60%),
-    -20px -20px 60px var(--ton-og-10);
+  box-shadow: var(--split-shadow);
   backdrop-filter: blur(15px);
 }
 
@@ -227,8 +228,7 @@
   text-transform: uppercase;
   background-color: var(--surface-3);
   border-radius: 0.5rem;
-  box-shadow: 10px 10px 60px hsl(var(--ton-og-9-raw) / 60%),
-    -10px -10px 60px var(--ton-og-10);
+  box-shadow: var(--split-shadow);
   transition: background-color 0.5s;
 }
 
@@ -251,6 +251,112 @@
   grid-column: 7 / span 4;
 }
 
-.specs {
-  background-color: black;
+/* Specs */
+.specs-overlay {
+  display: none;
+  height: 100%;
+}
+
+.specs-overlay::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background-color: rgba(var(--ton-og-10-raw) / 20%);
+  backdrop-filter: blur(2px);
+  z-index: 10;
+}
+
+.specs-overlay.show {
+  display: block;
+}
+
+.spec {
+  position: absolute;
+  z-index: 11;
+  max-width: 400px;
+  padding: 1rem;
+  margin: 1rem;
+  font-size: var(--small);
+  line-height: 1;
+  background-color: var(--surface-3);
+  border-radius: var(--radius);
+  box-shadow: 5px 5px 1rem rgb(0 0 0 / 15%);
+}
+
+.spec::before,
+.spec::after {
+  top: 0;
+  left: 0;
+  position: absolute;
+  height: 1px;
+  content: "";
+  background-color: var(--element-1);
+  opacity: 0.15;
+}
+
+.spec::before {
+  translate: calc(-100%) 1.25rem;
+  width: 25px;
+}
+
+.spec::after {
+  translate: calc(calc(-100% - 25px)) 1.25rem;
+  width: 7.5px;
+
+  transform: rotate(45deg);
+  transform-origin: right;
+}
+
+.spec > p {
+  text-transform: uppercase;
+  margin-block-end: 0.5rem;
+}
+
+.spec > div {
+  display: flex;
+  align-items: center;
+  font-family: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
+    "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
+    "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
+}
+
+.specs-overlay > button {
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  position: absolute;
+  margin: 1rem;
+  z-index: 11;
+  right: 0;
+}
+
+.spec .prop {
+  color: var(--spl-ke-1);
+}
+
+.spec .value {
+  color: var(--spl-ke-3);
+}
+
+:root[data-mode="dark"] .spec .prop {
+  color: var(--spl-ci-2);
+}
+
+:root[data-mode="dark"] .spec .value {
+  color: var(--spl-ci-3);
+}
+
+.spec-decorator {
+  height: 2rem;
+  width: 2rem;
+  margin-inline-end: 1rem;
+  display: inline-block;
+  flex-shrink: 0;
+  border-radius: 50%;
+  outline: 2px dotted var(--border-1);
+  outline-offset: 2px;
+}
+
+.spec-decorator.circle {
+  border-radius: 50%;
 }

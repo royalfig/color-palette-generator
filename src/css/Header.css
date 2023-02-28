@@ -15,6 +15,6 @@
 }
 
 .header button {
-  font-size: var(--small);
   padding: 0;
+  font-size: var(--small);
 }

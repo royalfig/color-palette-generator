@@ -12,9 +12,9 @@ textarea {
   font-family: inherit;
   font-size: inherit;
   line-height: 1;
+  color: var(--element);
   background-color: var(--surface-3);
   border: 1px solid var(--border-1);
-  color: var(--element);
   outline: none;
 }
 

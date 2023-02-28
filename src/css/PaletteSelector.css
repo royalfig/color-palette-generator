@@ -1,7 +1,7 @@
 .palette-selector {
   padding: var(--box-padding);
-  background-color: var(--surface-3);
   color: var(--element-3);
+  background-color: var(--surface-3);
   border-radius: var(--radius);
 }
 

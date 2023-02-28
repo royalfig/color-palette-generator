@@ -6,7 +6,7 @@ export function SampleNavbar({ name, handler }) {
       <ul>
         <li>{name}</li>
         <li>About</li>
-        <li>Xyz</li>
+        <li>Help</li>
       </ul>
       <button onClick={handler}>
         <Eyeglasses /> Specs

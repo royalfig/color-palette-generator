@@ -10,17 +10,31 @@
   color: var(--tas-og-3);
 }
 
+.complementary .sample-navbar:not(ul) button {
+  border-color: var(--border-3);
+}
+
 .complementary {
   position: relative;
   overflow: hidden;
 }
 
-.complementary .complementary-decoration {
+.complementary-decoration {
   position: absolute;
   top: 0;
   left: 10%;
   width: 100%;
   opacity: 0.45;
+}
+
+.complementary-decoration:last-of-type {
+  position: absolute;
+  top: 60%;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  opacity: 0.45;
+  transform: scaleX(-1) scaleY(-1);
 }
 
 .complementary-hero {
@@ -52,15 +66,16 @@
   color: var(--tas-og-3);
   text-decoration: none;
   text-transform: uppercase;
+  background-color: transparent;
   border: 1px solid;
   border-radius: var(--radius);
+  transition: background-color 0.3s, color 0.3s;
 }
 
-.complementary-divider {
-  height: 1px;
-  margin: 4rem 2rem 5rem;
+.complementary-hero a:where(:hover, :focus-visible) {
+  color: var(--tas-og-3-c);
   background-color: var(--tas-og-3);
-  opacity: 0.35;
+  border-color: var(--tas-og-3);
 }
 
 .complementary-card-container {
@@ -76,8 +91,6 @@
   grid-template-rows: repeat(12, auto);
   grid-template-columns: repeat(12, 1fr);
   grid-row: 1 / -1;
-
-  /* aspect-ratio: 4 / 3; */
   grid-column: 1 / span 1;
 }
 

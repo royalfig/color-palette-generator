@@ -2,8 +2,6 @@ import "../css/Color.css";
 import Copy from "./Copy";
 
 export default function Color({ color, displayValue, colorTitles, variation }) {
-  console.log(colorTitles);
-
   if (colorTitles.length) {
     color.variations[variation].forEach((c, idx) => {
       c.name = colorTitles[idx]?.name;
