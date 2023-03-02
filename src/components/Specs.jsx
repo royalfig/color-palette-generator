@@ -35,7 +35,7 @@ function generateSpecs(refs, container) {
     let yOnCenter = top - containerT + height / 2;
 
     // Shift element left or right if it's near the edge
-    xOnCenter = xOnCenter + 400 > containerR ? left - 200 : xOnCenter;
+    xOnCenter = xOnCenter + 400 > containerR ? left - 100 : xOnCenter;
     xOnCenter = xOnCenter < containerL ? (xOnCenter += 18) : xOnCenter;
 
     // Define the object values
