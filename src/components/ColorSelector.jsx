@@ -84,9 +84,13 @@ export default function ColorSelector({ setColor, color, children }) {
       </section>
 
       <footer className="previous">
-        <Button type="text-icon-btn" handler={handleEyedropper}>
-          <Eyedropper /> Eyedropper
-        </Button>
+        {window.EyeDropper ? (
+          <Button type="text-icon-btn" handler={handleEyedropper}>
+            <Eyedropper /> Eyedropper
+          </Button>
+        ) : (
+          ""
+        )}
 
         <div className="color-history">
           <ClockHistory />

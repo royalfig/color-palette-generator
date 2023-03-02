@@ -1,10 +1,10 @@
 .analogous {
-  background-color: var(--ana-og-2);
+  background-color: var(--ana-sb-1);
 }
 
 .analogous .sample-navbar {
   padding: 2rem;
-  color: var(--ana-og-2-c);
+  color: var(--ana-sb-1-c);
 }
 
 .analogous-hero {
@@ -12,14 +12,14 @@
   padding: 0 2rem 2rem;
   margin: 10rem auto 8rem;
   text-align: center;
-  border-bottom: 3px dashed var(--ana-og-1);
+  border-bottom: 3px dashed var(--ana-sb-2);
 }
 
 .analogous-title p {
   font-size: 5.5rem;
   font-weight: 900;
   line-height: 0.8;
-  color: var(--ana-og-1);
+  color: var(--ana-sb-2);
   text-transform: uppercase;
   letter-spacing: -0.3px;
 }
@@ -34,17 +34,13 @@
 }
 
 .analogous-bird-beak {
-  /* filter: brightness(90%); */
   position: absolute;
   top: 80%;
   right: 0;
   width: 0;
   height: 0;
   filter: drop-shadow(0 3px 1rem rgb(0 0 0 / 25%));
-
-  /* rotate: 1deg; */
-
-  border-color: transparent transparent transparent var(--ana-og-1);
+  border-color: transparent transparent transparent var(--ana-sb-1);
   border-style: solid;
   border-width: 2vw 2vw 0 4vw;
   translate: 15% 0.35rem;
@@ -57,7 +53,7 @@
   height: 40%;
   aspect-ratio: 1/1;
   margin-inline: auto;
-  background-color: var(--ana-og-3);
+  background-color: var(--ana-sb-3);
   border-radius: 50%;
   box-shadow: -3px 3px 1rem rgb(0 0 0 / 15%);
   translate: 10% 5px;
@@ -69,7 +65,7 @@
   height: 80%;
   aspect-ratio: 1 /1;
   margin-inline: auto;
-  background-color: var(--ana-og-3);
+  background-color: var(--ana-sb-3);
   border-radius: 50%;
   translate: 0 -20px;
 }

@@ -1,5 +1,5 @@
 .sample-container.complementary {
-  background-color: hsl(var(--com-ci-2-raw) / 30%);
+  background-color: hsl(var(--com-la-2-raw) / 20%);
 }
 
 .complementary .sample-navbar {
