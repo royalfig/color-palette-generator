@@ -1,20 +1,21 @@
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "react-bootstrap-icons";
 import "../css/Complementary.css";
 import { ArticleData } from "./ArticleData";
 import { SampleNavbar } from "./SampleNavbar";
-import { useState, useRef, useEffect } from "react";
 import Specs from "./Specs";
+
 export default function Complementary() {
+  const [specsOn, setSpecsOn] = useState(false);
+  const [elements, setElements] = useState([]);
+
   // Refs
   const container = useRef(null);
 
-  const [elements, setElements] = useState([]);
   useEffect(() => {
     const els = container.current.querySelectorAll("[data-name]");
     setElements(Array.from(els));
   }, []);
-
-  const [specsOn, setSpecsOn] = useState(false);
 
   function handleSpecOverlay() {
     setSpecsOn(true);
@@ -189,7 +190,6 @@ export default function Complementary() {
           <p
             data-property="color"
             data-value="var(--tas-og-3)"
-            data-decorator="square"
             data-name="Text"
           >
             Double Trouble
@@ -204,7 +204,6 @@ export default function Complementary() {
           <p
             data-property="background-color"
             data-value="hsl(var(--com-ci-2-raw) / 50%)"
-            data-decorator="square"
             data-name="Background color"
           >
             Support this project

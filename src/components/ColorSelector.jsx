@@ -9,14 +9,21 @@ import Button from "./buttons/Button";
 import Header from "./Header";
 
 export default function ColorSelector({ setColor, color, children }) {
-  const pickedColor = new ColorUtil(color);
+  const currentColor = new ColorUtil(color);
 
-  const hex = pickedColor.toString({ format: "hex" });
-  const hsl = pickedColor.to("hsl").toString({ precision: 2 });
-  const rgb = pickedColor.to("srgb").toString({ precision: 2 });
-  const lch = pickedColor.to("lch").toString({ precision: 2 });
-
+  const [validationError, setValidationError] = useState("");
   const [name, setName] = useState("");
+
+  const [hex, setHex] = useState(currentColor.toString({ format: "hex" }));
+  const [rgb, setRgb] = useState(
+    currentColor.to("srgb").toString({ precision: 2 })
+  );
+  const [hsl, setHsl] = useState(
+    currentColor.to("hsl").toString({ precision: 2 })
+  );
+  const [lch, setLch] = useState(
+    currentColor.to("lch").toString({ precision: 2 })
+  );
 
   async function getName(color) {
     const hexFormatted = hex3to6(color);
@@ -26,15 +33,56 @@ export default function ColorSelector({ setColor, color, children }) {
       const name = await res.json();
       setName(name?.colors[0]?.name);
     } catch (e) {
-      throw Error(e);
+      console.log(e.message);
+    }
+  }
+
+  function parseColor(e, type) {
+    const color = e.target.value;
+    setValidationError("");
+
+    switch (type) {
+      case "hex":
+        console.log(e, type);
+
+        const split = color.split(" ");
+        console.log(split);
+
+        const withoutHash = color.replace("#", "");
+
+        if (withoutHash.length < 3) {
+          setHex(color);
+          return;
+        }
+
+        if (withoutHash.length > 3 && withoutHash.length < 6) {
+          setHex(color);
+          return;
+        }
+
+        try {
+          const color = new ColorUtil("#" + withoutHash);
+          const newHex = color.toString({ format: "hex" });
+          setHex(newHex);
+          setColor(newHex);
+        } catch (error) {
+          setValidationError(`Couldn't parse "${color}" as a hex color.`);
+        }
+        break;
+      case "rgb":
+        const m = color.match(/\d+%?/g);
+        console.log(m);
+        setRgb(color);
+      default:
+        break;
     }
   }
 
   useEffect(() => {
     getName(color);
-  });
+  }, [color]);
 
-  async function handleEyedropper(e) {
+  async function handleEyedropper() {
     const eyeDropper = new EyeDropper();
 
     eyeDropper
@@ -60,27 +108,42 @@ export default function ColorSelector({ setColor, color, children }) {
           <label htmlFor="hex" className="color-selector-text-input-label">
             HEX
           </label>
-          <HexColorInput id="hex" color={color} onChange={setColor} />
+          <input value={hex} onChange={(e) => parseColor(e, "hex")} />
         </div>
         <div>
           <label htmlFor="rgb" className="color-selector-text-input-label">
             RGB
           </label>
-          <input type="text" id="rgb" value={rgb} />
+          <input
+            type="text"
+            id="rgb"
+            value={rgb}
+            onChange={(e) => parseColor(e, "rgb")}
+          />
         </div>
         <div>
           <label htmlFor="hsl" className="color-selector-text-input-label">
             HSL
           </label>
-          <input type="text" id="hsl" value={hsl} />
+          <input
+            type="text"
+            id="hsl"
+            value={hsl}
+            onChange={(e) => parseColor(e, "hsl")}
+          />
         </div>
         <div>
           <label htmlFor="lch" className="color-selector-text-input-label">
             LCH
           </label>
-          <input type="text" id="lch" value={lch} />
+          <input
+            type="text"
+            id="lch"
+            value={lch}
+            onChange={(e) => parseColor(e, "lch")}
+          />
         </div>
-        <p>Validation Error</p>
+        {validationError ? <p>{validationError}</p> : <p></p>}
       </section>
 
       <footer className="previous">

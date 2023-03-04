@@ -1,16 +1,16 @@
-import light from "../assets/lights.jpg";
+import sun from "../assets/sun.jpg";
 import boredom from "../assets/boredom.jpg";
 import lies from "../assets/lies.jpg";
 
 export const ArticleData = [
   {
-    title: "Relative Luminance: A TLDR",
+    title: "Shut up about the sun",
     excerpt: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
     longExcerpt:
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet consectetur adipisicing elit.",
     url: "https://ryanfeigenbaum.com",
-    image: light,
-    alt: "light",
+    image: sun,
+    alt: "sun",
   },
   {
     title: "HSL Is a Lie",

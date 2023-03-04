@@ -1,8 +1,8 @@
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "react-bootstrap-icons";
+import "../css/Tetradic.css";
 import { ArticleData } from "./ArticleData";
 import { SampleNavbar } from "./SampleNavbar";
-import "../css/Tetradic.css";
-import { useState, useRef, useEffect } from "react";
 import Specs from "./Specs";
 
 export default function Tetradic() {
@@ -76,6 +76,7 @@ export default function Tetradic() {
                 data-property="background-color"
                 data-value={articleProps[idx]}
                 data-name="Background color"
+                key={idx}
               >
                 <p className="tetradic-card-title">{article.title}</p>
                 <img src={article.image} alt={article.alt} />
