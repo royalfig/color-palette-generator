@@ -1,7 +1,7 @@
 import "../css/Analogous.css";
-import { ArticleData } from "./ArticleData";
-import { SampleNavbar } from "./SampleNavbar";
-import Specs from "./Specs";
+import { ArticleData } from "../util/ArticleData";
+import { SampleNavbar } from "./samples/SampleNavbar";
+import Specs from "./samples/Specs";
 import { useState, useRef, useEffect } from "react";
 
 export default function Analogous() {

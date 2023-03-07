@@ -1,6 +1,6 @@
 import { ArrowRightCircle } from "react-bootstrap-icons";
-import "../css/Split.css";
-import { ArticleData } from "./ArticleData";
+import "../../css/Split.css";
+import { ArticleData } from "../../util/ArticleData";
 import { SampleNavbar } from "./SampleNavbar";
 import { useEffect, useRef, useState } from "react";
 import Specs from "./Specs";

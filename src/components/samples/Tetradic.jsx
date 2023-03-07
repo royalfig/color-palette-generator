@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "react-bootstrap-icons";
-import "../css/Tetradic.css";
-import { ArticleData } from "./ArticleData";
+import "../../css/Tetradic.css";
+import { ArticleData } from "../../util/ArticleData";
 import { SampleNavbar } from "./SampleNavbar";
 import Specs from "./Specs";
 

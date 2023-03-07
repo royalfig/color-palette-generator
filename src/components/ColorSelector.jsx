@@ -1,4 +1,5 @@
 import ColorUtil from "colorjs.io";
+import { values } from "lodash-es";
 import { useEffect, useState } from "react";
 import { ClockHistory, Eyedropper, Clipboard } from "react-bootstrap-icons";
 import { HexColorInput, HexColorPicker } from "react-colorful";
@@ -8,13 +9,13 @@ import { hex3to6 } from "../util";
 import Button from "./buttons/Button";
 import Header from "./Header";
 
-export default function ColorSelector({ setColor, color, children }) {
+export default function ColorSelector({ setColor, color }) {
   const currentColor = new ColorUtil(color);
+  const hexString = currentColor.toString({ format: "hex" });
 
   const [validationError, setValidationError] = useState("");
   const [name, setName] = useState("");
-
-  const [hex, setHex] = useState(currentColor.toString({ format: "hex" }));
+  const [hex, setHex] = useState(hexString);
   const [rgb, setRgb] = useState(
     currentColor.to("srgb").toString({ precision: 2 })
   );
@@ -37,44 +38,164 @@ export default function ColorSelector({ setColor, color, children }) {
     }
   }
 
+  // Probably need to useEffect to update all inputs, then also wouldn't need to update the state in the parseColor function
+  useEffect(() => {
+    setHex(hexString);
+  }, [color]);
+
+  function updateValues(valuesToUpdate, newColor) {
+    if (valuesToUpdate.includes("hex")) {
+      setHex(newColor.to("srgb").toString({ format: "hex" }));
+    }
+
+    if (valuesToUpdate.includes("rgb")) {
+      setRgb(newColor.to("srgb").toString({ precision: 2 }));
+    }
+
+    if (valuesToUpdate.includes("hsl")) {
+      setHsl(newColor.to("hsl").toString({ precision: 2 }));
+    }
+
+    if (valuesToUpdate.includes("rgb")) {
+      setLch(newColor.to("lch").toString({ precision: 2 }));
+    }
+  }
+
   function parseColor(e, type) {
     const color = e.target.value;
+
     setValidationError("");
 
     switch (type) {
       case "hex":
-        console.log(e, type);
-
-        const split = color.split(" ");
-        console.log(split);
-
         const withoutHash = color.replace("#", "");
 
-        if (withoutHash.length < 3) {
+        if (
+          withoutHash.length < 3 ||
+          (withoutHash.length > 3 && withoutHash.length < 6)
+        ) {
           setHex(color);
           return;
         }
 
-        if (withoutHash.length > 3 && withoutHash.length < 6) {
-          setHex(color);
-          return;
+        if (withoutHash.length > 6) {
+          setValidationError(
+            `Can't parse color. Too many digits (${withoutHex.length})`
+          );
         }
 
         try {
-          const color = new ColorUtil("#" + withoutHash);
-          const newHex = color.toString({ format: "hex" });
-          setHex(newHex);
+          setHex(color);
+          const formattedHexColor = new ColorUtil("#" + withoutHash);
+          const newHex = formattedHexColor.toString({ format: "hex" });
           setColor(newHex);
+          updateValues(["rgb", "hsl", "lch"], formattedHexColor);
         } catch (error) {
           setValidationError(`Couldn't parse "${color}" as a hex color.`);
         }
         break;
       case "rgb":
-        const m = color.match(/\d+%?/g);
-        console.log(m);
+        const rgbMatch = color.match(/\d+%?/g);
+
+        if (rgbMatch === null) {
+          setRgb(color);
+          break;
+        }
+
+        if (rgbMatch.length !== 3) {
+          setRgb(color);
+          break;
+        }
+
         setRgb(color);
-      default:
+        if (rgbMatch.length === 3) {
+          try {
+            const newRgb = new ColorUtil(
+              `rgb(${rgbMatch[0]} ${rgbMatch[1]} ${rgbMatch[2]})`
+            );
+            const formattedHexColor = newRgb.toString({ format: "hex" });
+
+            setColor(formattedHexColor);
+            updateValues(["hex", "hsl", "lch"], newRgb);
+          } catch (e) {
+            console.log(e);
+            setValidationError(`Couldn't parse "${color}" as an RGB color.`);
+          } finally {
+            break;
+          }
+        }
+
+        setValidationError(`Couldn't parse "${color}" as an RGB color.`);
+
         break;
+      case "hsl":
+        const hslMatch = color.match(/\d+%?/g);
+
+        if (hslMatch === null) {
+          setHsl(color);
+          break;
+        }
+
+        if (hslMatch.length !== 3) {
+          setHsl(color);
+          break;
+        }
+
+        setHsl(color);
+        if (hslMatch.length === 3) {
+          try {
+            const newHsl = new ColorUtil(
+              `hsl(${hslMatch[0].replace("%", "")} ${
+                hslMatch[1].match(/\d+/)[0]
+              }% ${hslMatch[2].match(/\d+/)[0]}%)`
+            );
+            const formattedHexColor = newHsl
+              .to("srgb")
+              .toString({ format: "hex" });
+            setColor(formattedHexColor);
+            updateValues(["hex", "rgb", "lch"], newHsl);
+          } catch (e) {
+            setValidationError(`Couldn't parse "${color}" as an HSL color.`);
+          } finally {
+            break;
+          }
+        }
+
+        setValidationError(`Couldn't parse "${color}" as an HSL color.`);
+      case "lch":
+        const lch = color.match(/\d+%?/g);
+
+        if (lch === null) {
+          setLch(color);
+          break;
+        }
+
+        if (lch.length !== 3) {
+          setLch(color);
+          break;
+        }
+
+        setLch(color);
+        if (lch.length === 3) {
+          try {
+            const newLch = new ColorUtil(
+              `lch(${lch[0].match(/\d+/)[0]}% ${lch[1].match(/\d+/)[0]} ${
+                lch[2].match(/\d+/)[0]
+              })`
+            );
+            const formattedHexColor = newLch
+              .to("srgb")
+              .toString({ format: "hex" });
+            setColor(formattedHexColor);
+            updateValues(["hex", "rgb", "hsl"], newLch);
+          } catch (e) {
+            setValidationError(`Couldn't parse "${color}" as an LCH color.`);
+          } finally {
+            break;
+          }
+        }
+
+        setValidationError(`Couldn't parse "${color}" as an LCH color.`);
     }
   }
 
@@ -108,7 +229,11 @@ export default function ColorSelector({ setColor, color, children }) {
           <label htmlFor="hex" className="color-selector-text-input-label">
             HEX
           </label>
-          <input value={hex} onChange={(e) => parseColor(e, "hex")} />
+          <input
+            value={hex}
+            onChange={(e) => parseColor(e, "hex")}
+            onBlur={() => setHex(color)}
+          />
         </div>
         <div>
           <label htmlFor="rgb" className="color-selector-text-input-label">
@@ -119,6 +244,9 @@ export default function ColorSelector({ setColor, color, children }) {
             id="rgb"
             value={rgb}
             onChange={(e) => parseColor(e, "rgb")}
+            onBlur={() =>
+              setRgb(currentColor.to("srgb").toString({ precision: 2 }))
+            }
           />
         </div>
         <div>
@@ -130,6 +258,9 @@ export default function ColorSelector({ setColor, color, children }) {
             id="hsl"
             value={hsl}
             onChange={(e) => parseColor(e, "hsl")}
+            onBlur={() =>
+              setHsl(currentColor.to("hsl").toString({ precision: 2 }))
+            }
           />
         </div>
         <div>

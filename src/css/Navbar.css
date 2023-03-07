@@ -17,7 +17,7 @@
 .navbar .right {
   display: flex;
   flex-direction: row;
-  gap: 1rem;
+  gap: 0.5rem;
   align-items: center;
 }
 
@@ -25,6 +25,7 @@
   font-size: 1.15rem;
 }
 
-.navbar .left .text-btn {
+.navbar .right a {
+  display: flex;
   color: inherit;
 }

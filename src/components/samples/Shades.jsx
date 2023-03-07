@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "react-bootstrap-icons";
-import "../css/Shades.css";
-import { ArticleData } from "./ArticleData";
+import "../../css/Shades.css";
+import { ArticleData } from "../../util/ArticleData";
 import Specs from "./Specs";
 import { SampleNavbar } from "./SampleNavbar";
 export default function Shades() {
   const container = useRef(null);
 
   const [elements, setElements] = useState([]);
+
   useEffect(() => {
     const els = container.current.querySelectorAll("[data-name]");
     setElements(Array.from(els));
@@ -18,6 +19,7 @@ export default function Shades() {
   function handleSpecOverlay() {
     setSpecsOn(true);
   }
+
   return (
     <>
       {specsOn ? (

@@ -1,0 +1,8 @@
+.launchpad {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  padding: var(--box-padding);
+  background-color: var(--surface-3);
+  border-radius: var(--radius);
+}

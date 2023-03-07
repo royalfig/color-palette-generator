@@ -4,7 +4,8 @@ import ColorSelector from "./components/ColorSelector";
 import Navbar from "./components/Navbar";
 import Palette from "./components/Palette";
 import PaletteSelector from "./components/PaletteSelector";
-import Sample from "./components/Sample";
+import Sample from "./components/samples/Sample";
+import LaunchPad from "./components/LaunchPad";
 import "./css/App.css";
 import "./css/Defaults.css";
 import "./css/Reset.css";
@@ -148,6 +149,8 @@ function App() {
         </section>
       </main>
       <Sample selectedPalette={palette} />
+
+      <LaunchPad />
     </div>
   );
 }

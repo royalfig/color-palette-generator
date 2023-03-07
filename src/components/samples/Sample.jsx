@@ -1,6 +1,6 @@
-import "../css/Sample.css";
+import "../../css/Sample.css";
 
-import Analogous from "./Analogous";
+import Analogous from "../Analogous";
 import Complementary from "./Complementary";
 import Shades from "./Shades";
 import Split from "./Split";

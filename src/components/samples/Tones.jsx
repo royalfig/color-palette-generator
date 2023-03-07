@@ -1,5 +1,5 @@
-import "../css/Tones.css";
-import { ArticleData } from "./ArticleData";
+import "../../css/Tones.css";
+import { ArticleData } from "../../util/ArticleData";
 import { SampleNavbar } from "./SampleNavbar";
 import { useEffect, useRef, useState } from "react";
 import Specs from "./Specs";
