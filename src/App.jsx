@@ -151,6 +151,10 @@ function App() {
       <Sample selectedPalette={palette} />
 
       <LaunchPad />
+
+      <footer className="footer">
+        Designed by 𝕱𝖊𝖎𝖌𝖊𝖓𝖇𝖆𝖚𝖒 &copy; {new Date().getFullYear()}
+      </footer>
     </div>
   );
 }

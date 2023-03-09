@@ -38,7 +38,7 @@ export default function Tones() {
           <div className="tones-left">
             <div className="tones-title">
               <div className="tones-subtitle">
-                <p>It's classy. It's bougies. It's</p>
+                <p>It&apos;s classy. It&apos;s bougies. It&apos;s</p>
                 <div></div>
               </div>
               <p
@@ -58,7 +58,7 @@ export default function Tones() {
               data-value="var(--ton-ke-6)"
               data-name="Button"
             >
-              <a href="#">Show me the green</a>
+              <a href="#">Pony Up</a>
             </div>
           </div>
           <div className="tones-right">

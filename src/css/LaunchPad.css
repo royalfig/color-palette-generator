@@ -5,4 +5,8 @@
   padding: var(--box-padding);
   background-color: var(--surface-3);
   border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-md);
 }

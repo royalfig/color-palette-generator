@@ -1,7 +1,15 @@
 import Button from "./buttons/Button";
 import "../css/LaunchPad.css";
-import { MoonStars, Sun, Share } from "react-bootstrap-icons";
+import {
+  MoonStars,
+  Sun,
+  Share,
+  Clipboard,
+  FileArrowDown,
+} from "react-bootstrap-icons";
 import { useState } from "react";
+import Copy from "./Copy";
+import { toast } from "react-toastify";
 export default function LaunchPad({ props }) {
   const [darkMode, setDarkMode] = useState(false);
 
@@ -13,21 +21,27 @@ export default function LaunchPad({ props }) {
   }
 
   async function handleShare() {
-    const shareData = {
-      title: "Color Palette Pro",
-      text: "Look at the pretty colors",
-      url: window.location.href,
-    };
-
-    try {
-      await navigator.share(shareData);
-    } catch (err) {
-      console.error("problem sharing");
-    }
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(
+      () => {
+        toast("Link copied to clipboard");
+      },
+      () => {
+        toast("Something went wrong. Try again.");
+      }
+    );
   }
 
   return (
     <div className="launchpad">
+      <Button type="icon-btn">
+        <Clipboard />
+      </Button>
+
+      <Button type="icon-btn">
+        <FileArrowDown />
+      </Button>
+
       <Button
         type="icon-btn"
         handler={toggleDarkMode}

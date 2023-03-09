@@ -1,8 +1,7 @@
 import ColorUtil from "colorjs.io";
-import { values } from "lodash-es";
 import { useEffect, useState } from "react";
-import { ClockHistory, Eyedropper, Clipboard } from "react-bootstrap-icons";
-import { HexColorInput, HexColorPicker } from "react-colorful";
+import { ClockHistory, Eyedropper } from "react-bootstrap-icons";
+import { HexColorPicker } from "react-colorful";
 import "../css/ColorSelector.css";
 import "../css/EyeDropper.css";
 import { hex3to6 } from "../util";
@@ -11,11 +10,10 @@ import Header from "./Header";
 
 export default function ColorSelector({ setColor, color }) {
   const currentColor = new ColorUtil(color);
-  const hexString = currentColor.toString({ format: "hex" });
 
   const [validationError, setValidationError] = useState("");
   const [name, setName] = useState("");
-  const [hex, setHex] = useState(hexString);
+  const [hex, setHex] = useState(currentColor.toString({ format: "hex" }));
   const [rgb, setRgb] = useState(
     currentColor.to("srgb").toString({ precision: 2 })
   );
@@ -40,26 +38,14 @@ export default function ColorSelector({ setColor, color }) {
 
   // Probably need to useEffect to update all inputs, then also wouldn't need to update the state in the parseColor function
   useEffect(() => {
-    setHex(hexString);
+    setHex(currentColor.toString({ format: "hex" }));
+    setRgb(currentColor.to("srgb").toString({ precision: 2 }));
+    setHsl(currentColor.to("hsl").toString({ precision: 2 }));
+    setLch(currentColor.to("lch").toString({ precision: 2 }));
   }, [color]);
-
-  function updateValues(valuesToUpdate, newColor) {
-    if (valuesToUpdate.includes("hex")) {
-      setHex(newColor.to("srgb").toString({ format: "hex" }));
-    }
-
-    if (valuesToUpdate.includes("rgb")) {
-      setRgb(newColor.to("srgb").toString({ precision: 2 }));
-    }
-
-    if (valuesToUpdate.includes("hsl")) {
-      setHsl(newColor.to("hsl").toString({ precision: 2 }));
-    }
-
-    if (valuesToUpdate.includes("rgb")) {
-      setLch(newColor.to("lch").toString({ precision: 2 }));
-    }
-  }
+  // ideal logic -> set other inputs except for current.
+  // useEffect [colorBeingChanged...?]
+  // Or debounce input...
 
   function parseColor(e, type) {
     const color = e.target.value;
@@ -67,7 +53,7 @@ export default function ColorSelector({ setColor, color }) {
     setValidationError("");
 
     switch (type) {
-      case "hex":
+      case "hex": {
         const withoutHash = color.replace("#", "");
 
         if (
@@ -80,7 +66,7 @@ export default function ColorSelector({ setColor, color }) {
 
         if (withoutHash.length > 6) {
           setValidationError(
-            `Can't parse color. Too many digits (${withoutHex.length})`
+            `Can't parse color. Too many digits (${withoutHash.length})`
           );
         }
 
@@ -89,12 +75,12 @@ export default function ColorSelector({ setColor, color }) {
           const formattedHexColor = new ColorUtil("#" + withoutHash);
           const newHex = formattedHexColor.toString({ format: "hex" });
           setColor(newHex);
-          updateValues(["rgb", "hsl", "lch"], formattedHexColor);
         } catch (error) {
           setValidationError(`Couldn't parse "${color}" as a hex color.`);
         }
         break;
-      case "rgb":
+      }
+      case "rgb": {
         const rgbMatch = color.match(/\d+%?/g);
 
         if (rgbMatch === null) {
@@ -116,19 +102,16 @@ export default function ColorSelector({ setColor, color }) {
             const formattedHexColor = newRgb.toString({ format: "hex" });
 
             setColor(formattedHexColor);
-            updateValues(["hex", "hsl", "lch"], newRgb);
           } catch (e) {
-            console.log(e);
             setValidationError(`Couldn't parse "${color}" as an RGB color.`);
-          } finally {
-            break;
           }
         }
 
         setValidationError(`Couldn't parse "${color}" as an RGB color.`);
 
         break;
-      case "hsl":
+      }
+      case "hsl": {
         const hslMatch = color.match(/\d+%?/g);
 
         if (hslMatch === null) {
@@ -153,49 +136,47 @@ export default function ColorSelector({ setColor, color }) {
               .to("srgb")
               .toString({ format: "hex" });
             setColor(formattedHexColor);
-            updateValues(["hex", "rgb", "lch"], newHsl);
           } catch (e) {
             setValidationError(`Couldn't parse "${color}" as an HSL color.`);
-          } finally {
-            break;
           }
         }
 
         setValidationError(`Couldn't parse "${color}" as an HSL color.`);
-      case "lch":
-        const lch = color.match(/\d+%?/g);
+        break;
+      }
+      case "lch": {
+        const lchMatch = color.match(/\d+%?/g);
 
-        if (lch === null) {
+        if (lchMatch === null) {
           setLch(color);
           break;
         }
 
-        if (lch.length !== 3) {
+        if (lchMatch.length !== 3) {
           setLch(color);
           break;
         }
 
         setLch(color);
-        if (lch.length === 3) {
+        if (lchMatch.length === 3) {
           try {
             const newLch = new ColorUtil(
-              `lch(${lch[0].match(/\d+/)[0]}% ${lch[1].match(/\d+/)[0]} ${
-                lch[2].match(/\d+/)[0]
-              })`
+              `lch(${lchMatch[0].match(/\d+/)[0]}% ${
+                lchMatch[1].match(/\d+/)[0]
+              } ${lchMatch[2].match(/\d+/)[0]})`
             );
             const formattedHexColor = newLch
               .to("srgb")
               .toString({ format: "hex" });
             setColor(formattedHexColor);
-            updateValues(["hex", "rgb", "hsl"], newLch);
           } catch (e) {
             setValidationError(`Couldn't parse "${color}" as an LCH color.`);
-          } finally {
-            break;
           }
         }
 
         setValidationError(`Couldn't parse "${color}" as an LCH color.`);
+        break;
+      }
     }
   }
 
@@ -204,6 +185,7 @@ export default function ColorSelector({ setColor, color }) {
   }, [color]);
 
   async function handleEyedropper() {
+    // eslint-disable-next-line no-undef
     const eyeDropper = new EyeDropper();
 
     eyeDropper

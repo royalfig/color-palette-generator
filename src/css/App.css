@@ -23,3 +23,11 @@
 .right > section {
   flex-grow: 1;
 }
+
+.footer {
+  padding: var(--box-padding);
+  color: var(--element-1);
+  font-size: var(--small);
+  text-align: center;
+  text-transform: uppercase;
+}
