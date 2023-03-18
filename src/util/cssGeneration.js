@@ -1,13 +1,4 @@
 import Color from "colorjs.io";
-import {
-  createComplement,
-  createAnalogous,
-  createTriad,
-  createTetradic,
-  createSplit,
-  createTones,
-  createTintsAndShades,
-} from "./converters";
 
 // dark to bright for surface / dark to light for element
 const darkStyles = `
@@ -63,17 +54,12 @@ function cssWriter(args, isReversed) {
     .join("\n");
 }
 
-function generateCss(hex) {
+function generateCss(hex, palettes) {
   const color = new Color(hex);
   const [h, s, l] = color.hsl;
 
-  const complement = createComplement(color);
-  const analogous = createAnalogous(color);
-  const tetrad = createTetradic(color);
-  const triad = createTriad(color);
-  const tones = createTones(color);
-  const shades = createTintsAndShades(color);
-  const split = createSplit(color);
+  const { complement, analogous, tetrad, triad, split, tones, shades } =
+    palettes;
 
   const css = cssWriter(
     [complement, analogous, tetrad, triad, tones, shades, split],

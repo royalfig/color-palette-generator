@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import ColorSelector from "./components/ColorSelector";
 import Navbar from "./components/Navbar";
@@ -23,6 +23,7 @@ import {
   createTriad,
   generateCss,
 } from "./util";
+import { sayings } from "./util/ArticleData";
 
 function getQueryParam() {
   const params = new URLSearchParams(document.location.search);
@@ -33,16 +34,16 @@ function getQueryParam() {
 function App() {
   const [color, setColor] = useState(getQueryParam() || "#21a623");
   const [variation, setVariation] = useState(0);
-
+  const [saying, setSaying] = useState(sayings[0]);
   const [displayValue, setDisplayValue] = useState("hex");
 
-  const complementaryPalette = createComplement(color);
-  const splitComplementaryPalette = createSplit(color);
+  const complementaryPalette = useMemo(() => createComplement(color), [color]);
+  const splitComplementaryPalette = useMemo(() => createSplit(color), [color]);
   const analogousPalette = createAnalogous(color);
   const triadicPalette = createTriad(color);
   const tetradicPalette = createTetradic(color);
   const shadesPalette = createTintsAndShades(color);
-  const monochramaticPalette = createTones(color);
+  const tonalPalette = createTones(color);
 
   const [palette, setPalette] = useState(complementaryPalette);
 
@@ -74,14 +75,22 @@ function App() {
         break;
 
       case "tones":
-        setPalette(monochramaticPalette);
+        setPalette(tonalPalette);
         break;
     }
   }
 
   useEffect(() => {
     handlePalette(palette.name);
-    generateCss(color);
+    generateCss(color, {
+      complement: complementaryPalette,
+      analogous: analogousPalette,
+      tetrad: tetradicPalette,
+      triad: triadicPalette,
+      split: splitComplementaryPalette,
+      tones: tonalPalette,
+      shades: shadesPalette,
+    });
   }, [color]);
 
   const debouncedHandler = useCallback(
@@ -106,6 +115,13 @@ function App() {
     setColor(e);
   }
 
+  useEffect(() => {
+    const int = setInterval(() => {
+      setSaying(sayings[Math.floor(Math.random() * sayings.length)]);
+    }, 10000);
+    return () => clearInterval(int);
+  });
+
   return (
     <div>
       <ToastContainer />
@@ -119,9 +135,7 @@ function App() {
             setColor={debouncedHandler}
             color={color}
           ></ColorSelector>
-          <div className="palette-container">
-            💡Copy most values with a click
-          </div>
+          <div className="palette-container">{saying}</div>
         </section>
 
         <section className="right">
@@ -133,7 +147,7 @@ function App() {
               tetradicPalette,
               triadicPalette,
               shadesPalette,
-              monochramaticPalette,
+              tonalPalette,
             ]}
             handlePalette={handlePalette}
             palette={palette}
