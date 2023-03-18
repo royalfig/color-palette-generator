@@ -1,12 +1,6 @@
 .launchpad {
-  position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  padding: var(--box-padding);
-  background-color: var(--surface-3);
-  border-radius: var(--radius);
   display: flex;
   align-items: center;
+  justify-content: space-around;
   gap: 0.5rem;
-  box-shadow: var(--shadow-md);
 }

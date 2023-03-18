@@ -34,7 +34,6 @@ function getQueryParam() {
 function App() {
   const [color, setColor] = useState(getQueryParam() || "#21a623");
   const [variation, setVariation] = useState(0);
-  const [saying, setSaying] = useState(sayings[0]);
   const [displayValue, setDisplayValue] = useState("hex");
 
   const complementaryPalette = useMemo(() => createComplement(color), [color]);
@@ -135,7 +134,9 @@ function App() {
             setColor={debouncedHandler}
             color={color}
           ></ColorSelector>
-          <div className="palette-container">{saying}</div>
+          <div className="palette-container">
+            <LaunchPad />
+          </div>
         </section>
 
         <section className="right">
@@ -163,8 +164,6 @@ function App() {
         </section>
       </main>
       <Sample selectedPalette={palette} />
-
-      <LaunchPad />
 
       <footer className="footer">
         Designed by 𝕱𝖊𝖎𝖌𝖊𝖓𝖇𝖆𝖚𝖒 &copy; {new Date().getFullYear()}
