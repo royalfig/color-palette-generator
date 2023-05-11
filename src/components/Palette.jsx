@@ -14,6 +14,7 @@ export default function Palette({
   variation,
   setVariation,
 }) {
+  console.log("🚀 ~ file: Palette.jsx:17 ~ palette:", palette);
   const [paletteTitle, setPaletteTitle] = useState("");
   const [colorTitles, setColorTitles] = useState([]);
 
@@ -38,7 +39,9 @@ export default function Palette({
         <Circle
           colors={palette}
           type={
-            palette.name === "tones" || palette.name === "tints and shades"
+            palette.name === "tones" ||
+            palette.name === "tints and shades" ||
+            palette.name === "polychroma"
               ? "circle"
               : "default"
           }

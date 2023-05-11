@@ -30,7 +30,9 @@ export default function PaletteSelector({ palettes, handlePalette, palette }) {
               <Circle
                 colors={colors}
                 type={
-                  colors.name === "tones" || colors.name === "tints and shades"
+                  colors.name === "tones" ||
+                  colors.name === "tints and shades" ||
+                  colors.name === "polychroma"
                     ? "circle"
                     : "default"
                 }

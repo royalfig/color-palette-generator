@@ -4,16 +4,16 @@ import Color from "colorjs.io";
 const darkStyles = `
 
 --surface-1: #000;
---surface-2: var(--ton-og-10);
---surface-3: var(--ton-og-9);
+--surface-2: var(--ton-og-1);
+--surface-3: var(--ton-og-2);
 
---element-1: var(--ton-og-3);
---element-2: var(--ton-og-2);
---element-3: var(--ton-og-1);
+--border-1: var(--ton-og-3);
+--border-2: var(--ton-og-4);
+--border-3: var(--ton-og-5);
 
---border-1: var(--ton-og-8);
---border-2: var(--ton-og-7);
---border-3: var(--ton-og-6);
+--element-1: var(--ton-og-8);
+--element-2: var(--ton-og-9);
+--element-3: var(--ton-og-10);
 
 `;
 
@@ -25,22 +25,19 @@ const lightStyles = `
 --surface-3: var(--ton-og-10);
 
 --border-1: var(--ton-og-8);
---border-2: var(--ton-og-6);
---border-3: var(--ton-og-4);
+--border-2: var(--ton-og-7);
+--border-3: var(--ton-og-6);
 
 --element-1: var(--ton-og-3);
 --element-2: var(--ton-og-2);
 --element-3: var(--ton-og-1);
 `;
 
-function cssWriter(args, isReversed) {
+function cssWriter(args) {
   return args
     .map(({ name, variations }) => {
       return variations
         .map((variation) => {
-          if (isReversed) {
-            variation.reverse();
-          }
           return variation
             .map((color, idx) => {
               return `--${color.css}-${idx + 1}: ${color.hsl};

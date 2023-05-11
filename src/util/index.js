@@ -1,6 +1,7 @@
 export * from "./converters";
 export * from "./createAnalogous";
 export * from "./createComplementary";
+export * from "./createPolychroma";
 export * from "./createSplit";
 export * from "./createTetradic";
 export * from "./createTintsAndShades";

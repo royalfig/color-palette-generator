@@ -1,6 +1,6 @@
 .split {
   position: relative;
-  background-color: hsl(var(--ton-og-9-raw) / 30%);
+  background-color: var(--surface-3);
   background-image: radial-gradient(
       hsl(var(--spl-og-1-raw) / 15%),
       transparent 70%
@@ -11,12 +11,8 @@
   background-position: -25% -25%, 50% 350%, 160% 50%;
   background-size: 50% 50%, 80% 80%, 50% 70%;
 
-  --split-shadow: 20px 20px 60px rgb(56 56 56 / 15%), -20px -20px 60px #fff;
-}
-
-:root[data-mode="dark"] .split {
-  --split-shadow: 20px 20px 60px hsl(var(--tas-og-10-raw) / 35%),
-    -20px -20px 60px rgb(56 56 56 / 15%);
+  --split-shadow: 20px 20px 60px hsl(var(--tas-og-1-raw) / 15%),
+    -20px -20px 60px hsl(var(--tas-og-10-raw) / 5%);
 }
 
 .circle-1 {
@@ -205,7 +201,7 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: 2rem;
-  background-color: hsl(var(--ton-og-10-raw) / 30%);
+  background-color: var(--surface-3);
   border-radius: 1em;
   box-shadow: var(--split-shadow);
   backdrop-filter: blur(15px);

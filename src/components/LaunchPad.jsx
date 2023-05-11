@@ -8,9 +8,9 @@ import {
   FileArrowDown,
 } from "react-bootstrap-icons";
 import { useState } from "react";
-import Copy from "./Copy";
 import { toast } from "react-toastify";
-export default function LaunchPad({ props }) {
+
+export default function LaunchPad() {
   const [darkMode, setDarkMode] = useState(false);
 
   function toggleDarkMode() {

@@ -38,3 +38,13 @@ export function y(num) {
 export function createSlug(str) {
   return str.split(" ")[0].toLowerCase().replace(/\W/, "-");
 }
+
+export function isLight(color) {
+  const l = color.oklch.l;
+
+  if (l >= 0.5) {
+    return true;
+  }
+
+  return false;
+}

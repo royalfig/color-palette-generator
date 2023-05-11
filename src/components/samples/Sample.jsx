@@ -40,5 +40,7 @@ function selectComponent(slug) {
       return Tetradic;
     case "tones":
       return Tones;
+    case "polychroma":
+      return Tones;
   }
 }

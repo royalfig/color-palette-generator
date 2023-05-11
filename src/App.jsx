@@ -22,8 +22,8 @@ import {
   createTones,
   createTriad,
   generateCss,
+  createPolychroma,
 } from "./util";
-import { sayings } from "./util/ArticleData";
 
 function getQueryParam() {
   const params = new URLSearchParams(document.location.search);
@@ -43,11 +43,13 @@ function App() {
   const tetradicPalette = createTetradic(color);
   const shadesPalette = createTintsAndShades(color);
   const tonalPalette = createTones(color);
+  const polychromaPalette = createPolychroma(color);
 
   const [palette, setPalette] = useState(complementaryPalette);
 
   function handlePalette(e) {
     const name = e?.currentTarget?.dataset?.name || e;
+    console.log("🚀 ~ file: App.jsx:53 ~ handlePalette ~ name:", name);
     switch (name) {
       case "complementary":
         setPalette(complementaryPalette);
@@ -76,6 +78,10 @@ function App() {
       case "tones":
         setPalette(tonalPalette);
         break;
+
+      case "polychroma":
+        setPalette(polychromaPalette);
+        break;
     }
   }
 
@@ -89,6 +95,7 @@ function App() {
       split: splitComplementaryPalette,
       tones: tonalPalette,
       shades: shadesPalette,
+      poly: polychromaPalette,
     });
   }, [color]);
 
@@ -113,13 +120,6 @@ function App() {
     window.history.pushState({}, "", url);
     setColor(e);
   }
-
-  useEffect(() => {
-    const int = setInterval(() => {
-      setSaying(sayings[Math.floor(Math.random() * sayings.length)]);
-    }, 10000);
-    return () => clearInterval(int);
-  });
 
   return (
     <div>
@@ -149,6 +149,7 @@ function App() {
               triadicPalette,
               shadesPalette,
               tonalPalette,
+              polychromaPalette,
             ]}
             handlePalette={handlePalette}
             palette={palette}

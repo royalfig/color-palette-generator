@@ -7,7 +7,9 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-inner">
         <div className="left">
-          <h1>Color Palette Pro</h1>
+          <h1>
+            <span style={{ color: "var(--com-og-1)" }}>Color</span> Palette Pro
+          </h1>
         </div>
         <div className="right">
           <Button type="text-btn" handler={(e) => console.log(e)}>
