@@ -42,5 +42,7 @@ function selectComponent(slug) {
       return Tones;
     case "polychroma":
       return Tones;
+    case "ombre":
+      return Tones;
   }
 }

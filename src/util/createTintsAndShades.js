@@ -1,12 +1,12 @@
 import Color from "colorjs.io";
 import {
   colorFactory,
-  adjustColor,
   makeCinematic,
   makeKeel,
   makeLanguid,
-  makeSharkBite,
 } from "./converters";
+import { makeSharkBite } from "./makeSharkBite";
+import { adjustColor } from "./adjustColor";
 
 export function createTintsAndShades(hex) {
   const ogRange = [];

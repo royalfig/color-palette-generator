@@ -1,3 +1,18 @@
+/**
+ * Converts a number to a specified precision.
+ *
+ * @param {number} n - The number to be converted.
+ * @param {number} precision - The desired precision.
+ * @returns {number} The number `n` converted to the specified precision.
+ *
+ * @example
+ * returns 12.34
+ * toPrecision(12.3456, 4);
+ *
+ * @example
+ * returns 12300
+ * toPrecision(12345.6, 3);
+ */
 export function toPrecision(n, precision) {
   n = +n;
   precision = +precision;

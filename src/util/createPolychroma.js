@@ -1,18 +1,19 @@
 import Color from "colorjs.io";
 import {
   colorFactory,
-  adjustColor,
   makeCinematic,
   makeKeel,
   makeLanguid,
-  makeSharkBite,
 } from "./converters";
+import { makeSharkBite } from "./makeSharkBite";
+import { adjustColor } from "./adjustColor";
 
 export function createPolychroma(hex) {
   const ogRange = [];
 
   for (let index = 0; index < 360; index += 36) {
     const color = new Color(hex);
+
     color.hsl.h += index;
     ogRange.push(color);
   }

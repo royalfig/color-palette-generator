@@ -23,6 +23,7 @@ import {
   createTriad,
   generateCss,
   createPolychroma,
+  createOmbre,
 } from "./util";
 
 function getQueryParam() {
@@ -44,12 +45,12 @@ function App() {
   const shadesPalette = createTintsAndShades(color);
   const tonalPalette = createTones(color);
   const polychromaPalette = createPolychroma(color);
+  const ombrePalette = createOmbre(color);
 
   const [palette, setPalette] = useState(complementaryPalette);
 
   function handlePalette(e) {
     const name = e?.currentTarget?.dataset?.name || e;
-    console.log("🚀 ~ file: App.jsx:53 ~ handlePalette ~ name:", name);
     switch (name) {
       case "complementary":
         setPalette(complementaryPalette);
@@ -82,6 +83,10 @@ function App() {
       case "polychroma":
         setPalette(polychromaPalette);
         break;
+
+      case "ombre":
+        setPalette(ombrePalette);
+        break;
     }
   }
 
@@ -96,6 +101,7 @@ function App() {
       tones: tonalPalette,
       shades: shadesPalette,
       poly: polychromaPalette,
+      ombre: ombrePalette,
     });
   }, [color]);
 
@@ -150,6 +156,7 @@ function App() {
               shadesPalette,
               tonalPalette,
               polychromaPalette,
+              ombrePalette,
             ]}
             handlePalette={handlePalette}
             palette={palette}

@@ -32,7 +32,8 @@ export default function PaletteSelector({ palettes, handlePalette, palette }) {
                 type={
                   colors.name === "tones" ||
                   colors.name === "tints and shades" ||
-                  colors.name === "polychroma"
+                  colors.name === "polychroma" ||
+                  colors.name === "ombre"
                     ? "circle"
                     : "default"
                 }

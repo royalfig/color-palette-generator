@@ -1,5 +1,6 @@
 import Color from "colorjs.io";
 import { toPrecision } from "./toPrecision";
+import { adjustColor } from "./adjustColor";
 
 /*
 
@@ -35,7 +36,7 @@ import { toPrecision } from "./toPrecision";
 export function colorFactory(colors, paletteInformation) {
   return colors.map((color, idx) => ({
     code: `${paletteInformation}-${idx + 1}`,
-    hex: color.toString({ format: "hex" }),
+    hex: color.to("srgb").toString({ format: "hex" }),
     rgb: color.to("srgb").toString({ precision: 3 }),
     hsl: color.to("hsl").toString({ precision: 3 }),
     lch: color.to("oklch").toString({ precision: 3 }),
@@ -62,26 +63,6 @@ function createColor(hex) {
   // TODO create base color
 }
 
-export function adjustColor(hex, valueToAdjust, adjustment, operator) {
-  const color = new Color(hex);
-
-  switch (operator) {
-    case "divide":
-      color.hsl[valueToAdjust] /= adjustment;
-      break;
-    case "minus":
-      color.hsl[valueToAdjust] -= adjustment;
-      break;
-    case "times":
-      color.hsl[valueToAdjust] *= adjustment;
-      break;
-    default:
-      color.hsl[valueToAdjust] += adjustment;
-  }
-
-  return color;
-}
-
 export function makeCinematic(colors) {
   return colors.map(({ color, valueToAdjust }) => {
     const adjusted = adjustColor(color, "h", valueToAdjust);
@@ -106,17 +87,3 @@ export function makeKeel(colors) {
     return corrector(color, valueToAdjust);
   });
 }
-
-export function makeSharkBite(colors) {
-  return colors.map(({ color, valueToAdjust }) => {
-    const adjusted = adjustColor(color, "h", valueToAdjust);
-    adjusted.hsl.s *= 0.7;
-    adjusted.hsl.l *= 0.3;
-    return adjusted;
-  });
-}
-
-// Todo createPolychroma, createBands
-// polychroma -> lisa frank -> steps of 36deg
-// Bands -> expanded analogous -> steps of 10
-// Ombre --> comp -< range
