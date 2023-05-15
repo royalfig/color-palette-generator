@@ -1,10 +1,8 @@
 import Color from "colorjs.io";
-import {
-  colorFactory,
-  makeCinematic,
-  makeKeel,
-  makeLanguid,
-} from "./converters";
+import { colorFactory } from "./converters";
+import { makeKeel } from "./makeKeel";
+import { makeLanguid } from "./makeLanguid";
+import { makeCinematic } from "./makeCinematic";
 import { makeSharkBite } from "./makeSharkBite";
 import { adjustColor } from "./adjustColor";
 

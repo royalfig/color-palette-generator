@@ -23,14 +23,10 @@ export function makeSharkBite(colors) {
       console.log(adjusted.hsl.l);
       adjusted.hsl.l = Math.max(0, (adjusted.hsl.l *= 0.5));
     } else {
-      adjusted.hsl.l = Math.min((adjusted.hsl.l *= 1.5), 90);
+      adjusted.hsl.l = Math.min((adjusted.hsl.l *= 1.5), 95);
     }
 
-    if (adjusted.hsl.s > 50) {
-      adjusted.hsl.s = Math.max(0, (adjusted.hsl.s *= 0.5));
-    } else {
-      adjusted.hsl.s = Math.min((adjusted.hsl.s *= 1.5), 100);
-    }
+    adjusted.hsl.s = Math.min((adjusted.hsl.s *= 1.5), 95);
 
     return adjusted;
   });

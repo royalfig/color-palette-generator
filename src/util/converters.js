@@ -1,6 +1,4 @@
-import Color from "colorjs.io";
-import { toPrecision } from "./toPrecision";
-import { adjustColor } from "./adjustColor";
+import { toPrecision } from "../util";
 
 /*
 
@@ -33,6 +31,26 @@ import { adjustColor } from "./adjustColor";
 
 */
 
+/**
+ * Transforms an array of color objects into a comprehensive color palette object.
+ *
+ * Each color object is transformed into a new object which contains:
+ * - A `code` derived from the `paletteInformation` and the color's index in the array.
+ * - The color represented in multiple color spaces (sRGB, HSL, OKLCH) as strings.
+ * - The color's HSL value as a `point`.
+ * - A `contrast` property which determines if the color has higher contrast with black or white according to the WCAG 2.1 guidelines.
+ * - A `css` property which is a string representation of the `paletteInformation`.
+ * - A `cssRaw` property which is a string representation of the color's HSL value with high precision.
+ *
+ * @param {Array.<Object>} colors - An array of color objects to transform.
+ * @param {string} paletteInformation - A string to use when creating the color code.
+ * @returns {Array.<Object>} An array of comprehensive color palette objects.
+ *
+ * @example
+ * const colors = [Color("#FFFFFF"), Color("#000000")];
+ * const paletteInformation = "myPalette";
+ * const colorPalette = colorFactory(colors, paletteInformation);
+ */
 export function colorFactory(colors, paletteInformation) {
   return colors.map((color, idx) => ({
     code: `${paletteInformation}-${idx + 1}`,
@@ -51,39 +69,4 @@ export function colorFactory(colors, paletteInformation) {
       3
     )}% ${toPrecision(color.to("hsl").l, 3)}%`,
   }));
-}
-
-export function corrector(color, adjustment) {
-  const newColor = new Color(color);
-  newColor.oklch.h += adjustment;
-  return newColor;
-}
-
-function createColor(hex) {
-  // TODO create base color
-}
-
-export function makeCinematic(colors) {
-  return colors.map(({ color, valueToAdjust }) => {
-    const adjusted = adjustColor(color, "h", valueToAdjust);
-    adjusted.hsl.s *= 0.5;
-    adjusted.hsl.l *= 1.5;
-    return adjusted;
-  });
-}
-
-export function makeLanguid(colors) {
-  return colors.map(({ color, valueToAdjust }) => {
-    const adjusted = adjustColor(color, "h", valueToAdjust);
-    return adjusted.mix("white", 0.5, {
-      space: "oklch",
-      outputSpace: "srgb",
-    });
-  });
-}
-
-export function makeKeel(colors) {
-  return colors.map(({ color, valueToAdjust }) => {
-    return corrector(color, valueToAdjust);
-  });
 }
