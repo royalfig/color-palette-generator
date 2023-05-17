@@ -27,3 +27,8 @@ input:focus-visible,
 textarea:focus-visible {
   border-color: var(--border-3);
 }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}

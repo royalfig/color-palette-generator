@@ -9,6 +9,7 @@
   aspect-ratio: 3 / 4;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .color-input .react-colorful__saturation,
 .color-input .react-colorful__last-control {
   border-radius: 0;
@@ -38,10 +39,6 @@
 .color-input-container {
   width: 100%;
   margin-block-end: var(--space-after);
-}
-
-.color-input-container > *:first-child {
-  /* flex: 50%; */
 }
 
 .color-selector-text-input-label {

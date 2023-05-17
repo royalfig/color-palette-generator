@@ -7,6 +7,7 @@ import "../css/EyeDropper.css";
 import { hex3to6 } from "../util";
 import Button from "./buttons/Button";
 import Header from "./Header";
+import ColorInput from "./ColorInput";
 
 export default function ColorSelector({ setColor, color }) {
   const currentColor = new ColorUtil(color);
@@ -15,13 +16,22 @@ export default function ColorSelector({ setColor, color }) {
   const [name, setName] = useState("");
   const [hex, setHex] = useState(currentColor.toString({ format: "hex" }));
   const [rgb, setRgb] = useState(
-    currentColor.to("srgb").toString({ precision: 2 })
+    currentColor.to("srgb").toString({ precision: 3 })
   );
   const [hsl, setHsl] = useState(
-    currentColor.to("hsl").toString({ precision: 2 })
+    currentColor.to("hsl").toString({ precision: 3 })
   );
   const [lch, setLch] = useState(
-    currentColor.to("lch").toString({ precision: 2 })
+    currentColor.to("lch").toString({ precision: 3 })
+  );
+  const [oklch, setOklch] = useState(
+    currentColor.to("oklch").toString({ precision: 3 })
+  );
+  const [lab, setLab] = useState(
+    currentColor.to("lab").toString({ precision: 3 })
+  );
+  const [oklab, setOklab] = useState(
+    currentColor.to("oklab").toString({ precision: 3 })
   );
 
   async function getName(color) {
@@ -39,13 +49,28 @@ export default function ColorSelector({ setColor, color }) {
   // Probably need to useEffect to update all inputs, then also wouldn't need to update the state in the parseColor function
   useEffect(() => {
     setHex(currentColor.toString({ format: "hex" }));
-    setRgb(currentColor.to("srgb").toString({ precision: 2 }));
-    setHsl(currentColor.to("hsl").toString({ precision: 2 }));
-    setLch(currentColor.to("lch").toString({ precision: 2 }));
+    setRgb(currentColor.to("srgb").toString({ precision: 3 }));
+    setHsl(currentColor.to("hsl").toString({ precision: 3 }));
+    setLch(currentColor.to("lch").toString({ precision: 3 }));
+    setOklch(currentColor.to("oklch").toString({ precision: 3 }));
+    setLab(currentColor.to("lab").toString({ precision: 3 }));
+    setOklab(currentColor.to("oklab").toString({ precision: 3 }));
   }, [color]);
   // ideal logic -> set other inputs except for current.
   // useEffect [colorBeingChanged...?]
   // Or debounce input...
+
+  const [debouncedValue, setDebouncedValue] = useState("");
+
+  useEffect(() => {
+    const debounced = setTimeout(() => {
+      setDebouncedValue(hex);
+    }, 1000);
+
+    return () => {
+      clearTimeout(debounced);
+    };
+  }, [hex]);
 
   function parseColor(e, type) {
     const color = e.target.value;
@@ -54,6 +79,7 @@ export default function ColorSelector({ setColor, color }) {
 
     switch (type) {
       case "hex": {
+        setHex(color);
         const withoutHash = color.replace("#", "");
 
         if (
@@ -72,9 +98,8 @@ export default function ColorSelector({ setColor, color }) {
 
         try {
           setHex(color);
-          const formattedHexColor = new ColorUtil("#" + withoutHash);
-          const newHex = formattedHexColor.toString({ format: "hex" });
-          setColor(newHex);
+
+          // setColor(newHex);
         } catch (error) {
           setValidationError(`Couldn't parse "${color}" as a hex color.`);
         }
@@ -207,55 +232,63 @@ export default function ColorSelector({ setColor, color }) {
       </section>
 
       <section className="color-input-text">
-        <div>
-          <label htmlFor="hex" className="color-selector-text-input-label">
-            HEX
-          </label>
-          <input
-            value={hex}
-            onChange={(e) => parseColor(e, "hex")}
-            onBlur={() => setHex(color)}
-          />
-        </div>
-        <div>
-          <label htmlFor="rgb" className="color-selector-text-input-label">
-            RGB
-          </label>
-          <input
-            type="text"
-            id="rgb"
-            value={rgb}
-            onChange={(e) => parseColor(e, "rgb")}
-            onBlur={() =>
-              setRgb(currentColor.to("srgb").toString({ precision: 2 }))
-            }
-          />
-        </div>
-        <div>
-          <label htmlFor="hsl" className="color-selector-text-input-label">
-            HSL
-          </label>
-          <input
-            type="text"
-            id="hsl"
-            value={hsl}
-            onChange={(e) => parseColor(e, "hsl")}
-            onBlur={() =>
-              setHsl(currentColor.to("hsl").toString({ precision: 2 }))
-            }
-          />
-        </div>
-        <div>
-          <label htmlFor="lch" className="color-selector-text-input-label">
-            LCH
-          </label>
-          <input
-            type="text"
-            id="lch"
-            value={lch}
-            onChange={(e) => parseColor(e, "lch")}
-          />
-        </div>
+        <p>{debouncedValue}</p>
+
+        <ColorInput
+          label="HEX"
+          value={hex}
+          parseColor={parseColor}
+          setColor={setColor}
+          currentColor={currentColor}
+        />
+
+        <ColorInput
+          label="RGB"
+          value={rgb}
+          parseColor={parseColor}
+          setColor={setColor}
+          currentColor={currentColor}
+        />
+
+        <ColorInput
+          label="HSL"
+          value={hsl}
+          parseColor={parseColor}
+          setColor={setColor}
+          currentColor={currentColor}
+        />
+
+        <ColorInput
+          label="LCH"
+          value={lch}
+          parseColor={parseColor}
+          setColor={setColor}
+          currentColor={currentColor}
+        />
+
+        <ColorInput
+          label="OKLCH"
+          value={oklch}
+          parseColor={parseColor}
+          setColor={setColor}
+          currentColor={currentColor}
+        />
+
+        <ColorInput
+          label="LAB"
+          value={lab}
+          parseColor={parseColor}
+          setColor={setColor}
+          currentColor={currentColor}
+        />
+
+        <ColorInput
+          label="OKLAB"
+          value={oklab}
+          parseColor={parseColor}
+          setColor={setColor}
+          currentColor={currentColor}
+        />
         {validationError ? <p>{validationError}</p> : <p></p>}
       </section>
 

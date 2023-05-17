@@ -50,14 +50,14 @@ export function ColorName({ hex }) {
 // return colors.map(({ color, corrected }) => {
 //   return {
 //     hex: color.toString({ format: "hex" }),
-//     rgb: color.to("srgb").toString({ precision: 2 }),
-//     hsl: color.to("hsl").toString({ precision: 2 }),
+//     rgb: color.to("srgb").toString({ precision: 3 }),
+//     hsl: color.to("hsl").toString({ precision: 3 }),
 //     black: color.contrast("black", "wcag21"),
 //     white: color.contrast("white", "wcag21"),
 //     corrected: {
 //       hex: corrected.toString({ format: "hex" }),
-//       rgb: corrected.to("srgb").toString({ precision: 2 }),
-//       hsl: corrected.to("hsl").toString({ precision: 2 }),
+//       rgb: corrected.to("srgb").toString({ precision: 3 }),
+//       hsl: corrected.to("hsl").toString({ precision: 3 }),
 //       black: color.contrast("black", "wcag21"),
 //       white: color.contrast("white", "wcag21"),
 //     },

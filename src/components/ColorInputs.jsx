@@ -21,7 +21,7 @@ export default function ColorInputs({}) {
           value={rgb}
           onChange={(e) => parseColor(e, "rgb")}
           onBlur={() =>
-            setRgb(currentColor.to("srgb").toString({ precision: 2 }))
+            setRgb(currentColor.to("srgb").toString({ precision: 3 }))
           }
         />
       </div>
@@ -35,7 +35,7 @@ export default function ColorInputs({}) {
           value={hsl}
           onChange={(e) => parseColor(e, "hsl")}
           onBlur={() =>
-            setHsl(currentColor.to("hsl").toString({ precision: 2 }))
+            setHsl(currentColor.to("hsl").toString({ precision: 3 }))
           }
         />
       </div>

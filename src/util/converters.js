@@ -1,36 +1,5 @@
 import { toPrecision } from "../util";
 
-/*
-
-{
-  absolute: {
-    base: {
-
-    }
-    variation1: {
-
-    }
-    variation2: {
-
-    }
-  }
-
-  relative: {
-    base: {
-
-        }
-        variation1: {
-
-        }
-        variation2: {
-          
-        }
-      }
-}
-
-
-*/
-
 /**
  * Transforms an array of color objects into a comprehensive color palette object.
  *
@@ -64,9 +33,9 @@ export function colorFactory(colors, paletteInformation) {
         ? "#000"
         : "#fff",
     css: `${paletteInformation}`,
-    cssRaw: `${toPrecision(color.to("hsl").h, 3)} ${toPrecision(
+    cssRaw: `${toPrecision(color.to("hsl").h, 2)} ${toPrecision(
       color.to("hsl").s,
-      3
-    )}% ${toPrecision(color.to("hsl").l, 3)}%`,
+      2
+    )}% ${toPrecision(color.to("hsl").l, 2)}%`,
   }));
 }

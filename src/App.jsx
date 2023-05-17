@@ -140,9 +140,6 @@ function App() {
             setColor={debouncedHandler}
             color={color}
           ></ColorSelector>
-          <div className="palette-container">
-            <LaunchPad />
-          </div>
         </section>
 
         <section className="right">
@@ -171,10 +168,20 @@ function App() {
           />
         </section>
       </main>
+
+      <LaunchPad />
+
       <Sample selectedPalette={palette} />
 
+      {/* TODO UI -> 60/30/10 - green,red,yellow */}
+
+      {/* Surfaces, elements, borders */}
+
+      {/* Tints/shades of all hues */}
+
       <footer className="footer">
-        Designed by 𝕱𝖊𝖎𝖌𝖊𝖓𝖇𝖆𝖚𝖒 &copy; {new Date().getFullYear()}
+        Designed by <a href="https://ryanfeigenbaum.com">𝕱𝖊𝖎𝖌𝖊𝖓𝖇𝖆𝖚𝖒</a> &copy;{" "}
+        {new Date().getFullYear()}
       </footer>
     </div>
   );
