@@ -1,8 +1,8 @@
 import { ArrowRight } from "react-bootstrap-icons";
-import "../../css/Triad.css";
-import { SampleNavbar } from "./SampleNavbar";
-import { ArticleData } from "../../util/ArticleData";
-import Specs from "./Specs";
+import "./triad.css";
+import { SampleNavbar } from "../SampleNavbar";
+import { ArticleData } from "../../../util/ArticleData";
+import Specs from "../Specs";
 import { useState, useRef, useEffect } from "react";
 
 export default function Triad() {

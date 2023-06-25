@@ -1,5 +1,5 @@
 import "../css/PaletteSelector.css";
-import Circle from "./Circle";
+import Circle from "./circle/Circle";
 import Header from "./Header";
 import { useState } from "react";
 

@@ -1,15 +1,11 @@
 import Color from "colorjs.io";
-import { colorFactory } from "./converters";
+import { colorFactory } from "./colorFactory";
 
 import { adjustColor } from "../util";
 
 export function createOmbre(hex) {
   const color = new Color(hex);
   const complement = adjustColor(color, "h", 180);
-  console.log(
-    "🚀 ~ file: createOmbre.js:14 ~ createOmbre ~ complement:",
-    complement
-  );
 
   const ogRange = color.steps(complement, {
     space: "srgb",
@@ -40,10 +36,6 @@ export function createOmbre(hex) {
     outuptSpace: "srgb",
     steps: 10,
   });
-  console.log(
-    "🚀 ~ file: createOmbre.js:44 ~ createOmbre ~ sharkbite:",
-    sharkbite
-  );
 
   const og = colorFactory(ogRange, "omb-og");
   const ci = colorFactory(cinematic, "omb-ci");
@@ -55,7 +47,6 @@ export function createOmbre(hex) {
     name: "ombre",
     variations: [og, ci, ke, la, sb],
   };
-  console.log("🚀 ~ file: createOmbre.js:55 ~ createOmbre ~ palette:", palette);
 
   return palette;
 }

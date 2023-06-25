@@ -1,4 +1,4 @@
-import { toPrecision } from "../util";
+import { toPrecision } from ".";
 
 /**
  * Transforms an array of color objects into a comprehensive color palette object.
@@ -26,7 +26,10 @@ export function colorFactory(colors, paletteInformation) {
     hex: color.to("srgb").toString({ format: "hex" }),
     rgb: color.to("srgb").toString({ precision: 3 }),
     hsl: color.to("hsl").toString({ precision: 3 }),
-    lch: color.to("oklch").toString({ precision: 3 }),
+    lch: color.to("lch").toString({ precision: 3 }),
+    oklch: color.to("oklch").toString({ precision: 3 }),
+    lab: color.to("lab").toString({ precision: 3 }),
+    oklab: color.to("oklab").toString({ precision: 3 }),
     point: color.hsl,
     contrast:
       color.contrast("black", "wcag21") > color.contrast("white", "wcag21")

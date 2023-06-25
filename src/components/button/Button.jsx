@@ -1,4 +1,4 @@
-import "../../css/Button.css";
+import "./button.css";
 
 export default function Button({ type, handler, children, classes }) {
   classes = classes ? ` ${classes}` : "";

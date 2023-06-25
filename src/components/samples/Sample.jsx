@@ -1,12 +1,12 @@
 import "../../css/Sample.css";
 
-import Analogous from "../Analogous";
-import Complementary from "./Complementary";
-import Shades from "./Shades";
-import Split from "./Split";
-import Tetradic from "./Tetradic";
-import Tones from "./Tones";
-import Triad from "./Triad";
+import Analogous from "./analogous/Analogous";
+import Complementary from "./complementary/Complementary";
+import Shades from "./shades/Shades";
+import Split from "./split/Split";
+import Tetradic from "./tetradic/Tetradic";
+import Tones from "./tones/Tones";
+import Triad from "./triad/Triad";
 
 export default function Sample({ selectedPalette }) {
   const name = selectedPalette.name;

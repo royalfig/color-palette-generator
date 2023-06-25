@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
-import ColorSelector from "./components/ColorSelector";
-import Navbar from "./components/Navbar";
+import { ColorContext } from "./components/ColorContext";
+import ColorSelector from "./components/color_selector/ColorSelector";
+import LaunchPad from "./components/LaunchPad";
 import Palette from "./components/Palette";
 import PaletteSelector from "./components/PaletteSelector";
+import Navbar from "./components/navbar/Navbar";
 import Sample from "./components/samples/Sample";
-import LaunchPad from "./components/LaunchPad";
 import "./css/App.css";
 import "./css/Defaults.css";
 import "./css/Reset.css";
@@ -15,16 +16,18 @@ import { debounce } from "lodash-es";
 import { ToastContainer } from "react-toastify";
 import {
   createAnalogous,
+  createBase,
   createComplement,
-  createTintsAndShades,
+  createOmbre,
+  createPolychroma,
   createSplit,
   createTetradic,
+  createTintsAndShades,
   createTones,
   createTriad,
   generateCss,
-  createPolychroma,
-  createOmbre,
 } from "./util";
+import Color from "./components/color_swatch/ColorSwatch";
 
 function getQueryParam() {
   const params = new URLSearchParams(document.location.search);
@@ -34,11 +37,13 @@ function getQueryParam() {
 
 function App() {
   const [color, setColor] = useState(getQueryParam() || "#21a623");
+
   const [variation, setVariation] = useState(0);
   const [displayValue, setDisplayValue] = useState("hex");
 
-  const complementaryPalette = useMemo(() => createComplement(color), [color]);
-  const splitComplementaryPalette = useMemo(() => createSplit(color), [color]);
+  const base = useMemo(() => createBase(color));
+  const complementaryPalette = useMemo(() => createComplement(color));
+  const splitComplementaryPalette = useMemo(() => createSplit(color));
   const analogousPalette = createAnalogous(color);
   const triadicPalette = createTriad(color);
   const tetradicPalette = createTetradic(color);
@@ -129,60 +134,77 @@ function App() {
 
   return (
     <div>
-      <ToastContainer />
+      <ColorContext.Provider
+        value={{
+          color,
+          setColor,
+          base: { ...base[0] },
+          complementaryPalette,
+          splitComplementaryPalette,
+          analogousPalette,
+          tetradicPalette,
+          triadicPalette,
+          shadesPalette,
+          tonalPalette,
+          polychromaPalette,
+          ombrePalette,
+        }}
+      >
+        <ToastContainer />
 
-      <Navbar></Navbar>
+        <Navbar></Navbar>
 
-      <main className="app">
-        <section className="left">
-          {/* <UserInputControls> */}
-          <ColorSelector
-            setColor={debouncedHandler}
-            color={color}
-          ></ColorSelector>
-        </section>
+        <main className="app">
+          <section className="left">
+            {/* <UserInputControls> */}
+            <ColorSelector
+              setColor={debouncedHandler}
+              color={color}
+            ></ColorSelector>
+          </section>
 
-        <section className="right">
-          <PaletteSelector
-            palettes={[
-              complementaryPalette,
-              splitComplementaryPalette,
-              analogousPalette,
-              tetradicPalette,
-              triadicPalette,
-              shadesPalette,
-              tonalPalette,
-              polychromaPalette,
-              ombrePalette,
-            ]}
-            handlePalette={handlePalette}
-            palette={palette}
-          ></PaletteSelector>
+          <section className="right">
+            <PaletteSelector
+              palettes={[
+                complementaryPalette,
+                splitComplementaryPalette,
+                analogousPalette,
+                tetradicPalette,
+                triadicPalette,
+                shadesPalette,
+                tonalPalette,
+                polychromaPalette,
+                ombrePalette,
+              ]}
+              handlePalette={handlePalette}
+              palette={palette}
+            ></PaletteSelector>
 
-          <Palette
-            palette={palette}
-            displayValue={displayValue}
-            setDisplayValue={setDisplayValue}
-            variation={variation}
-            setVariation={setVariation}
-          />
-        </section>
-      </main>
+            <Palette
+              palette={palette}
+              displayValue={displayValue}
+              setDisplayValue={setDisplayValue}
+              variation={variation}
+              setVariation={setVariation}
+            />
+          </section>
+        </main>
 
-      <LaunchPad />
+        <LaunchPad />
 
-      <Sample selectedPalette={palette} />
+        <Sample selectedPalette={palette} />
 
-      {/* TODO UI -> 60/30/10 - green,red,yellow */}
+        {/* TODO UI -> 60/30/10 - green,red,yellow */}
 
-      {/* Surfaces, elements, borders */}
+        {/* Surfaces, elements, borders */}
 
-      {/* Tints/shades of all hues */}
+        {/* Tints/shades of all hues */}
 
-      <footer className="footer">
-        Designed by <a href="https://ryanfeigenbaum.com">𝕱𝖊𝖎𝖌𝖊𝖓𝖇𝖆𝖚𝖒</a> &copy;{" "}
-        {new Date().getFullYear()}
-      </footer>
+        <footer className="footer">
+          Designed by <a href="https://ryanfeigenbaum.com">𝕱𝖊𝖎𝖌𝖊𝖓𝖇𝖆𝖚𝖒</a> &copy;{" "}
+          {new Date().getFullYear()}
+        </footer>
+      </ColorContext.Provider>
     </div>
   );
 }

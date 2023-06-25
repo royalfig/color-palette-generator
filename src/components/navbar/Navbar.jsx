@@ -1,7 +1,7 @@
 import { Github, Twitter } from "react-bootstrap-icons";
-import "../css/Navbar.css";
+import "./navbar.css";
 
-import Button from "./buttons/Button";
+import Button from "../button/Button";
 export default function Navbar() {
   return (
     <nav className="navbar">
@@ -24,6 +24,7 @@ export default function Navbar() {
           <a href="" className="icon-btn">
             <Twitter />
           </a>
+          <p></p>
         </div>
       </div>
     </nav>

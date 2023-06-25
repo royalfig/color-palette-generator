@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "react-bootstrap-icons";
-import "../../css/Complementary.css";
-import { ArticleData } from "../../util/ArticleData";
-import { SampleNavbar } from "./SampleNavbar";
-import Specs from "./Specs";
+import "./complementary.css";
+import { ArticleData } from "../../../util/ArticleData";
+import { SampleNavbar } from "../SampleNavbar";
+import Specs from "../Specs";
 
 export default function Complementary() {
   const [specsOn, setSpecsOn] = useState(false);

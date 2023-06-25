@@ -1,6 +1,6 @@
 import { Clipboard } from "react-bootstrap-icons";
 import "../css/Header.css";
-import Button from "./buttons/Button";
+import Button from "./button/Button";
 
 import { copy } from "../util/copy";
 

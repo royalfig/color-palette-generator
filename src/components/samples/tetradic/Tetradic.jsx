@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "react-bootstrap-icons";
-import "../../css/Tetradic.css";
-import { ArticleData } from "../../util/ArticleData";
-import { SampleNavbar } from "./SampleNavbar";
-import Specs from "./Specs";
+import "./tetradic.css";
+import { ArticleData } from "../../../util/ArticleData";
+import { SampleNavbar } from "../SampleNavbar";
+import Specs from "../Specs";
 
 export default function Tetradic() {
   const articleProps = [

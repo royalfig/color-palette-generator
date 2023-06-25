@@ -1,10 +1,4 @@
-export default function ColorInput({
-  label,
-  value,
-  parseColor,
-  setColor,
-  currentColor,
-}) {
+export default function ColorTextInput({ label, value, parseColor }) {
   const id = label.toLowerCase();
   return (
     <div>
@@ -16,9 +10,7 @@ export default function ColorInput({
         id={id}
         value={value}
         onChange={(e) => parseColor(e, id)}
-        onBlur={() =>
-          setColor(currentColor.to("srgb").toString({ precision: 3 }))
-        }
+        spellCheck="false"
       />
     </div>
   );

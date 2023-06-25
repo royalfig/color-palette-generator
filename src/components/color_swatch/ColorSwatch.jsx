@@ -1,5 +1,5 @@
-import "../css/Color.css";
-import Copy from "./Copy";
+import "./color.css";
+import Copy from "../copy_button/Copy";
 
 export default function Color({ color, displayValue, colorTitles, variation }) {
   if (colorTitles.length) {

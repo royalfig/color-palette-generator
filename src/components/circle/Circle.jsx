@@ -1,4 +1,4 @@
-import "../css/Circle.css";
+import "./circle.css";
 function sizer(num, size) {
   if (size === "large") {
     return num;

@@ -1,4 +1,4 @@
-import Button from "./buttons/Button";
+import Button from "./button/Button";
 import "../css/LaunchPad.css";
 import {
   MoonStars,

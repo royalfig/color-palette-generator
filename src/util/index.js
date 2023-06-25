@@ -1,5 +1,5 @@
 export * from "./adjustColor";
-export * from "./converters";
+export * from "./colorFactory";
 export * from "./createAnalogous";
 export * from "./createComplementary";
 export * from "./createOmbre";
@@ -16,3 +16,5 @@ export * from "./makeLanguid";
 export * from "./makeSharkBite";
 export * from "./toPrecision";
 export * from "./utils";
+export * from "./validators";
+export * from "./createBase";

@@ -1,4 +1,4 @@
-import "../css/Copy.css";
+import "./copy.css";
 import { toast } from "react-toastify";
 
 export default function Copy({ text }) {

@@ -1,8 +1,8 @@
-import "../../css/Tones.css";
-import { ArticleData } from "../../util/ArticleData";
-import { SampleNavbar } from "./SampleNavbar";
+import "./tones.css";
+import { ArticleData } from "../../../util/ArticleData";
+import { SampleNavbar } from "../SampleNavbar";
 import { useEffect, useRef, useState } from "react";
-import Specs from "./Specs";
+import Specs from "../Specs";
 
 export default function Tones() {
   const [specsOn, setSpecsOn] = useState(false);

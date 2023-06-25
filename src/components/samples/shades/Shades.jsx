@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "react-bootstrap-icons";
-import "../../css/Shades.css";
-import { ArticleData } from "../../util/ArticleData";
-import Specs from "./Specs";
-import { SampleNavbar } from "./SampleNavbar";
+import "./shades.css";
+import { ArticleData } from "../../../util/ArticleData";
+import Specs from "../Specs";
+import { SampleNavbar } from "../SampleNavbar";
 export default function Shades() {
   const container = useRef(null);
 

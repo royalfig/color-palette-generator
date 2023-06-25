@@ -1,5 +1,5 @@
 import "../../css/Specs.css";
-import Button from "../buttons/Button";
+import Button from "../button/Button";
 import { X } from "react-bootstrap-icons";
 
 function Spec({ data }) {

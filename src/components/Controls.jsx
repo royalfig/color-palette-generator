@@ -1,5 +1,5 @@
 import "../css/Controls.css";
-import Button from "./buttons/Button";
+import Button from "./button/Button";
 import { useState } from "react";
 
 export default function Controls({ setDisplayValue, variation, setVariation }) {

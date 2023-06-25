@@ -1,5 +1,5 @@
 import Color from "colorjs.io";
-import { colorFactory } from "./converters";
+import { colorFactory } from "./colorFactory";
 import { makeKeel } from "./makeKeel";
 import { makeLanguid } from "./makeLanguid";
 import { makeCinematic } from "./makeCinematic";
