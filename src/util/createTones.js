@@ -16,26 +16,73 @@ export function createTones(hex) {
     ogRange.push(color);
   }
 
-  const tones = [];
+  const start = new Color(hex);
+  start.hsl.l = 0;
+  start.mix("gray", 0.5);
+
+  const end = new Color(hex);
+  end.hsl.l = 100;
+  start.mix("gray", 0.5);
+
+  const keel = start.steps(end, {
+    space: "lch",
+    outputSpace: "srgb",
+    steps: 10,
+  });
+
+  console.log({ keel });
+
+  const cinematic = [];
 
   for (let index = 0; index < 10; index++) {
     const color = new Color(hex);
 
-    let mixed = color.mix("gray", 0.95, {
+    color.oklch.l = (index + 1) / 10;
+
+    let mixed = color.mix("gray", 0.25, {
       space: "oklch",
       outputSpace: "srgb",
     });
 
-    mixed.oklch.l = index * 10 + 8;
+    cinematic.push(mixed);
+  }
 
-    tones.push(mixed);
+  const languid = [];
+
+  for (let index = 0; index < 10; index++) {
+    const color = new Color(hex);
+
+    color.oklch.l = (index + 1) / 9;
+
+    let mixed = color.mix("gray", 0.15, {
+      space: "oklch",
+      outputSpace: "srgb",
+    });
+
+    languid.push(mixed);
+  }
+
+  const shark = [];
+
+  for (let index = 0; index < 10; index++) {
+    const color = new Color(hex);
+
+    color.oklch.l = (index + 1) / 10;
+    color.oklch.c = 0.4;
+
+    let mixed = color.mix("gray", 0.25, {
+      space: "oklab",
+      outputSpace: "srgb",
+    });
+
+    shark.push(mixed);
   }
 
   const og = colorFactory(ogRange, "ton-og");
-  const ci = colorFactory(tones, "ton-ci");
-  const ke = colorFactory(tones, "ton-ke");
-  const la = colorFactory(tones, "ton-la");
-  const sb = colorFactory(tones, "ton-sb");
+  const ci = colorFactory(cinematic, "ton-ci");
+  const ke = colorFactory(keel, "ton-ke");
+  const la = colorFactory(languid, "ton-la");
+  const sb = colorFactory(keel, "ton-sb");
 
   const palette = {
     name: "tones",

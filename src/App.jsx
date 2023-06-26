@@ -27,7 +27,6 @@ import {
   createTriad,
   generateCss,
 } from "./util";
-import Color from "./components/color_swatch/ColorSwatch";
 
 function getQueryParam() {
   const params = new URLSearchParams(document.location.search);
@@ -41,9 +40,9 @@ function App() {
   const [variation, setVariation] = useState(0);
   const [displayValue, setDisplayValue] = useState("hex");
 
-  const base = useMemo(() => createBase(color));
-  const complementaryPalette = useMemo(() => createComplement(color));
-  const splitComplementaryPalette = useMemo(() => createSplit(color));
+  const base = createBase(color);
+  const complementaryPalette = createComplement(color);
+  const splitComplementaryPalette = createSplit(color);
   const analogousPalette = createAnalogous(color);
   const triadicPalette = createTriad(color);
   const tetradicPalette = createTetradic(color);
@@ -126,6 +125,7 @@ function App() {
   });
 
   function handleChange(e) {
+    console.log("🚀 ~ file: App.jsx:128 ~ handleChange ~ e:", e);
     const url = new URL(window.location);
     url.searchParams.set("color", e.substring(1));
     window.history.pushState({}, "", url);

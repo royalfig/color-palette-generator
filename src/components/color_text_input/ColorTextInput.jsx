@@ -1,5 +1,12 @@
-export default function ColorTextInput({ label, value, parseColor }) {
+import { useEffect, useState } from "react";
+
+export default function ColorTextInput({ label, value }) {
   const id = label.toLowerCase();
+  const [state, setState] = useState(value);
+
+  useEffect(() => {
+    setState(value);
+  }, [value]);
   return (
     <div>
       <label htmlFor={id} className="color-selector-text-input-label">
@@ -8,8 +15,8 @@ export default function ColorTextInput({ label, value, parseColor }) {
       <input
         type="text"
         id={id}
-        value={value}
-        onChange={(e) => parseColor(e, id)}
+        value={state}
+        onChange={(e) => setState(e.target.value)}
         spellCheck="false"
       />
     </div>

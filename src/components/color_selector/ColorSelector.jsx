@@ -17,12 +17,13 @@ import Header from "../Header";
 import EyeDropper from "../eye_dropper/EyeDropper";
 import "./colorSelector.css";
 
-export default function ColorSelector({ setColor, color }) {
+export default function ColorSelector() {
   const colors = useContext(ColorContext);
 
-  console.log("color selector is runnijng");
+  console.log(colors);
 
   const [validationError, setValidationError] = useState("");
+
   const [name, setName] = useState("");
 
   const hex = colors.base.hex;
@@ -57,84 +58,86 @@ export default function ColorSelector({ setColor, color }) {
     if (!debouncedValue) return;
     console.log("debounced value changed");
     const debounced = setTimeout(() => {
-      setColor(debouncedValue);
-    }, 1500);
+      colors.setColor(debouncedValue);
+    }, 1000);
 
     return () => {
       clearTimeout(debounced);
     };
   }, [debouncedValue]);
 
-  function parseColor(e, type) {
-    const color = e.target.value;
+  function parseColor(e) {
+    const { value, id } = e.target;
     let result;
 
-    switch (type) {
+    switch (id) {
       case "hex": {
-        result = validateHex(color, setValidationError);
-        console.log(result);
+        result = validateHex(value, setValidationError);
         break;
       }
       case "rgb": {
-        result = validateRgb(color, setValidationError);
+        result = validateRgb(value, setValidationError);
         break;
       }
       case "hsl": {
-        result = validateHsl(color, setValidationError);
+        result = validateHsl(value, setValidationError);
         break;
       }
       case "lch": {
-        result = validateLch(color, setValidationError);
+        result = validateLch(value, setValidationError);
         break;
       }
       case "oklch": {
-        result = validateOkLch(color, setValidationError);
+        result = validateOkLch(value, setValidationError);
         break;
       }
       case "lab": {
-        result = validateLab(color, setValidationError);
+        result = validateLab(value, setValidationError);
         break;
       }
       case "oklab": {
-        result = validateOkLab(color, setValidationError);
+        result = validateOkLab(value, setValidationError);
         break;
       }
     }
 
     if (result) {
-      console.log("result");
+      console.log(
+        "🚀 ~ file: ColorSelector.jsx:121 ~ parseColor ~ result:",
+        result
+      );
       setValidationError("");
-
       setDebouncedValue(result);
     }
   }
 
   useEffect(() => {
-    getName(color);
-  }, [color]);
+    getName(colors.base.hex);
+  }, [colors.base.hex]);
 
   return (
     <div className="color-selector">
       <Header h2="Start" text={name} />
 
       <section className="color-input-container">
-        <HexColorPicker color={color} onChange={setColor} />
+        <HexColorPicker color={colors.base.hex} onChange={colors.setColor} />
       </section>
 
-      <form className="color-input-text">
-        <ColorTextInput label="HEX" value={hex} parseColor={parseColor} />
+      <form className="color-input-text" onChange={parseColor}>
+        <ColorTextInput label="HEX" value={hex} />
 
-        <ColorTextInput label="RGB" value={rgb} parseColor={parseColor} />
+        <ColorTextInput label="RGB" value={rgb} />
 
-        <ColorTextInput label="HSL" value={hsl} parseColor={parseColor} />
+        <ColorTextInput label="HSL" value={hsl} />
 
-        <ColorTextInput label="LCH" value={lch} parseColor={parseColor} />
+        <ColorTextInput label="LCH" value={lch} />
 
-        <ColorTextInput label="OKLCH" value={oklch} parseColor={parseColor} />
+        <ColorTextInput label="OKLCH" value={oklch} />
 
-        <ColorTextInput label="LAB" value={lab} parseColor={parseColor} />
+        <ColorTextInput label="LAB" value={lab} />
 
-        <ColorTextInput label="OKLAB" value={oklab} parseColor={parseColor} />
+        <ColorTextInput label="OKLAB" value={oklab} />
+
         {validationError ? <p>{validationError}</p> : <p></p>}
       </form>
 
