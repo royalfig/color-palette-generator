@@ -125,7 +125,6 @@ function App() {
   });
 
   function handleChange(e) {
-    console.log("🚀 ~ file: App.jsx:128 ~ handleChange ~ e:", e);
     const url = new URL(window.location);
     url.searchParams.set("color", e.substring(1));
     window.history.pushState({}, "", url);

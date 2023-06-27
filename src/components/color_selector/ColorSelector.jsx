@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from "react";
-import { ClockHistory } from "react-bootstrap-icons";
-import { HexColorPicker } from "react-colorful";
+import { useCallback, useContext, useEffect, useState } from 'react';
+import { ClockHistory } from 'react-bootstrap-icons';
+import { HexColorPicker } from 'react-colorful';
 import {
   hex3to6,
   validateHex,
@@ -10,21 +10,21 @@ import {
   validateOkLab,
   validateOkLch,
   validateRgb,
-} from "../../util";
-import { ColorContext } from "../ColorContext";
-import ColorTextInput from "../color_text_input/ColorTextInput";
-import Header from "../Header";
-import EyeDropper from "../eye_dropper/EyeDropper";
-import "./colorSelector.css";
-
+} from '../../util';
+import { ColorContext } from '../ColorContext';
+import ColorTextInput from '../color_text_input/ColorTextInput';
+import Header from '../Header';
+import EyeDropper from '../eye_dropper/EyeDropper';
+import './colorSelector.css';
+import Loader from '../loader/Loader';
+import { set } from 'lodash-es';
 export default function ColorSelector() {
   const colors = useContext(ColorContext);
 
-  console.log(colors);
-
-  const [validationError, setValidationError] = useState("");
-
-  const [name, setName] = useState("");
+  const [validationError, setValidationError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState('');
+  const [debouncedValue, setDeouncedValue] = useState();
 
   const hex = colors.base.hex;
   const rgb = colors.base.rgb;
@@ -36,7 +36,6 @@ export default function ColorSelector() {
 
   async function getName(color) {
     const hexFormatted = hex3to6(color);
-
     try {
       const res = await fetch(`https://api.color.pizza/v1/${hexFormatted}`);
       const name = await res.json();
@@ -46,68 +45,60 @@ export default function ColorSelector() {
     }
   }
 
-  // Probably need to useEffect to update all inputs, then also wouldn't need to update the state in the parseColor function
-
-  // ideal logic -> set other inputs except for current.
-  // useEffect [colorBeingChanged...?]
-  // Or debounce input...
-
-  const [debouncedValue, setDebouncedValue] = useState("");
-
   useEffect(() => {
     if (!debouncedValue) return;
-    console.log("debounced value changed");
-    const debounced = setTimeout(() => {
+    const timeout = setTimeout(() => {
+      console.log('debouncing');
+      console.timeStamp();
+setValidationError('');
       colors.setColor(debouncedValue);
+      setLoading(false);
     }, 1000);
-
-    return () => {
-      clearTimeout(debounced);
-    };
+    return () => clearTimeout(timeout);
   }, [debouncedValue]);
 
   function parseColor(e) {
     const { value, id } = e.target;
     let result;
+    setLoading(false);
 
     switch (id) {
-      case "hex": {
+      case 'hex': {
         result = validateHex(value, setValidationError);
         break;
       }
-      case "rgb": {
+      case 'rgb': {
         result = validateRgb(value, setValidationError);
         break;
       }
-      case "hsl": {
+      case 'hsl': {
         result = validateHsl(value, setValidationError);
         break;
       }
-      case "lch": {
+      case 'lch': {
         result = validateLch(value, setValidationError);
         break;
       }
-      case "oklch": {
+      case 'oklch': {
         result = validateOkLch(value, setValidationError);
         break;
       }
-      case "lab": {
+      case 'lab': {
         result = validateLab(value, setValidationError);
         break;
       }
-      case "oklab": {
+      case 'oklab': {
         result = validateOkLab(value, setValidationError);
         break;
       }
     }
 
     if (result) {
-      console.log(
-        "🚀 ~ file: ColorSelector.jsx:121 ~ parseColor ~ result:",
-        result
-      );
-      setValidationError("");
-      setDebouncedValue(result);
+      console.log('setting loading');
+      console.timeStamp();
+      setLoading(true);
+      setValidationError('');
+      setDeouncedValue(result);
     }
   }
 
@@ -124,19 +115,19 @@ export default function ColorSelector() {
       </section>
 
       <form className="color-input-text" onChange={parseColor}>
-        <ColorTextInput label="HEX" value={hex} />
+        <ColorTextInput label="HEX" value={hex} loading={loading} />
 
-        <ColorTextInput label="RGB" value={rgb} />
+        <ColorTextInput label="RGB" value={rgb} loading={loading} />
 
-        <ColorTextInput label="HSL" value={hsl} />
+        <ColorTextInput label="HSL" value={hsl} loading={loading} />
 
-        <ColorTextInput label="LCH" value={lch} />
+        <ColorTextInput label="LCH" value={lch} loading={loading} />
 
-        <ColorTextInput label="OKLCH" value={oklch} />
+        <ColorTextInput label="OKLCH" value={oklch} loading={loading} />
 
-        <ColorTextInput label="LAB" value={lab} />
+        <ColorTextInput label="LAB" value={lab} loading={loading} />
 
-        <ColorTextInput label="OKLAB" value={oklab} />
+        <ColorTextInput label="OKLAB" value={oklab} loading={loading} />
 
         {validationError ? <p>{validationError}</p> : <p></p>}
       </form>

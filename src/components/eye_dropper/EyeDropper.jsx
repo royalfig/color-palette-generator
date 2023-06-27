@@ -8,7 +8,6 @@ export default function EyeDropper() {
   const { setColor } = useContext(ColorContext);
 
   async function handleEyedropper() {
-    console.log("eyedropper clicked");
     const eyeDropper = new window.EyeDropper();
 
     eyeDropper

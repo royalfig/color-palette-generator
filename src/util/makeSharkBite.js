@@ -20,7 +20,6 @@ export function makeSharkBite(colors) {
     const adjusted = adjustColor(color, "h", valueToAdjust);
 
     if (adjusted.hsl.l > 50) {
-      console.log(adjusted.hsl.l);
       adjusted.hsl.l = Math.max(0, (adjusted.hsl.l *= 0.5));
     } else {
       adjusted.hsl.l = Math.min((adjusted.hsl.l *= 1.5), 95);

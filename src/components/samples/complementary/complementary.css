@@ -2,6 +2,13 @@
   background-color: hsl(var(--com-la-2-raw) / 20%);
 }
 
+.complementary > div {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .complementary .sample-navbar {
   padding: 2rem;
 }
@@ -31,10 +38,10 @@
 
 .complementary-decoration:last-of-type {
   position: absolute;
-  top: 60%;
+  top: auto;
+  bottom: 0;
   left: 0;
   z-index: -1;
-  width: 100%;
   opacity: 0.45;
   transform: scaleX(-1) scaleY(-1);
 }
@@ -82,6 +89,7 @@
 
 .complementary-card-container {
   display: grid;
+  flex: 1;
   grid-template-rows: repeat(2, 1fr);
   grid-template-columns: repeat(2, 1fr);
   gap: 2rem;

@@ -21,7 +21,6 @@ function Spec({ data }) {
 }
 
 function generateSpecs(refs, container) {
-  console.log(container, refs);
   const {
     left: containerL,
     right: containerR,

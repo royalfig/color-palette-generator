@@ -30,7 +30,6 @@ export function createTones(hex) {
     steps: 10,
   });
 
-  console.log({ keel });
 
   const cinematic = [];
 

@@ -14,6 +14,7 @@ export function validateHex(color, setValidationError) {
     setValidationError(
       `Can't parse color. Too many digits (${withoutHash.length})`
     );
+    return;
   }
 
   try {
@@ -21,10 +22,20 @@ export function validateHex(color, setValidationError) {
     return newHex.toString({ format: "hex" });
   } catch (error) {
     setValidationError(`Couldn't parse "${color}" as a hex color.`);
+    return; 
   }
 }
 
 export function validateRgb(color, setValidationError) {
+
+  const floatingPointMatch = color.match(/\d+\.\d+/g);
+  
+  if (floatingPointMatch?.length) {
+    setValidationError(`Can't parse color. Floating point numbers are not allowed.`);
+    return;
+  }
+
+  
   const rgbMatch = color.match(/\d+%?/g);
 
   if (rgbMatch === null) {
@@ -52,10 +63,7 @@ export function validateRgb(color, setValidationError) {
 
 export function validateHsl(color, setValidationError) {
   const hslMatch = color.match(/(\d+)\.?/g);
-  console.log(
-    "🚀 ~ file: validators.js:62 ~ validateHsl ~ hslMatch:",
-    hslMatch
-  );
+ 
 
   if (hslMatch === null) {
     return;
@@ -71,7 +79,6 @@ export function validateHsl(color, setValidationError) {
         `hsl(${hslMatch[0]} ${hslMatch[1]}% ${hslMatch[2]}%)`
       );
       const formattedHexColor = newHsl.to("srgb").toString({ format: "hex" });
-      console.log(newHsl.space);
       return formattedHexColor;
     } catch (e) {
       setValidationError(`Couldn't parse "${color}" as an HSL color.`);

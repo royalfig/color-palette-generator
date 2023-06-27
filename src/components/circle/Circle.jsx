@@ -1,6 +1,6 @@
-import "./circle.css";
+import './circle.css';
 function sizer(num, size) {
-  if (size === "large") {
+  if (size === 'large') {
     return num;
   }
 
@@ -8,11 +8,11 @@ function sizer(num, size) {
 }
 
 export default function Circle({ colors, type, size }) {
-  const className = size === "large" ? "large circle" : "small circle";
+  const className = size === 'large' ? 'large circle' : 'small circle';
 
   return (
     <div className={className}>
-      <svg viewBox={size === "large" ? "-120 -120 240 240" : "-60 -60 120 120"}>
+      <svg viewBox={size === 'large' ? '-120 -120 240 240' : '-60 -60 120 120'}>
         <circle
           cx="0"
           cy="0"
@@ -21,7 +21,7 @@ export default function Circle({ colors, type, size }) {
           stroke="var(--border-1)"
           strokeWidth="3"
         />
-        {type !== "circle"
+        {type !== 'circle'
           ? colors.variations[0].map((color, idx) => {
               const [h, s] = color.point;
 
@@ -33,31 +33,29 @@ export default function Circle({ colors, type, size }) {
 
               const xr = x;
               const yr = y * -1;
-
               return (
                 <circle
                   key={idx}
-                  cx={xr}
-                  cy={yr}
+                  cx={xr < -50 ? 0 : xr}
+                  cy={yr < -50 ? 0 : yr}
                   r={sizer(20, size)}
                   fill={color.hex}
                 ></circle>
               );
             })
           : colors.variations[0].map((color, idx) => {
-              const h = sizer((idx + 10) * (size === "large" ? 36 : 72), size);
+              const h = sizer((idx + 10) * (size === 'large' ? 36 : 72), size);
 
               const hRadians = (h * Math.PI) / 180;
               const sRadians = sizer(50, size);
 
               const x = sRadians * Math.sin(hRadians);
               const y = sRadians * Math.cos(hRadians);
-
               return (
                 <circle
                   key={idx}
-                  cx={x}
-                  cy={y}
+                  cx={x < -50 ? 0 : x}
+                  cy={y < -50 ? 0 : y}
                   r={sizer(20, size)}
                   fill={color.hex}
                 ></circle>

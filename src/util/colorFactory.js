@@ -24,8 +24,8 @@ export function colorFactory(colors, paletteInformation) {
   return colors.map((color, idx) => ({
     code: `${paletteInformation}-${idx + 1}`,
     hex: color.to("srgb").toString({ format: "hex" }),
-    rgb: color.to("srgb").toString({ precision: 3 }),
-    hsl: color.to("hsl").toString({ precision: 3 }),
+    rgb: color.to("srgb").toString({ precision: 2 }),
+    hsl: color.to("hsl").toString({ precision: 2 }),
     lch: color.to("lch").toString({ precision: 3 }),
     oklch: color.to("oklch").toString({ precision: 3 }),
     lab: color.to("lab").toString({ precision: 3 }),
