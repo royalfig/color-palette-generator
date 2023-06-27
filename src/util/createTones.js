@@ -1,10 +1,5 @@
 import Color from "colorjs.io";
 import { colorFactory } from "./colorFactory";
-import { makeKeel } from "./makeKeel";
-import { makeLanguid } from "./makeLanguid";
-import { makeCinematic } from "./makeCinematic";
-import { makeSharkBite } from "./makeSharkBite";
-import { adjustColor } from "./adjustColor";
 
 export function createTones(hex) {
   const ogRange = [];
@@ -16,20 +11,34 @@ export function createTones(hex) {
     ogRange.push(color);
   }
 
-  const start = new Color(hex);
-  start.hsl.l = 0;
-  start.mix("gray", 0.5);
+  const darkest = new Color(hex);
+  darkest.lch.l = 1;
+  darkest.lch.c = 0.2;
 
-  const end = new Color(hex);
-  end.hsl.l = 100;
-  start.mix("gray", 0.5);
+  const dark = new Color(hex);
+  dark.lch.l = 20;
+  dark.lch.c = 0.2;
 
-  const keel = start.steps(end, {
+  const light = new Color(hex);
+  light.lch.l = 88;
+  light.lch.c = 0.2;
+  const lightest = new Color(hex);
+  lightest.lch.l = 99;
+  lightest.lch.c = 0.2;
+
+  const darkScale = darkest.steps(dark, {
     space: "lch",
     outputSpace: "srgb",
-    steps: 10,
+    steps: 5,
   });
 
+  const lightScale = light.steps(lightest, {
+    space: "lch",
+    outputSpace: "srgb",
+    steps: 5,
+  });
+
+  const keel = [...darkScale, ...lightScale];
 
   const cinematic = [];
 
