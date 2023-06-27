@@ -1,0 +1,13 @@
+.loader.loading {
+    animation: blur 3.5s infinite;
+}
+
+@keyframes blur {
+    0% {
+        filter: blur(2px);
+    }
+
+    50% {
+        filter: blur(5px);
+    }
+}
