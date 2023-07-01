@@ -1,0 +1,37 @@
+.previous {
+  display: flex;
+  flex: 1;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.previous .text-icon-btn {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+}
+
+.color-history {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.color-history svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--ton-og-4);
+}
+
+.color-history :where(button, div) {
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  background: var(--ton-og-8);
+  border-radius: 4px;
+}
+
+.color-history-item:not([style]) {
+  opacity: 0.25;
+}

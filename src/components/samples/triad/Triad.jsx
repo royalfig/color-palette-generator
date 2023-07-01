@@ -90,8 +90,11 @@ export default function Triad() {
           data-value="var(--ana-sb-3)"
           data-name="Background color"
         >
-          <p>stat</p> <p>stat</p> <p>stat</p> <p>stat</p> <p>stat</p>{" "}
-          <p>stat</p> <p>stat</p>
+          <p>
+            I’ve never been afraid of big moments. I get butterflies… I get
+            nervous and anxious, but I think those are all good signs that I’m
+            ready for the moment.
+          </p>
         </footer>
       </div>
     </>

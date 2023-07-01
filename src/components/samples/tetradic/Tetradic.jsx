@@ -4,6 +4,7 @@ import "./tetradic.css";
 import { ArticleData } from "../../../util/ArticleData";
 import { SampleNavbar } from "../SampleNavbar";
 import Specs from "../Specs";
+import ImageSwitcher from "../../article_images/ImageSwitcher";
 
 export default function Tetradic() {
   const articleProps = [
@@ -79,7 +80,7 @@ export default function Tetradic() {
                 key={idx}
               >
                 <p className="tetradic-card-title">{article.title}</p>
-                <img src={article.image} alt={article.alt} />
+                <ImageSwitcher type={article.alt} />
                 <p className="article excerpt">{article.excerpt}</p>
                 <a href={article.url} className="tetradic-link">
                   Read <ArrowRight />

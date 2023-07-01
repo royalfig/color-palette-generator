@@ -2,7 +2,7 @@
   position: relative;
   max-width: var(--max-viewport);
   height: 100vh;
-  height: 100lvh;
+  height: calc(100lvh - 4rem);
 
   /* padding: var(--box-padding); */
   margin: 2rem auto 10rem;

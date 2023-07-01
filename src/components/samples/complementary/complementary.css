@@ -104,7 +104,7 @@
   grid-column: 1 / span 1;
 }
 
-.complementary-card img {
+.complementary-card svg {
   grid-row: 1 / 12;
   grid-column: 1 / 12;
   width: 100%;
@@ -169,7 +169,7 @@
   grid-row: 2 / -1;
 }
 
-.complementary-card-horizontal img {
+.complementary-card-horizontal svg {
   grid-row: 1 / -1;
   grid-column: 1 / span 1;
 }

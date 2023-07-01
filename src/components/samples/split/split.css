@@ -1,5 +1,9 @@
 .split {
+  --split-shadow: 20px 20px 60px hsl(var(--tas-og-1-raw) / 15%),
+    -20px -20px 60px hsl(var(--tas-og-10-raw) / 5%);
+
   position: relative;
+  height: 100%;
   background-color: var(--surface-3);
   background-image: radial-gradient(
       hsl(var(--spl-og-1-raw) / 15%),
@@ -10,9 +14,6 @@
   background-repeat: no-repeat;
   background-position: -25% -25%, 50% 350%, 160% 50%;
   background-size: 50% 50%, 80% 80%, 50% 70%;
-
-  --split-shadow: 20px 20px 60px hsl(var(--tas-og-1-raw) / 15%),
-    -20px -20px 60px hsl(var(--tas-og-10-raw) / 5%);
 }
 
 .circle-1 {

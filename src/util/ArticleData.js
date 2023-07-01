@@ -1,4 +1,4 @@
-import sun from "../assets/sun.jpg";
+import sun from "../assets/sun.png";
 import boredom from "../assets/boredom.jpg";
 import lies from "../assets/lies.jpg";
 
@@ -19,7 +19,7 @@ export const ArticleData = [
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet consectetur adipisicing elit.",
     url: "https://ryanfeigenbaum.com",
     image: lies,
-    alt: "lies",
+    alt: "liar",
   },
   {
     title: "The Browser Is Dull",

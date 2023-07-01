@@ -11,6 +11,7 @@ import "./css/App.css";
 import "./css/Defaults.css";
 import "./css/Reset.css";
 import "./css/Variables.css";
+import "./css/Toast.css";
 
 import { debounce } from "lodash-es";
 import { ToastContainer } from "react-toastify";
@@ -36,9 +37,9 @@ function getQueryParam() {
 
 function App() {
   const [color, setColor] = useState(getQueryParam() || "#21a623");
-
   const [variation, setVariation] = useState(0);
   const [displayValue, setDisplayValue] = useState("hex");
+  const [colorHistory, setColorHistory] = useState([]);
 
   const base = createBase(color);
   const complementaryPalette = createComplement(color);
@@ -107,6 +108,15 @@ function App() {
       poly: polychromaPalette,
       ombre: ombrePalette,
     });
+
+    let colorsArray = colorHistory;
+
+    if (colorHistory.length > 2) {
+      colorsArray = colorHistory.slice(0, 2);
+    }
+
+    const history = [color, ...colorsArray];
+    setColorHistory(history);
   }, [color]);
 
   const debouncedHandler = useCallback(
@@ -159,6 +169,8 @@ function App() {
             <ColorSelector
               setColor={debouncedHandler}
               color={color}
+              colorHistory={colorHistory}
+              setColorHistory={setColorHistory}
             ></ColorSelector>
           </section>
 

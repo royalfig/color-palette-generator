@@ -1,5 +1,8 @@
 .triad-container {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .triad-container .sample-navbar {
@@ -130,17 +133,25 @@
 
 .triad-footer {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
+  flex: 1;
+  place-items: center;
+  padding: 3rem;
+  font-size: 2rem;
   background-color: hsl(var(--tri-og-2-raw) / 10%);
   border-top: 1px solid var(--border-3);
 }
 
-.triad-footer p {
-  padding: 1rem;
+.triad-footer > p {
+  max-width: 40ch;
+  line-height: 1.2;
   text-align: center;
+  letter-spacing: -1px;
 }
 
-.triad-footer p:not(:last-child) {
-  flex: 1;
-  border-right: 1px solid var(--border-3);
+.triad-footer > p::before {
+  content: open-quote;
+}
+
+.triad-footer > p::after {
+  content: close-quote;
 }

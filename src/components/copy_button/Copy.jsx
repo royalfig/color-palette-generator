@@ -5,18 +5,16 @@ export default function Copy({ text }) {
   function clickHandler() {
     navigator.clipboard.writeText(text).then(() => {
       toast(
-        <div>
-          {text} copied to clipboard!
+        <div style={{ fontSize: ".8rem" }}>
           <span
             style={{
-              backgroundColor: text,
-              height: "1em",
-              width: "1em",
-              borderRadius: 50,
-              display: "inline-block",
-              marginLeft: ".5em",
+              textDecoration: `underline ${text} .25em`,
+              textUnderlineOffset: "6px",
             }}
-          ></span>
+          >
+            {text}
+          </span>{" "}
+          copied!
         </div>,
         {
           position: "bottom-left",

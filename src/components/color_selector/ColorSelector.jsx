@@ -1,6 +1,5 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
-import { ClockHistory } from 'react-bootstrap-icons';
-import { HexColorPicker } from 'react-colorful';
+import { useContext, useEffect, useState } from "react";
+import { HexColorPicker } from "react-colorful";
 import {
   hex3to6,
   validateHex,
@@ -10,20 +9,20 @@ import {
   validateOkLab,
   validateOkLch,
   validateRgb,
-} from '../../util';
-import { ColorContext } from '../ColorContext';
-import ColorTextInput from '../color_text_input/ColorTextInput';
-import Header from '../Header';
-import EyeDropper from '../eye_dropper/EyeDropper';
-import './colorSelector.css';
-import Loader from '../loader/Loader';
-import { set } from 'lodash-es';
-export default function ColorSelector() {
+} from "../../util";
+import { ColorContext } from "../ColorContext";
+import Header from "../Header";
+import ColorHistory from "../color_history/ColorHistory";
+import ColorTextInput from "../color_text_input/ColorTextInput";
+import EyeDropper from "../eye_dropper/EyeDropper";
+import "./colorSelector.css";
+
+export default function ColorSelector({ colorHistory, setColorHistory }) {
   const colors = useContext(ColorContext);
 
-  const [validationError, setValidationError] = useState('');
+  const [validationError, setValidationError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [debouncedValue, setDeouncedValue] = useState();
 
   const hex = colors.base.hex;
@@ -48,9 +47,9 @@ export default function ColorSelector() {
   useEffect(() => {
     if (!debouncedValue) return;
     const timeout = setTimeout(() => {
-      console.log('debouncing');
+      console.log("debouncing");
       console.timeStamp();
-setValidationError('');
+      setValidationError("");
       colors.setColor(debouncedValue);
       setLoading(false);
     }, 1000);
@@ -63,41 +62,41 @@ setValidationError('');
     setLoading(false);
 
     switch (id) {
-      case 'hex': {
+      case "hex": {
         result = validateHex(value, setValidationError);
         break;
       }
-      case 'rgb': {
+      case "rgb": {
         result = validateRgb(value, setValidationError);
         break;
       }
-      case 'hsl': {
+      case "hsl": {
         result = validateHsl(value, setValidationError);
         break;
       }
-      case 'lch': {
+      case "lch": {
         result = validateLch(value, setValidationError);
         break;
       }
-      case 'oklch': {
+      case "oklch": {
         result = validateOkLch(value, setValidationError);
         break;
       }
-      case 'lab': {
+      case "lab": {
         result = validateLab(value, setValidationError);
         break;
       }
-      case 'oklab': {
+      case "oklab": {
         result = validateOkLab(value, setValidationError);
         break;
       }
     }
 
     if (result) {
-      console.log('setting loading');
+      console.log("setting loading");
       console.timeStamp();
       setLoading(true);
-      setValidationError('');
+      setValidationError("");
       setDeouncedValue(result);
     }
   }
@@ -130,17 +129,15 @@ setValidationError('');
         <ColorTextInput label="OKLAB" value={oklab} loading={loading} />
 
         {validationError ? <p>{validationError}</p> : <p></p>}
+        <p>{colors.base.inGamut}</p>
       </form>
 
       <footer className="previous">
         <EyeDropper />
-
-        <div className="color-history">
-          <ClockHistory />
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
+        <ColorHistory
+          colorHistory={colorHistory}
+          setColorHistory={setColorHistory}
+        />
       </footer>
     </div>
   );

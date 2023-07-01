@@ -1,6 +1,9 @@
 .tetradic {
-  padding-block-end: 3rem;
   background-color: var(--tas-la-9);
+}
+
+.tetradic .tetradic {
+  height: 100%;
 }
 
 .tetradic .sample-navbar {
@@ -11,12 +14,12 @@
   display: grid;
   gap: 2rem;
   justify-items: center;
-  padding: 6rem 2rem 8rem;
+  padding: 6rem 2rem;
   text-align: center;
 }
 
 .tetradic-title {
-  font-size: 4.5rem;
+  font-size: 3.5rem;
   font-weight: 700;
   line-height: 0.9;
   color: var(--tas-og-1);
@@ -74,10 +77,11 @@
   line-height: 1.1;
 }
 
-.tetradic-card img {
+.tetradic-card > svg {
   width: 100%;
   aspect-ratio: 3 / 3.5;
-  object-fit: cover;
+  background-color: rgb(255 255 255 / 50%);
+  object-fit: contain;
 }
 
 .tetradic-link {
@@ -95,4 +99,21 @@
 .tetradic-link:hover svg {
   rotate: -15deg;
   scale: 1.1;
+}
+
+.tetradic-card:first-of-type svg {
+  --com-og-1: var(--tet-ke-2);
+  --com-la-1: var(--tet-la-2);
+  --border-2: var(--tet-ci-2);
+}
+
+.tetradic-card:nth-last-of-type(2) svg {
+  --com-og-1: var(--tet-ke-3);
+  --com-la-1: var(--tet-la-3);
+  --border-2: var(--tet-ci-3);
+}
+
+.tetradic-card:last-of-type svg {
+  --com-og-1: var(--tet-ke-4);
+  --com-la-1: var(--tet-la-4);
 }

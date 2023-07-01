@@ -4,6 +4,7 @@ import "./complementary.css";
 import { ArticleData } from "../../../util/ArticleData";
 import { SampleNavbar } from "../SampleNavbar";
 import Specs from "../Specs";
+import ImageSwitcher from "../../article_images/ImageSwitcher";
 
 export default function Complementary() {
   const [specsOn, setSpecsOn] = useState(false);
@@ -368,7 +369,7 @@ export default function Complementary() {
             if (idx === 0) {
               return (
                 <article className="complementary-card" key={article.title}>
-                  <img src={article.image} alt={article.alt} />
+                  <ImageSwitcher type={article.alt} />
                   <div className="complementary-card-body">
                     <p className="complementary-card-title">{article.title}</p>
                     <p className="complementary-card-excerpt">
@@ -386,7 +387,7 @@ export default function Complementary() {
                   className="complementary-card complementary-card-horizontal"
                   key={article.title}
                 >
-                  <img src={article.image} alt={article.alt} />
+                  <ImageSwitcher type={article.alt} />
                   <div className="complementary-card-body">
                     <p className="complementary-card-title">{article.title}</p>
                     <p className="complementary-card-excerpt">

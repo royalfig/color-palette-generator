@@ -31,6 +31,7 @@ export function colorFactory(colors, paletteInformation) {
     lab: color.to("lab").toString({ precision: 3 }),
     oklab: color.to("oklab").toString({ precision: 3 }),
     point: color.hsl,
+    inGamut: color.inGamut("srgb") ? "Yes" : "No",
     contrast:
       color.contrast("black", "wcag21") > color.contrast("white", "wcag21")
         ? "#000"

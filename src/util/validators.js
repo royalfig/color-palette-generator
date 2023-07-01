@@ -3,6 +3,9 @@ import ColorUtil from "colorjs.io";
 export function validateHex(color, setValidationError) {
   const withoutHash = color.replace("#", "");
 
+  const hexMatch = color.match(/#?([a-f0-9]{6}|[a-f0-9]{3})/i);
+  // Can add early validation
+
   if (
     withoutHash.length < 3 ||
     (withoutHash.length > 3 && withoutHash.length < 6)
@@ -22,21 +25,17 @@ export function validateHex(color, setValidationError) {
     return newHex.toString({ format: "hex" });
   } catch (error) {
     setValidationError(`Couldn't parse "${color}" as a hex color.`);
-    return; 
+    return;
   }
 }
 
 export function validateRgb(color, setValidationError) {
-
-  const floatingPointMatch = color.match(/\d+\.\d+/g);
-  
-  if (floatingPointMatch?.length) {
-    setValidationError(`Can't parse color. Floating point numbers are not allowed.`);
+  if (/-/.test(color)) {
+    setValidationError(`Values can't be negative.`);
     return;
   }
 
-  
-  const rgbMatch = color.match(/\d+%?/g);
+  const rgbMatch = color.match(/\d+\.?\d*%?/g);
 
   if (rgbMatch === null) {
     return;
@@ -62,8 +61,7 @@ export function validateRgb(color, setValidationError) {
 }
 
 export function validateHsl(color, setValidationError) {
-  const hslMatch = color.match(/(\d+)\.?/g);
- 
+  const hslMatch = color.match(/\d+\.?\d*/g);
 
   if (hslMatch === null) {
     return;
