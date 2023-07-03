@@ -1,6 +1,6 @@
-import "../css/Controls.css";
-import Button from "./button/Button";
 import { useState } from "react";
+import Button from "../button/Button";
+import "./Controls.css";
 
 export default function Controls({ setDisplayValue, variation, setVariation }) {
   const [property, setProperty] = useState("hex");

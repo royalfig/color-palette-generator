@@ -1,11 +1,10 @@
-import "../css/Palette.css";
-
-import { useState, useEffect } from "react";
-import { adjustColor, hex3to6 } from "../util/";
-import Color from "./color_swatch/ColorSwatch";
-import Controls from "./Controls";
-import Circle from "./circle/Circle";
-import Header from "./Header";
+import { useEffect, useState } from "react";
+import { hex3to6 } from "../../util";
+import Circle from "../circle/Circle";
+import Color from "../color_swatch/ColorSwatch";
+import Controls from "../controls/Controls";
+import Header from "../header/Header";
+import "./Palette.css";
 
 export default function Palette({
   palette,

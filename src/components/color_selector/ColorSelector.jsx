@@ -11,7 +11,7 @@ import {
   validateRgb,
 } from "../../util";
 import { ColorContext } from "../ColorContext";
-import Header from "../Header";
+import Header from "../header/Header";
 import ColorHistory from "../color_history/ColorHistory";
 import ColorTextInput from "../color_text_input/ColorTextInput";
 import EyeDropper from "../eye_dropper/EyeDropper";

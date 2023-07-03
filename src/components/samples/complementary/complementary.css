@@ -48,7 +48,7 @@
 
 .complementary-hero {
   position: relative;
-  padding: 10rem 5rem 3rem;
+  padding: var(--spacing-08) var(--spacing-05);
   margin-inline: auto;
   text-align: center;
 }
@@ -93,7 +93,7 @@
   grid-template-rows: repeat(2, 1fr);
   grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
-  padding: 2rem 2rem 4rem;
+  padding: var(--spacing-09);
 }
 
 .complementary-card {
@@ -104,11 +104,13 @@
   grid-column: 1 / span 1;
 }
 
-.complementary-card svg {
+.complementary-card > svg {
+  z-index: 1;
   grid-row: 1 / 12;
   grid-column: 1 / 12;
   width: 100%;
   height: 100%;
+  translate: 1rem 0;
   object-fit: cover;
 }
 
@@ -160,7 +162,7 @@
   position: relative;
   display: grid;
   grid-template-rows: auto;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr 1fr;
   grid-row: 1 / span 1;
   grid-column: 2 / -1;
 }

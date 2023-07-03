@@ -1,8 +1,7 @@
-import { Clipboard } from "react-bootstrap-icons";
-import "../css/Header.css";
-import Button from "./button/Button";
+import Button from "../button/Button";
+import "./Header.css";
 
-import { copy } from "../util/copy";
+import { copy } from "../../util/copy";
 
 export default function Header({ h2, text, children }) {
   return (

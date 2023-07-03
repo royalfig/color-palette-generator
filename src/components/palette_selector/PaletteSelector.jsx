@@ -1,7 +1,7 @@
-import "../css/PaletteSelector.css";
-import Circle from "./circle/Circle";
-import Header from "./Header";
 import { useState } from "react";
+import Circle from "../circle/Circle";
+import Header from "../header/Header";
+import "./PaletteSelector.css";
 
 export default function PaletteSelector({ palettes, handlePalette, palette }) {
   const [paletteType, setPaletteType] = useState("Complementary");
