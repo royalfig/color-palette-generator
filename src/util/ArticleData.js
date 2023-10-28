@@ -4,6 +4,16 @@ import lies from "../assets/lies.jpg";
 
 export const ArticleData = [
   {
+    title: "The Browser Is Dull: Understanding Color Space on the Web",
+    excerpt:
+      "Don't fall prey to color FOMO. Learn why the browser was dull but doesn't need to be anymore. Get out of grayscale and into polychromia, baby.",
+    longExcerpt:
+      "Don't fall prey to color FOMO. Learn why the browser was dull but doesn't need to be anymore. Get out of grayscale and into polychromia, baby.",
+    url: "https://ryanfeigenbaum.com/the-browser-is-dull/",
+    image: boredom,
+    alt: "boredom",
+  },
+  {
     title: "Shut up about the sun",
     excerpt: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
     longExcerpt:
@@ -20,15 +30,6 @@ export const ArticleData = [
     url: "https://ryanfeigenbaum.com",
     image: lies,
     alt: "liar",
-  },
-  {
-    title: "The Browser Is Dull",
-    excerpt: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
-    longExcerpt:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet consectetur adipisicing elit.",
-    url: "https://ryanfeigenbaum.com",
-    image: boredom,
-    alt: "boredom",
   },
 ];
 

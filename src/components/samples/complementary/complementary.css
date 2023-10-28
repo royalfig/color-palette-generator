@@ -10,7 +10,7 @@
 }
 
 .complementary .sample-navbar {
-  padding: 2rem;
+  padding: var(--spacing-07);
 }
 
 .complementary .sample-navbar li:first-child {
@@ -70,7 +70,7 @@
 .complementary-hero a {
   display: inline-block;
   padding: var(--button-padding);
-  margin-block: 3rem 0.25rem;
+  margin-block: var(--spacing-07) var(--spacing-02);
   font-size: var(--small);
   color: var(--tas-og-3);
   text-decoration: none;
@@ -92,7 +92,7 @@
   flex: 1;
   grid-template-rows: repeat(2, 1fr);
   grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
+  gap: var(--spacing-07);
   padding: var(--spacing-09);
 }
 
@@ -106,8 +106,8 @@
 
 .complementary-card > svg {
   z-index: 1;
-  grid-row: 1 / 12;
-  grid-column: 1 / 12;
+  grid-row: 1 / 8;
+  grid-column: 1 / 11;
   width: 100%;
   height: 100%;
   translate: 1rem 0;
@@ -115,16 +115,16 @@
 }
 
 .complementary-card-body {
-  grid-row: 9 / -1;
-  grid-column: 4 / 13;
+  grid-row: 7 / -1;
+  grid-column: 1 / -1;
   min-height: 8rem;
-  padding: var(--box-padding);
+  padding: var(--spacing-06);
   background-color: var(--ton-og-10);
   outline: 1rem solid var(--tas-9);
 }
 
 .complementary-card-title {
-  margin-block-end: 0.5rem;
+  margin-block-end: var(--spacing-04);
   font-size: 1.15rem;
   font-weight: 700;
   line-height: 1.2;
@@ -133,10 +133,8 @@
 }
 
 .complementary-card-excerpt {
-  max-width: 70%;
   font-size: 1rem;
   font-size: var(--small);
-  font-weight: 300;
   line-height: 1.2;
 }
 
