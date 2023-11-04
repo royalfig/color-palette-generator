@@ -1,6 +1,6 @@
 import { filterSaturate, filterContrast } from 'culori/fn'
 import { colorFactory } from './factory.js'
-import { hsl, lch, oklch } from '../../lib/colorParse.js'
+import { hsl, lch } from '../../lib/colorParse.js'
 
 const targetHues = {
   analogous: [0, 30, 60],
