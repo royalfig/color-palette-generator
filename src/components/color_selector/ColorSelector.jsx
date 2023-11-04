@@ -16,6 +16,7 @@ import ColorHistory from "../color_history/ColorHistory";
 import ColorTextInput from "../color_text_input/ColorTextInput";
 import EyeDropper from "../eye_dropper/EyeDropper";
 import "./colorSelector.css";
+import { useColor } from "../../util/useColor";
 
 export default function ColorSelector({ colorHistory, setColorHistory }) {
   const colors = useContext(ColorContext);
@@ -33,6 +34,7 @@ export default function ColorSelector({ colorHistory, setColorHistory }) {
   const lab = colors.base.lab;
   const oklab = colors.base.oklab;
 
+  useColor(colors.base.hex);
   async function getName(color) {
     const hexFormatted = hex3to6(color);
     try {
