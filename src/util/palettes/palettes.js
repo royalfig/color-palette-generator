@@ -1,6 +1,7 @@
 import { filterSaturate, filterContrast } from 'culori/fn'
 import { colorFactory } from './factory.js'
 import { hsl, lch } from '../../lib/colorParse.js'
+import { createScales } from './scales.js'
 
 const targetHues = {
   analogous: [0, 30, 60],
@@ -45,12 +46,11 @@ function createPalettes(baseColor) {
       const p = targetHues[hueKey].map((hue, idx) => {
         let base = variations[variationKey].space === 'hsl' ? hsl(baseColor) : lch(baseColor)
         base.h = adjustHue(base.h + hue)
-        console.log(base)
         base = variations[variationKey].adjust(base)
         return colorFactory(base, variationKey + hueKey, idx)
       })
 
-      variationAcc[variationKey] = p
+      variationAcc[variationKey] = [...p]
       return variationAcc
     }, {})
 
@@ -58,7 +58,8 @@ function createPalettes(baseColor) {
     return hueAcc
   }, {})
 
-  console.log(JSON.stringify(palettes, null, 4))
+  const scales = createScales(baseColor)
+  console.log({ ...palettes, ...scales })
 }
 
 createPalettes('#a890d4')
