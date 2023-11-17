@@ -1,0 +1,8 @@
+.display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-02);
+    background-color: #000;
+    border-radius: var(--radius);
+}   

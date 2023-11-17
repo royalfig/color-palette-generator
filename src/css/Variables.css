@@ -13,7 +13,7 @@
   --spacing-12: 6rem;
   --spacing-13: 10rem;
   --gap: var(--spacing-06);
-  --radius: 0.5em;
+  --radius: 0.15em;
   --small: 0.833rem;
   --x-small: min(0.75rem, 14px);
   --button-padding: 0.4em 0.8em;
