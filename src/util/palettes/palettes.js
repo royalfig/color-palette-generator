@@ -40,7 +40,7 @@ function adjustHue(val) {
   return val % 360
 }
 
-function createPalettes(baseColor) {
+export function createPalettes(baseColor) {
   const palettes = Object.keys(targetHues).reduce((hueAcc, hueKey) => {
     const v = Object.keys(variations).reduce((variationAcc, variationKey) => {
       const p = targetHues[hueKey].map((hue, idx) => {
@@ -59,7 +59,5 @@ function createPalettes(baseColor) {
   }, {})
 
   const scales = createScales(baseColor)
-  console.log({ ...palettes, ...scales })
+ return { ...palettes, ...scales }
 }
-
-createPalettes('#a890d4')

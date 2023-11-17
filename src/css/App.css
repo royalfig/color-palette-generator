@@ -1,33 +1,64 @@
-.app {
+main {
   display: grid;
-  gap: 2rem;
-  max-width: var(--max-viewport);
-  margin-inline: auto;
+  place-items: center;
+  height: 100vh;
+  padding: 2.5vw;
+  background-image: linear-gradient(to bottom in lch increasing hue, lch(50% 50 180deg), lch(20% 50 190deg));
 }
 
-@media (min-width: 1200px) {
-  .app {
-    grid-template-columns: 1fr 2fr;
+.synth-container {
+  display: grid;
+  grid-template-rows: auto min-content;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+  background-color: var(--synth-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+
+  > div {
+    padding: var(--box-padding);
   }
 }
 
-.left,
-.right {
+.synth-bottom {
   display: flex;
-  flex-direction: column;
-  flex-grow: 0;
-  gap: var(--space-after);
-  overflow: hidden;
+  grid-column: 1 / -1;
+  justify-content: space-between;
+
+  & h1 {
+    font-family: var(--font-brand);
+    font-size: 1.25rem;
+    font-weight: 400;
+    text-transform: uppercase;
+
+    & span {
+      font-weight: 700;
+    }
+  }
 }
 
-.right > section {
-  flex-grow: 1;
+.relative {
+  position: relative;
+
+  &::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+  }
 }
 
-.footer {
-  padding: var(--box-padding);
-  color: var(--element-1);
-  font-size: var(--small);
-  text-align: center;
-  text-transform: uppercase;
+.vibrancy-module {
+  width: 5rem;
+
+  /* overflow: hidden; */
+  background-image: linear-gradient(to right in lch longer hue, lch(50% 50 180deg), lch(50% 50 181deg));
+  border: 1px solid #333;
+  border-radius: var(--radius);
+  box-shadow: 0 0 1rem 0.5rem rgb(255 255 255 / 45%);
+
+  &::after {
+    background-image: conic-gradient(from 225deg at 49% -3%, #ffff 0%, #fff0 100%);
+    opacity: 0.25;
+  }
 }

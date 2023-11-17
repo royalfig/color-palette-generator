@@ -179,4 +179,3 @@ export function createScales(baseColor) {
   return { tones: tones, polychromia: polychromia, ombre: ombre, tintsAndShades: tintsAndShades }
 }
 
-createScales('#ff0000')
