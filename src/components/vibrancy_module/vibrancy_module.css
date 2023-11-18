@@ -1,20 +1,7 @@
 .vibrancy-module {
-  width: 5rem;
-  height: 1rem;
+  width: 80px;
+  height: 20px;
   line-height: 0;
-  background-image: linear-gradient(
-    to right in oklab,
-    var(--vm-0),
-    var(--vm-1),
-    var(--vm-2),
-    var(--vm-3),
-    var(--vm-4),
-    var(--vm-5),
-    var(--vm-6),
-    var(--vm-7),
-    var(--vm-8),
-    var(--vm-9)
-  );
   border-radius: var(--radius);
 
   &::after {

@@ -3,7 +3,7 @@ main {
   place-items: center;
   height: 100vh;
   padding: 2.5vw;
-  background-image: linear-gradient(to bottom in lch increasing hue, lch(50% 50 180deg), lch(20% 50 190deg));
+  background-image: linear-gradient(to bottom in lab, var(--bg-1), var(--bg-2));
 }
 
 .synth-container {

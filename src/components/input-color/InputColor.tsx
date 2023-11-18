@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './InputColor.css'
 
 export function InputColor({
@@ -17,6 +17,10 @@ export function InputColor({
     function handleChange(value: string): void {
         setInputColor(value)
     }
+
+    useEffect(() => {
+        setInputColor(palettes.complementary.original[0][type])
+    }, [palettes])
 
   return (
     <div className="input-color">

@@ -1,4 +1,4 @@
-import { filterSaturate, filterContrast } from 'culori/fn'
+import { filterSaturate, filterContrast, formatHsl } from 'culori/fn'
 import { colorFactory } from './factory.js'
 import { hsl, lch } from '../../lib/colorParse.js'
 import { createScales } from './scales.js'
@@ -47,7 +47,7 @@ export function createPalettes(baseColor) {
         let base = variations[variationKey].space === 'hsl' ? hsl(baseColor) : lch(baseColor)
         base.h = adjustHue(base.h + hue)
         base = variations[variationKey].adjust(base)
-        return colorFactory(base, variationKey + hueKey, idx)
+        return  colorFactory(base, variationKey + hueKey, idx)
       })
 
       variationAcc[variationKey] = [...p]
