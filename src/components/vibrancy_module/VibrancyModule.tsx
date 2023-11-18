@@ -11,7 +11,6 @@ export function VibrancyModule({palettes}) {
 
 
     }, {})
-    console.log("🚀 ~ file: VibrancyModule.tsx:14 ~ colors ~ colors:", colors)
     
     return (
         <div className="vibrancy-module relative" style={colors}></div>

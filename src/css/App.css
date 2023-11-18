@@ -37,14 +37,3 @@ main {
     }
   }
 }
-
-.relative {
-  position: relative;
-
-  &::after {
-    position: absolute;
-    inset: 0;
-    content: '';
-  }
-}
-

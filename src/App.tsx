@@ -2,10 +2,15 @@ import './css/Reset.css'
 import './css/Defaults.css'
 import './css/Variables.css'
 import './css/App.css'
+import './css/utils.css'
 import { useState } from 'react'
 import { createPalettes } from './util/palettes/palettes.js'
 import { Display } from './components/display/Display'
 import { VibrancyModule } from './components/vibrancy_module/VibrancyModule'
+import { ColorSelector } from './components/color-selector/ColorSelector'
+import { CurrentColorDisplay } from './components/current-color-display/CurrentColorDisplay'
+import { InputGroup } from './components/input-group/InputGroup'
+import { InputColor } from './components/input-color/InputColor'
 
 export default function App() {
   const [color, setColor] = useState('#21a623')
@@ -18,13 +23,24 @@ export default function App() {
       <div className="synth-container">
         <div className="synth-left">
           <div className="current-color">
-            <div
-              style={{ backgroundColor: palettes.complementary.original[0].hex, height: '1rem', width: '2rem' }}
-            ></div>
+            <Display spacing="05">
+              <CurrentColorDisplay color={color} />
+            </Display>
           </div>
           <div className="color-selector">
-            <input type="color" value={color} onChange={e => setColor(e.target.value)} />
+            <Display spacing="05">
+              <ColorSelector color={color} setColor={setColor} />
+             </Display>
           </div>
+          <InputGroup>
+            <InputColor palettes={palettes} setColor={setColor} type="hex" />
+            <InputColor palettes={palettes} setColor={setColor} type="hsl" />
+            <InputColor palettes={palettes} setColor={setColor} type="rgb" />
+            <InputColor palettes={palettes} setColor={setColor} type="lch" />
+            <InputColor palettes={palettes} setColor={setColor} type="oklch" />
+            <InputColor palettes={palettes} setColor={setColor} type="lab" />
+            <InputColor palettes={palettes} setColor={setColor} type="oklab" />
+          </InputGroup>
         </div>
         <div className="synth-center"></div>
         <div className="synth-right"></div>
@@ -32,7 +48,7 @@ export default function App() {
           <h1 className="brand">
             <span>Color</span>Palette Pro
           </h1>
-          <Display>
+          <Display spacing="01">
             <VibrancyModule palettes={palettes} />
           </Display>
         </div>
