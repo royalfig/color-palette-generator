@@ -1,4 +1,5 @@
 .input-color {
+    width: 100%;
     padding: var(--spacing-02);
 
     & .label-group {
@@ -20,8 +21,8 @@
         width: 100%;
         font-family: monospace;
         font-size: var(--small);
-        background-color: #dbfdff;
-        border: 1px solid #7c7c7c;
+        background-color: #f1fbfc;
+        border: 1px solid var(--border-color);
         border-radius: var(--radius);
     }
 }

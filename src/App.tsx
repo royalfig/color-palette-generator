@@ -15,14 +15,13 @@ import { InputColor } from './components/input-color/InputColor'
 export default function App() {
   const [color, setColor] = useState<string>('#21a623')
   const [palettes, setPalettes] = useState(() => createPalettes(color))
-  const prevColor = useRef(color);
+  const prevColor = useRef(color)
 
   useEffect(() => {
-    if (prevColor.current === color) return;
+    if (prevColor.current === color) return
     setPalettes(createPalettes(color))
     prevColor.current = color
   }, [color])
-
 
   console.log(palettes)
   const s = {
@@ -45,17 +44,22 @@ export default function App() {
             </Display>
           </div>
           <InputGroup>
-            <InputColor palettes={palettes} setColor={setColor} type="hex" />
-            <InputColor palettes={palettes} setColor={setColor} type="hsl" />
-            <InputColor palettes={palettes} setColor={setColor} type="rgb" />
-            <InputColor palettes={palettes} setColor={setColor} type="lch" />
-            <InputColor palettes={palettes} setColor={setColor} type="oklch" />
-            <InputColor palettes={palettes} setColor={setColor} type="lab" />
-            <InputColor palettes={palettes} setColor={setColor} type="oklab" />
+            <div className="flex col gap-1 flex-1">
+              <InputColor palettes={palettes} setColor={setColor} type="hex" />
+              <InputColor palettes={palettes} setColor={setColor} type="hsl" />
+              <InputColor palettes={palettes} setColor={setColor} type="rgb" />
+              <InputColor palettes={palettes} setColor={setColor} type="p3" />
+            </div>
+            <div className="flex col gap-1 flex-1">
+              <InputColor palettes={palettes} setColor={setColor} type="lch" />
+              <InputColor palettes={palettes} setColor={setColor} type="oklch" />
+              <InputColor palettes={palettes} setColor={setColor} type="lab" />
+              <InputColor palettes={palettes} setColor={setColor} type="oklab" />
+            </div>
           </InputGroup>
         </div>
         <div className="synth-center"></div>
-        <div className="synth-right"></div>
+        {/* <div className="synth-right"></div> */}
         <div className="synth-bottom">
           <h1 className="brand">
             <span>Color</span>Palette Pro

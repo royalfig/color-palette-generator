@@ -13,10 +13,40 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-}  
+
+    &.col {
+      flex-direction: column;
+    }
+}
+
+
 
 .icon {
     width: 100%;
     height: 100%;
     stroke: currentcolor;
+}
+
+.gap-1 {
+    gap: var(--spacing-01);
+}
+
+.gap-2 {
+    gap: var(--spacing-02);
+}
+
+.gap-3 {
+    gap: var(--spacing-03);
+}
+
+.gap-4 {
+    gap: var(--spacing-04);
+}
+
+.gap-5 {
+    gap: var(--spacing-05);
+}
+
+.flex-1 {
+    flex: 1;
 }

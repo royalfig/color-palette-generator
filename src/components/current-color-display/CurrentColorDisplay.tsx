@@ -9,6 +9,7 @@ export function CurrentColorDisplay({ palettes }: { palettes: any }) {
 
   const currentColor = useCurrentColor(palettes)
   const color = currentColor.hex
+  console.log("🚀 ~ file: CurrentColorDisplay.tsx:12 ~ CurrentColorDisplay ~ color:", color)
 
   async function getColorName(color: string) {
     try {

@@ -17,11 +17,11 @@ import {
   wcagContrast,
 } from 'culori/fn'
 
-import {  Lch, Oklch, Lab, Oklab, P3, Color } from 'culori'
+import { Lch, Oklch, Lab, Oklab, P3, Color } from 'culori'
 
-type IndexableColor = Color & { [key: string]: any };
+type IndexableColor = Color & { [key: string]: any }
 
-function roundColor<T extends IndexableColor | undefined >(color: T): T {
+function roundColor<T extends IndexableColor | undefined>(color: T): T {
   if (!color) throw new Error('Could not parse color')
   const objKeys = Object.keys(color)
   const roundedColor = objKeys.reduce((prev: any, acc: string) => {
@@ -46,24 +46,38 @@ const rgb = useMode(modeRgb)
 
 function clampRgbWrapper(color: string | Color) {
   if (typeof color === 'string') {
-    return formatHex(clampRgb(color))
+    if (!displayable(color)) {
+      return clampRgb(color)
+    } else {
+      return color
+    }
   } else {
-    return formatHex(clampRgb(color))
+    if (!displayable(color)) {
+      return clampRgb(color)
+    } else {
+      return color
+    }
   }
 }
 
 function clampChromaWrapper(color: string | Color) {
   if (typeof color === 'string') {
-    const res = formatHex(clampChroma(color))
-    return res
+    if (!displayable(color)) {
+      return clampChroma(color)
+    } else {
+      return color
+    }
   } else {
-    const res = formatHex(clampChroma(color))
-    return res
+    if (!displayable(color)) {
+      return clampChroma(color)
+    } else {
+      return color
+    }
   }
 }
 
 export const colorParser = {
-  hex: (color: string | Color) => clampChromaWrapper(color),
+  hex: (color: string | Color) => formatHex(clampChromaWrapper(color)),
   rgb: (color: string | Color) => formatRgb(clampChromaWrapper(color)),
   rawRgb: (color: string | Color) => rgb(color),
   hsl: (color: string | Color) => formatHsl(clampChromaWrapper(color)),

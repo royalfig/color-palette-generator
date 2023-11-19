@@ -27,4 +27,5 @@
   --shadow-sm: 0.3px 0.5px 0.7px var(--shadow-color), 0.4px 0.8px 1px -1.2px var(--shadow-color),
     1px 2px 2.5px -2.5px var(--shadow-color);
   --font-brand: 'Orbitron', system-ui, sans-serif;
+  --border-color: hsl(0deg 0% 50% / 45%)
 }

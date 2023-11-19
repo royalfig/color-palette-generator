@@ -1,0 +1,18 @@
+.input-group {
+    margin-block: var(--spacing-06);
+
+    & fieldset {
+        padding: var(--spacing-04);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius)
+    }
+
+    & legend {
+        padding-inline: var(--spacing-02);
+        font-size: var(--x-small);
+        font-weight: 700;
+        line-height: 1;
+        text-transform: uppercase;
+    }
+}
+
