@@ -1,0 +1,27 @@
+.input-color {
+    padding: var(--spacing-02);
+
+    & .label-group {
+        margin-block-end: var(--spacing-01);
+    }
+
+    & label {
+        font-size: var(--x-small);
+        text-transform: uppercase;
+    }
+
+    & .clipped-icon {
+        flex-shrink: 0;
+        width: var(--small);
+        height: var(--small);
+    }
+
+    & input {
+        width: 100%;
+        font-family: monospace;
+        font-size: var(--small);
+        background-color: #dbfdff;
+        border: 1px solid #7c7c7c;
+        border-radius: var(--radius);
+    }
+}

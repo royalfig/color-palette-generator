@@ -1,4 +1,4 @@
-import { hsl, oklch } from '../../lib/colorParse'
+import { hsl, oklch } from './colorParse'
 import { colorFactory } from './factory'
 import {
   filterGrayscale,
@@ -55,16 +55,20 @@ export function createScales(baseColor: Color | string) {
   }
 
   const dark = hsl(baseColor)
-  if (!dark) throw new Error('Could not parse color')
+  if (!dark) throw new Error('Could not parse color: dark')
   dark.s = 0.25
   dark.l = 0.15
   const light = hsl(baseColor)
-  if (!light) throw new Error('Could not parse color')
+  if (!light) throw new Error('Could not parse color: light')
   light.s = 0.15
   light.l = 0.99
   const interpolatedColors = interpolate([dark, light])
   const start = hsl(baseColor)
-  if (!start || !start.h) throw new Error('Could not parse color')
+
+  if (!start) throw new Error('Could not parse color: start')
+
+  if (!start.h) start.h = 0
+
 
   // Polychromia
   const end = { ...start, h: (start.h + 359) % 360 }

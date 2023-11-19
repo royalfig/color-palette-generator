@@ -3,8 +3,8 @@ import './css/Defaults.css'
 import './css/Variables.css'
 import './css/App.css'
 import './css/utils.css'
-import { useState } from 'react'
-import { createPalettes } from './util/palettes/palettes'
+import { useEffect, useState, useRef } from 'react'
+import { createPalettes } from './util/palettes'
 import { Display } from './components/display/Display'
 import { VibrancyModule } from './components/vibrancy_module/VibrancyModule'
 import { ColorSelector } from './components/color-selector/ColorSelector'
@@ -13,24 +13,36 @@ import { InputGroup } from './components/input-group/InputGroup'
 import { InputColor } from './components/input-color/InputColor'
 
 export default function App() {
-  const [color, setColor] = useState('#21a623')
-  const palettes = createPalettes(color)
+  const [color, setColor] = useState<string>('#21a623')
+  const [palettes, setPalettes] = useState(() => createPalettes(color))
+  const prevColor = useRef(color);
 
-  const s = {'--bg-1': palettes.tones.original[4].hex, '--bg-2': palettes.tones.original[1].hex} as React.CSSProperties
+  useEffect(() => {
+    if (prevColor.current === color) return;
+    setPalettes(createPalettes(color))
+    prevColor.current = color
+  }, [color])
+
+
+  console.log(palettes)
+  const s = {
+    '--bg-1': palettes.tones.original[4].hex,
+    '--bg-2': palettes.tones.original[1].hex,
+  } as React.CSSProperties
 
   return (
     <main style={s}>
-      <div className="synth-container" > 
+      <div className="synth-container">
         <div className="synth-left">
           <div className="current-color">
             <Display spacing="05">
-              <CurrentColorDisplay color={color} />
+              <CurrentColorDisplay palettes={palettes} />
             </Display>
           </div>
           <div className="color-selector">
             <Display spacing="05">
-              <ColorSelector color={color} setColor={setColor} />
-             </Display>
+              <ColorSelector palettes={palettes} setColor={setColor} />
+            </Display>
           </div>
           <InputGroup>
             <InputColor palettes={palettes} setColor={setColor} type="hex" />
@@ -56,5 +68,3 @@ export default function App() {
     </main>
   )
 }
-
-

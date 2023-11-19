@@ -1,6 +1,6 @@
 import { filterSaturate, filterContrast, formatHsl } from 'culori/fn'
 import { colorFactory } from './factory'
-import { hsl, lch } from '../../lib/colorParse'
+import { hsl, lch } from './colorParse'
 import { createScales } from './scales'
 import {Color} from 'culori'
 
@@ -123,6 +123,7 @@ export interface ColorProps {
 }
 
 export function createPalettes(baseColor: Color | string): Schemes {
+  console.log(baseColor)
   const palettes = Object.keys(targetHues).reduce<Record<string, any>>((hueAcc, hueKey) => {
     const v = Object.keys(variations).reduce<Record<string, any>>((variationAcc, variationKey) => {
       const p = targetHues[hueKey].map((hue, idx) => {

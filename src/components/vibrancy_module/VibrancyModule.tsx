@@ -15,7 +15,6 @@ export function VibrancyModule({ palettes }) {
       saturation = s
       lightness = l
     }
-    console.log(color)
     return color.point[0] % 360
   })
   const step = width / (hues.length - 1)

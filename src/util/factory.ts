@@ -1,4 +1,4 @@
-import { colorParser } from '../../lib/colorParse'
+import { colorParser } from './colorParse'
 import { Color } from 'culori'
 
 export function colorFactory(color: string | Color, paletteInformation: string, idx = 0) {

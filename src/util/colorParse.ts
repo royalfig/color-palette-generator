@@ -44,15 +44,29 @@ export const oklch = useMode(modeOklch)
 const p3 = useMode(modeP3)
 const rgb = useMode(modeRgb)
 
+function clampRgbWrapper(color: string | Color) {
+  if (typeof color === 'string') {
+    return formatHex(clampRgb(color))
+  } else {
+    return formatHex(clampRgb(color))
+  }
+}
+
+function clampChromaWrapper(color: string | Color) {
+  if (typeof color === 'string') {
+    const res = formatHex(clampChroma(color))
+    return res
+  } else {
+    const res = formatHex(clampChroma(color))
+    return res
+  }
+}
 
 export const colorParser = {
-  // @ts-ignore clampChroma is typed to only accept a string, but it can also accept a Color object
-  hex: (color: string | Color) => formatHex(clampChroma(color)),
-  // @ts-ignore
-  rgb: (color: string | Color) => formatRgb(clampChroma(color)),
+  hex: (color: string | Color) => clampChromaWrapper(color),
+  rgb: (color: string | Color) => formatRgb(clampChromaWrapper(color)),
   rawRgb: (color: string | Color) => rgb(color),
-  // @ts-ignore
-  hsl: (color: string | Color) => formatHsl(clampChroma(color)),
+  hsl: (color: string | Color) => formatHsl(clampChromaWrapper(color)),
   lch: (color: string | Color) => formatCss(roundColor<Lch | undefined>(lch(color))),
   oklch: (color: string | Color) => formatCss(roundColor<Oklch | undefined>(oklch(color))),
   lab: (color: string | Color) => formatCss(roundColor<Lab | undefined>(lab(color))),
@@ -60,10 +74,8 @@ export const colorParser = {
   p3: (color: string | Color) => formatCss(roundColor<P3 | undefined>(p3(color))),
   inGamut: (color: string | Color) => displayable(color),
   contrast: (color: string | Color) => (wcagContrast(color, '#000') > wcagContrast(color, '#fff') ? '#000' : '#fff'),
-  // @ts-ignore
-  clamp: (color: string | Color) => clampRgb(color),
+  clamp: (color: string | Color) => clampRgbWrapper(color),
   formatCss: (color: string | Color) => formatCss(color),
   rawHsl: (color: string | Color) => roundColor(hsl(color)),
-  // @ts-ignore
-  chromaClamp: (color: string | Color) => clampChroma(color),
+  chromaClamp: (color: string | Color) => clampChromaWrapper(color),
 }

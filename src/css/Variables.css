@@ -13,7 +13,7 @@
   --spacing-12: 6rem;
   --spacing-13: 10rem;
   --gap: var(--spacing-06);
-  --radius: 0.15em;
+  --radius: 0.35rem;
   --small: 0.833rem;
   --x-small: min(0.75rem, 14px);
   --button-padding: 0.4em 0.8em;
@@ -26,6 +26,5 @@
     2.1px 4.1px 5.2px -1.7px var(--shadow-color), 5px 10px 12.6px -2.5px var(--shadow-color);
   --shadow-sm: 0.3px 0.5px 0.7px var(--shadow-color), 0.4px 0.8px 1px -1.2px var(--shadow-color),
     1px 2px 2.5px -2.5px var(--shadow-color);
-  --synth-bg: silver;
   --font-brand: 'Orbitron', system-ui, sans-serif;
 }
