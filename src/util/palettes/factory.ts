@@ -1,9 +1,10 @@
 import { colorParser } from '../../lib/colorParse'
-
 import { Color } from 'culori'
 
 export function colorFactory(color: string | Color, paletteInformation: string, idx = 0) {
-  const { h, s, l } = colorParser.rawHsl(color)
+  const hsl = colorParser.rawHsl(color)
+  if (!hsl) throw new Error('Could not parse color')
+  const { h, s, l } = hsl
 
   return {
     code: `${paletteInformation}-${idx + 1}`,
