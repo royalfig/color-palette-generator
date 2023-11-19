@@ -11,7 +11,6 @@ export function InputColor({
   type: 'hex' | 'rgb' | 'hsl' | 'lch' | 'oklch' | 'lab' | 'oklab'
 }) {
   
-  
     const [inputColor, setInputColor] = useState(palettes.complementary.original[0][type])
     
     function handleChange(value: string): void {

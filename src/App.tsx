@@ -4,7 +4,7 @@ import './css/Variables.css'
 import './css/App.css'
 import './css/utils.css'
 import { useState } from 'react'
-import { createPalettes } from './util/palettes/palettes.js'
+import { createPalettes } from './util/palettes/palettes'
 import { Display } from './components/display/Display'
 import { VibrancyModule } from './components/vibrancy_module/VibrancyModule'
 import { ColorSelector } from './components/color-selector/ColorSelector'
@@ -17,9 +17,6 @@ export default function App() {
   const palettes = createPalettes(color)
 
   const s = {'--bg-1': palettes.tones.original[4].hex, '--bg-2': palettes.tones.original[1].hex} as React.CSSProperties
-
-  console.log(s)
-  // const palettes = createPalettes(color)
 
   return (
     <main style={s}>

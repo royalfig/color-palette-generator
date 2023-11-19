@@ -1,5 +1,5 @@
-import { hsl, oklch } from '../../lib/colorParse.js'
-import { colorFactory } from './factory.js'
+import { hsl, oklch } from '../../lib/colorParse'
+import { colorFactory } from './factory'
 import {
   filterGrayscale,
   filterContrast,
@@ -10,8 +10,19 @@ import {
   interpolatorSplineMonotoneClosed,
 } from 'culori/fn'
 
-export function createScales(baseColor) {
-  const tones = {
+import { Color } from 'culori'
+import { ColorProps } from './palettes'
+
+type ColorScheme = {
+  original: ColorProps[]
+  keel: ColorProps[]
+  cinematic: ColorProps[]
+  languid: ColorProps[]
+  sharkbite: ColorProps[]
+}
+
+export function createScales(baseColor: Color | string) {
+  const tones: ColorScheme = {
     original: [],
     keel: [],
     cinematic: [],
@@ -19,7 +30,7 @@ export function createScales(baseColor) {
     sharkbite: [],
   }
 
-  const polychromia = {
+  const polychromia: ColorScheme = {
     original: [],
     keel: [],
     cinematic: [],
@@ -27,7 +38,7 @@ export function createScales(baseColor) {
     sharkbite: [],
   }
 
-  const tintsAndShades = {
+  const tintsAndShades: ColorScheme = {
     original: [],
     keel: [],
     cinematic: [],
@@ -35,7 +46,7 @@ export function createScales(baseColor) {
     sharkbite: [],
   }
 
-  const ombre = {
+  const ombre: ColorScheme = {
     original: [],
     keel: [],
     cinematic: [],
@@ -44,13 +55,16 @@ export function createScales(baseColor) {
   }
 
   const dark = hsl(baseColor)
+  if (!dark) throw new Error('Could not parse color')
   dark.s = 0.25
   dark.l = 0.15
   const light = hsl(baseColor)
+  if (!light) throw new Error('Could not parse color')
   light.s = 0.15
   light.l = 0.99
   const interpolatedColors = interpolate([dark, light])
   const start = hsl(baseColor)
+  if (!start || !start.h) throw new Error('Could not parse color')
 
   // Polychromia
   const end = { ...start, h: (start.h + 359) % 360 }
@@ -82,7 +96,7 @@ export function createScales(baseColor) {
     },
   })
 
-  const poly5 = interpolate([start, end], 'lab', {
+  const poly5 = interpolate([start, end], 'lch', {
     h: {
       use: interpolatorSplineMonotoneClosed,
       fixup: fixupHueLonger,
@@ -136,10 +150,10 @@ export function createScales(baseColor) {
   for (let index = 0; index < 10; index++) {
     const hslBase = hsl(baseColor)
     const oklchBase = oklch(baseColor)
-
+    if (!oklchBase) throw new Error('Could not parse color')
     oklchBase.c = 10
     oklchBase.l = index * 10 + 8
-
+    if (!hslBase) throw new Error('Could not parse color')
     hslBase.s = 0.1
     hslBase.l = (index * 10 + 8) / 100
 
@@ -178,4 +192,3 @@ export function createScales(baseColor) {
 
   return { tones: tones, polychromia: polychromia, ombre: ombre, tintsAndShades: tintsAndShades }
 }
-
