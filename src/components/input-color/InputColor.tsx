@@ -1,6 +1,6 @@
 import { ScissorsIcon } from '@heroicons/react/24/outline'
 import { formatCss, parse } from 'culori'
-import { debounce } from 'lodash-es'
+import { debounce, set } from 'lodash-es'
 import { useCallback, useEffect, useState } from 'react'
 import { useCurrentColor } from '../../hooks/useCurrentColor'
 import './InputColor.css'
@@ -22,11 +22,12 @@ export function InputColor({
   const debouncedParseColor = useCallback(debounce(parseColor, 1000), [])
 
   function parseColor(value: string) {
-    console.log('parsing color')
+    console.log('parsing color', Date.now())
     const parsed = parse(value)
 
-    if (!parsed && value.length > 3) {
+    if (!parsed) {
       setWarning(true)
+      return;
     }
 
     if (parsed) {
@@ -37,9 +38,27 @@ export function InputColor({
     }
   }
 
+  function validate(value: string) {
+
+    if (['rgb', 'hsl'].includes(type)) {
+      return value.split(',').length === 3
+    } else {
+      return value.split(' ').length === 3
+    }
+  }
+
   function handleChange(value: string): void {
-    console.log('handling chnge')
+    console.log('handling change', Date.now())
+    setWarning(false)
     setInputColor(value)
+
+    if (type === 'hex' && value.length < 7) return
+
+    if (type !== 'hex' && !validate(value)) {
+      console.log('dont match')
+      return
+    }
+
     debouncedParseColor(value)
   }
 
@@ -52,7 +71,7 @@ export function InputColor({
   return (
     <div className="input-color">
       <div className="label-group flex">
-        <div className='flex gap-2'>
+        <div className="flex gap-2">
           <label htmlFor={`input-color-${type}`}>{type}</label>{' '}
           {clipped ? <ScissorsIcon className="clipped-icon" /> : undefined}
         </div>

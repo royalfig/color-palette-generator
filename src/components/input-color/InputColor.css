@@ -19,8 +19,9 @@
 
     & input {
         width: 100%;
-        font-family: monospace;
-        font-size: var(--small);
+        padding: var(--spacing-02);
+        font-family: inherit;
+        font-size: max(var(--x-small), 14px);
         background-color: #f1fbfc;
         border: 1px solid var(--border-color);
         border-radius: var(--radius);

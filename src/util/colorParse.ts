@@ -17,7 +17,20 @@ import {
   wcagContrast,
 } from 'culori/fn'
 
-import { Lch, Oklch, Lab, Oklab, P3, Color } from 'culori'
+import{to as convert, contrastWCAG21, parse, ColorSpace, inGamut, sRGB, P3, HSL, LCH, serialize, OKLCH, OKLab, Lab, display} from "colorjs.io/fn"
+
+ColorSpace.register(sRGB);
+ColorSpace.register(P3);
+ColorSpace.register(LCH);
+ColorSpace.register(HSL);
+ColorSpace.register(OKLCH);
+
+const red = parse('lch(55.64 84.04 3.99)')
+const redLch = display(convert(red, "lch"))
+
+
+
+// import { Lch, Oklch, Lab, Oklab, P3 } from 'culori'
 
 type IndexableColor = Color & { [key: string]: any }
 
@@ -75,6 +88,36 @@ function clampChromaWrapper(color: string | Color) {
     }
   }
 }
+
+export function hex(color: string) {
+  const parsed = parse(color);
+  const convertedColor = convert(color, 'srgb');
+    const isInGamut = inGamut(parsed, 'srgb');
+    const str = serialize(convertedColor, { format: 'hex' })
+    const css = str;
+    const raw = parsed.coords
+    const contrast = contrastWCAG21(parsed, '#fff') > contrastWCAG21(parsed, '#000') ? '#fff' : '#000'
+
+  const convertedToHsl = convert(color, 'hsl', );
+  const hslStr = serialize(convertedToHsl, { format: 'hsl', precision: 2 })
+  const hslCss = display(hslStr, {space: 'hsl'}).toString()
+  console.log(convertedToHsl, hslStr, hslCss)
+
+  const parsedFromOk = parse('oklch(83.98% 0.3255 144)')
+  const oconvertedColor = convert(parsedFromOk, 'srgb');
+    const oisInGamut = inGamut(parsedFromOk, 'srgb');
+    const ostr = serialize(parsedFromOk)
+    const ocss = display(parsedFromOk);
+console.log({contrast})
+
+  return {
+    string: str,
+    css,
+    isInGamut,
+  }
+}
+
+
 
 export const colorParser = {
   hex: (color: string | Color) => formatHex(clampChromaWrapper(color)),

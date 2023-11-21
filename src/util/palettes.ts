@@ -122,8 +122,10 @@ export interface ColorProps {
   cssRaw: string;
 }
 
+import {hex} from "./colorParse"
+
 export function createPalettes(baseColor: Color | string): Schemes {
-  console.log(baseColor)
+  console.log("🚀 ~ file: palettes.ts:129 ~ createPalettes ~  hex(baseColor):",  hex(baseColor))
   const palettes = Object.keys(targetHues).reduce<Record<string, any>>((hueAcc, hueKey) => {
     const v = Object.keys(variations).reduce<Record<string, any>>((variationAcc, variationKey) => {
       const p = targetHues[hueKey].map((hue, idx) => {

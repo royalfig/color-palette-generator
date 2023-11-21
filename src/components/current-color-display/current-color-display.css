@@ -1,3 +1,7 @@
+.current-color {
+  width: 100%;
+}
+
 .current-color .display-inner {
   justify-content: flex-start;
 }
