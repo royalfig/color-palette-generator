@@ -1,26 +1,19 @@
-import { colorParser } from './colorParse'
-import { Color } from 'culori'
+import { PlainColorObject } from 'colorjs.io/types/src/color'
+import { createColorObj } from './colorParse'
+import Color from 'colorjs.io'
 
-
-export function colorFactory(color: string | Color, paletteInformation: string, idx = 0) {
-  const hsl = colorParser.rawHsl(color)
-  if (!hsl) throw new Error('Could not parse color')
-  const { h, s, l } = hsl
-
+export function colorFactory(color: string | Color | PlainColorObject, paletteInformation: string, idx = 0) {
   return {
     code: `${paletteInformation}-${idx + 1}`,
-    hex: colorParser.hex(color),
-    rgb: colorParser.rgb(color),
-    hsl: colorParser.hsl(color),
-    lch: colorParser.lch(color),
-    oklch: colorParser.oklch(color),
-    lab: colorParser.lab(color),
-    oklab: colorParser.oklab(color),
-    p3: colorParser.p3(color),
-    inGamut: colorParser.inGamut(color),
-    point: [h, s * 100],
-    //   contrast: colorParser.contrast(color),
-    css: `${paletteInformation}`,
-    cssRaw: [h, s * 100 + '%', l * 100 + '%'].join(' '),
+    hex: createColorObj(color, 'hex'),
+    rgb: createColorObj(color, 'srgb'),
+    hsl: createColorObj(color, 'hsl'),
+    lch: createColorObj(color, 'lch'),
+    oklch: createColorObj(color, 'oklch'),
+    lab: createColorObj(color, 'lab'),
+    oklab: createColorObj(color, 'oklab'),
+    p3: createColorObj(color, 'p3'),
   }
 }
+
+export type ColorFactory = ReturnType<typeof colorFactory>

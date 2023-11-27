@@ -1,8 +1,6 @@
 .input-group {
-    margin-block: var(--spacing-06);
-
     & fieldset {
-        padding: var(--spacing-04);
+        padding: var(--spacing-03);
         border: 1px solid var(--border-color);
         border-radius: var(--radius)
     }
@@ -12,6 +10,8 @@
         font-size: var(--x-small);
         font-weight: 700;
         line-height: 1;
+        color: #c8c8c8;
+        text-shadow: 2px 2px 1rem hsl(0deg 0% 100% 0.83);
         text-transform: uppercase;
     }
 }

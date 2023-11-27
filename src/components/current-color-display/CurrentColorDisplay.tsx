@@ -8,7 +8,7 @@ export function CurrentColorDisplay({ palettes }: { palettes: any }) {
   const [colorName, setColorName] = useState('')
 
   const currentColor = useCurrentColor(palettes)
-  const color = currentColor.hex
+  const color = currentColor
 
   async function getColorName(color: string) {
     try {

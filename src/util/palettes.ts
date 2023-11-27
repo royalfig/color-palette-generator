@@ -1,18 +1,40 @@
-import { filterSaturate, filterContrast, formatHsl } from 'culori/fn'
-import { colorFactory } from './factory'
-import { hsl, lch } from './colorParse'
+import { ColorFactory, colorFactory } from './factory'
 import { createScales } from './scales'
-import {Color} from 'culori'
+import { createColorObj, ReturnColor } from './colorParse'
+import { ColorConstructor } from 'colorjs.io/types/src/color'
+import Color from 'colorjs.io'
 
-const targetHues: {[key: string]: number[] } = {
+const targetHues: { [key: string]: number[] } = {
   analogous: [0, 30, 60],
   triadic: [0, 120, 240],
   tetradic: [0, 90, 180, 270],
   complementary: [0, 180],
   splitComplementary: [0, 150, 210],
-} 
+}
 
-const variations: {[key: string]: {space: string, adjust: Function}} = {
+function cinematic(color: Color) {
+  color.hsl.s *= 1.2;
+  if (color.hsl.l > 0.5) {
+    color.hsl.l *= 0.9;
+  } else {
+    color.hsl.l *= 1.1;
+  }
+  return color;
+}
+
+function languid(color: Color) {
+  color.hsl.s *= .5;
+  color.hsl.l *= 1.25;
+  return color;
+}
+
+function sharkbite(color: Color) {
+  color.hsl.s *= 1.5;
+  color.hsl.l *= 1.25;
+  return color;
+}
+
+const variations: { [key: string]: { space: string; adjust: Function } } = {
   original: {
     space: 'hsl',
     adjust: (color: Color) => color,
@@ -23,15 +45,15 @@ const variations: {[key: string]: {space: string, adjust: Function}} = {
   },
   cinematic: {
     space: 'hsl',
-    adjust: (color: Color) => filterContrast(1.5, 'rgb')(filterSaturate(1.2, 'rgb')(color)),
+    adjust: (color: Color) => cinematic(color),
   },
   languid: {
     space: 'hsl',
-    adjust: (color: Color) => filterSaturate(0.5, 'rgb')(color),
+    adjust: (color: Color) => languid(color),
   },
   sharkbite: {
     space: 'hsl',
-    adjust: (color: Color) => filterSaturate(1.5, 'rgb')(color),
+    adjust: (color: Color) => sharkbite(color),
   },
 }
 
@@ -40,101 +62,41 @@ function adjustHue(val: number) {
   return val % 360
 }
 
-type Schemes = {
-  analogous: {
-    original: ColorProps[];
-    keel: ColorProps[];
-    cinematic: ColorProps[];
-    languid: ColorProps[];
-    sharkbite: ColorProps[];
-  };
-  triadic: {
-    original: ColorProps[];
-    keel: ColorProps[];
-    cinematic: ColorProps[];
-    languid: ColorProps[];
-    sharkbite: ColorProps[];    
-  };
-  tetradic: {
-    original: ColorProps[];
-    keel: ColorProps[];
-    cinematic: ColorProps[];
-    languid: ColorProps[];
-    sharkbite: ColorProps[];
-  };
-  complementary: {
-    original: ColorProps[];
-    keel: ColorProps[];
-    cinematic: ColorProps[];
-    languid: ColorProps[];
-    sharkbite: ColorProps[];
-  };
-  splitComplementary: {
-    original: ColorProps[];
-    keel: ColorProps[];
-    cinematic: ColorProps[];
-    languid: ColorProps[];
-    sharkbite: ColorProps[];
-  };
-  tones: {
-    original: ColorProps[];
-    keel: ColorProps[];
-    cinematic: ColorProps[]; 
-    languid: ColorProps[];
-    sharkbite: ColorProps[];
-  };
-  polychromia: {
-    original: ColorProps[];
-    keel: ColorProps[];
-    cinematic: ColorProps[];
-    languid: ColorProps[];
-    sharkbite: ColorProps[];
-  };
-  ombre: {
-    original: ColorProps[];
-    keel: ColorProps[];
-    cinematic: ColorProps[];
-    languid: ColorProps[]; 
-    sharkbite: ColorProps[];
-  };
-  tintsAndShades: {
-    original: ColorProps[];
-    keel: ColorProps[];
-    cinematic: ColorProps[];
-    languid: ColorProps[];
-    sharkbite: ColorProps[];
-  };
+type ColorScheme = {
+  original: ColorFactory[]
+  keel: ColorFactory[]
+  cinematic: ColorFactory[]
+  languid: ColorFactory[]
+  sharkbite: ColorFactory[]
 }
 
-export interface ColorProps {
-  code: string;
-  hex: string;
-  rgb: string;
-  hsl: string;
-  lch: string;
-  oklch: string;
-  lab: string;
-  oklab: string;
-  p3: string;
-  inGamut: boolean;
-  point: [number, number];
-  css: string;
-  cssRaw: string;
+export type Schemes = {
+  analogous: ColorScheme
+  triadic: ColorScheme
+  tetradic: ColorScheme
+  complementary: ColorScheme
+  splitComplementary: ColorScheme
+  tones: ColorScheme
+  polychromia: ColorScheme
+  tintsAndShades: ColorScheme
 }
 
-import {hex} from "./colorParse"
-
-export function createPalettes(baseColor: Color | string): Schemes {
-  console.log("🚀 ~ file: palettes.ts:129 ~ createPalettes ~  hex(baseColor):",  hex(baseColor))
+export function createPalettes(baseColor: string | Color): Schemes {
   const palettes = Object.keys(targetHues).reduce<Record<string, any>>((hueAcc, hueKey) => {
     const v = Object.keys(variations).reduce<Record<string, any>>((variationAcc, variationKey) => {
       const p = targetHues[hueKey].map((hue, idx) => {
-        let base = variations[variationKey].space === 'hsl' ? hsl(baseColor) : lch(baseColor)
-        if (!base) {throw new Error('Base color is undefined')} 
-        base.h = adjustHue(base.h! + hue)
-        base = variations[variationKey].adjust(base)
-        if (!base) {throw new Error('Base color is undefined')} 
-        return colorFactory(base, variationKey + hueKey, idx)
+        const space = variations[variationKey].space
+        const base = new Color(baseColor)
+        if (space === 'hsl') {
+          base.hsl.h += hue; 
+          const variedColor = variations[variationKey].adjust(base, idx)
+          return colorFactory(variedColor, `${hueKey}-${variationKey}`, idx)
+        } else {
+          base.lch.h += hue;
+          const variedColor = variations[variationKey].adjust(base, idx)
+          return colorFactory(variedColor, `${hueKey}-${variationKey}`, idx)
+        }
+
       })
 
       variationAcc[variationKey] = [...p]
@@ -146,5 +108,6 @@ export function createPalettes(baseColor: Color | string): Schemes {
   }, {})
 
   const scales = createScales(baseColor)
- return { ...palettes, ...scales } as Schemes
+  console.log("🚀 ~ file: palettes.ts:111 ~ createPalettes ~ scales:", scales)
+  return { ...palettes, ...scales } as Schemes
 }

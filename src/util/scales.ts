@@ -1,198 +1,154 @@
-import { hsl, oklch } from './colorParse'
 import { colorFactory } from './factory'
-import {
-  filterGrayscale,
-  filterContrast,
-  interpolate,
-  fixupHueLonger,
-  interpolatorLinear,
-  interpolatorSplineBasis,
-  interpolatorSplineMonotoneClosed,
-} from 'culori/fn'
-
-import { Color } from 'culori'
-import { ColorProps } from './palettes'
-
-type ColorScheme = {
-  original: ColorProps[]
-  keel: ColorProps[]
-  cinematic: ColorProps[]
-  languid: ColorProps[]
-  sharkbite: ColorProps[]
-}
+import Color from 'colorjs.io'
 
 export function createScales(baseColor: Color | string) {
-  const tones: ColorScheme = {
-    original: [],
-    keel: [],
-    cinematic: [],
-    languid: [],
-    sharkbite: [],
+  const tonesStartOriginal = new Color(baseColor).mix('#808080', 0.9, { space: 'hsl', outputSpace: 'hsl' })
+  const lightenedTonesStartOriginal = new Color(tonesStartOriginal)
+  lightenedTonesStartOriginal.hsl.l = 99
+  const tonesEndOriginal = new Color(baseColor).mix('#808080', 0.9, { space: 'hsl', outputSpace: 'hsl' })
+  const lightenedTonesEndOriginal = new Color(tonesEndOriginal)
+  lightenedTonesEndOriginal.hsl.l = 1
+  const tonesOriginal = Color.steps(lightenedTonesStartOriginal, lightenedTonesEndOriginal, {
+    space: 'hsl',
+    steps: 10,
+  })
+
+  const tonesStartKeel = new Color(baseColor).mix('#808080', 0.9, { space: 'lch', outputSpace: 'lch' })
+  const tonesSk = new Color(tonesStartKeel)
+  tonesSk.lch.l = 99
+  const tonesEndKeel = new Color(baseColor).mix('#808080', 0.9, { space: 'lch', outputSpace: 'lch' })
+  const tonesEk = new Color(tonesEndKeel)
+  tonesEk.lch.l = 1
+  const tonesKeel = Color.steps(tonesSk, tonesEk, { space: 'lch', outputSpace: 'lch', steps: 10 })
+
+  const tonesStartCinematic = new Color(baseColor).mix('#808080', 0.75, { space: 'lch', outputSpace: 'lch' })
+  const tSc = new Color(tonesStartCinematic)
+  tSc.lch.l = 99
+  tSc.lch.c *= .5
+  const tonesEndCinematic = new Color(baseColor).mix('#808080', 0.75, { space: 'lch', outputSpace: 'lch' })
+  const tEc = new Color(tonesEndCinematic)
+  tEc.lch.l = 1
+  tEc.lch.c *= 1.5
+  
+  const tonesCinematic = Color.steps(tSc, tEc, {
+    space: 'oklab',
+    outputSpace: 'oklab',
+    steps: 10,
+  })
+
+  const tonesStartLanguid = new Color(baseColor).mix('#808080', 0.98, { space: 'hsl', outputSpace: 'hsl' })
+  const tSl = new Color(tonesStartLanguid)
+  tSl.hsl.l = 99
+  tSl.hsl.s *= .5
+
+  const tonesEndLanguid = new Color(baseColor).mix('#808080', 0.98, { space: 'hsl', outputSpace: 'hsl' })
+  const tEl = new Color(tonesEndLanguid)
+  tEl.hsl.l = 1
+  tEl.hsl.s *= .5
+
+  const tonesLanguid = Color.steps(tSl, tEl, {
+    space: 'lch',
+    outputSpace: 'lch',
+    steps: 10,
+    hue: 'shorter',
+  })
+
+  const sbStartLanguid = new Color(baseColor).mix('#808080', 0.98, { space: 'lch', outputSpace: 'lch' })
+  const tSbs = new Color(sbStartLanguid)
+  tSbs.lch.l = 99
+  tSbs.lch.c *= 1.5
+
+  const sbEndLanguid = new Color(baseColor).mix('#808080', 0.98, { space: 'lch', outputSpace: 'lch' })
+  const tSbe = new Color(sbEndLanguid)
+  tSbe.lch.l = 1
+  tSbe.lch.c *= 1.5
+
+  const tonesSharkbite = Color.steps(tSbs, tSbe, {
+    space: 'lch',
+    outputSpace: 'oklab',
+    steps: 10
+  })
+
+  const tones = {
+    original: tonesOriginal.map((c, idx) => colorFactory(c, 'tns-o', idx)),
+    keel: tonesKeel.map((c, idx) => colorFactory(c, 'tns-k', idx)),
+    cinematic: tonesCinematic.map((c, idx) => colorFactory(c, 'tns-c', idx)),
+    languid: tonesLanguid.map((c, idx) => colorFactory(c, 'tns-l', idx)),
+    sharkbite: tonesSharkbite.map((c, idx) => colorFactory(c, 'tns-s', idx)),
   }
 
-  const polychromia: ColorScheme = {
-    original: [],
-    keel: [],
-    cinematic: [],
-    languid: [],
-    sharkbite: [],
+  const polyStartOriginal = new Color(baseColor)
+  const polyEndOriginal = new Color(baseColor)
+  polyEndOriginal.hsl.h += 359
+  polyEndOriginal.hsl.h = polyEndOriginal.hsl.h % 360
+  const polyOriginal = Color.steps(polyStartOriginal, polyEndOriginal, {
+    space: 'hsl',
+    steps: 10,
+    hue: 'increasing',
+  })
+  const polyKeel = Color.steps(polyStartOriginal, polyEndOriginal, {
+    space: 'oklch',
+    outputSpace: 'oklch',
+    steps: 10,
+    hue: 'increasing',
+  })
+  const polyCinematic = Color.steps(polyStartOriginal, polyEndOriginal, {
+    space: 'oklab',
+    outputSpace: 'oklab',
+    steps: 10,
+    hue: 'shorter',
+  })
+  const polyLanguid = Color.steps(polyStartOriginal, polyEndOriginal, {
+    space: 'oklch',
+    outputSpace: 'oklch',
+    steps: 10,
+    hue: 'shorter',
+  })
+  const polySharkbite = Color.steps(polyStartOriginal, polyEndOriginal, {
+    space: 'srgb',
+    outputSpace: 'srgb',
+    steps: 10,
+    hue: 'longer',
+  })
+  const polychromia = {
+    original: polyOriginal.map((c, idx) => colorFactory(c, 'ply-o', idx)),
+    keel: polyKeel.map((c, idx) => colorFactory(c, 'ply-k', idx)),
+    cinematic: polyCinematic.map((c, idx) => colorFactory(c, 'ply-c', idx)),
+    languid: polyLanguid.map((c, idx) => colorFactory(c, 'ply-l', idx)),
+    sharkbite: polySharkbite.map((c, idx) => colorFactory(c, 'ply-s', idx)),
   }
 
-  const tintsAndShades: ColorScheme = {
-    original: [],
-    keel: [],
-    cinematic: [],
-    languid: [],
-    sharkbite: [],
+  const tintsAndShadesStartDesaturated = new Color(baseColor).mix('white', 0.9, { space: 'srgb', outputSpace: 'srgb' })
+  const tintsAndShadesStartOriginal = new Color(tintsAndShadesStartDesaturated)
+  const tintsAndShadesEndDesaturated = new Color(baseColor).mix('black', 0.9, { space: 'srgb', outputSpace: 'srgb' })
+  const tintsAndShadesEndOriginal = new Color(tintsAndShadesEndDesaturated)
+  const tintsAndShadesOriginal = Color.steps(tintsAndShadesStartOriginal, tintsAndShadesEndOriginal, {
+    space: 'hsl',
+    outputSpace: 'hsl',
+    steps: 10,
+  })
+
+  const tintsAndShadesCinematic = Color.steps(tintsAndShadesStartOriginal, tintsAndShadesEndOriginal, {
+    space: 'oklab',
+    outputSpace: 'oklab',
+    steps: 10,
+  })
+
+  const tintsAndShadesStartKeel = new Color(baseColor).mix('#fff', 0.95, { space: 'lch', outputSpace: 'lch' })
+  const tintsAndShadesEndKeel = new Color(baseColor).mix('#000', 0.95, { space: 'lch', outputSpace: 'lch' })
+  const tintsAndShadesKeel = Color.steps(tintsAndShadesStartKeel, tintsAndShadesEndKeel, {
+    space: 'lch',
+    outputSpace: 'lch',
+    steps: 10,
+  })
+
+  const tintsAndShades = {
+    original: tintsAndShadesOriginal.map((c, idx) => colorFactory(c, 'tas-original', idx)),
+    keel: tintsAndShadesKeel.map((c, idx) => colorFactory(c, 'tas-keel', idx)),
+    cinematic: tintsAndShadesCinematic.map((c, idx) => colorFactory(c, 'tas-cinematic', idx)),
+    languid: tintsAndShadesOriginal.map((c, idx) => colorFactory(c, 'tas-languid', idx)),
+    sharkbite: tintsAndShadesOriginal.map((c, idx) => colorFactory(c, 'tas-sharkbite', idx)),
   }
 
-  const ombre: ColorScheme = {
-    original: [],
-    keel: [],
-    cinematic: [],
-    languid: [],
-    sharkbite: [],
-  }
-
-  const dark = hsl(baseColor)
-  if (!dark) throw new Error('Could not parse color: dark')
-  dark.s = 0.25
-  dark.l = 0.15
-  const light = hsl(baseColor)
-  if (!light) throw new Error('Could not parse color: light')
-  light.s = 0.15
-  light.l = 0.99
-  const interpolatedColors = interpolate([dark, light])
-  const start = hsl(baseColor)
-
-  if (!start) throw new Error('Could not parse color: start')
-
-  if (!start.h) start.h = 0
-
-
-  // Polychromia
-  const end = { ...start, h: (start.h + 359) % 360 }
-  const poly1 = interpolate([start, end], 'hsl', {
-    h: {
-      use: interpolatorLinear,
-      fixup: fixupHueLonger,
-    },
-  })
-
-  const poly2 = interpolate([start, end], 'lch', {
-    h: {
-      use: interpolatorLinear,
-      fixup: fixupHueLonger,
-    },
-  })
-
-  const poly3 = interpolate([start, end], 'hsl', {
-    h: {
-      use: interpolatorSplineMonotoneClosed,
-      fixup: fixupHueLonger,
-    },
-  })
-
-  const poly4 = interpolate([start, end], 'hsl', {
-    h: {
-      use: interpolatorSplineBasis,
-      fixup: fixupHueLonger,
-    },
-  })
-
-  const poly5 = interpolate([start, end], 'lch', {
-    h: {
-      use: interpolatorSplineMonotoneClosed,
-      fixup: fixupHueLonger,
-    },
-  })
-
-  // Ombre
-  const ombreEnd = { ...start, h: (start.h + 180) % 360 }
-  const ombre1 = interpolate([start, ombreEnd], 'hsl', {
-    h: {
-      use: interpolatorLinear,
-      fixup: fixupHueLonger,
-    },
-  })
-
-  const ombre2 = interpolate([start, ombreEnd], 'lch', {
-    h: {
-      use: interpolatorLinear,
-      fixup: fixupHueLonger,
-    },
-  })
-
-  const ombre3 = interpolate([start, ombreEnd], 'hsl', {
-    h: {
-      use: interpolatorSplineMonotoneClosed,
-      fixup: fixupHueLonger,
-    },
-  })
-
-  const ombre4 = interpolate([start, ombreEnd], 'hsl', {
-    h: {
-      use: interpolatorSplineBasis,
-      fixup: fixupHueLonger,
-    },
-  })
-
-  const ombre5 = interpolate([start, ombreEnd], 'lab', {
-    h: {
-      use: interpolatorSplineMonotoneClosed,
-      fixup: fixupHueLonger,
-    },
-  })
-
-  const hslTint = interpolate([start, '#fff'], 'hsl')
-  const hslShade = interpolate([start, '#000'], 'hsl')
-  const lchTint = interpolate([start, '#fff'], 'lch')
-  const lchShade = interpolate([start, '#000'], 'lch')
-  const labTint = interpolate([start, '#fff'], 'lab')
-  const labShade = interpolate([start, '#000'], 'lab')
-
-  for (let index = 0; index < 10; index++) {
-    const hslBase = hsl(baseColor)
-    const oklchBase = oklch(baseColor)
-    if (!oklchBase) throw new Error('Could not parse color')
-    oklchBase.c = 10
-    oklchBase.l = index * 10 + 8
-    if (!hslBase) throw new Error('Could not parse color')
-    hslBase.s = 0.1
-    hslBase.l = (index * 10 + 8) / 100
-
-    const keelScale = filterGrayscale(0.75)(oklchBase)
-    const lanquidScale = filterContrast(0.5)(oklchBase)
-    tones.original.push(colorFactory(hslBase, 'tones-og', index))
-    tones.keel.push(colorFactory(keelScale, 'tones-cinematic', index))
-    tones.cinematic.push(colorFactory(oklchBase, 'tones-keel', index))
-    tones.languid.push(colorFactory(lanquidScale, 'tones-languid', index))
-    tones.sharkbite.push(colorFactory(interpolatedColors(index / 10), 'tones-sharkbite', index))
-    polychromia.original.push(colorFactory(poly1(index / 10), 'poly-og', index))
-    polychromia.keel.push(colorFactory(poly2(index / 10), 'poly-cinematic', index))
-    polychromia.cinematic.push(colorFactory(poly3(index / 10), 'poly-keel', index))
-    polychromia.languid.push(colorFactory(poly4(index / 10), 'poly-languid', index))
-    polychromia.sharkbite.push(colorFactory(poly5(index / 10), 'poly-sharkbite', index))
-    ombre.original.push(colorFactory(ombre1(index / 10), 'ombre-og', index))
-    ombre.keel.push(colorFactory(ombre2(index / 10), 'ombre-cinematic', index))
-    ombre.cinematic.push(colorFactory(ombre3(index / 10), 'ombre-keel', index))
-    ombre.languid.push(colorFactory(ombre4(index / 10), 'ombre-languid', index))
-    ombre.sharkbite.push(colorFactory(ombre5(index / 10), 'ombre-sharkbite', index))
-
-    if (index < 6) {
-      tintsAndShades.original.push(colorFactory(hslShade((10 - index) / 10), 'tints-and-shades-og', index))
-      tintsAndShades.keel.push(colorFactory(lchShade((10 - index) / 10), 'tints-and-shades-og', index))
-      tintsAndShades.cinematic.push(colorFactory(lchShade((10 - index) / 5), 'tints-and-shades-og', index))
-      tintsAndShades.languid.push(colorFactory(lchShade((10 - index) / 2), 'tints-and-shades-og', index))
-      tintsAndShades.sharkbite.push(colorFactory(labShade((10 - index) / 10), 'tints-and-shades-og', index))
-    } else {
-      tintsAndShades.original.push(colorFactory(hslTint(index / 10), 'tints-and-shades-og', index))
-      tintsAndShades.keel.push(colorFactory(lchShade(index / 10), 'tints-and-shades-og', index))
-      tintsAndShades.cinematic.push(colorFactory(lchTint(index / 5), 'tints-and-shades-og', index))
-      tintsAndShades.languid.push(colorFactory(lchTint(index / 2), 'tints-and-shades-og', index))
-      tintsAndShades.sharkbite.push(colorFactory(labTint(index / 10), 'tints-and-shades-og', index))
-    }
-  }
-
-  return { tones: tones, polychromia: polychromia, ombre: ombre, tintsAndShades: tintsAndShades }
+  return { tones: tones, polychromia: polychromia, tintsAndShades: tintsAndShades }
 }

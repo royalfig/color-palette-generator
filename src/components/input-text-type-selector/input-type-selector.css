@@ -1,0 +1,34 @@
+.input-type-selectors {
+  display: flex;
+  gap: var(--spacing-02);
+  justify-content: space-between;
+  margin-block: var(--spacing-04);
+
+  & .indicator {
+    width: var(--spacing-03);
+    height: var(--spacing-03);
+    background-color: #e7e4e4;
+    border: 1px solid #ccccccb3;
+    border-radius: 50%;
+  }
+
+  & .input-type-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    &.active {
+      & .indicator {
+        background-color: rgb(255 75 75);
+      }
+    }
+
+    & p {
+      font-size: var(--x-small);
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      opacity: 0.5;
+    }
+  }
+}

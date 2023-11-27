@@ -1,50 +1,59 @@
 import { ScissorsIcon } from '@heroicons/react/24/outline'
-import { formatCss, parse } from 'culori'
-import { debounce, set } from 'lodash-es'
+import { debounce } from 'lodash-es'
 import { useCallback, useEffect, useState } from 'react'
-import { useCurrentColor } from '../../hooks/useCurrentColor'
+import { Schemes } from '../../util/palettes'
 import './InputColor.css'
+import Color from 'colorjs.io'
 
 export function InputColor({
   palettes,
   setColor,
   type,
 }: {
-  palettes: any
-  setColor: React.Dispatch<React.SetStateAction<string>>
+  palettes: Schemes
+  setColor: React.Dispatch<React.SetStateAction<string | Color>>
   type: 'hex' | 'rgb' | 'hsl' | 'lch' | 'oklch' | 'lab' | 'oklab' | 'p3'
 }) {
-  const currentPalette = useCurrentColor(palettes)
+  // const current = palettes.complementary.original[0][type].string;
+  
+  const [inputColor, setInputColor] = useState<Schemes | string>(palettes)
+  const [prevColor, setPrevColor] = useState(palettes)
 
-  const [inputColor, setInputColor] = useState(currentPalette[type])
+  console.log('rendering input el', Date.now())
+
+  // useEffect(() => {
+  //   console.log('EFFECT setting input color', Date.now())
+  //   setInputColor(palettes.complementary.original[0][type].string)
+  // }, [palettes])
+
+  if (palettes !== prevColor) {
+    setInputColor(palettes)
+    setPrevColor(palettes)
+    console.log("prev don't match", palettes, prevColor)
+  }
+
+  
+  const string = palettes.complementary.original[0][type].string
+  const inGamut = palettes.complementary.original[0][type].isInGamut
   const [warning, setWarning] = useState(false)
 
   const debouncedParseColor = useCallback(debounce(parseColor, 1000), [])
 
   function parseColor(value: string) {
     console.log('parsing color', Date.now())
-    const parsed = parse(value)
 
-    if (!parsed) {
-      setWarning(true)
-      return;
-    }
-
-    if (parsed) {
+    try {
+      const parsed = new Color(value)
       setWarning(false)
-      const parsedAsStr = formatCss(parsed)
-      console.log({ parsedAsStr, parsed })
-      setColor(parsedAsStr)
+      setColor(parsed)
+    } catch (error) {
+      setWarning(true)
+      return
     }
   }
 
   function validate(value: string) {
-
-    if (['rgb', 'hsl'].includes(type)) {
-      return value.split(',').length === 3
-    } else {
-      return value.split(' ').length === 3
-    }
+    return value.split(' ').length === 3
   }
 
   function handleChange(value: string): void {
@@ -62,28 +71,22 @@ export function InputColor({
     debouncedParseColor(value)
   }
 
-  const clipped = !currentPalette.inGamut && ['rgb', 'hsl', 'hex'].includes(type)
-
-  useEffect(() => {
-    setInputColor(currentPalette[type])
-  }, [palettes])
-
   return (
-    <div className="input-color">
-      <div className="label-group flex">
-        <div className="flex gap-2">
-          <label htmlFor={`input-color-${type}`}>{type}</label>{' '}
-          {clipped ? <ScissorsIcon className="clipped-icon" /> : undefined}
-        </div>
-        {warning ? <div className="warning">Color not parsed</div> : undefined}
-      </div>
+    <div className="input-color flex">
+      <label className="sr-only" htmlFor={`input-color-${type}`}>
+        {type}
+      </label>
       <input
         id={`input-color-${type}`}
         type="text"
-        value={inputColor}
+        value={string}
         onChange={e => handleChange(e.target.value)}
         spellCheck="false"
       />
+      <div className="input-color-metadata">
+        {!inGamut ? <ScissorsIcon className="clipped-icon" /> : undefined}
+        {warning ? <div className="warning">Color not parsed</div> : undefined}
+      </div>
     </div>
   )
 }

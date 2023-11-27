@@ -1,6 +1,7 @@
 .display {
     padding: var(--spacing-02);
     background-color: #000;
+    border-radius: var(--radius);
 
     &::after {
         pointer-events: none;

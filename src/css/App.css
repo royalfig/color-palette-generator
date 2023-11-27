@@ -3,7 +3,7 @@ main {
   place-items: center;
   height: 100vh;
   padding: 2.5vw;
-  background-image: linear-gradient(to bottom in lab, var(--bg-1), var(--bg-2));
+  background-image: linear-gradient(to top in oklab, var(--bg-1), var(--bg-2));
 }
 
 .synth-container {
@@ -37,4 +37,16 @@ main {
       font-weight: 700;
     }
   }
+}
+
+.box {
+  width: 2rem;
+  height: 2rem;
+}
+
+.color-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-04);
+  width: 100%;
 }
