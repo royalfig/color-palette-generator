@@ -1,0 +1,17 @@
+.control-group {
+  & h2 {
+    margin-block-end: var(--spacing-03);
+    font-size: var(--small);
+    font-weight: normal;
+  }
+
+  & .button-container {
+    flex: 1;
+  }
+}
+
+.control-group-container {
+  display: flex;
+  gap: var(--spacing-03);
+  justify-content: space-between;
+}

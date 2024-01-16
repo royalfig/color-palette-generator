@@ -1,49 +1,44 @@
 import { ScissorsIcon } from '@heroicons/react/24/outline'
-import { debounce } from 'lodash-es'
-import { useCallback, useEffect, useState } from 'react'
-import { Schemes } from '../../util/palettes'
-import './InputColor.css'
 import Color from 'colorjs.io'
+import { debounce } from 'lodash-es'
+import { useCallback, useState } from 'react'
+import './InputColor.css'
+import { ColorFactory } from '../../util/factory'
+import { ColorTypes } from '../input-color-container/InputColorContainer'
 
 export function InputColor({
-  palettes,
+  setColorspaceType,
   setColor,
   type,
+  base
 }: {
-  palettes: Schemes
+  setColorspaceType: React.Dispatch<React.SetStateAction<ColorTypes>>
   setColor: React.Dispatch<React.SetStateAction<string | Color>>
-  type: 'hex' | 'rgb' | 'hsl' | 'lch' | 'oklch' | 'lab' | 'oklab' | 'p3'
+  type: 'hex' | 'rgb' | 'hsl' | 'lch' | 'oklch' | 'lab' | 'oklab' | 'p3',
+  base: ColorFactory
 }) {
-  // const current = palettes.complementary.original[0][type].string;
-  
-  const [inputColor, setInputColor] = useState<Schemes | string>(palettes)
-  const [prevColor, setPrevColor] = useState(palettes)
-
-  console.log('rendering input el', Date.now())
-
-  // useEffect(() => {
-  //   console.log('EFFECT setting input color', Date.now())
-  //   setInputColor(palettes.complementary.original[0][type].string)
-  // }, [palettes])
-
-  if (palettes !== prevColor) {
-    setInputColor(palettes)
-    setPrevColor(palettes)
-    console.log("prev don't match", palettes, prevColor)
-  }
-
-  
-  const string = palettes.complementary.original[0][type].string
-  const inGamut = palettes.complementary.original[0][type].isInGamut
+  const current = base[type].string
+  const [inputColor, setInputColor] = useState<string>(current)
+  const [prevInputColor, setPrevInputColor] = useState<string>(current)
   const [warning, setWarning] = useState(false)
+  const inGamut = base[type].isInGamut
+
+  console.log('inputColor rendering')
+  
+  if (current !== prevInputColor) {
+    console.log("🚀 ~ file: InputColor.tsx:30 ~ current !== prevInputColor:", current, prevInputColor)
+    setInputColor(current)
+    setPrevInputColor(inputColor)
+  }
 
   const debouncedParseColor = useCallback(debounce(parseColor, 1000), [])
 
   function parseColor(value: string) {
-    console.log('parsing color', Date.now())
-
+    console.log('handling change', Date.now())
     try {
       const parsed = new Color(value)
+      // setColorspaceType(parsed.spaceId)
+      console.log("🚀 ~ file: InputColor.tsx:57 ~ parseColor ~ parsed:", parsed)
       setWarning(false)
       setColor(parsed)
     } catch (error) {
@@ -57,14 +52,12 @@ export function InputColor({
   }
 
   function handleChange(value: string): void {
-    console.log('handling change', Date.now())
     setWarning(false)
     setInputColor(value)
 
-    if (type === 'hex' && value.length < 7) return
+    if (value.includes('#') && value.length < 7) return
 
-    if (type !== 'hex' && !validate(value)) {
-      console.log('dont match')
+    if (!value.includes('#') && !validate(value)) {
       return
     }
 
@@ -79,7 +72,7 @@ export function InputColor({
       <input
         id={`input-color-${type}`}
         type="text"
-        value={string}
+        value={inputColor}
         onChange={e => handleChange(e.target.value)}
         spellCheck="false"
       />

@@ -1,43 +1,65 @@
-.color-text-inputs {
-    margin-block: var(--spacing-04);
-}
-
 .input-color {
-    position: relative;
-    align-items: baseline;
+  position: relative;
+  align-items: baseline;
+  width: 100%;
+  padding: var(--spacing-04);
+  background-color: #c2d2d5;
+  border: 2px solid #242424;
+  border-radius: 2px;
+  box-shadow: inset 3px 3px 6px hwb(0deg 0% 100% / 30%);
+
+  &::after {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    padding: var(--spacing-03);
-    background-color: #c2d2d5;
-    box-shadow: inset 2px 2px 4px #0000001f;
+    pointer-events: none;
+    content: '';
+    background: linear-gradient(
+      90deg,
+      rgb(255 255 255 / 15.2%) 0%,
+      rgb(0 0 0 / 25%) 15%,
+      rgb(255 255 255 / 15.5%) 30%,
+      rgb(0 0 0 / 15%) 50%,
+      rgb(255 255 255 / 14.9%) 70%,
+      rgb(0 0 0 / 15%) 85%,
+      rgb(255 255 255 / 14.9%) 100%
+    );
+    opacity: 0.5;
+  }
 
-    &::after {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        pointer-events: none;
-        content: '';
-        background: linear-gradient(90deg, rgb(255 255 255 / 15.2%) 0%, rgb(0 0 0 / 25%) 15%, rgb(255 255 255 / 15.5%) 30%, rgb(0 0 0 / 15%) 50%, rgb(255 255 255 / 14.9%) 70%, rgb(0 0 0 / 15%) 85%, rgb(255 255 255 / 14.9%) 100%);
-        opacity: .5;
+  &::before {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    pointer-events: none;
+    content: '';
+    background: linear-gradient(rgb(230 248 251), transparent, rgb(230 248 251));
+    opacity: 0.5;
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  &:focus-within {
+    &::before {
+      opacity: 1;
     }
 
-    &:focus-within {
-        outline: 1px solid red;
-    }
+    /* outline: 1px solid red; */
+  }
 
-   
+  & .clipped-icon {
+    flex-shrink: 0;
+    width: var(--small);
+    height: var(--small);
+    opacity: 0.5;
+  }
 
-    & .clipped-icon {
-        flex-shrink: 0;
-        width: var(--small);
-        height: var(--small);
-        opacity: .5;
-    }
+  & input {
+    width: 100%;
+    padding: 0;
+    font-family: monospace;
+    color: #242424;
 
-    & input {
-        width: 100%;
-        padding: 0;
-        font-family: monospace;
-        font-size: var(--small);
-        border: none
-    }
+    /* font-size: var(--small); */
+    border: none;
+  }
 }

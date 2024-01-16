@@ -13,6 +13,9 @@ import { createPalettes } from './util/palettes'
 import Color from 'colorjs.io'
 import ColorHistory from './components/color-history/ColorHistory'
 import { InputColorContainer } from './components/input-color-container/InputColorContainer'
+import { useBaseColor } from './hooks/useBaseColor'
+import { EyeDropper } from './components/eye-dropper/EyeDropper'
+import { ControlGroup } from './components/control-group/ControlGroup'
 
 function pickRandomColor() {
   const popularColors = [
@@ -86,6 +89,7 @@ function pickRandomColor() {
 export default function App() {
   const [color, setColor] = useState<string | Color>(pickRandomColor())
   const palettes = createPalettes(color)
+  const base = useBaseColor(palettes)
 
   const s = {
     '--bg-1': palettes.tintsAndShades.original[9].lch.css,
@@ -107,9 +111,18 @@ export default function App() {
             </div>
           </Display>
           <section className="color-text-inputs">
-            <InputColorContainer palettes={palettes} setColor={setColor} />
+            <InputColorContainer palettes={palettes} setColor={setColor} base={base} />
           </section>
-          <ColorHistory palettes={palettes} setColor={setColor} />
+
+          <ControlGroup title="History">
+            <ColorHistory palettes={palettes} setColor={setColor} />
+          </ControlGroup>
+
+          <ControlGroup title="Controls">
+            <EyeDropper setColor={setColor} />
+            <EyeDropper setColor={setColor} />
+            <EyeDropper setColor={setColor} />
+          </ControlGroup>
         </div>
         <div className="synth-center flex" style={{ justifyContent: 'flex-start' }}>
           <div className="flex col">
@@ -119,6 +132,66 @@ export default function App() {
           </div>
           <div className="flex col">
             {palettes.tintsAndShades.original.map((color, idx) => (
+              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
+            ))}
+          </div>
+          <div className="flex col">
+            {palettes.complementary.original.map((color, idx) => (
+              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
+            ))}
+          </div>
+          <div className="flex col">
+            {palettes.analogous.original.map((color, idx) => (
+              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
+            ))}
+          </div>
+          <div className="flex col">
+            {palettes.splitComplementary.original.map((color, idx) => (
+              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
+            ))}
+          </div>
+          <div className="flex col">
+            {palettes.triadic.original.map((color, idx) => (
+              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
+            ))}
+          </div>
+          <div className="flex col">
+            {palettes.tetradic.original.map((color, idx) => (
+              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
+            ))}
+          </div>
+          <div className="flex col">
+            {palettes.tones.keel.map((color, idx) => (
+              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
+            ))}
+          </div>
+          <div className="flex col">
+            {palettes.tintsAndShades.keel.map((color, idx) => (
+              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
+            ))}
+          </div>
+          <div className="flex col">
+            {palettes.complementary.keel.map((color, idx) => (
+              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
+            ))}
+          </div>
+          <div className="flex col">
+            {palettes.analogous.keel.map((color, idx) => (
+              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
+            ))}
+          </div>
+          <div className="flex col">
+            {palettes.splitComplementary.keel.map((color, idx) => (
+              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
+            ))}
+          </div>
+          <div className="flex col">
+            {palettes.triadic.keel.map((color, idx) => (
+              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
+            ))}
+          </div>
+          <div className="flex col">
+            {palettes.tetradic.keel.map((color, idx) => (
               <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
             ))}
           </div>

@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react'
 import { ShareIcon } from '@heroicons/react/24/outline'
 import { motion } from 'framer-motion'
 import './current-color-display.css'
-import { useCurrentColor } from '../../hooks/useCurrentColor'
+import { useBaseColor } from '../../hooks/useBaseColor'
 
 export function CurrentColorDisplay({ palettes }: { palettes: any }) {
   const [colorName, setColorName] = useState('')
 
-  const currentColor = useCurrentColor(palettes)
-  const color = currentColor
+  const currentColor = useBaseColor(palettes)
+  const color = currentColor.hex.string
 
   async function getColorName(color: string) {
     try {

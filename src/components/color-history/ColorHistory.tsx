@@ -15,8 +15,7 @@ export default function ColorHistory({ palettes, setColor }: { palettes: Schemes
   }
 
   return (
-    <section className="color-history">
-      <p>History</p>
+    <>
       {history.map((color, idx) => (
         <button
           key={idx}
@@ -30,6 +29,6 @@ export default function ColorHistory({ palettes, setColor }: { palettes: Schemes
           <div className="color-history-swatch" style={{ backgroundColor: color.hex?.string }}></div>
         </button>
       ))}
-    </section>
+    </>
   )
 }

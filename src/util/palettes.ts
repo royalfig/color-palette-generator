@@ -5,7 +5,7 @@ import { ColorConstructor } from 'colorjs.io/types/src/color'
 import Color from 'colorjs.io'
 
 const targetHues: { [key: string]: number[] } = {
-  analogous: [0, 30, 60],
+  analogous: [0, 40, 70],
   triadic: [0, 120, 240],
   tetradic: [0, 90, 180, 270],
   complementary: [0, 180],
@@ -82,6 +82,7 @@ export type Schemes = {
 }
 
 export function createPalettes(baseColor: string | Color): Schemes {
+  console.log("🚀 ~ file: palettes.ts:85 ~ createPalettes ~ baseColor:", baseColor)
   const palettes = Object.keys(targetHues).reduce<Record<string, any>>((hueAcc, hueKey) => {
     const v = Object.keys(variations).reduce<Record<string, any>>((variationAcc, variationKey) => {
       const p = targetHues[hueKey].map((hue, idx) => {

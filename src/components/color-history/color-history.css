@@ -1,18 +1,3 @@
-.color-history {
-  display: flex;
-  gap: var(--spacing-02);
-  align-items: center;
-  justify-content: space-between;
-  padding-block: var(--spacing-06);
-
-  & p {
-    font-size: var(--x-small);
-    text-transform: uppercase;
-    letter-spacing: -0.5px;
-    opacity: 0.5;
-  }
-}
-
 .color-history-item {
   display: flex;
   align-items: center;
@@ -20,7 +5,7 @@
   width: 2rem;
   height: 2rem;
   padding: var(--spacing-01);
-  background-color: #393939;
+  background-color: #000;
   border-radius: 50%;
 
   &:disabled {
@@ -29,9 +14,15 @@
 }
 
 .color-history-swatch {
-  width: 1.5rem;
-  height: 1.5rem;
-  background-color: #f0f0f0;
+  width: 100%;
+  height: 100%;
+  background-color: #535353;
   border-radius: 50%;
-  box-shadow: inset -1px -1px 2px rgb(0 0 0 / 15.5%), inset 1px 1px 2px #ffffffb4, 1px 1px 4px rgb( 0 0 0 / 15%);
+  box-shadow: inset 1px 1px 2px rgb(255 255 255 / 65%), inset -1px -1px 2px rgb(0 0 0 / 35%),
+    2px 2px 0.15em rgb(0 0 0 / 35%);
+  transition: box-shadow 0.25s ease-in-out;
+
+  &:active {
+    box-shadow: inset 1px 1px 4px rgb(0 0 0 / 35%), inset -1px -1px 4px rgb(0 0 0 / 35%), 2px 2px 1px rgb(0 0 0 / 35%);
+  }
 }
