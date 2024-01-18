@@ -1,7 +1,6 @@
 import { ColorFactory, colorFactory } from './factory'
+import { generateCss } from './generateCss'
 import { createScales } from './scales'
-import { createColorObj, ReturnColor } from './colorParse'
-import { ColorConstructor } from 'colorjs.io/types/src/color'
 import Color from 'colorjs.io'
 
 const targetHues: { [key: string]: number[] } = {
@@ -13,25 +12,25 @@ const targetHues: { [key: string]: number[] } = {
 }
 
 function cinematic(color: Color) {
-  color.hsl.s *= 1.2;
+  color.hsl.s *= 1.2
   if (color.hsl.l > 0.5) {
-    color.hsl.l *= 0.9;
+    color.hsl.l *= 0.9
   } else {
-    color.hsl.l *= 1.1;
+    color.hsl.l *= 1.1
   }
-  return color;
+  return color
 }
 
 function languid(color: Color) {
-  color.hsl.s *= .5;
-  color.hsl.l *= 1.25;
-  return color;
+  color.hsl.s *= 0.5
+  color.hsl.l *= 1.25
+  return color
 }
 
 function sharkbite(color: Color) {
-  color.hsl.s *= 1.5;
-  color.hsl.l *= 1.25;
-  return color;
+  color.hsl.s *= 1.5
+  color.hsl.l *= 1.25
+  return color
 }
 
 const variations: { [key: string]: { space: string; adjust: Function } } = {
@@ -81,25 +80,30 @@ export type Schemes = {
   tintsAndShades: ColorScheme
 }
 
+function createColorVariations(hueKey: string, variationKey: string, baseColor: string | Color) {
+  return targetHues[hueKey].map((hue, idx) => {
+    // 0, 30  & 0, 1, 2
+    const space = variations[variationKey].space
+    const base = new Color(baseColor)
+    if (space === 'hsl') {
+      base.hsl.h += hue
+      const variedColor = variations[variationKey].adjust(base, idx)
+      return colorFactory(variedColor, `${hueKey}-${variationKey}`, idx)
+    } else {
+      base.lch.h += hue
+      const variedColor = variations[variationKey].adjust(base, idx)
+      return colorFactory(variedColor, `${hueKey}-${variationKey}`, idx)
+    }
+  })
+}
+
+// TODO: is it possible to simplify this function?
 export function createPalettes(baseColor: string | Color): Schemes {
-  console.log("🚀 ~ file: palettes.ts:85 ~ createPalettes ~ baseColor:", baseColor)
   const palettes = Object.keys(targetHues).reduce<Record<string, any>>((hueAcc, hueKey) => {
+    // hueAcc = {schemes} & hueKey = 'analogous'
     const v = Object.keys(variations).reduce<Record<string, any>>((variationAcc, variationKey) => {
-      const p = targetHues[hueKey].map((hue, idx) => {
-        const space = variations[variationKey].space
-        const base = new Color(baseColor)
-        if (space === 'hsl') {
-          base.hsl.h += hue; 
-          const variedColor = variations[variationKey].adjust(base, idx)
-          return colorFactory(variedColor, `${hueKey}-${variationKey}`, idx)
-        } else {
-          base.lch.h += hue;
-          const variedColor = variations[variationKey].adjust(base, idx)
-          return colorFactory(variedColor, `${hueKey}-${variationKey}`, idx)
-        }
-
-      })
-
+      // hueAcc = {variations} & variationKey = 'original'
+      const p = createColorVariations(hueKey, variationKey, baseColor)
       variationAcc[variationKey] = [...p]
       return variationAcc
     }, {})
@@ -109,6 +113,53 @@ export function createPalettes(baseColor: string | Color): Schemes {
   }, {})
 
   const scales = createScales(baseColor)
-  console.log("🚀 ~ file: palettes.ts:111 ~ createPalettes ~ scales:", scales)
+  const ui = createUi(palettes as Schemes, scales)
   return { ...palettes, ...scales } as Schemes
+}
+
+function createUi(palettes: Schemes, scales) {
+  const isLight = palettes.complementary.keel[0].lch.raw[0] > 50
+  const l = 50 - (palettes.complementary.keel[0].lch.raw[0] - 50)
+
+  return {
+    dark: {
+      primary: '',
+      primaryLight: '',
+      primaryDark: '',
+      secondary: '',
+      secondaryLight: '',
+      secondaryDark: '',
+
+      surface: '',
+      surfaceLight: '',
+      surfaceDark: '',
+
+      element: '',
+      elementLight: '',
+      elementDark: '',
+
+      success: '',
+      error: '',
+    },
+
+    light: {
+      primary: '',
+      primaryLight: '',
+      primaryDark: '',
+      secondary: '',
+      secondaryLight: '',
+      secondaryDark: '',
+
+      surface: '',
+      surfaceLight: '',
+      surfaceDark: '',
+
+      element: '',
+      elementLight: '',
+      elementDark: '',
+
+      success: '',
+      error: '',
+    },
+  }
 }

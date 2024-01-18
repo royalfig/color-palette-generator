@@ -53,7 +53,6 @@ function App() {
   const ombrePalette = createOmbre(color)
 
   const [palette, setPalette] = useState(complementaryPalette)
-  console.log(palette)
   function handlePalette(e) {
     const name = e?.currentTarget?.dataset?.name || e
     switch (name) {

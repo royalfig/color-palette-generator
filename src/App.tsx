@@ -3,7 +3,7 @@ import './css/Defaults.css'
 import './css/Reset.css'
 import './css/Variables.css'
 import './css/utils.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ColorSelector } from './components/color-selector/ColorSelector'
 import { CurrentColorDisplay } from './components/current-color-display/CurrentColorDisplay'
 import { Display } from './components/display/Display'
@@ -16,6 +16,7 @@ import { InputColorContainer } from './components/input-color-container/InputCol
 import { useBaseColor } from './hooks/useBaseColor'
 import { EyeDropper } from './components/eye-dropper/EyeDropper'
 import { ControlGroup } from './components/control-group/ControlGroup'
+import { generateCss } from './util/generateCss'
 
 function pickRandomColor() {
   const popularColors = [
@@ -89,15 +90,27 @@ function pickRandomColor() {
 export default function App() {
   const [color, setColor] = useState<string | Color>(pickRandomColor())
   const palettes = createPalettes(color)
+  const css = generateCss(palettes)
   const base = useBaseColor(palettes)
 
-  const s = {
-    '--bg-1': palettes.tintsAndShades.original[9].lch.css,
-    '--bg-2': palettes.tintsAndShades.original[7].lch.css,
-  } as React.CSSProperties
+  useEffect(() => {
+    const styleEl = document.createElement('style')
+    styleEl.textContent = `:root { ${css} }`
+    styleEl.setAttribute('id', 'color-palette')
+    document.head.append(styleEl)
+
+    return () => {
+      document.head.removeChild(styleEl)
+    }
+  }, [css])
+
+  // const s = {
+  //   '--bg-1': palettes.tintsAndShades.original[9].lch.css,
+  //   '--bg-2': palettes.tintsAndShades.original[7].lch.css,
+  // } as React.CSSProperties
 
   return (
-    <main style={s}>
+    <main>
       <div className="synth-container">
         <div className="synth-left">
           <Display spacing="04">

@@ -1,6 +1,6 @@
+import Color from 'colorjs.io'
 import { PlainColorObject } from 'colorjs.io/types/src/color'
 import { createColorObj } from './colorParse'
-import Color from 'colorjs.io'
 
 export function colorFactory(color: string | Color | PlainColorObject, paletteInformation: string, idx = 0) {
   return {

@@ -3,7 +3,7 @@ main {
   place-items: center;
   height: 100vh;
   padding: 2.5vw;
-  background-image: linear-gradient(to top in oklab, var(--bg-1), var(--bg-2));
+  background-image: linear-gradient(to top in oklab, oklch(var(--tns-o-9)), oklch(var(--tns-o-7)));
 }
 
 .synth-container {

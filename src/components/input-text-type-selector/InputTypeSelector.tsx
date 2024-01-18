@@ -7,7 +7,7 @@ export function InputTypeSelector({setColorSpace, current}: {setColorSpace: Func
   return (
     <div className="input-type-selectors">
       {colorSpaceTypes.map((type: string) => (
-        <Button handler={() => setColorSpace(type)} active={type === current}>
+        <Button handler={() => setColorSpace(type)} active={type === current} key={type}>
           {type}
         </Button>
       ))}
