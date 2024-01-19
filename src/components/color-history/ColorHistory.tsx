@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import { Schemes } from '../../util/palettes'
 import './color-history.css'
+import { useBaseColor } from '../../hooks/useBaseColor'
 
 export default function ColorHistory({ palettes, setColor }: { palettes: Schemes; setColor: Function }) {
   const [history, setHistory] = useState(Array(7).fill(''))
-  const [prev, setPrev] = useState({} as object)
+  const [prev, setPrev] = useState('')
+  const { hex } = useBaseColor(palettes)
 
-  if (prev.complementary?.original?.[0].hex?.string !== palettes.complementary?.original?.[0].hex?.string) {
+  if (prev !== hex?.string) {
     let newHistory = [...history]
     newHistory.unshift(palettes.complementary.original[0])
     newHistory = newHistory.slice(0, 7)
     setHistory(newHistory)
-    setPrev(palettes)
+    setPrev(hex.string)
   }
 
   return (

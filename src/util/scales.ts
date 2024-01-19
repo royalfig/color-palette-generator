@@ -24,12 +24,12 @@ export function createScales(baseColor: Color | string) {
   const tonesStartCinematic = new Color(baseColor).mix('#808080', 0.75, { space: 'lch', outputSpace: 'lch' })
   const tSc = new Color(tonesStartCinematic)
   tSc.lch.l = 99
-  tSc.lch.c *= .5
+  tSc.lch.c *= 0.5
   const tonesEndCinematic = new Color(baseColor).mix('#808080', 0.75, { space: 'lch', outputSpace: 'lch' })
   const tEc = new Color(tonesEndCinematic)
   tEc.lch.l = 1
   tEc.lch.c *= 1.5
-  
+
   const tonesCinematic = Color.steps(tSc, tEc, {
     space: 'oklab',
     outputSpace: 'oklab',
@@ -39,12 +39,12 @@ export function createScales(baseColor: Color | string) {
   const tonesStartLanguid = new Color(baseColor).mix('#808080', 0.98, { space: 'hsl', outputSpace: 'hsl' })
   const tSl = new Color(tonesStartLanguid)
   tSl.hsl.l = 99
-  tSl.hsl.s *= .5
+  tSl.hsl.s *= 0.5
 
   const tonesEndLanguid = new Color(baseColor).mix('#808080', 0.98, { space: 'hsl', outputSpace: 'hsl' })
   const tEl = new Color(tonesEndLanguid)
   tEl.hsl.l = 1
-  tEl.hsl.s *= .5
+  tEl.hsl.s *= 0.5
 
   const tonesLanguid = Color.steps(tSl, tEl, {
     space: 'lch',
@@ -66,15 +66,15 @@ export function createScales(baseColor: Color | string) {
   const tonesSharkbite = Color.steps(tSbs, tSbe, {
     space: 'lch',
     outputSpace: 'oklab',
-    steps: 10
+    steps: 10,
   })
 
   const tones = {
-    original: tonesOriginal.map((c, idx) => colorFactory(c, 'tns-o', idx)),
-    keel: tonesKeel.map((c, idx) => colorFactory(c, 'tns-k', idx)),
-    cinematic: tonesCinematic.map((c, idx) => colorFactory(c, 'tns-c', idx)),
-    languid: tonesLanguid.map((c, idx) => colorFactory(c, 'tns-l', idx)),
-    sharkbite: tonesSharkbite.map((c, idx) => colorFactory(c, 'tns-s', idx)),
+    original: tonesOriginal.map((c, idx) => colorFactory(c, 'tones-o', idx)),
+    keel: tonesKeel.map((c, idx) => colorFactory(c, 'tones-k', idx)),
+    cinematic: tonesCinematic.map((c, idx) => colorFactory(c, 'tones-c', idx)),
+    languid: tonesLanguid.map((c, idx) => colorFactory(c, 'tones-l', idx)),
+    sharkbite: tonesSharkbite.map((c, idx) => colorFactory(c, 'tones-s', idx)),
   }
 
   const polyStartOriginal = new Color(baseColor)
@@ -111,44 +111,44 @@ export function createScales(baseColor: Color | string) {
     hue: 'longer',
   })
   const polychromia = {
-    original: polyOriginal.map((c, idx) => colorFactory(c, 'ply-o', idx)),
-    keel: polyKeel.map((c, idx) => colorFactory(c, 'ply-k', idx)),
-    cinematic: polyCinematic.map((c, idx) => colorFactory(c, 'ply-c', idx)),
-    languid: polyLanguid.map((c, idx) => colorFactory(c, 'ply-l', idx)),
-    sharkbite: polySharkbite.map((c, idx) => colorFactory(c, 'ply-s', idx)),
+    original: polyOriginal.map((c, idx) => colorFactory(c, 'polychromia-o', idx)),
+    keel: polyKeel.map((c, idx) => colorFactory(c, 'polychromia-k', idx)),
+    cinematic: polyCinematic.map((c, idx) => colorFactory(c, 'polychromia-c', idx)),
+    languid: polyLanguid.map((c, idx) => colorFactory(c, 'polychromia-l', idx)),
+    sharkbite: polySharkbite.map((c, idx) => colorFactory(c, 'polychromia-s', idx)),
   }
 
-  const tintsAndShadesStartDesaturated = new Color(baseColor).mix('white', 0.9, { space: 'srgb', outputSpace: 'srgb' })
-  const tintsAndShadesStartOriginal = new Color(tintsAndShadesStartDesaturated)
-  const tintsAndShadesEndDesaturated = new Color(baseColor).mix('black', 0.9, { space: 'srgb', outputSpace: 'srgb' })
-  const tintsAndShadesEndOriginal = new Color(tintsAndShadesEndDesaturated)
-  const tintsAndShadesOriginal = Color.steps(tintsAndShadesStartOriginal, tintsAndShadesEndOriginal, {
+  const tintsStartDesaturated = new Color(baseColor).mix('white', 0.9, { space: 'srgb', outputSpace: 'srgb' })
+  const tintsStartOriginal = new Color(tintsStartDesaturated)
+  const tintsEndDesaturated = new Color(baseColor).mix('black', 0.9, { space: 'srgb', outputSpace: 'srgb' })
+  const tintsEndOriginal = new Color(tintsEndDesaturated)
+  const tintsOriginal = Color.steps(tintsStartOriginal, tintsEndOriginal, {
     space: 'hsl',
     outputSpace: 'hsl',
     steps: 10,
   })
 
-  const tintsAndShadesCinematic = Color.steps(tintsAndShadesStartOriginal, tintsAndShadesEndOriginal, {
+  const tintsCinematic = Color.steps(tintsStartOriginal, tintsEndOriginal, {
     space: 'oklab',
     outputSpace: 'oklab',
     steps: 10,
   })
 
-  const tintsAndShadesStartKeel = new Color(baseColor).mix('#fff', 0.95, { space: 'lch', outputSpace: 'lch' })
-  const tintsAndShadesEndKeel = new Color(baseColor).mix('#000', 0.95, { space: 'lch', outputSpace: 'lch' })
-  const tintsAndShadesKeel = Color.steps(tintsAndShadesStartKeel, tintsAndShadesEndKeel, {
+  const tintsStartKeel = new Color(baseColor).mix('#fff', 0.95, { space: 'lch', outputSpace: 'lch' })
+  const tintsEndKeel = new Color(baseColor).mix('#000', 0.95, { space: 'lch', outputSpace: 'lch' })
+  const tintsKeel = Color.steps(tintsStartKeel, tintsEndKeel, {
     space: 'lch',
     outputSpace: 'lch',
     steps: 10,
   })
 
-  const tintsAndShades = {
-    original: tintsAndShadesOriginal.map((c, idx) => colorFactory(c, 'tas-original', idx)),
-    keel: tintsAndShadesKeel.map((c, idx) => colorFactory(c, 'tas-keel', idx)),
-    cinematic: tintsAndShadesCinematic.map((c, idx) => colorFactory(c, 'tas-cinematic', idx)),
-    languid: tintsAndShadesOriginal.map((c, idx) => colorFactory(c, 'tas-languid', idx)),
-    sharkbite: tintsAndShadesOriginal.map((c, idx) => colorFactory(c, 'tas-sharkbite', idx)),
+  const tints = {
+    original: tintsOriginal.map((c, idx) => colorFactory(c, 'tints-original', idx)),
+    keel: tintsKeel.map((c, idx) => colorFactory(c, 'tints-keel', idx)),
+    cinematic: tintsCinematic.map((c, idx) => colorFactory(c, 'tints-cinematic', idx)),
+    languid: tintsOriginal.map((c, idx) => colorFactory(c, 'tints-languid', idx)),
+    sharkbite: tintsOriginal.map((c, idx) => colorFactory(c, 'tints-sharkbite', idx)),
   }
 
-  return { tones: tones, polychromia: polychromia, tintsAndShades: tintsAndShades }
+  return { tones: tones, polychromia: polychromia, tints: tints }
 }

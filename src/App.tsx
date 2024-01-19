@@ -1,22 +1,23 @@
+import Color from 'colorjs.io'
+import { useEffect, useState } from 'react'
+import ColorHistory from './components/color-history/ColorHistory'
+import { ColorSelector } from './components/color-selector/ColorSelector'
+import { ControlGroup } from './components/control-group/ControlGroup'
+import { CurrentColorDisplay } from './components/current-color-display/CurrentColorDisplay'
+import { DarkMode } from './components/dark_mode/DarkMode'
+import { Display } from './components/display/Display'
+import { EyeDropper } from './components/eye-dropper/EyeDropper'
+import { InputColorContainer } from './components/input-color-container/InputColorContainer'
+import { VibrancyModule } from './components/vibrancy_module/VibrancyModule'
 import './css/App.css'
 import './css/Defaults.css'
 import './css/Reset.css'
 import './css/Variables.css'
 import './css/utils.css'
-import { useEffect, useState } from 'react'
-import { ColorSelector } from './components/color-selector/ColorSelector'
-import { CurrentColorDisplay } from './components/current-color-display/CurrentColorDisplay'
-import { Display } from './components/display/Display'
-import { InputColor } from './components/input-color/InputColor'
-import { VibrancyModule } from './components/vibrancy_module/VibrancyModule'
-import { createPalettes } from './util/palettes'
-import Color from 'colorjs.io'
-import ColorHistory from './components/color-history/ColorHistory'
-import { InputColorContainer } from './components/input-color-container/InputColorContainer'
 import { useBaseColor } from './hooks/useBaseColor'
-import { EyeDropper } from './components/eye-dropper/EyeDropper'
-import { ControlGroup } from './components/control-group/ControlGroup'
 import { generateCss } from './util/generateCss'
+import { createPalettes } from './util/palettes'
+import PaletteSelector from './components/palette_selector/PaletteSelector'
 
 function pickRandomColor() {
   const popularColors = [
@@ -89,6 +90,7 @@ function pickRandomColor() {
 
 export default function App() {
   const [color, setColor] = useState<string | Color>(pickRandomColor())
+  const [palette, setPalette] = useState('complementary')
   const palettes = createPalettes(color)
   const css = generateCss(palettes)
   const base = useBaseColor(palettes)
@@ -103,11 +105,6 @@ export default function App() {
       document.head.removeChild(styleEl)
     }
   }, [css])
-
-  // const s = {
-  //   '--bg-1': palettes.tintsAndShades.original[9].lch.css,
-  //   '--bg-2': palettes.tintsAndShades.original[7].lch.css,
-  // } as React.CSSProperties
 
   return (
     <main>
@@ -133,6 +130,22 @@ export default function App() {
 
           <ControlGroup title="Controls">
             <EyeDropper setColor={setColor} />
+            <DarkMode />
+            <EyeDropper setColor={setColor} />
+          </ControlGroup>
+
+          <ControlGroup title="Export">
+            <EyeDropper setColor={setColor} />
+            <EyeDropper setColor={setColor} />
+            <EyeDropper setColor={setColor} />
+          </ControlGroup>
+
+          <ControlGroup title="Palettes">
+            <PaletteSelector palettes={palettes} palette={palette} setPalette={setPalette} />
+          </ControlGroup>
+
+          <ControlGroup title="Variations">
+            <EyeDropper setColor={setColor} />
             <EyeDropper setColor={setColor} />
             <EyeDropper setColor={setColor} />
           </ControlGroup>
@@ -144,7 +157,7 @@ export default function App() {
             ))}
           </div>
           <div className="flex col">
-            {palettes.tintsAndShades.original.map((color, idx) => (
+            {palettes.tints.original.map((color, idx) => (
               <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
             ))}
           </div>
@@ -159,7 +172,7 @@ export default function App() {
             ))}
           </div>
           <div className="flex col">
-            {palettes.splitComplementary.original.map((color, idx) => (
+            {palettes.split.original.map((color, idx) => (
               <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
             ))}
           </div>
@@ -179,7 +192,7 @@ export default function App() {
             ))}
           </div>
           <div className="flex col">
-            {palettes.tintsAndShades.keel.map((color, idx) => (
+            {palettes.tints.keel.map((color, idx) => (
               <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
             ))}
           </div>
@@ -194,7 +207,7 @@ export default function App() {
             ))}
           </div>
           <div className="flex col">
-            {palettes.splitComplementary.keel.map((color, idx) => (
+            {palettes.split.keel.map((color, idx) => (
               <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
             ))}
           </div>

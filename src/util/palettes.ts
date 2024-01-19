@@ -4,11 +4,11 @@ import { createScales } from './scales'
 import Color from 'colorjs.io'
 
 const targetHues: { [key: string]: number[] } = {
+  complementary: [0, 180],
   analogous: [0, 40, 70],
+  split: [0, 150, 210],
   triadic: [0, 120, 240],
   tetradic: [0, 90, 180, 270],
-  complementary: [0, 180],
-  splitComplementary: [0, 150, 210],
 }
 
 function cinematic(color: Color) {
@@ -74,10 +74,10 @@ export type Schemes = {
   triadic: ColorScheme
   tetradic: ColorScheme
   complementary: ColorScheme
-  splitComplementary: ColorScheme
+  split: ColorScheme
   tones: ColorScheme
   polychromia: ColorScheme
-  tintsAndShades: ColorScheme
+  tints: ColorScheme
 }
 
 function createColorVariations(hueKey: string, variationKey: string, baseColor: string | Color) {

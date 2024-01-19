@@ -1,40 +1,35 @@
-.palette-selector {
-  padding: var(--box-padding);
-  color: var(--element-3);
-  background-color: var(--surface-3);
-  border-radius: var(--radius);
-}
-
 .palette-selector-container {
   display: grid;
-  flex-wrap: wrap;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 1rem;
-}
-
-.palette-selector-card {
-  position: relative;
-  z-index: 2;
-  display: flex;
   flex: 1;
-  gap: 0.3em;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  justify-items: center;
+}
+
+.palette-selector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-04);
   align-items: center;
-  font-size: var(--small);
-  color: var(--element-3);
-  text-align: left;
-  background-image: linear-gradient(25deg, var(--surface-2), var(--surface-3));
-  border-radius: var(--radius);
-  outline: 1px solid var(--border-1);
-  transition: outline 0.4s cubic-bezier(0.455, 0.03, 0.515, 0.955);
-}
 
-.palette-selector-card:hover {
-  outline: 1px solid var(--border-2);
-}
+  & p {
+    font-size: var(--x-small);
+    font-weight: 300;
+    text-align: center;
+    text-transform: uppercase;
+  }
 
-.palette-selector-card.active {
-  --alpha: 0.5;
+  & div {
+    box-sizing: content-box;
+    padding: var(--spacing-02);
+    background-color: #c8c8c8;
+    border-radius: 50%;
+    outline: var(--spacing-01) solid #000;
+    box-shadow: inset 1px 1px 2px rgb(255 255 255 / 65%), inset -1px -1px 2px rgb(0 0 0 / 35%),
+      2px 2px 0.15em rgb(0 0 0 / 35%);
+  }
 
-  z-index: 3;
-  outline: 1px solid var(--border-3);
+  &:active div {
+    box-shadow: inset 1px 1px 4px rgb(0 0 0 / 35%), inset -1px -1px 4px rgb(0 0 0 / 35%), 2px 2px 1px rgb(0 0 0 / 35%);
+  }
 }
