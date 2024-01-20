@@ -90,8 +90,9 @@ function pickRandomColor() {
 
 export default function App() {
   const [color, setColor] = useState<string | Color>(pickRandomColor())
-  const [palette, setPalette] = useState('complementary')
+  const [palette, setPalette] = useState('comp')
   const palettes = createPalettes(color)
+  console.log('🚀 ~ App ~ palettes:', palettes)
   const css = generateCss(palettes)
   const base = useBaseColor(palettes)
 
@@ -150,78 +151,7 @@ export default function App() {
             <EyeDropper setColor={setColor} />
           </ControlGroup>
         </div>
-        <div className="synth-center flex" style={{ justifyContent: 'flex-start' }}>
-          <div className="flex col">
-            {palettes.tones.original.map((color, idx) => (
-              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
-            ))}
-          </div>
-          <div className="flex col">
-            {palettes.tints.original.map((color, idx) => (
-              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
-            ))}
-          </div>
-          <div className="flex col">
-            {palettes.complementary.original.map((color, idx) => (
-              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
-            ))}
-          </div>
-          <div className="flex col">
-            {palettes.analogous.original.map((color, idx) => (
-              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
-            ))}
-          </div>
-          <div className="flex col">
-            {palettes.split.original.map((color, idx) => (
-              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
-            ))}
-          </div>
-          <div className="flex col">
-            {palettes.triadic.original.map((color, idx) => (
-              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
-            ))}
-          </div>
-          <div className="flex col">
-            {palettes.tetradic.original.map((color, idx) => (
-              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
-            ))}
-          </div>
-          <div className="flex col">
-            {palettes.tones.keel.map((color, idx) => (
-              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
-            ))}
-          </div>
-          <div className="flex col">
-            {palettes.tints.keel.map((color, idx) => (
-              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
-            ))}
-          </div>
-          <div className="flex col">
-            {palettes.complementary.keel.map((color, idx) => (
-              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
-            ))}
-          </div>
-          <div className="flex col">
-            {palettes.analogous.keel.map((color, idx) => (
-              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
-            ))}
-          </div>
-          <div className="flex col">
-            {palettes.split.keel.map((color, idx) => (
-              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
-            ))}
-          </div>
-          <div className="flex col">
-            {palettes.triadic.keel.map((color, idx) => (
-              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
-            ))}
-          </div>
-          <div className="flex col">
-            {palettes.tetradic.keel.map((color, idx) => (
-              <div key={idx} style={{ backgroundColor: color.hex.string }} className="box"></div>
-            ))}
-          </div>
-        </div>
+        <div className="synth-center flex" style={{ justifyContent: 'flex-start' }}></div>
         {/* <div className="synth-right"></div> */}
         <div className="synth-bottom">
           <h1 className="brand">

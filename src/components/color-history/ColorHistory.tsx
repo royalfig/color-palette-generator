@@ -10,7 +10,7 @@ export default function ColorHistory({ palettes, setColor }: { palettes: Schemes
 
   if (prev !== hex?.string) {
     let newHistory = [...history]
-    newHistory.unshift(palettes.complementary.original[0])
+    newHistory.unshift(palettes.comp.original[0])
     newHistory = newHistory.slice(0, 7)
     setHistory(newHistory)
     setPrev(hex.string)

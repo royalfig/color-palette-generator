@@ -4,11 +4,11 @@ import { createScales } from './scales'
 import Color from 'colorjs.io'
 
 const targetHues: { [key: string]: number[] } = {
-  complementary: [0, 180],
-  analogous: [0, 40, 70],
+  comp: [0, 180],
+  ana: [0, 40, 70],
   split: [0, 150, 210],
-  triadic: [0, 120, 240],
-  tetradic: [0, 90, 180, 270],
+  tria: [0, 120, 240],
+  tetra: [0, 90, 180, 270],
 }
 
 function cinematic(color: Color) {
@@ -70,13 +70,13 @@ type ColorScheme = {
 }
 
 export type Schemes = {
-  analogous: ColorScheme
-  triadic: ColorScheme
-  tetradic: ColorScheme
-  complementary: ColorScheme
+  ana: ColorScheme
+  tria: ColorScheme
+  tetra: ColorScheme
+  comp: ColorScheme
   split: ColorScheme
   tones: ColorScheme
-  polychromia: ColorScheme
+  poly: ColorScheme
   tints: ColorScheme
 }
 
@@ -100,7 +100,7 @@ function createColorVariations(hueKey: string, variationKey: string, baseColor: 
 // TODO: is it possible to simplify this function?
 export function createPalettes(baseColor: string | Color): Schemes {
   const palettes = Object.keys(targetHues).reduce<Record<string, any>>((hueAcc, hueKey) => {
-    // hueAcc = {schemes} & hueKey = 'analogous'
+    // hueAcc = {schemes} & hueKey = 'ana'
     const v = Object.keys(variations).reduce<Record<string, any>>((variationAcc, variationKey) => {
       // hueAcc = {variations} & variationKey = 'original'
       const p = createColorVariations(hueKey, variationKey, baseColor)
@@ -118,8 +118,8 @@ export function createPalettes(baseColor: string | Color): Schemes {
 }
 
 function createUi(palettes: Schemes, scales) {
-  const isLight = palettes.complementary.keel[0].lch.raw[0] > 50
-  const l = 50 - (palettes.complementary.keel[0].lch.raw[0] - 50)
+  const isLight = palettes.comp.keel[0].lch.raw[0] > 50
+  const l = 50 - (palettes.comp.keel[0].lch.raw[0] - 50)
 
   return {
     dark: {

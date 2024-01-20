@@ -15,7 +15,7 @@ export function CurrentColorDisplay({ palettes }: { palettes: any }) {
       const res = await fetch(`https://api.color.pizza/v1/?values=${color.replace('#', '')}`)
       const name = await res.json()
       setColorName(name?.colors[0]?.name)
-    } catch (e) {
+    } catch (e: any) {
       console.log(e.message)
     }
   }
@@ -34,7 +34,7 @@ export function CurrentColorDisplay({ palettes }: { palettes: any }) {
           initial={{ clipPath: 'inset(0 100% 0 0)' }} // Hides text initially
           animate={{ clipPath: 'inset(0 0 0 0)' }} // Reveals text
           exit={{ clipPath: 'inset(0 100% 0 0)' }} // Hides text again
-          transition={{ duration: .5, ease: 'easeOut' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
         >
           {colorName}
         </motion.p>

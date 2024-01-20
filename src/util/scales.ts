@@ -110,12 +110,12 @@ export function createScales(baseColor: Color | string) {
     steps: 10,
     hue: 'longer',
   })
-  const polychromia = {
-    original: polyOriginal.map((c, idx) => colorFactory(c, 'polychromia-o', idx)),
-    keel: polyKeel.map((c, idx) => colorFactory(c, 'polychromia-k', idx)),
-    cinematic: polyCinematic.map((c, idx) => colorFactory(c, 'polychromia-c', idx)),
-    languid: polyLanguid.map((c, idx) => colorFactory(c, 'polychromia-l', idx)),
-    sharkbite: polySharkbite.map((c, idx) => colorFactory(c, 'polychromia-s', idx)),
+  const poly = {
+    original: polyOriginal.map((c, idx) => colorFactory(c, 'poly-o', idx)),
+    keel: polyKeel.map((c, idx) => colorFactory(c, 'poly-k', idx)),
+    cinematic: polyCinematic.map((c, idx) => colorFactory(c, 'poly-c', idx)),
+    languid: polyLanguid.map((c, idx) => colorFactory(c, 'poly-l', idx)),
+    sharkbite: polySharkbite.map((c, idx) => colorFactory(c, 'poly-s', idx)),
   }
 
   const tintsStartDesaturated = new Color(baseColor).mix('white', 0.9, { space: 'srgb', outputSpace: 'srgb' })
@@ -150,5 +150,5 @@ export function createScales(baseColor: Color | string) {
     sharkbite: tintsOriginal.map((c, idx) => colorFactory(c, 'tints-sharkbite', idx)),
   }
 
-  return { tones: tones, polychromia: polychromia, tints: tints }
+  return { tones: tones, poly: poly, tints: tints }
 }

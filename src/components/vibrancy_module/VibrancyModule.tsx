@@ -9,7 +9,7 @@ export function VibrancyModule({ palettes }: { palettes: Schemes }) {
   let saturation: number
   let lightness: number
 
-  const hues = palettes.polychromia.original.map((color, idx: number) => {
+  const hues = palettes.poly.original.map((color, idx: number) => {
     if (idx === 0) {
       saturation = color.hsl.raw[1]
       lightness = color.hsl.raw[2]
@@ -58,8 +58,8 @@ export function VibrancyModule({ palettes }: { palettes: Schemes }) {
       </defs>
       <motion.path
         d={pathD}
-        stroke="url(#gradient)" 
-        strokeWidth="2"   
+        stroke="url(#gradient)"
+        strokeWidth="2"
         fill="none"
         initial={false}
         animate={{ d: pathD }}

@@ -23,6 +23,7 @@ export function InputColor({
   const [inputColor, setInputColor] = useState<string>(current)
   const [prevInputColor, setPrevInputColor] = useState<string>(current)
   const [warning, setWarning] = useState(false)
+  console.log('🚀 ~ warning:', warning)
   const [activity, setActivity] = useState(false)
   const inGamut = base[type].isInGamut
 
@@ -47,6 +48,7 @@ export function InputColor({
       setActivity(false)
       setColor(parsed)
     } catch (error) {
+      setInputColor(error.message)
       setActivity(false)
       setWarning(true)
       return

@@ -1,5 +1,5 @@
-import { ColorFactory } from "../util/factory"
-import { Schemes } from "../util/palettes"
+import { ColorFactory } from '../util/factory'
+import { Schemes } from '../util/palettes'
 export function useBaseColor(palettes: Schemes): ColorFactory {
-  return palettes.complementary.original[0] 
+  return palettes.comp.original[0]
 }
