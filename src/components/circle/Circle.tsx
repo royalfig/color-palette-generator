@@ -17,8 +17,9 @@ export function Circle({ colors, type, size }: { colors: any; type: 'default' | 
         <circle cx="0" cy="0" r={sizer(100, size)} fill="none" stroke="var(--border)" strokeWidth="3" />
         {type !== 'circle'
           ? colors.original.map((color: any, idx: number) => {
-              const [h, s] = color.hsl.raw
-              console.log('🚀 ~ ?colors.original.map ~ [h, s]:', [h, s])
+              let [h, s] = color.hsl.raw
+              h = h > 360 ? 360 : h
+              s = s > 100 ? 100 : s
 
               const hRadians = (h * Math.PI) / 180
               const sRadians = sizer(s, size)
