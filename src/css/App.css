@@ -2,8 +2,8 @@ main {
   display: grid;
   place-items: center;
   height: 100vh;
-  padding: 2.5vw;
-  background-image: linear-gradient(to top in oklab, oklch(var(--tones-o-9)), oklch(var(--tones-o-7)));
+  padding: 1.5vw;
+  background-image: var(--bg);
 }
 
 .synth-container {
@@ -15,6 +15,8 @@ main {
   background-color: var(--synth-body);
   border-radius: var(--radius);
   box-shadow: var(--shadow-md);
+  box-shadow: 0 -1px 2px -0.5px #9194a3 inset, 2px 0 2px -0.5px #eaeaf2 inset, 0 1px 1px #eaeaf2 inset,
+    0 25px 20px -15px rgb(0 0 0 / 10%), 10px 65px 50px -10px rgb(0 0 0 / 5%);
 
   > div {
     padding: var(--box-padding);

@@ -13,7 +13,7 @@
   --spacing-12: 6rem;
   --spacing-13: 10rem;
   --gap: var(--spacing-06);
-  --radius: 0.35rem;
+  --radius: 16px;
   --small: 0.833rem;
   --x-small: min(0.75rem, 14px);
   --button-padding: 0.4em 0.8em;
@@ -28,13 +28,22 @@
     1px 2px 2.5px -2.5px var(--shadow-color);
   --font-brand: 'Orbitron', system-ui, sans-serif;
   --border-color: hsl(0deg 0% 50% / 45%);
-  --synth-body: #e6e6e6;
-  --element: #000;
-  --border: #7f7f7f;
+  --synth-body: hsl(248deg 11% 85%);
+  --element: hsl(248deg 11% 15%);
+  --border: hsl(248deg 11% 75%);
+  --bg: linear-gradient(
+    to bottom in lab,
+    oklch(var(--tints-original-3)),
+    oklch(var(--tints-original-4)),
+    oklch(var(--tints-original-5)),
+    oklch(var(--tints-original-6)),
+    oklch(var(--tints-original-7))
+  );
 }
 
 [data-mode='dark'] {
-  --synth-body: #282828;
-  --element: #fff;
-  --border: #2f2f2f;
+  --synth-body: hsl(248deg 11% 15%);
+  --element: hsl(248deg 11% 85%);
+  --border: hsl(248deg 11% 25%);
+  --bg: hsl(248deg 11% 8%);
 }

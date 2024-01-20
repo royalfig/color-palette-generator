@@ -29,7 +29,7 @@
       2px 2px 0.15em rgb(0 0 0 / 35%);
   }
 
-  &:active div {
+  &:where(:active, .active) div {
     box-shadow: inset 1px 1px 4px rgb(0 0 0 / 35%), inset -1px -1px 4px rgb(0 0 0 / 35%), 2px 2px 1px rgb(0 0 0 / 35%);
   }
 }
