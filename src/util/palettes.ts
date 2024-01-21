@@ -1,11 +1,10 @@
 import { ColorFactory, colorFactory } from './factory'
-import { generateCss } from './generateCss'
 import { createScales } from './scales'
 import Color from 'colorjs.io'
 
 const targetHues: { [key: string]: number[] } = {
   comp: [0, 180],
-  ana: [0, 40, 70],
+  ana: [0, 35, 70],
   split: [0, 150, 210],
   tria: [0, 120, 240],
   tetra: [0, 90, 180, 270],

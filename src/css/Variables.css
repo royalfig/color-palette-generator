@@ -30,7 +30,7 @@
   --border-color: hsl(0deg 0% 50% / 45%);
   --synth-body: hsl(248deg 11% 85%);
   --element: hsl(248deg 11% 15%);
-  --border: hsl(248deg 11% 75%);
+  --border: hsl(248deg 11% 65% / 75%);
   --bg: linear-gradient(
     to bottom in lab,
     oklch(var(--tints-original-3)),
@@ -45,5 +45,11 @@
   --synth-body: hsl(248deg 11% 15%);
   --element: hsl(248deg 11% 85%);
   --border: hsl(248deg 11% 25%);
-  --bg: hsl(248deg 11% 8%);
+  --bg: linear-gradient(
+    to bottom in lab,
+
+    oklch(var(--tints-original-8)),
+    oklch(var(--tints-original-9)),
+    oklch(var(--tints-original-10))
+  );
 }

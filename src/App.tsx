@@ -6,8 +6,11 @@ import { ControlGroup } from './components/control-group/ControlGroup'
 import { CurrentColorDisplay } from './components/current-color-display/CurrentColorDisplay'
 import { DarkMode } from './components/dark_mode/DarkMode'
 import { Display } from './components/display/Display'
+import { ExportCSS, ExportImage, ExportJSON } from './components/exports/Exports'
 import { EyeDropper } from './components/eye-dropper/EyeDropper'
 import { InputColorContainer } from './components/input-color-container/InputColorContainer'
+import PaletteSelector from './components/palette_selector/PaletteSelector'
+import { VariationSelector } from './components/variations/Variations'
 import { VibrancyModule } from './components/vibrancy_module/VibrancyModule'
 import './css/App.css'
 import './css/Defaults.css'
@@ -17,7 +20,6 @@ import './css/utils.css'
 import { useBaseColor } from './hooks/useBaseColor'
 import { generateCss } from './util/generateCss'
 import { createPalettes } from './util/palettes'
-import PaletteSelector from './components/palette_selector/PaletteSelector'
 
 function pickRandomColor() {
   const popularColors = [
@@ -91,8 +93,8 @@ function pickRandomColor() {
 export default function App() {
   const [color, setColor] = useState<string | Color>(pickRandomColor())
   const [palette, setPalette] = useState('comp')
+  const [variation, setVariation] = useState('original')
   const palettes = createPalettes(color)
-  console.log('🚀 ~ App ~ palettes:', palettes)
   const css = generateCss(palettes)
   const base = useBaseColor(palettes)
 
@@ -136,9 +138,9 @@ export default function App() {
           </ControlGroup>
 
           <ControlGroup title="Export">
-            <EyeDropper setColor={setColor} />
-            <EyeDropper setColor={setColor} />
-            <EyeDropper setColor={setColor} />
+            <ExportCSS css={css} />
+            <ExportImage />
+            <ExportJSON data={palettes} />
           </ControlGroup>
 
           <ControlGroup title="Palettes">
@@ -146,9 +148,7 @@ export default function App() {
           </ControlGroup>
 
           <ControlGroup title="Variations">
-            <EyeDropper setColor={setColor} />
-            <EyeDropper setColor={setColor} />
-            <EyeDropper setColor={setColor} />
+            <VariationSelector variation={variation} setVariation={setVariation} />
           </ControlGroup>
         </div>
         <div className="synth-center flex" style={{ justifyContent: 'flex-start' }}></div>

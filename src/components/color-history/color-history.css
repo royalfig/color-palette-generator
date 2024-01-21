@@ -1,12 +1,19 @@
 .color-history-item {
+  --background-color: hsl(248deg 11% 80%);
+  --background-color-active: hsl(248deg 11% 78%);
+  --light-shadow-color: hsl(248deg 11% 95%);
+  --dark-shadow-color: hsl(248deg 11% 5%);
+
   display: flex;
   align-items: center;
   justify-content: center;
   width: 2rem;
   height: 2rem;
   padding: var(--spacing-01);
-  background-color: #000;
+  background-color: hsl(248deg 11% 35%);
+  border: 2px solid transparent;
   border-radius: 50%;
+  box-shadow: 0.0625em 0.0625em 0.0625em rgb(255 255 255 / 60%);
 
   &:disabled {
     cursor: initial;
@@ -17,12 +24,18 @@
   width: 100%;
   height: 100%;
   background-color: #535353;
+  background-color: var(--background-color);
+  background-image: url('noise.png');
   border-radius: 50%;
   box-shadow: inset 1px 1px 2px rgb(255 255 255 / 65%), inset -1px -1px 2px rgb(0 0 0 / 35%),
     2px 2px 0.15em rgb(0 0 0 / 35%);
+  box-shadow: inset 0.0625em 0.0625em 0.0625em var(--light-shadow-color),
+    inset -0.0625em -0.0625em 0.0625em var(--dark-shadow-color), 0.125em 0.125em 0.25em #000;
   transition: box-shadow 0.25s ease-in-out;
 
   &:active {
-    box-shadow: inset 1px 1px 4px rgb(0 0 0 / 35%), inset -1px -1px 4px rgb(0 0 0 / 35%), 2px 2px 1px rgb(0 0 0 / 35%);
+    background-color: var(--background-color-active);
+    box-shadow: inset 0 0 0.25em #000, inset 0.0625em 0.0625em 0.0625em transparent,
+      inset -0.0625em -0.0625em 0.0625em transparent, 0.125em 0.125em 0.25em transparent;
   }
 }
