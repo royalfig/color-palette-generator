@@ -2,5 +2,4 @@
   display: flex;
   gap: var(--spacing-02);
   justify-content: space-between;
-  margin-block: var(--spacing-04);
 }

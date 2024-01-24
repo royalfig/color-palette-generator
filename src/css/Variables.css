@@ -32,12 +32,9 @@
   --element: hsl(248deg 11% 15%);
   --border: hsl(248deg 11% 65% / 75%);
   --bg: linear-gradient(
-    to bottom in lab,
-    oklch(var(--tints-original-3)),
-    oklch(var(--tints-original-4)),
-    oklch(var(--tints-original-5)),
-    oklch(var(--tints-original-6)),
-    oklch(var(--tints-original-7))
+    to bottom right in oklab,
+    hsl(248deg 11% 98%),
+    hsl(248deg 11% 75%)
   );
 }
 
@@ -46,10 +43,8 @@
   --element: hsl(248deg 11% 85%);
   --border: hsl(248deg 11% 25%);
   --bg: linear-gradient(
-    to bottom in lab,
-
-    oklch(var(--tints-original-8)),
-    oklch(var(--tints-original-9)),
-    oklch(var(--tints-original-10))
+    to bottom right in oklab,
+    hsl(248deg 11% 25%),
+    hsl(248deg 11% 5%)
   );
 }

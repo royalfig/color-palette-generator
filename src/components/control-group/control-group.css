@@ -1,4 +1,8 @@
 .control-group {
+  &:not(:last-of-type) {
+    margin-block-end: var(--spacing-06);
+  }
+
   & h2 {
     margin-block-end: var(--spacing-03);
     font-size: var(--small);

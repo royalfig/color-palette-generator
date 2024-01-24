@@ -29,7 +29,6 @@ export function ExportImage() {
 }
 
 export function ExportJSON({ data }: { data: any }) {
-  console.log(data)
   const json = JSON.stringify(data, null, 2)
   return (
     <Button handler={() => downloadAction(json, 'color-palette-pro.json', 'text/json')} active={false}>

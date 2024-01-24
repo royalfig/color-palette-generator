@@ -15,7 +15,7 @@
   border-radius: 2px;
   box-shadow: 0.0625em 0.0625em 0.0625em rgb(255 255 255 / 60%);
 
-  button {
+  & button {
     width: 100%;
     height: 100%;
     padding: var(--spacing-03) var(--spacing-04);

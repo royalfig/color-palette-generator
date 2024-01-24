@@ -12,14 +12,18 @@ import { InputColorContainer } from './components/input-color-container/InputCol
 import PaletteSelector from './components/palette_selector/PaletteSelector'
 import { VariationSelector } from './components/variations/Variations'
 import { VibrancyModule } from './components/vibrancy_module/VibrancyModule'
-import './css/App.css'
-import './css/Defaults.css'
 import './css/Reset.css'
 import './css/Variables.css'
+import './css/Defaults.css'
 import './css/utils.css'
+import './css/App.css'
 import { useBaseColor } from './hooks/useBaseColor'
 import { generateCss } from './util/generateCss'
 import { createPalettes } from './util/palettes'
+import { PaletteDisplay } from './components/palette_display/PaletteDisplay'
+import Button from './components/button/Button'
+import { InputTypeSelector } from './components/input-text-type-selector/InputTypeSelector'
+export type ColorTypes = 'hex' | 'rgb' | 'hsl' | 'lch' | 'oklch' | 'lab' | 'oklab' | 'p3'
 
 function pickRandomColor() {
   const popularColors = [
@@ -91,9 +95,12 @@ function pickRandomColor() {
 }
 
 export default function App() {
+  console.log('rendering')
   const [color, setColor] = useState<string | Color>(pickRandomColor())
   const [palette, setPalette] = useState('comp')
   const [variation, setVariation] = useState('original')
+  const [colorspaceType, setColorspaceType] = useState<ColorTypes>('hex')
+
   const palettes = createPalettes(color)
   const css = generateCss(palettes)
   const base = useBaseColor(palettes)
@@ -112,56 +119,80 @@ export default function App() {
   return (
     <main>
       <div className="synth-container">
-        <div className="synth-left">
-          <Display spacing="04">
-            <div className="color-inputs">
-              <div className="current-color">
-                <CurrentColorDisplay palettes={palettes} />
-              </div>
-              <div className="color-selector">
-                <ColorSelector palettes={palettes} setColor={setColor} />
-              </div>
-            </div>
-          </Display>
-          <section className="color-text-inputs">
-            <InputColorContainer palettes={palettes} setColor={setColor} base={base} />
-          </section>
-
-          <ControlGroup title="History">
-            <ColorHistory palettes={palettes} setColor={setColor} />
-          </ControlGroup>
-
-          <ControlGroup title="Controls">
-            <EyeDropper setColor={setColor} />
-            <DarkMode />
-            <EyeDropper setColor={setColor} />
-          </ControlGroup>
-
-          <ControlGroup title="Export">
-            <ExportCSS css={css} />
-            <ExportImage />
-            <ExportJSON data={palettes} />
-          </ControlGroup>
-
-          <ControlGroup title="Palettes">
-            <PaletteSelector palettes={palettes} palette={palette} setPalette={setPalette} />
-          </ControlGroup>
-
-          <ControlGroup title="Variations">
-            <VariationSelector variation={variation} setVariation={setVariation} />
-          </ControlGroup>
-        </div>
-        <div className="synth-center flex" style={{ justifyContent: 'flex-start' }}></div>
-        {/* <div className="synth-right"></div> */}
-        <div className="synth-bottom">
+        <div className="synth-brand">
           <h1 className="brand">
             <span>Color</span>Palette Pro
           </h1>
-          <Display spacing="01">
-            <VibrancyModule palettes={palettes} />
-          </Display>
+          <div className="flex gap-4">
+            <Button handler={() => console.log('about')} active={false}>
+              About
+            </Button>
+            <Button handler={() => console.log('halp')} active={false}>
+              Help
+            </Button>
+            <Display spacing="01">
+              <VibrancyModule palettes={palettes} />
+            </Display>
+          </div>
         </div>
-      </div>
+        <section className="synth-display">
+          <Display spacing="04">
+            <div className="synth-columns">
+              <div>
+                <div className="color-input-display">
+                  <CurrentColorDisplay palettes={palettes} />
+                  <ColorSelector palettes={palettes} setColor={setColor} />
+                </div>
+                <InputColorContainer
+                  palettes={palettes}
+                  setColor={setColor}
+                  base={base}
+                  colorspaceType={colorspaceType}
+                  setColorspaceType={setColorspaceType}
+                />
+              </div>
+            </div>
+          </Display>
+        </section>
+          <div className="synth-left box-padding">
+            <section className="control-section">
+              <ControlGroup title="Color Space">
+                <InputTypeSelector setColorSpace={setColorspaceType} current={colorspaceType} />
+              </ControlGroup>
+
+              <ControlGroup title="History">
+                <ColorHistory palettes={palettes} setColor={setColor} />
+              </ControlGroup>
+            </section>
+
+            <section className="control-section">
+              <ControlGroup title="Controls">
+                <EyeDropper setColor={setColor} />
+                <DarkMode />
+                <EyeDropper setColor={setColor} />
+              </ControlGroup>
+
+              <ControlGroup title="Export">
+                <ExportCSS css={css} />
+                <ExportImage />
+                <ExportJSON data={palettes} />
+              </ControlGroup>
+            </section>
+
+            <section className="control-section">
+              <ControlGroup title="Palettes">
+                <PaletteSelector palettes={palettes} palette={palette} setPalette={setPalette} />
+              </ControlGroup>
+
+              <ControlGroup title="Variations">
+                <VariationSelector variation={variation} setVariation={setVariation} />
+              </ControlGroup>
+            </section>
+          </div>
+          <div className="synth-right box-padding">
+            <PaletteDisplay palettes={palettes} palette={palette} variation={variation} colorSpace={colorspaceType} />
+          </div>
+        </div>
     </main>
   )
 }

@@ -1,7 +1,6 @@
 .display {
   padding: var(--spacing-02);
   background-color: #000;
-  border-radius: 4px;
 
   &::after {
     pointer-events: none;
@@ -12,7 +11,7 @@
 .display-inner {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   padding: var(--inner-spacing);
   background-color: #111;
   border-radius: 2px;

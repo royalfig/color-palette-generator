@@ -12,6 +12,8 @@
     font-size: var(--small);
     line-height: 1;
     color: #eee;
+    background: #eeeeee1f;
+    border-radius: 2px;
   }
 }
 

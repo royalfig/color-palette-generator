@@ -1,4 +1,4 @@
-import { BoltIcon, ExclamationTriangleIcon, ScissorsIcon } from '@heroicons/react/24/solid'
+import { BoltIcon, ExclamationTriangleIcon, ScissorsIcon } from '@heroicons/react/24/outline'
 import Color from 'colorjs.io'
 import { motion } from 'framer-motion'
 import { debounce } from 'lodash-es'
@@ -23,7 +23,6 @@ export function InputColor({
   const [inputColor, setInputColor] = useState<string>(current)
   const [prevInputColor, setPrevInputColor] = useState<string>(current)
   const [warning, setWarning] = useState(false)
-  console.log('🚀 ~ warning:', warning)
   const [activity, setActivity] = useState(false)
   const inGamut = base[type].isInGamut
 
@@ -79,16 +78,15 @@ export function InputColor({
       <label className="sr-only" htmlFor={`input-color-${type}`}>
         {type}
       </label>
-      <Display spacing="small">
-        <input
-          id={`input-color-${type}`}
-          type="text"
-          value={inputColor}
-          onChange={e => handleChange(e.target.value)}
-          spellCheck="false"
-        />
-        <span className="blur-input">{inputColor}</span>
-      </Display>
+
+      <input
+        id={`input-color-${type}`}
+        type="text"
+        value={inputColor}
+        onChange={e => handleChange(e.target.value)}
+        spellCheck="false"
+      />
+      <span className="blur-input">{inputColor}</span>
       <div className="input-color-metadata flex">
         <ScissorsIcon className={!inGamut ? 'clipped' : ''} />
         <ExclamationTriangleIcon className={warning ? 'warning' : ''} />

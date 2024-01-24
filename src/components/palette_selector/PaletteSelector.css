@@ -27,7 +27,6 @@
   & div {
     position: relative;
     box-sizing: content-box;
-    padding: var(--spacing-02);
     background-color: hsl(248deg 11% 35%);
     border: 2px solid transparent;
     border-radius: 50%;
