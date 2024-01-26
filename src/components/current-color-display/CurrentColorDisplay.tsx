@@ -4,17 +4,16 @@ import { motion } from 'framer-motion'
 import './current-color-display.css'
 import { useBaseColor } from '../../hooks/useBaseColor'
 
-export function CurrentColorDisplay({ palettes }: { palettes: any }) {
-  const [colorName, setColorName] = useState('')
+export function CurrentColorDisplay({ base, baseColorName, setBaseColorName  }: { base: any, baseColorName: string, setBaseColorName: React.Dispatch<React.SetStateAction<string>>}) {
+console.log("🚀 ~ CurrentColorDisplay ~ baseColorName:", baseColorName)
 
-  const currentColor = useBaseColor(palettes)
-  const color = currentColor.hex.string
+  const color = base.hex.string
 
   async function getColorName(color: string) {
     try {
       const res = await fetch(`https://api.color.pizza/v1/?values=${color.replace('#', '')}`)
       const name = await res.json()
-      setColorName(name?.colors[0]?.name)
+      setBaseColorName(name?.colors[0]?.name)
     } catch (e: any) {
       console.log(e.message)
     }
@@ -30,13 +29,13 @@ export function CurrentColorDisplay({ palettes }: { palettes: any }) {
         <div className="color-dot relative" style={{ backgroundColor: color }}></div>
         <motion.p
           className="color-name"
-          key={colorName}
+          key={baseColorName}
           initial={{ clipPath: 'inset(0 100% 0 0)' }} // Hides text initially
           animate={{ clipPath: 'inset(0 0 0 0)' }} // Reveals text
           exit={{ clipPath: 'inset(0 100% 0 0)' }} // Hides text again
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          {colorName}
+          {baseColorName}
         </motion.p>
       </div>
       <button className="color-share-icon" aria-label="Share or save color by copying the URL" style={{ color: color }}>

@@ -1,0 +1,54 @@
+.pallete-info {
+    display: grid;
+    align-content: space-between;
+    justify-content: center;
+    color: #fff;
+}
+
+.palette-info-main {
+    font-size: var(--x-small);
+    text-align: right;
+    text-transform: uppercase;
+}
+
+.palette-info-palette-type {
+    font-size: 2rem;
+}
+
+.palette-info-meta {
+    font-weight: 300;
+    opacity: .8;
+
+}
+
+:where(.palette-info-display-support, .palette-info-colorspace) {
+    font-size: 10px;
+    color: var(--border);
+    text-transform: uppercase;
+}
+
+.palette-info-display-support {
+    & span {
+        font-weight: 700;
+    }
+    
+    & p {
+        text-wrap: pretty;
+    }
+}
+
+.palette-info-colorspace {
+    display: flex;
+    gap: var(--spacing-02);
+    overflow: clip;
+
+    & div {
+        flex-shrink: 0;
+    }
+}
+
+.palette-info-description {
+    font-size: var(--small);
+    line-height: 1.5;
+    opacity: .8;
+}

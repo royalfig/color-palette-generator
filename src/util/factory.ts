@@ -5,14 +5,14 @@ import { createColorObj } from './colorParse'
 export function colorFactory(color: string | Color | PlainColorObject, paletteInformation: string, idx = 0) {
   return {
     code: `${paletteInformation}-${idx + 1}`,
-    hex: createColorObj(color, 'hex', 5),
-    rgb: createColorObj(color, 'srgb', 5),
-    hsl: createColorObj(color, 'hsl', 5),
-    lch: createColorObj(color, 'lch', 5),
-    oklch: createColorObj(color, 'oklch', 5),
-    lab: createColorObj(color, 'lab', 5),
-    oklab: createColorObj(color, 'oklab', 5),
-    p3: createColorObj(color, 'p3', 5),
+    hex: createColorObj(color, 'hex', 3),
+    rgb: createColorObj(color, 'srgb', 3),
+    hsl: createColorObj(color, 'hsl', 3),
+    lch: createColorObj(color, 'lch', 3),
+    oklch: createColorObj(color, 'oklch', 3),
+    lab: createColorObj(color, 'lab', 3),
+    oklab: createColorObj(color, 'oklab', 3),
+    p3: createColorObj(color, 'p3', 3),
   }
 }
 

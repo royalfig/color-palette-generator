@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { Schemes } from '../../util/palettes'
-import './color-history.css'
-import { useBaseColor } from '../../hooks/useBaseColor'
+import { useState } from 'react';
+import { useBaseColor } from '../../hooks/useBaseColor';
+import { Schemes } from '../../util/palettes';
+import './color-history.css';
 
 export default function ColorHistory({ palettes, setColor }: { palettes: Schemes; setColor: Function }) {
   const [history, setHistory] = useState(Array(7).fill(''))

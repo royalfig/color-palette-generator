@@ -23,6 +23,7 @@ import { createPalettes } from './util/palettes'
 import { PaletteDisplay } from './components/palette_display/PaletteDisplay'
 import Button from './components/button/Button'
 import { InputTypeSelector } from './components/input-text-type-selector/InputTypeSelector'
+import { PaletteInfo } from './components/palette_info/PaletteInfo'
 export type ColorTypes = 'hex' | 'rgb' | 'hsl' | 'lch' | 'oklch' | 'lab' | 'oklab' | 'p3'
 
 function pickRandomColor() {
@@ -95,8 +96,9 @@ function pickRandomColor() {
 }
 
 export default function App() {
-  console.log('rendering')
+  console.log('app rendering')
   const [color, setColor] = useState<string | Color>(pickRandomColor())
+  const [baseColorName, setBaseColorName] = useState<string>('')
   const [palette, setPalette] = useState('comp')
   const [variation, setVariation] = useState('original')
   const [colorspaceType, setColorspaceType] = useState<ColorTypes>('hex')
@@ -140,7 +142,7 @@ export default function App() {
             <div className="synth-columns">
               <div>
                 <div className="color-input-display">
-                  <CurrentColorDisplay palettes={palettes} />
+                  <CurrentColorDisplay base={base} setBaseColorName={setBaseColorName} baseColorName={baseColorName}  />
                   <ColorSelector palettes={palettes} setColor={setColor} />
                 </div>
                 <InputColorContainer
@@ -151,6 +153,7 @@ export default function App() {
                   setColorspaceType={setColorspaceType}
                 />
               </div>
+              <PaletteInfo palettes={palettes} base={base} variation={variation} colorspaceType={colorspaceType} palette={palette} baseColorName={baseColorName} />
             </div>
           </Display>
         </section>

@@ -1,5 +1,4 @@
 import { Schemes } from '../../util/palettes'
-import { Display } from '../display/Display'
 import './palette-display.css'
 
 declare module 'react' {
@@ -22,16 +21,18 @@ type PaletteDisplayProps = {
 export function PaletteDisplay({ palettes, colorSpace, palette, variation }: PaletteDisplayProps) {
   const currentPalette = palettes[palette][variation]
   return (
-    <section className="palette-display-container">
-      {currentPalette.map(color => (
-        <button
-          className="palette-display"
-          key={color.code}
-          style={{ '--color': color[colorSpace].css, '--text': color[colorSpace].contrast }}
-        >
-          {color[colorSpace].string}
-        </button>
-      ))}
-    </section>
+  
+      <section className="palette-display-container">
+        {currentPalette.map(color => (
+          <button
+            className="palette-display"
+            key={color.code}
+            style={{ '--color': color[colorSpace].css, '--text': color[colorSpace].contrast }}
+          >
+            {color[colorSpace].string}
+          </button>
+        ))}
+      </section>
+    
   )
 }

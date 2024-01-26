@@ -1,7 +1,7 @@
 main {
   display: grid;
   place-items: center;
-  height: 100vh;
+  min-height: 100svh;
   padding: 1.5vw;
   background-image: var(--bg);
 }

@@ -1,28 +1,22 @@
 .palette-display-container {
   display: grid;
   flex: 1;
-  grid-template-columns: repeat(auto-fit, minmax(10ch, 1fr));
-  padding: var(--spacing-04);
-  border-radius: 20px;
+  grid-template-rows: repeat(auto-fit, 1fr);
+  gap: var(--spacing-04);
+  height: 100%;
 }
 
 .palette-display {
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
-  height: 5rem;
+  height: 100%;
   padding: var(--button-padding);
   font-size: var(--small);
   font-weight: 600;
   color: var(--text);
   text-align: right;
-  background-color: var(--color);
-
-  &:first-child {
-    border-radius: 4px 0 0 4px;
-  }
-
-  &:last-child {
-    border-radius: 0 4px 4px 0;
-  }
+  background-color: var(--color, var(--border));
+  border-radius: 2px;
+  box-shadow: inset .25em .25em .25em hsl(0deg 0% 0% / 25.7%);
 }
