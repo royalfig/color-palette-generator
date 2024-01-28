@@ -44,3 +44,12 @@
     }
   }
 }
+
+[data-mode='dark'] {
+  .button-container {
+    --background-color: hsl(248deg 11% 20%);
+    --background-color-active: hsl(248deg 11% 18%);
+    --light-shadow-color: hsl(248deg 11% 25%);
+    --dark-shadow-color: hsl(248deg 11% 5%);
+  }
+}

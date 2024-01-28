@@ -85,7 +85,7 @@ function createColorVariations(hueKey: string, variationKey: string, baseColor: 
     const space = variations[variationKey].space
     const base = new Color(baseColor)
     if (space === 'hsl') {
-      base.hsl.h += hue
+      base.hsl.h = adjustHue(base.hsl.h + hue)
       const variedColor = variations[variationKey].adjust(base, idx)
       return colorFactory(variedColor, `${hueKey}-${variationKey}`, idx)
     } else {

@@ -24,6 +24,7 @@ import { PaletteDisplay } from './components/palette_display/PaletteDisplay'
 import Button from './components/button/Button'
 import { InputTypeSelector } from './components/input-text-type-selector/InputTypeSelector'
 import { PaletteInfo } from './components/palette_info/PaletteInfo'
+import { Share } from './components/share/Share'
 export type ColorTypes = 'hex' | 'rgb' | 'hsl' | 'lch' | 'oklch' | 'lab' | 'oklab' | 'p3'
 
 function pickRandomColor() {
@@ -97,7 +98,9 @@ function pickRandomColor() {
 
 export default function App() {
   console.log('app rendering')
-  const [color, setColor] = useState<string | Color>(pickRandomColor())
+  const colorQueryParaCheck = new URLSearchParams(document.location.search).has('color');
+  const colorQueryParam = colorQueryParaCheck ? new URLSearchParams(document.location.search).get('color') : null;
+  const [color, setColor] = useState<string | Color>(colorQueryParam || pickRandomColor())
   const [baseColorName, setBaseColorName] = useState<string>('')
   const [palette, setPalette] = useState('comp')
   const [variation, setVariation] = useState('original')
@@ -117,6 +120,7 @@ export default function App() {
       document.head.removeChild(styleEl)
     }
   }, [css])
+
 
   return (
     <main>
@@ -172,7 +176,7 @@ export default function App() {
               <ControlGroup title="Controls">
                 <EyeDropper setColor={setColor} />
                 <DarkMode />
-                <EyeDropper setColor={setColor} />
+                <Share base={base}/>
               </ControlGroup>
 
               <ControlGroup title="Export">
