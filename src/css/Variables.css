@@ -41,7 +41,7 @@
 [data-mode='dark'] {
   --synth-body: hsl(248deg 11% 15%);
   --element: hsl(248deg 11% 85%);
-  --border: hsl(248deg 11% 25%);
+  --border: hsl(248deg 11% 35%);
   --bg: linear-gradient(
     to bottom right in oklab,
     hsl(248deg 11% 25%),

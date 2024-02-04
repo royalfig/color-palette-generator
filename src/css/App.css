@@ -12,11 +12,13 @@ main {
   grid-template-columns: repeat(2, 1fr);
   background-color: var(--synth-body);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-md);
   box-shadow: 0 -1px 2px -0.5px #9194a3 inset, 2px 0 2px -0.5px #eaeaf2 inset, 0 1px 1px #eaeaf2 inset,
     0 25px 20px -15px rgb(0 0 0 / 10%), 10px 65px 50px -10px rgb(0 0 0 / 5%);
+}
 
-  
+[data-mode='dark'] .synth-container {
+  box-shadow: 0 -1px 2px -0.5px hsl(230deg 9% 30%) inset, 2px 0 2px -0.5px hsl(240deg 24% 53%) inset,
+    0 1px 1px hsl(240deg 24% 53%) inset, 0 25px 20px -15px rgb(0 0 0 / 10%), 10px 65px 50px -10px rgb(0 0 0 / 5%);
 }
 
 .synth-brand {
@@ -42,7 +44,6 @@ main {
 .synth-display {
   display: grid;
   grid-column: 1 / -1;
- 
 }
 
 .synth-left {

@@ -28,12 +28,19 @@ export function InputColor({
 
   console.log('inputColor rendering')
 
-  if (current !== prevInputColor) {
-    console.log('🚀 ~ file: InputColor.tsx:30 ~ current !== prevInputColor:', current, prevInputColor)
+  // if (current !== prevInputColor) {
+  //   console.log('🚀 ~ file: InputColor.tsx:30 ~ current !== prevInputColor:', current, prevInputColor)
+  //   setInputColor(current)
+  //   setPrevInputColor(inputColor)
+  //   setWarning(false)
+  // }
+
+  useEffect(() => { 
+    console.log('🚀 ~ file: InputColor.tsx:30 ~ useEffect render', current, prevInputColor)
     setInputColor(current)
-    setPrevInputColor(inputColor)
+    // setPrevInputColor(inputColor)
     setWarning(false)
-  }
+  }, [current]);
 
   const debouncedParseColor = useCallback(debounce(parseColor, 1000), [])
 
@@ -46,7 +53,7 @@ export function InputColor({
       setWarning(false)
       setActivity(false)
       setColor(parsed)
-    } catch (error) {
+    } catch (error: any) {
       setInputColor(error.message)
       setActivity(false)
       setWarning(true)

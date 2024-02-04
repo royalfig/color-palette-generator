@@ -3,25 +3,22 @@ import { ShareIcon } from '@heroicons/react/24/outline'
 import { motion } from 'framer-motion'
 import './current-color-display.css'
 import { useBaseColor } from '../../hooks/useBaseColor'
+import { useFetchColorNames } from '../../hooks/useColorName'
 
-export function CurrentColorDisplay({ base, baseColorName, setBaseColorName  }: { base: any, baseColorName: string, setBaseColorName: React.Dispatch<React.SetStateAction<string>>}) {
-console.log("🚀 ~ CurrentColorDisplay ~ baseColorName:", baseColorName)
+export function CurrentColorDisplay({
+  base,
+  baseColorName,
+  setBaseColorName,
+}: {
+  base: any
+  baseColorName: string
+  setBaseColorName: React.Dispatch<React.SetStateAction<string>>
+}) {
 
   const color = base.hex.string
-
-  async function getColorName(color: string) {
-    try {
-      const res = await fetch(`https://api.color.pizza/v1/?values=${color.replace('#', '')}`)
-      const name = await res.json()
-      setBaseColorName(name?.colors[0]?.name)
-    } catch (e: any) {
-      console.log(e.message)
-    }
-  }
-
-  useEffect(() => {
-    getColorName(color)
-  }, [color])
+  const { fetchedData, isLoading, error } = useFetchColorNames(color)
+  console.log("🚀 ~ fetchedData, isLoading, error:", fetchedData, isLoading, error)
+  !isLoading && fetchedData && setBaseColorName(fetchedData.colorNames[0])
 
   return (
     <div className="current-color-display flex">
