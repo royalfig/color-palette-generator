@@ -1,3 +1,4 @@
+import { useFetchColorNames } from '../../hooks/useColorName'
 import { Schemes } from '../../util/palettes'
 import './palette-display.css'
 
@@ -20,19 +21,25 @@ type PaletteDisplayProps = {
 
 export function PaletteDisplay({ palettes, colorSpace, palette, variation }: PaletteDisplayProps) {
   const currentPalette = palettes[palette][variation]
-  return (
+  console.log("🚀 ~ PaletteDisplay ~ currentPalette:", currentPalette)
+
+  const hexStr = currentPalette.map(color => color.hex.string.replace('#', '')).join(',')
   
-      <section className="palette-display-container">
-        {currentPalette.map(color => (
-          <button
-            className="palette-display"
-            key={color.code}
-            style={{ '--color': color[colorSpace].css, '--text': color[colorSpace].contrast }}
-          >
-            {color[colorSpace].string}
-          </button>
-        ))}
-      </section>
-    
+  const {error, fetchedData, isLoading} = useFetchColorNames(hexStr)
+  
+  
+  console.log("🚀 ~ PaletteDisplay ~ error, fetchedData, isLoading:", error, fetchedData, isLoading)
+  return (
+    <section className="palette-display-container">
+      {currentPalette.map((color, idx) => (
+        <button
+          className="palette-display"
+          key={color.code}
+          style={{ '--color': color[colorSpace].css, '--text': color[colorSpace].contrast }}
+        >
+          {fetchedData?.colorNames[idx]} | {color[colorSpace].string} | {color[colorSpace].isInGamut ? 'in gamut' : 'out of gamut'} 
+        </button>
+      ))}
+    </section>
   )
 }
