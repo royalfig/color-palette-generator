@@ -1,5 +1,6 @@
 .pallete-info {
     display: grid;
+    grid-column: span 2;
     align-content: space-between;
     justify-content: center;
     color: #fff;

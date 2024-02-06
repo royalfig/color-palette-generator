@@ -135,6 +135,8 @@ export default function App() {
             </ControlGroup>
           </section>
 
+        </div>
+        <div className="synth-center box-padding">
           <section className="control-section">
             <ControlGroup title="Palettes">
               <PaletteSelector palettes={palettes} palette={palette} setPalette={setPalette} />
@@ -146,7 +148,7 @@ export default function App() {
           </section>
         </div>
         <div className="synth-right box-padding">
-          <PaletteDisplay palettes={palettes} palette={palette} variation={variation} colorSpace={colorspaceType} />
+          <PaletteDisplay palettes={palettes} palette={palette} variation={variation} colorSpace={colorspaceType} colorName={fetchColorName} />
         </div>
       </div>
     </main>

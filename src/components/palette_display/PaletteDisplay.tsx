@@ -1,5 +1,7 @@
+import { ColorName } from '../../App'
 import { Schemes } from '../../util/palettes'
 import './palette-display.css'
+import { ScissorsIcon } from '@heroicons/react/24/outline'
 
 declare module 'react' {
   interface CSSProperties {
@@ -16,9 +18,10 @@ type PaletteDisplayProps = {
   colorSpace: ColorSpace
   palette: string
   variation: string
+  colorName: ColorName
 }
 
-export function PaletteDisplay({ palettes, colorSpace, palette, variation }: PaletteDisplayProps) {
+export function PaletteDisplay({ palettes, colorSpace, palette, variation, colorName }: PaletteDisplayProps) {
   const currentPalette = palettes[palette][variation]
   console.log('🚀 ~ PaletteDisplay ~ currentPalette:', currentPalette)
 
@@ -32,7 +35,7 @@ export function PaletteDisplay({ palettes, colorSpace, palette, variation }: Pal
           key={color.code}
           style={{ '--color': color[colorSpace].css, '--text': color[colorSpace].contrast }}
         >
-          {color[colorSpace].string} | {color[colorSpace].isInGamut ? 'in gamut' : 'out of gamut'}
+          <span>{colorName.fetchedData?.colorNames[idx]}</span> <span>{color[colorSpace].string} {color[colorSpace].isInGamut ? undefined : <ScissorsIcon className="icon" />}</span>
         </button>
       ))}
     </section>

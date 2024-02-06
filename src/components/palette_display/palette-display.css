@@ -8,8 +8,9 @@
 
 .palette-display {
   display: flex;
+  gap: var(--spacing-04);
   align-items: flex-end;
-  justify-content: flex-end;
+  justify-content: space-between;
   height: 100%;
   padding: var(--button-padding);
   font-size: var(--small);
@@ -19,4 +20,17 @@
   background-color: var(--color, var(--border));
   border-radius: 2px;
   box-shadow: inset .25em .25em .25em hsl(0deg 0% 0% / 25.7%);
+
+  span  {
+    &:last-child {
+      display: flex;
+      gap: var(--spacing-02);
+      align-items: center;
+    }
+  }
+
+  svg {
+    width: 1.5em;
+    height: 1.5em;
+  }
 }

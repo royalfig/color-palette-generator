@@ -9,7 +9,7 @@ main {
 .synth-container {
   display: grid;
   grid-template-rows: min-content auto auto;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   background-color: var(--synth-body);
   border-radius: var(--radius);
   box-shadow: 0 -1px 2px -0.5px #9194a3 inset, 2px 0 2px -0.5px #eaeaf2 inset, 0 1px 1px #eaeaf2 inset,
@@ -65,9 +65,14 @@ main {
 
 .synth-columns {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-08);
   width: 100%;
+
+  div:first-child {
+    grid-column: 1 / span 1
+  }
+  
 }
 
 .box {
