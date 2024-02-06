@@ -3,6 +3,7 @@ import { Schemes } from '../../util/palettes'
 import { Circle } from '../circle/Circle'
 import './palette-info.css'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ColorName } from '../../App'
 
 function getFullName(palette: string) {
   switch (palette) {
@@ -27,33 +28,32 @@ function getFullName(palette: string) {
   }
 }
 
-function createNarrative(palette: string, variation: string) {
+function createNarrative(palette: string, variation: string, paletteTitle: string) {
   let narrative = ''
   switch (palette) {
     case 'comp':
-      narrative = 'The complementary palette features two colors opposite each other on the color wheel.'
+      narrative = `${paletteTitle} is a complementary palette features two colors opposite each other on the color wheel.`
       break
     case 'ana':
-      narrative = 'The analogous palette features three colors next to each other on the color wheel.'
+      narrative = `${paletteTitle} is an analogous palette features three colors next to each other on the color wheel.`
       break
     case 'tones':
-      narrative = 'The tones palette features a color with varying degrees of saturation and brightness.'
+      narrative = `${paletteTitle} is a tones palette features a color with varying degrees of saturation and brightness.`
       break
     case 'tints':
-      narrative = 'The tints & shades palette features a color with varying degrees of lightness and darkness.'
+      narrative = `${paletteTitle} is a tints & shades palette features a color with varying degrees of lightness and darkness.`
       break
     case 'poly':
-      narrative = 'The polychromia palette features a color with varying degrees of saturation.'
+      narrative = `${paletteTitle} is a polychromia palette features a color with varying degrees of saturation.`
       break
     case 'tria':
-      narrative = 'The triadic palette features three colors evenly spaced around the color wheel.'
+      narrative = `${paletteTitle} is a triadic palette features three colors evenly spaced around the color wheel.`
       break
     case 'tetra':
-      narrative = 'The tetradic palette features four colors evenly spaced around the color wheel.'
+      narrative = `${paletteTitle} is a tetradic palette features four colors evenly spaced around the color wheel.`
       break
     case 'split':
-      narrative =
-        'The split complementary palette features three colors, one color and two colors adjacent to its complementary color.'
+      narrative = `${paletteTitle} is a split complementary palette features three colors, one color and two colors adjacent to its complementary color.`
       break
     default:
       narrative = palette
@@ -118,14 +118,14 @@ export function PaletteInfo({
   variation,
   colorspaceType,
   palettes,
-  baseColorName,
+  colorName,
 }: {
   base: any
   palette: string
   variation: string
   colorspaceType: string
   palettes: Schemes
-  baseColorName: string
+  colorName: ColorName
 }) {
   const [displaySupport, setDisplaySupport] = useState<DisplaySupport | null>(null)
 
@@ -133,6 +133,8 @@ export function PaletteInfo({
   // create two arrays of similar lengths of the colorspaces
   const colorSpaces1 = colorSpaces.slice(0, colorSpaces.length / 2)
   const colorSpaces2 = colorSpaces.slice(colorSpaces.length / 2)
+
+  const paletteTitle = colorName.fetchedData?.paletteTitle
 
   useEffect(() => {
     setDisplaySupport(determineSupportedColorspace())
@@ -156,7 +158,12 @@ export function PaletteInfo({
 
       <div className="palette-info-main">
         <p className="palette-info-color-name">
-          {baseColorName} <span className="palette-info-meta">Base Color</span>
+          {colorName.isLoading ? '' : colorName.fetchedData?.paletteTitle}{' '}
+          <span className="palette-info-meta">Palette</span>
+        </p>
+        <p className="palette-info-color-name">
+          {colorName.isLoading ? '' : colorName.fetchedData?.colorNames[0]}{' '}
+          <span className="palette-info-meta">Base Color</span>
         </p>
         <p className="palette-info-palette-type">
           {/* <Circle colors={base.} type='circle' size='large'/> */}
@@ -172,7 +179,7 @@ export function PaletteInfo({
       </div>
 
       <p className="palette-info-description" style={{ maxWidth: '30ch' }}>
-        {createNarrative(palette, variation)}
+        {createNarrative(palette, variation, paletteTitle)}
       </p>
 
       <div className="palette-info-display-support flex gap-4">

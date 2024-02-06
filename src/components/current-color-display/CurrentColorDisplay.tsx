@@ -2,23 +2,22 @@ import { useEffect, useState } from 'react'
 import { ShareIcon } from '@heroicons/react/24/outline'
 import { motion } from 'framer-motion'
 import './current-color-display.css'
-import { useBaseColor } from '../../hooks/useBaseColor'
-import { useFetchColorNames } from '../../hooks/useColorName'
+import { ColorName } from '../../App'
 
 export function CurrentColorDisplay({
   base,
-  baseColorName,
-  setBaseColorName,
+  colorName,
 }: {
   base: any
-  baseColorName: string
-  setBaseColorName: React.Dispatch<React.SetStateAction<string>>
+  colorName: ColorName
 }) {
 
+  // TODO: use current color space
   const color = base.hex.string
-  const { fetchedData, isLoading, error } = useFetchColorNames(color)
-  console.log("🚀 ~ fetchedData, isLoading, error:", fetchedData, isLoading, error)
-  !isLoading && fetchedData && setBaseColorName(fetchedData.colorNames[0])
+
+
+  const baseColorName = colorName.isLoading ? 'Loading...' : colorName.fetchedData?.colorNames[0]
+
 
   return (
     <div className="current-color-display flex">
