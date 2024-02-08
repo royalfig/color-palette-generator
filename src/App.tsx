@@ -130,7 +130,7 @@ export default function App() {
 
             <ControlGroup title="Export">
               <ExportCSS css={css} />
-              <ExportImage />
+              <ExportImage colorNames={fetchColorName} palettes={palettes} palette={palette} variation={variation} colorSpace={colorspaceType} />
               <ExportJSON data={palettes} />
             </ControlGroup>
           </section>
