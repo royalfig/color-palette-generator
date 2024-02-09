@@ -41,11 +41,13 @@ export function ExportImage({
 
   const currentPalette = palettes[palette][variation]
   const totalColors = currentPalette.length
+  const width = 2000
+  const outerPadding = 60
 
   function createFrame() {
     const canvas = document.createElement('canvas')
-    canvas.width = 500
-    canvas.height = 80 + (totalColors * 40)
+    canvas.width = width
+    canvas.height = outerPadding + Math.max((totalColors * outerPadding), 1000)
     const ctx = canvas.getContext('2d')
     if (ctx) {
       ctx.fillStyle = '#000'
@@ -53,9 +55,9 @@ export function ExportImage({
 
       ctx.fillStyle = '#fff'
       ctx.font = '20px system-ui'
-      ctx.fillText(colorNames.fetchedData?.paletteTitle || 'Palette', 40, 20)
+      ctx.fillText(colorNames.fetchedData?.paletteTitle || 'Palette', outerPadding, outerPadding)
       ctx.font = '14px system-ui'
-      ctx.fillText(`Generated from Color Palette Pro at ${new Date().toLocaleString()}`, 40, 40)
+      ctx.fillText(`Generated from Color Palette Pro at ${new Date().toLocaleString()}`, outerPadding, outerPadding * 2)
     }
 
     return { ctx, canvas }
@@ -67,7 +69,7 @@ export function ExportImage({
     if (ctx) {
       for (let idx = 0; idx < totalColors; idx++) {
         ctx.fillStyle = currentPalette[idx][colorSpace].string
-        ctx.fillRect(40, 40 + (idx * 40), 40, 360)
+        ctx.fillRect(outerPadding, outerPadding + (idx * outerPadding), width / 2, outerPadding)
 
         // ctx.fillStyle = currentPalette[0][colorSpace].contrast
         // ctx.font = '20px sans-serif'

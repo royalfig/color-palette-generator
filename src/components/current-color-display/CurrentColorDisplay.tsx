@@ -1,15 +1,18 @@
-import { useEffect, useState } from 'react'
-import { ShareIcon } from '@heroicons/react/24/outline'
 import { motion } from 'framer-motion'
-import './current-color-display.css'
 import { ColorName } from '../../App'
+import ColorHistory from '../color-history/ColorHistory'
+import './current-color-display.css'
 
 export function CurrentColorDisplay({
   base,
   colorName,
+  palettes,
+  setColor,
 }: {
   base: any
-  colorName: ColorName
+  colorName: ColorName,
+  palettes: any,
+  setColor: Function
 }) {
 
   // TODO: use current color space
@@ -34,9 +37,9 @@ export function CurrentColorDisplay({
           {baseColorName}
         </motion.p>
       </div>
-      <button className="color-share-icon" aria-label="Share or save color by copying the URL" style={{ color: color }}>
-        <ShareIcon className="icon" />
-      </button>
+      <div className="flex color-history-group">
+        <ColorHistory palettes={palettes} setColor={setColor} />
+      </div>
     </div>
   )
 }

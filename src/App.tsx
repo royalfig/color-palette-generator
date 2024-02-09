@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
 import { useEffect, useState } from 'react'
-import ColorHistory from './components/color-history/ColorHistory'
+import Button from './components/button/Button'
 import { ColorSelector } from './components/color-selector/ColorSelector'
 import { ControlGroup } from './components/control-group/ControlGroup'
 import { CurrentColorDisplay } from './components/current-color-display/CurrentColorDisplay'
@@ -9,24 +9,23 @@ import { Display } from './components/display/Display'
 import { ExportCSS, ExportImage, ExportJSON } from './components/exports/Exports'
 import { EyeDropper } from './components/eye-dropper/EyeDropper'
 import { InputColorContainer } from './components/input-color-container/InputColorContainer'
+import { InputTypeSelector } from './components/input-text-type-selector/InputTypeSelector'
+import { PaletteDisplay } from './components/palette_display/PaletteDisplay'
+import { PaletteInfo } from './components/palette_info/PaletteInfo'
 import PaletteSelector from './components/palette_selector/PaletteSelector'
+import { Share } from './components/share/Share'
 import { VariationSelector } from './components/variations/Variations'
 import { VibrancyModule } from './components/vibrancy_module/VibrancyModule'
+import './css/App.css'
+import './css/Defaults.css'
 import './css/Reset.css'
 import './css/Variables.css'
-import './css/Defaults.css'
 import './css/utils.css'
-import './css/App.css'
 import { useBaseColor } from './hooks/useBaseColor'
+import { useFetchColorNames } from './hooks/useColorName'
 import { generateCss } from './util/generateCss'
 import { createPalettes } from './util/palettes'
-import { PaletteDisplay } from './components/palette_display/PaletteDisplay'
-import Button from './components/button/Button'
-import { InputTypeSelector } from './components/input-text-type-selector/InputTypeSelector'
-import { PaletteInfo } from './components/palette_info/PaletteInfo'
-import { Share } from './components/share/Share'
 import { pickRandomColor } from './util/pickRandomColor'
-import { useFetchColorNames } from './hooks/useColorName'
 export type ColorTypes = 'hex' | 'rgb' | 'hsl' | 'lch' | 'oklch' | 'lab' | 'oklab' | 'p3'
 
 export type ColorName = {
@@ -46,12 +45,11 @@ export default function App() {
   const [palette, setPalette] = useState('comp')
   const [variation, setVariation] = useState('original')
   const [colorspaceType, setColorspaceType] = useState<ColorTypes>('hex')
-  
+
   const palettes = createPalettes(color)
   const css = generateCss(palettes)
   const base = useBaseColor(palettes)
   const fetchColorName = useFetchColorNames(palettes, palette, variation)
-
 
   useEffect(() => {
     const styleEl = document.createElement('style')
@@ -88,7 +86,7 @@ export default function App() {
             <div className="synth-columns">
               <div>
                 <div className="color-input-display">
-                  <CurrentColorDisplay base={base} colorName={fetchColorName} />
+                  <CurrentColorDisplay base={base} colorName={fetchColorName} palettes={palettes} setColor={setColor} />
                   <ColorSelector palettes={palettes} setColor={setColor} />
                 </div>
                 <InputColorContainer
@@ -115,10 +113,6 @@ export default function App() {
             <ControlGroup title="Color Space">
               <InputTypeSelector setColorSpace={setColorspaceType} current={colorspaceType} />
             </ControlGroup>
-
-            <ControlGroup title="History">
-              <ColorHistory palettes={palettes} setColor={setColor} />
-            </ControlGroup>
           </section>
 
           <section className="control-section">
@@ -130,11 +124,16 @@ export default function App() {
 
             <ControlGroup title="Export">
               <ExportCSS css={css} />
-              <ExportImage colorNames={fetchColorName} palettes={palettes} palette={palette} variation={variation} colorSpace={colorspaceType} />
+              <ExportImage
+                colorNames={fetchColorName}
+                palettes={palettes}
+                palette={palette}
+                variation={variation}
+                colorSpace={colorspaceType}
+              />
               <ExportJSON data={palettes} />
             </ControlGroup>
           </section>
-
         </div>
         <div className="synth-center box-padding">
           <section className="control-section">
@@ -148,7 +147,13 @@ export default function App() {
           </section>
         </div>
         <div className="synth-right box-padding">
-          <PaletteDisplay palettes={palettes} palette={palette} variation={variation} colorSpace={colorspaceType} colorName={fetchColorName} />
+          <PaletteDisplay
+            palettes={palettes}
+            palette={palette}
+            variation={variation}
+            colorSpace={colorspaceType}
+            colorName={fetchColorName}
+          />
         </div>
       </div>
     </main>

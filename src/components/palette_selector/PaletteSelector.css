@@ -6,11 +6,15 @@
   justify-items: center;
 }
 
+
+
 .palette-selector {
   --background-color: hsl(248deg 11% 80%);
   --background-color-active: hsl(248deg 11% 78%);
   --light-shadow-color: hsl(248deg 11% 95%);
   --dark-shadow-color: hsl(248deg 11% 5%);
+
+  
 
   display: flex;
   flex-direction: column;
@@ -58,4 +62,11 @@
       inset -0.0625em -0.0625em 0.0625em transparent, 0.125em 0.125em 0.25em transparent;
     transform: scale(0.98);
   }
+}
+
+[data-mode='dark'] .palette-selector {
+  --background-color: hsl(248deg 11% 20%);
+  --background-color-active: hsl(248deg 11% 38%);
+  --light-shadow-color: hsl(248deg 11% 15%);
+  --dark-shadow-color: hsl(248deg 11% 5%);
 }
