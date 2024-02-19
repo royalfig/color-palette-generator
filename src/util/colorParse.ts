@@ -1,5 +1,6 @@
 import Color from 'colorjs.io'
 import { PlainColorObject } from 'colorjs.io/types/src/color';
+import { ColorSpace, ColorObj } from '../types';
 
 function roundNumber(num: number, precision: number) {
   // copied from colorjs lib for consistency
@@ -13,7 +14,7 @@ function roundNumber(num: number, precision: number) {
   } 
 }
 
-export function createColorObj(color: string | Color | PlainColorObject, colorSpace: 'lch' | 'oklch' | 'lab' | 'oklab' | 'p3' | 'srgb' | 'hsl' | 'hex' , precision: number = 3) {
+export function createColorObj(color: string | Color | PlainColorObject, colorSpace: ColorSpace , precision: number = 3): ColorObj {
   const space = colorSpace === 'hex' ? 'srgb' : colorSpace
   const format = colorSpace === 'hex' ? 'hex' : ''
   const colorObj = new Color(color);
@@ -37,5 +38,3 @@ export function createColorObj(color: string | Color | PlainColorObject, colorSp
     outOfGamut,
   }
 }
-
-export type ReturnColor = ReturnType<typeof createColorObj>

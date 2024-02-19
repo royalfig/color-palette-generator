@@ -1,5 +1,6 @@
 .pallete-info {
     display: grid;
+    grid-template-columns: repeat(2, 1fr);
     grid-column: span 2;
     align-content: space-between;
     justify-content: center;
@@ -7,13 +8,14 @@
 }
 
 .palette-info-main {
-    font-size: var(--x-small);
-    text-align: right;
+    font-size: var(--small);
+    text-align: left;
     text-transform: uppercase;
 }
 
-.palette-info-palette-type {
-    font-size: 2rem;
+.palette-info-color-name {
+    font-size: 1.5em;
+    text-transform: none;
 }
 
 .palette-info-meta {
@@ -22,7 +24,7 @@
 
 }
 
-:where(.palette-info-display-support, .palette-info-colorspace) {
+:where(.palette-info-display-support) {
     font-size: 10px;
     color: var(--border);
     text-transform: uppercase;
@@ -39,17 +41,39 @@
 }
 
 .palette-info-colorspace {
-    display: flex;
-    gap: var(--spacing-02);
-    overflow: clip;
+   display: grid;
+   grid-template-columns: repeat(2, 1fr);
+   gap: var(--spacing-02);
+   font-size: var(--small);
 
-    & div {
-        flex-shrink: 0;
-    }
+   span {
+    display: inline-block;
+    padding: var(--spacing-01);
+    margin-inline-end: var(--spacing-02);
+    text-transform: none;
+    text-transform: uppercase;
+    border: 1px solid;
+    border-radius: 4px;
+    opacity: .4;
+   }
 }
 
 .palette-info-description {
-    font-size: var(--small);
-    line-height: 1.5;
+    margin-block-end: 1rem;
+    line-height: 1.35;
+    text-wrap: pretty;
     opacity: .8;
+}
+
+.color-blocks {
+    display: grid;
+    grid-template-columns: repeat(5, min-content);
+    gap: var(--spacing-02);
+    margin-block-start: var(--spacing-04);
+
+    .color-block {
+        width: 1rem;
+        height: 1rem;
+        border-radius: var(--radius-small);
+    }
 }

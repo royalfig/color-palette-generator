@@ -129,6 +129,7 @@ export function PaletteInfo({
 }) {
   const [displaySupport, setDisplaySupport] = useState<DisplaySupport | null>(null)
 
+
   const colorSpaces = Object.entries(base).slice(1)
   // create two arrays of similar lengths of the colorspaces
   const colorSpaces1 = colorSpaces.slice(0, colorSpaces.length / 2)
@@ -140,6 +141,11 @@ export function PaletteInfo({
     setDisplaySupport(determineSupportedColorspace())
   }, [])
 
+  const colorBlocks = Array(10).fill("var(--border)").map((color: any, idx: number) => {
+    return palettes?.[palette]?.[variation]?.[idx]?.[colorspaceType].string ? palettes[palette][variation][idx][colorspaceType].string : color
+  })
+  
+
   const variants = {
     enter: { opacity: 0 },
     exit: { opacity: 0 },
@@ -148,45 +154,63 @@ export function PaletteInfo({
   // const colorSpaces2 = colorSpaces.slice(5)
   return (
     <div className="pallete-info">
-      <div className="palette-info-colorspace">
-        {colorSpaces.map(([key, value]) => (
-          <div key={key}>
-            <p>{value.string}</p>
-          </div>
-        ))}
-      </div>
+     
 
       <div className="palette-info-main">
+        <p className="palette-info-palette-type">
+          
+          {getFullName(palette)} <span className="palette-info-meta">Palette</span>
+        </p>
         <p className="palette-info-color-name">
           {colorName.isLoading ? '' : colorName.fetchedData?.paletteTitle}{' '}
           <span className="palette-info-meta">Palette</span>
         </p>
-        <p className="palette-info-color-name">
-          {colorName.isLoading ? '' : colorName.fetchedData?.colorNames[0]}{' '}
-          <span className="palette-info-meta">Base Color</span>
-        </p>
-        <p className="palette-info-palette-type">
-          {/* <Circle colors={base.} type='circle' size='large'/> */}
-          {getFullName(palette)} <span className="palette-info-meta">Palette</span>
-        </p>
+        
         <p className="palette-info-variation">
           {variation} <span className="palette-info-meta">Variation</span>
         </p>
         <p className="palette-info-code">
           --{base.code}: {base.oklch.raw.join(' ')}
         </p>
-        <p className="palette-info-gamut">{base.hex.isInGamut ? 'In Gamut' : 'Out of Gamut'}</p>
+        <p className="palette-info-gamut">{base.hex.isInGamut ? 'In sRGB Gamut' : 'Out of sRGB Gamut'}</p>
+        {['tones', 'tints', 'poly'].includes(palette) ? (
+              <Circle colors={palettes[palette]} type="circle" size="large" />
+            ) : (
+              <Circle colors={palettes[palette]} type="default" size="large" />
+            )}
+
+            <div className="color-blocks">
+              {colorBlocks.map((color: any, idx: number) => (
+                <div className='color-block' style={{ backgroundColor: color }} key={idx} />
+              ))}
+            </div>
       </div>
 
-      <p className="palette-info-description" style={{ maxWidth: '30ch' }}>
+<div className="palette-info-3">
+      <p className="palette-info-description">
         {createNarrative(palette, variation, paletteTitle)}
       </p>
+
+      <div className="palette-info-colorspace">
+        {colorSpaces.map(([key, value]) => (
+          <div key={key}>
+            <p><span>{key}</span>{removeNonNumericalElements(value.string)}</p>
+          </div>
+        ))}
+      </div>
+
+</div>
 
       <div className="palette-info-display-support flex gap-4">
         <p>
           <span>{displaySupport?.colorGamut}</span>: {displaySupport?.colorGamutDescription}
         </p>
+        
       </div>
     </div>
   )
+}
+
+function removeNonNumericalElements(str: string) {
+  return str.replace(/[^0-9% .#-]/g, '')
 }

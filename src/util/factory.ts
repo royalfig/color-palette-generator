@@ -1,8 +1,9 @@
 import Color from 'colorjs.io'
 import { PlainColorObject } from 'colorjs.io/types/src/color'
 import { createColorObj } from './colorParse'
+import { ColorFactory } from '../types'
 
-export function colorFactory(color: string | Color | PlainColorObject, paletteInformation: string, idx = 0) {
+export function colorFactory(color: string | Color | PlainColorObject, paletteInformation: string, idx = 0): ColorFactory{
   return {
     code: `${paletteInformation}-${idx + 1}`,
     hex: createColorObj(color, 'hex', 3),
@@ -15,5 +16,3 @@ export function colorFactory(color: string | Color | PlainColorObject, paletteIn
     p3: createColorObj(color, 'p3', 3),
   }
 }
-
-export type ColorFactory = ReturnType<typeof colorFactory>

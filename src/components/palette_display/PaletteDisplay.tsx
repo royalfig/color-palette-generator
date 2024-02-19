@@ -23,7 +23,6 @@ type PaletteDisplayProps = {
 
 export function PaletteDisplay({ palettes, colorSpace, palette, variation, colorName }: PaletteDisplayProps) {
   const currentPalette = palettes[palette][variation]
-  console.log('🚀 ~ PaletteDisplay ~ currentPalette:', currentPalette)
 
   const hexStr = currentPalette.map(color => color.hex.string.replace('#', '')).join(',')
 

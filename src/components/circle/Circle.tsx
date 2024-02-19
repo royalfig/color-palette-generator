@@ -29,7 +29,7 @@ export function Circle({ colors, type, size }: { colors: any; type: 'default' | 
 
               const xr = isNaN(x) ? 0 : x
               const yr = isNaN(y) ? 0 : y * -1
-              return <circle key={idx} cx={xr} cy={yr} r="12" fill={color.hex.string}></circle>
+              return <circle key={idx} cx={xr} cy={yr} r={size === 'large' ? 18 : 12} fill={color.hex.string}></circle>
             })
           : colors.original.map((color: any, idx: number) => {
               const h = sizer((idx + 10) * (size === 'large' ? 36 : 72), size)
@@ -42,7 +42,7 @@ export function Circle({ colors, type, size }: { colors: any; type: 'default' | 
 
               const xr = isNaN(x) ? 0 : x
               const yr = isNaN(y) ? 0 : y * -1
-              return <circle key={idx} cx={xr} cy={yr} r="12" fill={color.hex.string}></circle>
+              return <circle key={idx} cx={xr} cy={yr} r={size === 'large' ? 18 : 12} fill={color.hex.string}></circle>
             })}
       </svg>
     </div>

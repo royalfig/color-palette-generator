@@ -8,11 +8,13 @@ export function CurrentColorDisplay({
   colorName,
   palettes,
   setColor,
+  colorSpace,
 }: {
   base: any
   colorName: ColorName,
   palettes: any,
-  setColor: Function
+  setColor: Function,
+  colorSpace: string
 }) {
 
   // TODO: use current color space
@@ -38,7 +40,7 @@ export function CurrentColorDisplay({
         </motion.p>
       </div>
       <div className="flex color-history-group">
-        <ColorHistory palettes={palettes} setColor={setColor} />
+        <ColorHistory palettes={palettes} setColor={setColor} colorSpace={colorSpace}/>
       </div>
     </div>
   )

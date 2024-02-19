@@ -6,15 +6,11 @@
   justify-items: center;
 }
 
-
-
 .palette-selector {
   --background-color: hsl(248deg 11% 80%);
   --background-color-active: hsl(248deg 11% 78%);
   --light-shadow-color: hsl(248deg 11% 95%);
   --dark-shadow-color: hsl(248deg 11% 5%);
-
-  
 
   display: flex;
   flex-direction: column;
@@ -31,6 +27,7 @@
   & div {
     position: relative;
     box-sizing: content-box;
+    padding: var(--spacing-02);
     background-color: hsl(248deg 11% 35%);
     border: 2px solid transparent;
     border-radius: 50%;

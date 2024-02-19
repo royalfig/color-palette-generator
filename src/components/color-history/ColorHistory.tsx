@@ -3,18 +3,19 @@ import { useBaseColor } from '../../hooks/useBaseColor'
 import { Schemes } from '../../util/palettes'
 import './color-history.css'
 
-export default function ColorHistory({ palettes, setColor }: { palettes: Schemes; setColor: Function }) {
-  const [history, setHistory] = useState(Array(5).fill(''))
-  const [prev, setPrev] = useState('')
+export default function ColorHistory({ palettes, setColor, colorSpace }: { palettes: Schemes; setColor: Function }) {
   const { hex } = useBaseColor(palettes)
-
-  if (prev !== hex?.string) {
-    let newHistory = [...history]
-    newHistory.unshift(palettes.comp.original[0])
-    newHistory = newHistory.slice(0, 5)
-    setHistory(newHistory)
+  
+  const [prev, setPrev] = useState(hex.string)
+  const [history, setHistory] = useState(Array(5).fill(''))
+  
+  if (hex.string !== prev) {
+    setHistory([prev, ...history.slice(0, 4)])
     setPrev(hex.string)
   }
+    
+    
+  
 
   return (
     <>
@@ -23,11 +24,11 @@ export default function ColorHistory({ palettes, setColor }: { palettes: Schemes
           key={idx}
           className="color-history-item"
           disabled={color === '' ? true : false}
-          aria-label={`Set history color to ${color.hex?.string}`}
+          aria-label={`Set history color to ${color}`}
           onClick={() => {
-            setColor(color.hex.base)
+            setColor(color)
           }}
-          style={{ backgroundColor: color.hex?.string }}
+          style={{ backgroundColor: color }}
         ></button>
       ))}
     </>
