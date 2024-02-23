@@ -1,9 +1,0 @@
-.palette-container {
-  padding: var(--box-padding);
-  background-color: var(--surface-3);
-  border-radius: var(--radius);
-}
-
-.palette {
-  margin-block-end: var(--space-after);
-}
