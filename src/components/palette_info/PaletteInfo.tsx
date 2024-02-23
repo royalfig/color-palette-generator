@@ -1,27 +1,29 @@
 import { useEffect, useState } from 'react'
-import { Schemes } from '../../util/palettes'
 import { Circle } from '../circle/Circle'
 import './palette-info.css'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ColorName } from '../../App'
+import { Palettes } from '../../types'
+import { LightUpSvg } from '../input-color/LightUpSvg'
+import { BoltIcon } from '@heroicons/react/24/outline'
 
 function getFullName(palette: string) {
   switch (palette) {
-    case 'comp':
+    case 'com':
       return 'Complementary'
     case 'ana':
       return 'Analogous'
-    case 'tones':
+    case 'ton':
       return 'Tones'
-    case 'tints':
+    case 'tas':
       return 'Tints & shades'
-    case 'poly':
+    case 'pol':
       return 'Polychromia'
-    case 'tria':
+    case 'tri':
       return 'Triadic'
-    case 'tetra':
+    case 'tet':
       return 'Tetradic'
-    case 'split':
+    case 'spl':
       return 'Split complementary'
     default:
       return palette
@@ -66,7 +68,7 @@ function createNarrative(palette: string, variation: string, paletteTitle: strin
     case 'keel':
       narrative += ' The keel variation operates in the RGB colorspace with relative luminance.'
       break
-    case 'fil':
+    case 'film':
       narrative += ' The film variation operates in the RGB colorspace with relative luminance.'
       break
     case 'cloud':
@@ -119,16 +121,18 @@ export function PaletteInfo({
   colorspaceType,
   palettes,
   colorName,
+  isActive,
 }: {
   base: any
   palette: string
   variation: string
   colorspaceType: string
-  palettes: Schemes
+  palettes: Palettes
   colorName: ColorName
+  isActive: boolean
 }) {
+  console.log("🚀 ~ isActive:", isActive)
   const [displaySupport, setDisplaySupport] = useState<DisplaySupport | null>(null)
-
 
   const colorSpaces = Object.entries(base).slice(1)
   // create two arrays of similar lengths of the colorspaces
@@ -141,10 +145,13 @@ export function PaletteInfo({
     setDisplaySupport(determineSupportedColorspace())
   }, [])
 
-  const colorBlocks = Array(10).fill("var(--border)").map((color: any, idx: number) => {
-    return palettes?.[palette]?.[variation]?.[idx]?.[colorspaceType].string ? palettes[palette][variation][idx][colorspaceType].string : color
-  })
-  
+  const colorBlocks = Array(10)
+    .fill('var(--border)')
+    .map((color: any, idx: number) => {
+      return palettes?.[palette]?.[variation]?.[idx]?.[colorspaceType].string
+        ? palettes[palette][variation][idx][colorspaceType].string
+        : color
+    })
 
   const variants = {
     enter: { opacity: 0 },
@@ -154,18 +161,21 @@ export function PaletteInfo({
   // const colorSpaces2 = colorSpaces.slice(5)
   return (
     <div className="pallete-info">
-     
-
       <div className="palette-info-main">
-        <p className="palette-info-palette-type">
-          
-          {getFullName(palette)} <span className="palette-info-meta">Palette</span>
-        </p>
-        <p className="palette-info-color-name">
-          {colorName.isLoading ? '' : colorName.fetchedData?.paletteTitle}{' '}
-          <span className="palette-info-meta">Palette</span>
-        </p>
-        
+        <div className="flex gap-4 palette-info-name-container">
+          <div className='flex gap-2'>
+            {['ton', 'tas', 'pol'].includes(palette) ? (
+              <Circle colors={palettes[palette]} type="circle" size="small" />
+            ) : (
+              <Circle colors={palettes[palette]} type="default" size="small" />
+            )}
+            <p className="palette-info-name">{colorName.isLoading ? '' : colorName.fetchedData?.paletteTitle} </p>
+          </div>
+
+          <div className="activity-monitor">{isActive ? <LightUpSvg /> : <BoltIcon />}</div>
+        </div>
+        <p className="palette-info-palette-type">{getFullName(palette)} Palette</p>
+
         <p className="palette-info-variation">
           {variation} <span className="palette-info-meta">Variation</span>
         </p>
@@ -173,39 +183,33 @@ export function PaletteInfo({
           --{base.code}: {base.oklch.raw.join(' ')}
         </p>
         <p className="palette-info-gamut">{base.hex.isInGamut ? 'In sRGB Gamut' : 'Out of sRGB Gamut'}</p>
-        {['tones', 'tints', 'poly'].includes(palette) ? (
-              <Circle colors={palettes[palette]} type="circle" size="large" />
-            ) : (
-              <Circle colors={palettes[palette]} type="default" size="large" />
-            )}
 
-            <div className="color-blocks">
-              {colorBlocks.map((color: any, idx: number) => (
-                <div className='color-block' style={{ backgroundColor: color }} key={idx} />
-              ))}
+        <div className="color-blocks">
+          {colorBlocks.map((color: any, idx: number) => (
+            <div className="color-block" style={{ backgroundColor: color }} key={idx} />
+          ))}
+        </div>
+      </div>
+
+      <div className="palette-info-3">
+        <p className="palette-info-description">{createNarrative(palette, variation, paletteTitle)}</p>
+
+        <div className="palette-info-colorspace">
+          {colorSpaces.map(([key, value]) => (
+            <div key={key}>
+              <p>
+                <span>{key}</span>
+                {removeNonNumericalElements(value.string)}
+              </p>
             </div>
+          ))}
+        </div>
       </div>
-
-<div className="palette-info-3">
-      <p className="palette-info-description">
-        {createNarrative(palette, variation, paletteTitle)}
-      </p>
-
-      <div className="palette-info-colorspace">
-        {colorSpaces.map(([key, value]) => (
-          <div key={key}>
-            <p><span>{key}</span>{removeNonNumericalElements(value.string)}</p>
-          </div>
-        ))}
-      </div>
-
-</div>
 
       <div className="palette-info-display-support flex gap-4">
         <p>
           <span>{displaySupport?.colorGamut}</span>: {displaySupport?.colorGamutDescription}
         </p>
-        
       </div>
     </div>
   )

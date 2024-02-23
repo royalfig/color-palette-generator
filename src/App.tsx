@@ -23,7 +23,7 @@ import './css/Variables.css'
 import './css/utils.css'
 import { useBaseColor } from './hooks/useBaseColor'
 import { useFetchColorNames } from './hooks/useColorName'
-import { ColorSpace } from './types'
+import { ColorSpace, Variations } from './types'
 import { generateCss } from './util/generateCss'
 import { createPalettes } from './util/palettes'
 import { pickRandomColor } from './util/pickRandomColor'
@@ -43,8 +43,10 @@ export default function App() {
   const colorQueryParam = colorQueryParaCheck ? new URLSearchParams(document.location.search).get('color') : null
   const [color, setColor] = useState<string | Color>(colorQueryParam || pickRandomColor())
   const [palette, setPalette] = useState('com')
-  const [variation, setVariation] = useState('og')
+  const [variation, setVariation] = useState<keyof Variations>('og')
   const [colorspaceType, setColorspaceType] = useState<ColorSpace>('hex')
+  const [isActive, setIsActive] = useState(false)
+  const [error, setError] = useState('')
 
   const palettes = createPalettes(color)
   const css = generateCss(palettes)
@@ -86,7 +88,7 @@ export default function App() {
             <div className="synth-columns">
               <div>
                 <div className="color-input-display">
-                  <CurrentColorDisplay base={base} colorName={fetchColorName} palettes={palettes} setColor={setColor} />
+                  <CurrentColorDisplay base={base} colorName={fetchColorName} palettes={palettes} setColor={setColor} colorSpace={colorspaceType}/>
                   <ColorSelector palettes={palettes} setColor={setColor} />
                 </div>
                 <InputColorContainer
@@ -95,6 +97,9 @@ export default function App() {
                   base={base}
                   colorspaceType={colorspaceType}
                   setColorspaceType={setColorspaceType}
+                  setError={setError}
+                  setIsActive={setIsActive}
+                  isActive={isActive}
                 />
               </div>
               <PaletteInfo
@@ -104,6 +109,9 @@ export default function App() {
                 colorspaceType={colorspaceType}
                 palette={palette}
                 colorName={fetchColorName}
+                setError={setError}
+                  setIsActive={setIsActive}
+                  isActive={isActive}
               />
             </div>
           </Display>

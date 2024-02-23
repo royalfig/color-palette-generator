@@ -20,7 +20,7 @@ export default function PaletteSelector({
             onClick={() => setPalette(key)}
             className={palette === key ? `active palette-selector` : `palette-selector`}
           >
-            {['tones', 'tints', 'poly'].includes(key) ? (
+            {['ton', 'tas', 'pol'].includes(key) ? (
               <Circle colors={value} type="circle" size="small" />
             ) : (
               <Circle colors={value} type="default" size="small" />

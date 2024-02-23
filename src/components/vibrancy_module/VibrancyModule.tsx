@@ -3,7 +3,6 @@ import { Palettes } from '../../types'
 import './vibrancy_module.css'
 
 export function VibrancyModule({ palettes }: { palettes: Palettes }) {
-  console.log("🚀 ~ VibrancyModule ~ palettes:", palettes)
   const width = 80 // Width of the SVG
   const height = 20 // Height of the SVG
 

@@ -1,38 +1,46 @@
-import { AdjustmentsHorizontalIcon, ScaleIcon, FilmIcon, CloudIcon, FireIcon } from '@heroicons/react/24/outline'
-import Button from '../button/Button'
-import './variationSelector.css'
+import { AdjustmentsHorizontalIcon, CloudIcon, FilmIcon, FireIcon, ScaleIcon } from '@heroicons/react/24/outline';
+import { Dispatch } from 'react';
+import { Variations } from '../../types';
+import Button from '../button/Button';
+import './variationSelector.css';
 
-export function VariationSelector({ variation, setVariation }: { variation: string; setVariation: Function }) {
+type VariationStrings = keyof Variations
+
+function fmtAriaTxt(variation: VariationStrings) {
+  return `Set variation to ${variation}`
+}
+
+export function VariationSelector({ variation, setVariation }: { variation: VariationStrings; setVariation: Dispatch<VariationStrings> }) {
   return (
     <div className="variation-selector-container">
       <Button
-        handler={() => setVariation('original')}
-        active={variation === 'original'}
-        aria-label="Set variation to original"
+        handler={() => setVariation('og')}
+        active={variation === 'og'}
+        aria-label={fmtAriaTxt('og')}
       >
         <AdjustmentsHorizontalIcon />
       </Button>
-      <Button handler={() => setVariation('keel')} active={variation === 'keel'} aria-label="Set variation to keel">
+      <Button handler={() => setVariation('keel')} active={variation === 'keel'} aria-label={fmtAriaTxt('keel')}>
         <ScaleIcon />
       </Button>
       <Button
-        handler={() => setVariation('cinematic')}
-        active={variation === 'cinematic'}
-        aria-label="Set variation to cinematic"
+        handler={() => setVariation('film')}
+        active={variation === 'film'}
+        aria-label={fmtAriaTxt('film')}
       >
         <FilmIcon />
       </Button>
       <Button
-        handler={() => setVariation('languid')}
-        active={variation === 'languid'}
-        aria-label="Set variation to languid"
+        handler={() => setVariation('cloud')}
+        active={variation === 'cloud'}
+        aria-label={fmtAriaTxt('cloud')}
       >
         <CloudIcon />
       </Button>
       <Button
-        handler={() => setVariation('sharkbite')}
-        active={variation === 'sharkbite'}
-        aria-label="Set variation to sharkbite"
+        handler={() => setVariation('fire')}
+        active={variation === 'fire'}
+        aria-label={fmtAriaTxt('fire')}
       >
         <FireIcon />
       </Button>

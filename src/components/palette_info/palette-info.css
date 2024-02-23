@@ -8,9 +8,11 @@
 }
 
 .palette-info-main {
-    font-size: var(--small);
     text-align: left;
-    text-transform: uppercase;
+}
+
+.flex.palette-info-name-container {
+    margin-block-end: var(--spacing-04);
 }
 
 .palette-info-color-name {

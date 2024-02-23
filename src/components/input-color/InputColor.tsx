@@ -1,8 +1,6 @@
-import { BoltIcon } from '@heroicons/react/24/outline'
 import Color from 'colorjs.io'
-import { motion } from 'framer-motion'
 import { debounce } from 'lodash-es'
-import { useCallback, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
 import { BaseColorData, ColorSpace } from '../../types'
 import './InputColor.css'
 
@@ -11,17 +9,21 @@ export function InputColor({
   setColor,
   type,
   base,
+  setIsActive,
+  setError,
+  isActive,
 }: {
-  setColorspaceType: React.Dispatch<React.SetStateAction<ColorSpace>>
-  setColor: React.Dispatch<React.SetStateAction<string | Color>>
+  setColorspaceType: Dispatch<SetStateAction<ColorSpace>>
+  setColor: Dispatch<SetStateAction<string | Color>>
   type: ColorSpace
   base: BaseColorData
+  setIsActive: Dispatch<SetStateAction<boolean>>
+  isActive: boolean
+  setError: Dispatch<SetStateAction<string>>
 }) {
   const current = base[type].string
   const [inputColor, setInputColor] = useState<string>(current)
   const [prevInputColor, setPrevInputColor] = useState<string>(current)
-  const [warning, setWarning] = useState(false)
-  const [activity, setActivity] = useState(false)
   const inGamut = base[type].isInGamut
 
   console.log('inputColor rendering')
@@ -37,7 +39,7 @@ export function InputColor({
     console.log('🚀 ~ file: InputColor.tsx:30 ~ useEffect render', current, prevInputColor)
     setInputColor(current)
     // setPrevInputColor(inputColor)
-    setWarning(false)
+    setError('')
   }, [current])
 
   const debouncedParseColor = useCallback(debounce(parseColor, 1000), [])
@@ -48,13 +50,13 @@ export function InputColor({
       const parsed = new Color(value)
       // setColorspaceType(parsed.spaceId)
       console.log('🚀 ~ file: InputColor.tsx:57 ~ parseColor ~ parsed:', parsed)
-      setWarning(false)
-      setActivity(false)
+      setError('')
+      setIsActive(false)
       setColor(parsed)
     } catch (error: any) {
       setInputColor(error.message)
-      setActivity(false)
-      setWarning(true)
+      setIsActive(false)
+      setError(error.message)
       return
     }
   }
@@ -64,10 +66,10 @@ export function InputColor({
   }
 
   function handleChange(value: string): void {
-    setWarning(false)
+    setError('')
     setInputColor(value)
 
-    setActivity(!activity)
+    setIsActive(!isActive)
 
     if (value.includes('#') && value.length < 7) return
 
@@ -92,36 +94,6 @@ export function InputColor({
         spellCheck="false"
       />
       <span className="blur-input">{inputColor}</span>
-      
     </div>
-  )
-}
-
-function LightUpSvg() {
-  const [isAnimating, setIsAnimating] = useState(false)
-
-  useEffect(() => {
-    // Trigger the animation at random intervals
-    const interval = setInterval(() => {
-      setIsAnimating(true)
-      setTimeout(() => setIsAnimating(false), 500) // Duration of the light-up effect
-    }, Math.random() * 2000) // Random interval between 0 and 2000 milliseconds
-
-    return () => clearInterval(interval)
-  }, [])
-
-  const variants = {
-    active: { opacity: 1 }, // Light-up effect properties
-    inactive: { opacity: 0.7 },
-  }
-
-  return (
-    <motion.svg
-      animate={isAnimating ? 'active' : 'inactive'}
-      variants={variants}
-      // ... other SVG props
-    >
-      <BoltIcon style={{ color: 'orange' }} />
-    </motion.svg>
   )
 }
