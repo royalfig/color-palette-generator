@@ -1,7 +1,7 @@
-import { ColorName } from '../../App'
-import { Schemes } from '../../util/palettes'
-import './palette-display.css'
 import { ScissorsIcon } from '@heroicons/react/24/outline'
+import { ColorName } from '../../App'
+import { Palettes } from '../../types'
+import './palette-display.css'
 
 declare module 'react' {
   interface CSSProperties {
@@ -10,11 +10,11 @@ declare module 'react' {
 }
 
 type ColorSpace = 'hex' | 'rgb' | 'hsl' | 'lch' | 'oklch' | 'lab' | 'oklab' | 'p3'
-type Palette = 'ana' | 'tones' | 'tints' | 'poly' | 'comp'
-type Variation = 'original' | 'keel' | 'cinematic' | 'languid' | 'sharkbite'
+
+
 
 type PaletteDisplayProps = {
-  palettes: Schemes
+  palettes: Palettes
   colorSpace: ColorSpace
   palette: string
   variation: string

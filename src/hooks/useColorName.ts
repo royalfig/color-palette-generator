@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Schemes } from '../util/palettes'
+import { Palettes } from '../types';
 
 // Your type definitions remain the same
 
@@ -9,12 +9,12 @@ interface IUseFetchWithAbortResponse {
   error: Error | null
 }
 
-function prepareColorData(palettes: Schemes, palette: string, variation: string) {
+function prepareColorData(palettes: Palettes, palette: string, variation: string) {
   return palettes[palette][variation].map(color => color.hex.string.replace('#', '')).join(',')
 }
 
 export function useFetchColorNames(
-  palettes: Schemes,
+  palettes: Palettes,
   palette: string,
   variation: string,
 ): IUseFetchWithAbortResponse {

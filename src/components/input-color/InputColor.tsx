@@ -1,11 +1,9 @@
-import { BoltIcon, ExclamationTriangleIcon, ScissorsIcon } from '@heroicons/react/24/outline'
+import { BoltIcon } from '@heroicons/react/24/outline'
 import Color from 'colorjs.io'
 import { motion } from 'framer-motion'
 import { debounce } from 'lodash-es'
 import { useCallback, useEffect, useState } from 'react'
-import { ColorFactory } from '../../util/factory'
-import { Display } from '../display/Display'
-import { ColorTypes } from '../input-color-container/InputColorContainer'
+import { BaseColorData, ColorSpace } from '../../types'
 import './InputColor.css'
 
 export function InputColor({
@@ -14,10 +12,10 @@ export function InputColor({
   type,
   base,
 }: {
-  setColorspaceType: React.Dispatch<React.SetStateAction<ColorTypes>>
+  setColorspaceType: React.Dispatch<React.SetStateAction<ColorSpace>>
   setColor: React.Dispatch<React.SetStateAction<string | Color>>
-  type: 'hex' | 'rgb' | 'hsl' | 'lch' | 'oklch' | 'lab' | 'oklab' | 'p3'
-  base: ColorFactory
+  type: ColorSpace
+  base: BaseColorData
 }) {
   const current = base[type].string
   const [inputColor, setInputColor] = useState<string>(current)
@@ -35,12 +33,12 @@ export function InputColor({
   //   setWarning(false)
   // }
 
-  useEffect(() => { 
+  useEffect(() => {
     console.log('🚀 ~ file: InputColor.tsx:30 ~ useEffect render', current, prevInputColor)
     setInputColor(current)
     // setPrevInputColor(inputColor)
     setWarning(false)
-  }, [current]);
+  }, [current])
 
   const debouncedParseColor = useCallback(debounce(parseColor, 1000), [])
 
@@ -94,11 +92,7 @@ export function InputColor({
         spellCheck="false"
       />
       <span className="blur-input">{inputColor}</span>
-      <div className="input-color-metadata flex">
-        <ScissorsIcon className={!inGamut ? 'clipped' : ''} />
-        <ExclamationTriangleIcon className={warning ? 'warning' : ''} />
-        {activity ? <LightUpSvg /> : <BoltIcon />}
-      </div>
+      
     </div>
   )
 }

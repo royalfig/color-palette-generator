@@ -1,4 +1,5 @@
-import './circle.css'
+import { Variations } from '../../types';
+import './circle.css';
 
 function sizer(num: number, size: string) {
   if (size === 'large') {
@@ -8,7 +9,7 @@ function sizer(num: number, size: string) {
   return num / 2
 }
 
-export function Circle({ colors, type, size }: { colors: any; type: 'default' | 'circle'; size: string }) {
+export function Circle({ colors, type, size }: { colors: Variations; type: 'default' | 'circle'; size: string }) {
   const className = size === 'large' ? 'large circle' : 'small circle'
 
   return (
@@ -16,7 +17,7 @@ export function Circle({ colors, type, size }: { colors: any; type: 'default' | 
       <svg viewBox={size === 'large' ? '-120 -120 240 240' : '-60 -60 120 120'}>
         <circle cx="0" cy="0" r={sizer(100, size)} fill="none" stroke="var(--border)" strokeWidth="3" />
         {type !== 'circle'
-          ? colors.original.map((color: any, idx: number) => {
+          ? colors.og.map((color: any, idx: number) => {
               let [h, s] = color.hsl.raw
 
               s = s > 100 ? 100 : s
@@ -31,7 +32,7 @@ export function Circle({ colors, type, size }: { colors: any; type: 'default' | 
               const yr = isNaN(y) ? 0 : y * -1
               return <circle key={idx} cx={xr} cy={yr} r={size === 'large' ? 18 : 12} fill={color.hex.string}></circle>
             })
-          : colors.original.map((color: any, idx: number) => {
+          : colors.og.map((color: any, idx: number) => {
               const h = sizer((idx + 10) * (size === 'large' ? 36 : 72), size)
 
               const hRadians = (h * Math.PI) / 180

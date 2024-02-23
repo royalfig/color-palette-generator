@@ -11,7 +11,7 @@ export type ColorObj = {
     outOfGamut: string;
 }
 
-export type ColorFactory = {
+export type BaseColorData = {
   code: `${string}-${number}`
   hex: ColorObj
   rgb: ColorObj
@@ -23,21 +23,21 @@ export type ColorFactory = {
   p3: ColorObj
 }
 
-export type ColorScheme = {
-  original: ColorFactory[]
-  keel: ColorFactory[]
-  cinematic: ColorFactory[]
-  languid: ColorFactory[]
-  sharkbite: ColorFactory[]
+export type Variations = {
+  og: BaseColorData[]
+  keel: BaseColorData[]
+  film: BaseColorData[]
+  cloud: BaseColorData[]
+  fire: BaseColorData[]
 }
 
-export type Schemes = {
-  ana: ColorScheme
-  tria: ColorScheme
-  tetra: ColorScheme
-  comp: ColorScheme
-  split: ColorScheme
-  tones: ColorScheme
-  poly: ColorScheme
-  tints: ColorScheme
+export type Palettes = {
+  ana: Variations
+  tri: Variations
+  tet: Variations
+  com: Variations
+  spl: Variations
+  ton: Variations
+  pol: Variations
+  tas: Variations
 }

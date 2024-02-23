@@ -1,15 +1,16 @@
 import { motion } from 'framer-motion'
+import { Palettes } from '../../types'
 import './vibrancy_module.css'
-import { Schemes } from '../../util/palettes'
 
-export function VibrancyModule({ palettes }: { palettes: Schemes }) {
+export function VibrancyModule({ palettes }: { palettes: Palettes }) {
+  console.log("🚀 ~ VibrancyModule ~ palettes:", palettes)
   const width = 80 // Width of the SVG
   const height = 20 // Height of the SVG
 
   let saturation: number
   let lightness: number
 
-  const hues = palettes.poly.original.map((color, idx: number) => {
+  const hues = palettes.pol.og.map((color, idx: number) => {
     if (idx === 0) {
       saturation = color.hsl.raw[1]
       lightness = color.hsl.raw[2]

@@ -69,12 +69,12 @@ export function createScales(baseColor: Color | string) {
     steps: 10,
   })
 
-  const tones = {
-    original: tonesOriginal.map((c, idx) => colorFactory(c, 'tones-o', idx)),
+  const ton = {
+    og: tonesOriginal.map((c, idx) => colorFactory(c, 'tones-o', idx)),
     keel: tonesKeel.map((c, idx) => colorFactory(c, 'tones-k', idx)),
-    cinematic: tonesCinematic.map((c, idx) => colorFactory(c, 'tones-c', idx)),
-    languid: tonesLanguid.map((c, idx) => colorFactory(c, 'tones-l', idx)),
-    sharkbite: tonesSharkbite.map((c, idx) => colorFactory(c, 'tones-s', idx)),
+    film: tonesCinematic.map((c, idx) => colorFactory(c, 'tones-c', idx)),
+    cloud: tonesLanguid.map((c, idx) => colorFactory(c, 'tones-l', idx)),
+    fire: tonesSharkbite.map((c, idx) => colorFactory(c, 'tones-s', idx)),
   }
 
   const polyStartOriginal = new Color(baseColor)
@@ -110,12 +110,12 @@ export function createScales(baseColor: Color | string) {
     steps: 10,
     hue: 'longer',
   })
-  const poly = {
-    original: polyOriginal.map((c, idx) => colorFactory(c, 'poly-o', idx)),
+  const pol = {
+    og: polyOriginal.map((c, idx) => colorFactory(c, 'poly-o', idx)),
     keel: polyKeel.map((c, idx) => colorFactory(c, 'poly-k', idx)),
-    cinematic: polyCinematic.map((c, idx) => colorFactory(c, 'poly-c', idx)),
-    languid: polyLanguid.map((c, idx) => colorFactory(c, 'poly-l', idx)),
-    sharkbite: polySharkbite.map((c, idx) => colorFactory(c, 'poly-s', idx)),
+    film: polyCinematic.map((c, idx) => colorFactory(c, 'poly-c', idx)),
+    cloud: polyLanguid.map((c, idx) => colorFactory(c, 'poly-l', idx)),
+    fire: polySharkbite.map((c, idx) => colorFactory(c, 'poly-s', idx)),
   }
 
   const tintsStartDesaturated = new Color(baseColor).mix('white', 0.9, { space: 'srgb', outputSpace: 'srgb' })
@@ -142,13 +142,13 @@ export function createScales(baseColor: Color | string) {
     steps: 10,
   })
 
-  const tints = {
-    original: tintsOriginal.map((c, idx) => colorFactory(c, 'tints-original', idx)),
+  const tas = {
+    og: tintsOriginal.map((c, idx) => colorFactory(c, 'tints-original', idx)),
     keel: tintsKeel.map((c, idx) => colorFactory(c, 'tints-keel', idx)),
-    cinematic: tintsCinematic.map((c, idx) => colorFactory(c, 'tints-cinematic', idx)),
-    languid: tintsOriginal.map((c, idx) => colorFactory(c, 'tints-languid', idx)),
-    sharkbite: tintsOriginal.map((c, idx) => colorFactory(c, 'tints-sharkbite', idx)),
+    film: tintsCinematic.map((c, idx) => colorFactory(c, 'tints-cinematic', idx)),
+    cloud: tintsOriginal.map((c, idx) => colorFactory(c, 'tints-languid', idx)),
+    fire: tintsOriginal.map((c, idx) => colorFactory(c, 'tints-sharkbite', idx)),
   }
 
-  return { tones: tones, poly: poly, tints: tints }
+  return { ton, pol, tas }
 }

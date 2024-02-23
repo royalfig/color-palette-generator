@@ -1,16 +1,17 @@
-import { ColorFactory, colorFactory } from './factory'
-import { createScales } from './scales'
 import Color from 'colorjs.io'
+import { Palettes } from '../types'
+import { colorFactory } from './factory'
+import { createScales } from './scales'
 
 const targetHues: { [key: string]: number[] } = {
-  comp: [0, 180],
+  com: [0, 180],
   ana: [0, 35, 70],
-  split: [0, 150, 210],
-  tria: [0, 120, 240],
-  tetra: [0, 90, 180, 270],
+  spl: [0, 150, 210],
+  tri: [0, 120, 240],
+  tet: [0, 90, 180, 270],
 }
 
-function cinematic(color: Color) {
+function film(color: Color) {
   color.hsl.s *= 1.2
   if (color.hsl.l > 0.5) {
     color.hsl.l *= 0.9
@@ -20,20 +21,20 @@ function cinematic(color: Color) {
   return color
 }
 
-function languid(color: Color) {
+function cloud(color: Color) {
   color.hsl.s *= 0.5
   color.hsl.l *= 1.25
   return color
 }
 
-function sharkbite(color: Color) {
+function fire(color: Color) {
   color.hsl.s *= 1.5
   color.hsl.l *= 1.25
   return color
 }
 
 const variations: { [key: string]: { space: string; adjust: Function } } = {
-  original: {
+  og: {
     space: 'hsl',
     adjust: (color: Color) => color,
   },
@@ -41,17 +42,17 @@ const variations: { [key: string]: { space: string; adjust: Function } } = {
     space: 'oklch',
     adjust: (color: Color) => color,
   },
-  cinematic: {
+  film: {
     space: 'hsl',
-    adjust: (color: Color) => cinematic(color),
+    adjust: (color: Color) => film(color),
   },
-  languid: {
+  cloud: {
     space: 'hsl',
-    adjust: (color: Color) => languid(color),
+    adjust: (color: Color) => cloud(color),
   },
-  sharkbite: {
+  fire: {
     space: 'hsl',
-    adjust: (color: Color) => sharkbite(color),
+    adjust: (color: Color) => fire(color),
   },
 }
 
@@ -60,24 +61,6 @@ function adjustHue(val: number) {
   return val % 360
 }
 
-type ColorScheme = {
-  original: ColorFactory[]
-  keel: ColorFactory[]
-  cinematic: ColorFactory[]
-  languid: ColorFactory[]
-  sharkbite: ColorFactory[]
-}
-
-export type Schemes = {
-  ana: ColorScheme
-  tria: ColorScheme
-  tetra: ColorScheme
-  comp: ColorScheme
-  split: ColorScheme
-  tones: ColorScheme
-  poly: ColorScheme
-  tints: ColorScheme
-}
 
 function createColorVariations(hueKey: string, variationKey: string, baseColor: string | Color) {
   return targetHues[hueKey].map((hue, idx) => {
@@ -97,7 +80,7 @@ function createColorVariations(hueKey: string, variationKey: string, baseColor: 
 }
 
 // TODO: is it possible to simplify this function?
-export function createPalettes(baseColor: string | Color): Schemes {
+export function createPalettes(baseColor: string | Color): Palettes {
   const palettes = Object.keys(targetHues).reduce<Record<string, any>>((hueAcc, hueKey) => {
     // hueAcc = {schemes} & hueKey = 'ana'
     const v = Object.keys(variations).reduce<Record<string, any>>((variationAcc, variationKey) => {
@@ -112,13 +95,13 @@ export function createPalettes(baseColor: string | Color): Schemes {
   }, {})
 
   const scales = createScales(baseColor)
-  const ui = createUi(palettes as Schemes, scales)
-  return { ...palettes, ...scales } as Schemes
+  const ui = createUi(palettes as Palettes, scales)
+  return { ...palettes, ...scales } as Palettes
 }
 
-function createUi(palettes: Schemes, scales) {
-  const isLight = palettes.comp.keel[0].lch.raw[0] > 50
-  const l = 50 - (palettes.comp.keel[0].lch.raw[0] - 50)
+function createUi(palettes: Palettes, scales) {
+  const isLight = palettes.com.keel[0].lch.raw[0] > 50
+  const l = 50 - (palettes.com.keel[0].lch.raw[0] - 50)
 
   return {
     dark: {

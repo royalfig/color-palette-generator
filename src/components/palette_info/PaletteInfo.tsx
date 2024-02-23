@@ -31,28 +31,28 @@ function getFullName(palette: string) {
 function createNarrative(palette: string, variation: string, paletteTitle: string) {
   let narrative = ''
   switch (palette) {
-    case 'comp':
+    case 'com':
       narrative = `${paletteTitle} is a complementary palette features two colors opposite each other on the color wheel.`
       break
     case 'ana':
       narrative = `${paletteTitle} is an analogous palette features three colors next to each other on the color wheel.`
       break
-    case 'tones':
+    case 'ton':
       narrative = `${paletteTitle} is a tones palette features a color with varying degrees of saturation and brightness.`
       break
-    case 'tints':
+    case 'tas':
       narrative = `${paletteTitle} is a tints & shades palette features a color with varying degrees of lightness and darkness.`
       break
-    case 'poly':
+    case 'pol':
       narrative = `${paletteTitle} is a polychromia palette features a color with varying degrees of saturation.`
       break
-    case 'tria':
+    case 'tri':
       narrative = `${paletteTitle} is a triadic palette features three colors evenly spaced around the color wheel.`
       break
-    case 'tetra':
+    case 'tet':
       narrative = `${paletteTitle} is a tetradic palette features four colors evenly spaced around the color wheel.`
       break
-    case 'split':
+    case 'spl':
       narrative = `${paletteTitle} is a split complementary palette features three colors, one color and two colors adjacent to its complementary color.`
       break
     default:
@@ -60,19 +60,19 @@ function createNarrative(palette: string, variation: string, paletteTitle: strin
   }
 
   switch (variation) {
-    case 'original':
+    case 'og':
       narrative += ' The original variation operates in the RGB colorspace with absolute luminance.'
       break
     case 'keel':
       narrative += ' The keel variation operates in the RGB colorspace with relative luminance.'
       break
-    case 'cinematic':
-      narrative += ' The cinematic variation operates in the RGB colorspace with relative luminance.'
+    case 'fil':
+      narrative += ' The film variation operates in the RGB colorspace with relative luminance.'
       break
-    case 'languid':
+    case 'cloud':
       narrative += ' The languid variation operates in the RGB colorspace with relative luminance.'
       break
-    case 'sharkbite':
+    case 'fire':
       narrative += ' The sharkbite variation operates in the RGB colorspace with relative luminance.'
       break
     default:

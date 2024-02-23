@@ -1,10 +1,9 @@
-import { useState } from 'react'
-import { useBaseColor } from '../../hooks/useBaseColor'
-import { Schemes } from '../../util/palettes'
-import './color-history.css'
-import { ColorSpace } from '../../types'
+import { useState } from 'react';
+import { useBaseColor } from '../../hooks/useBaseColor';
+import { ColorSpace, Palettes } from '../../types';
+import './color-history.css';
 
-export default function ColorHistory({ palettes, setColor, colorSpace }: { palettes: Schemes; setColor: Function, colorSpace: ColorSpace }) {
+export default function ColorHistory({ palettes, setColor, colorSpace }: { palettes: Palettes; setColor: Function, colorSpace: ColorSpace }) {
   const { hex } = useBaseColor(palettes)
   
   const [prev, setPrev] = useState(hex.string)

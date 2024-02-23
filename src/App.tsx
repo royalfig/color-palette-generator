@@ -23,10 +23,10 @@ import './css/Variables.css'
 import './css/utils.css'
 import { useBaseColor } from './hooks/useBaseColor'
 import { useFetchColorNames } from './hooks/useColorName'
+import { ColorSpace } from './types'
 import { generateCss } from './util/generateCss'
 import { createPalettes } from './util/palettes'
 import { pickRandomColor } from './util/pickRandomColor'
-export type ColorTypes = 'hex' | 'rgb' | 'hsl' | 'lch' | 'oklch' | 'lab' | 'oklab' | 'p3'
 
 export type ColorName = {
   fetchedData: {
@@ -42,9 +42,9 @@ export default function App() {
   const colorQueryParaCheck = new URLSearchParams(document.location.search).has('color')
   const colorQueryParam = colorQueryParaCheck ? new URLSearchParams(document.location.search).get('color') : null
   const [color, setColor] = useState<string | Color>(colorQueryParam || pickRandomColor())
-  const [palette, setPalette] = useState('comp')
-  const [variation, setVariation] = useState('original')
-  const [colorspaceType, setColorspaceType] = useState<ColorTypes>('hex')
+  const [palette, setPalette] = useState('com')
+  const [variation, setVariation] = useState('og')
+  const [colorspaceType, setColorspaceType] = useState<ColorSpace>('hex')
 
   const palettes = createPalettes(color)
   const css = generateCss(palettes)
