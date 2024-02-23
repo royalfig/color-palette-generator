@@ -63,8 +63,8 @@ export default function App() {
   }, [css])
 
   return (
-    <main>
-      <div className="synth-container">
+    <div className="bg">
+      <main className="synth-container">
         <div className="synth-brand">
           <h1 className="brand">
             <span>Color</span>Palette Pro
@@ -155,7 +155,7 @@ export default function App() {
             colorName={fetchColorName}
           />
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   )
 }

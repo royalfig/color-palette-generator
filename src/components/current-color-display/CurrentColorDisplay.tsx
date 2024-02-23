@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { ColorName } from '../../App'
 import ColorHistory from '../color-history/ColorHistory'
 import './current-color-display.css'
+import { ColorSpace } from '../../types'
 
 export function CurrentColorDisplay({
   base,
@@ -11,18 +12,15 @@ export function CurrentColorDisplay({
   colorSpace,
 }: {
   base: any
-  colorName: ColorName,
-  palettes: any,
-  setColor: Function,
-  colorSpace: string
+  colorName: ColorName
+  palettes: any
+  setColor: Function
+  colorSpace: ColorSpace
 }) {
-
   // TODO: use current color space
   const color = base.hex.string
 
-
   const baseColorName = colorName.isLoading ? 'Loading...' : colorName.fetchedData?.colorNames[0]
-
 
   return (
     <div className="current-color-display flex">
@@ -40,7 +38,7 @@ export function CurrentColorDisplay({
         </motion.p>
       </div>
       <div className="flex color-history-group">
-        <ColorHistory palettes={palettes} setColor={setColor} colorSpace={colorSpace}/>
+        <ColorHistory palettes={palettes} setColor={setColor} colorSpace={colorSpace} />
       </div>
     </div>
   )

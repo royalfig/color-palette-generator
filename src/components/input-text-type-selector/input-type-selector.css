@@ -1,5 +1,7 @@
 .input-type-selectors {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--spacing-02);
   justify-content: space-between;
+  width: 100%;
 }
