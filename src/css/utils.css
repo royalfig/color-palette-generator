@@ -16,6 +16,10 @@
   &.col {
     flex-direction: column;
   }
+
+  &.start {
+    align-items: flex-start;
+  }
 }
 
 .icon {
@@ -46,6 +50,14 @@
 
 .flex-1 {
   flex: 1;
+}
+
+.small {
+  font-size: var(--small);
+}
+
+.x-small {
+  font-size: var(--x-small);
 }
 
 .sr-only {

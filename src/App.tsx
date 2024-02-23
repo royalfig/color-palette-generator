@@ -86,22 +86,26 @@ export default function App() {
         <section className="synth-display">
           <Display spacing="04">
             <div className="synth-columns">
-              <div>
-                <div className="color-input-display">
-                  <CurrentColorDisplay base={base} colorName={fetchColorName} palettes={palettes} setColor={setColor} colorSpace={colorspaceType}/>
-                  <ColorSelector palettes={palettes} setColor={setColor} />
-                </div>
-                <InputColorContainer
+              <div className="color-input-display">
+                <CurrentColorDisplay
+                  base={base}
+                  colorName={fetchColorName}
                   palettes={palettes}
                   setColor={setColor}
-                  base={base}
-                  colorspaceType={colorspaceType}
-                  setColorspaceType={setColorspaceType}
-                  setError={setError}
-                  setIsActive={setIsActive}
-                  isActive={isActive}
+                  colorSpace={colorspaceType}
                 />
-              </div>
+                <ColorSelector palettes={palettes} setColor={setColor} />
+              <InputColorContainer
+                palettes={palettes}
+                setColor={setColor}
+                base={base}
+                colorspaceType={colorspaceType}
+                setColorspaceType={setColorspaceType}
+                setError={setError}
+                setIsActive={setIsActive}
+                isActive={isActive}
+                />
+                </div>
               <PaletteInfo
                 palettes={palettes}
                 base={base}
@@ -109,9 +113,8 @@ export default function App() {
                 colorspaceType={colorspaceType}
                 palette={palette}
                 colorName={fetchColorName}
-                setError={setError}
-                  setIsActive={setIsActive}
-                  isActive={isActive}
+                error={error}
+                isActive={isActive}
               />
             </div>
           </Display>

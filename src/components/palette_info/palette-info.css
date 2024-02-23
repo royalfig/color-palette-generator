@@ -1,81 +1,99 @@
 .pallete-info {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-column: span 2;
-    align-content: space-between;
-    justify-content: center;
-    color: #fff;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: subgrid;
+  grid-column: span 2;
+  align-content: space-between;
+  justify-content: center;
+  color: #fff;
 }
 
 .palette-info-main {
-    text-align: left;
+  text-align: left;
 }
 
-.flex.palette-info-name-container {
-    margin-block-end: var(--spacing-04);
+.palette-info-name-container {
+  margin-block-end: var(--spacing-06);
 }
 
-.palette-info-color-name {
-    font-size: 1.5em;
-    text-transform: none;
+.color-blocks-container {
+  margin-block-end: var(--spacing-06);
 }
 
-.palette-info-meta {
-    font-weight: 300;
-    opacity: .8;
-
-}
-
-:where(.palette-info-display-support) {
-    font-size: 10px;
-    color: var(--border);
+.data-heading {
+    justify-content: flex-start;
+    font-size: var(--small);
     text-transform: uppercase;
-}
 
-.palette-info-display-support {
-    & span {
-        font-weight: 700;
+    &.flex {
+        justify-content: flex-start;
     }
-    
-    & p {
-        text-wrap: pretty;
+
+    svg {
+        width: 1em;
+        height: 1em;
+        color: var(--border);
     }
 }
 
-.palette-info-colorspace {
-   display: grid;
-   grid-template-columns: repeat(2, 1fr);
-   gap: var(--spacing-02);
-   font-size: var(--small);
+.palette-info-variation {
+    &.flex {
+        align-items: flex-start;
+        justify-content: flex-start;
+    }
 
-   span {
-    display: inline-block;
-    padding: var(--spacing-01);
-    margin-inline-end: var(--spacing-02);
-    text-transform: none;
-    text-transform: uppercase;
-    border: 1px solid;
-    border-radius: 4px;
-    opacity: .4;
-   }
+    margin-block-end: var(--spacing-06);
+   
+
+    .variation-icons {
+        svg {
+            width: 20px;
+            height: 20px;
+            color: var(--border);
+        }
+
+        .active {
+            color: currentcolor;
+        }
+    }
+
 }
 
-.palette-info-description {
-    margin-block-end: 1rem;
-    line-height: 1.35;
-    text-wrap: pretty;
-    opacity: .8;
+
+.color-blocks-name {
+  margin-block-end: var(--spacing-02);
+  font-size: var(--small);
+  text-transform: uppercase;
 }
 
 .color-blocks {
-    display: grid;
-    grid-template-columns: repeat(5, min-content);
-    gap: var(--spacing-02);
-    margin-block-start: var(--spacing-04);
+  display: flex;
+  gap: var(--spacing-02);
+  margin-block-start: var(--spacing-02);
 
-    .color-block {
-        width: 1rem;
-        height: 1rem;
-        border-radius: var(--radius-small);
+  .color-block {
+    flex: 1;
+    height: 1em;
+    border-radius: var(--radius-small);
+  }
+}
+
+.palette-info-gamut {
+    align-items: flex-start;
+}
+
+.palette-info-colorspace {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-02);
+    margin-block-start: var(--spacing-06);
+    font-size: var(--small);
+    opacity: .8;
+
+    span {
+        margin-inline-end: .25em;
+        font-weight: 600;
+        text-transform: uppercase;
+        opacity: 1;
     }
 }

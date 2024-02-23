@@ -54,9 +54,9 @@ export function InputColor({
       setIsActive(false)
       setColor(parsed)
     } catch (error: any) {
-      setInputColor(error.message)
+      // setInputColor(error.message)
       setIsActive(false)
-      setError(error.message)
+      setError(`Can't parse ${value} as a color`)
       return
     }
   }

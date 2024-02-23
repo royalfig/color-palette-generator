@@ -3,9 +3,23 @@ import { Circle } from '../circle/Circle'
 import './palette-info.css'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ColorName } from '../../App'
-import { Palettes } from '../../types'
+import { BaseColorData, ColorSpace, PaletteKinds, Palettes, VariationKinds } from '../../types'
 import { LightUpSvg } from '../input-color/LightUpSvg'
-import { BoltIcon } from '@heroicons/react/24/outline'
+import {
+  AdjustmentsHorizontalIcon,
+  BoltIcon,
+  CloudIcon,
+  FilmIcon,
+  FireIcon,
+  LightBulbIcon,
+  NoSymbolIcon,
+  ScaleIcon,
+  SwatchIcon,
+  VariableIcon,
+} from '@heroicons/react/24/outline'
+import { Color } from 'culori'
+import { ExclamationCircle, InfoCircle } from 'react-bootstrap-icons'
+import { ErrorIcon } from 'react-hot-toast'
 
 function getFullName(palette: string) {
   switch (palette) {
@@ -122,16 +136,18 @@ export function PaletteInfo({
   palettes,
   colorName,
   isActive,
+  error,
 }: {
-  base: any
-  palette: string
-  variation: string
-  colorspaceType: string
+  base: BaseColorData
+  palette: PaletteKinds
+  variation: VariationKinds
+  colorspaceType: ColorSpace
   palettes: Palettes
   colorName: ColorName
   isActive: boolean
+  error: string
 }) {
-  console.log("🚀 ~ isActive:", isActive)
+  console.log('🚀 ~ isActive:', isActive)
   const [displaySupport, setDisplaySupport] = useState<DisplaySupport | null>(null)
 
   const colorSpaces = Object.entries(base).slice(1)
@@ -147,7 +163,7 @@ export function PaletteInfo({
 
   const colorBlocks = Array(10)
     .fill('var(--border)')
-    .map((color: any, idx: number) => {
+    .map((color: string, idx: number) => {
       return palettes?.[palette]?.[variation]?.[idx]?.[colorspaceType].string
         ? palettes[palette][variation][idx][colorspaceType].string
         : color
@@ -158,12 +174,14 @@ export function PaletteInfo({
     exit: { opacity: 0 },
   }
 
+  const gradient = palettes[palette][variation].map(color => color[colorspaceType].string).join(', ')
+
   // const colorSpaces2 = colorSpaces.slice(5)
   return (
     <div className="pallete-info">
       <div className="palette-info-main">
         <div className="flex gap-4 palette-info-name-container">
-          <div className='flex gap-2'>
+          <div className="flex gap-2">
             {['ton', 'tas', 'pol'].includes(palette) ? (
               <Circle colors={palettes[palette]} type="circle" size="small" />
             ) : (
@@ -174,22 +192,80 @@ export function PaletteInfo({
 
           <div className="activity-monitor">{isActive ? <LightUpSvg /> : <BoltIcon />}</div>
         </div>
-        <p className="palette-info-palette-type">{getFullName(palette)} Palette</p>
 
-        <p className="palette-info-variation">
-          {variation} <span className="palette-info-meta">Variation</span>
-        </p>
-        <p className="palette-info-code">
-          --{base.code}: {base.oklch.raw.join(' ')}
-        </p>
-        <p className="palette-info-gamut">{base.hex.isInGamut ? 'In sRGB Gamut' : 'Out of sRGB Gamut'}</p>
-
-        <div className="color-blocks">
-          {colorBlocks.map((color: any, idx: number) => (
-            <div className="color-block" style={{ backgroundColor: color }} key={idx} />
-          ))}
+        <div className="color-blocks-container">
+          <DataHeading>
+            <SwatchIcon />
+            <p>{getFullName(palette)} Palette</p>
+          </DataHeading>
+          <div className="color-blocks">
+            {colorBlocks.map((color: any, idx: number) => (
+              <div className="color-block" style={{ backgroundColor: color }} key={idx} />
+            ))}
+          </div>
         </div>
+
+        {/* <div className="color-border" style={{backgroundImage: `linear-gradient(to right in lab, ${gradient})`}}></div> */}
+
+        <div className="flex start">
+          <div className="palette-info-variation flex col gap-2">
+            <DataHeading>
+              <VariableIcon />
+              <p>{variation} Variation</p>
+            </DataHeading>
+            <div className="variation-icons flex gap-2">
+              <AdjustmentsHorizontalIcon className={variation === 'og' ? 'active' : ''} />
+              <ScaleIcon className={variation === 'keel' ? 'active' : ''} />
+              <FilmIcon className={variation === 'film' ? 'active' : ''} />
+              <CloudIcon className={variation === 'cloud' ? 'active' : ''} />
+              <FireIcon className={variation === 'fire' ? 'active' : ''} />
+            </div>
+          </div>
+
+          <div className="palette-info-gamut flex col start gap-2">
+            <DataHeading>
+              {base.hex.isInGamut ? (
+                <>
+                  <LightBulbIcon />
+                  <p>in srgb gamut</p>
+                </>
+              ) : (
+                <>
+                  <NoSymbolIcon />
+                  <p>not in srgb gamut</p>
+                </>
+              )}
+            </DataHeading>
+            <p className="x-small">
+              {base.hex.isInGamut ? 'Supported in all browsers' : 'Browser support may be limited'}
+            </p>
+          </div>
+        </div>
+
+
+        <div className="flex start">
+          <div>
+            <DataHeading>
+              <InfoCircle />
+              <p>Info</p>
+            </DataHeading>
+          </div>
+          <div>
+            <DataHeading>
+              <ExclamationCircle />
+              <p>Error</p>
+            </DataHeading>
+            <p className='x-small'>{error}</p>
+          </div>
+
+        </div>
+        
       </div>
+
+
+
+
+
 
       <div className="palette-info-3">
         <p className="palette-info-description">{createNarrative(palette, variation, paletteTitle)}</p>
@@ -206,7 +282,7 @@ export function PaletteInfo({
         </div>
       </div>
 
-      <div className="palette-info-display-support flex gap-4">
+      <div className="palette-info-display-support flex gap-4 small">
         <p>
           <span>{displaySupport?.colorGamut}</span>: {displaySupport?.colorGamutDescription}
         </p>
@@ -217,4 +293,8 @@ export function PaletteInfo({
 
 function removeNonNumericalElements(str: string) {
   return str.replace(/[^0-9% .#-]/g, '')
+}
+
+function DataHeading({ children }: { children: React.ReactNode }) {
+  return <div className="data-heading flex gap-2">{children}</div>
 }

@@ -1,14 +1,14 @@
 import Color from 'colorjs.io'
 
 export type ColorObj = {
-    base: Color;
-    string: string;
-    css: string;
-    isInGamut: boolean;
-    contrast: string;
-    raw: number[];
-    fallback: string;
-    outOfGamut: string;
+  base: Color
+  string: string
+  css: string
+  isInGamut: boolean
+  contrast: string
+  raw: number[]
+  fallback: string
+  outOfGamut: string
 }
 
 export type BaseColorData = {
@@ -23,21 +23,14 @@ export type BaseColorData = {
   p3: ColorObj
 }
 
+export type VariationKinds = 'og' | 'keel' | 'film' | 'cloud' | 'fire'
+
 export type Variations = {
-  og: BaseColorData[]
-  keel: BaseColorData[]
-  film: BaseColorData[]
-  cloud: BaseColorData[]
-  fire: BaseColorData[]
+  [key in VariationKinds]: BaseColorData[]
 }
 
+export type PaletteKinds = 'ana' | 'tri' | 'tet' | 'com' | 'spl' | 'ton' | 'pol' | 'tas'
+
 export type Palettes = {
-  ana: Variations
-  tri: Variations
-  tet: Variations
-  com: Variations
-  spl: Variations
-  ton: Variations
-  pol: Variations
-  tas: Variations
+  [key in PaletteKinds]: Variations
 }
