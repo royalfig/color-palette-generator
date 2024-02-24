@@ -17,8 +17,12 @@
     flex-direction: column;
   }
 
-  &.start {
+  &.align-start {
     align-items: flex-start;
+  }
+
+  &.justify-start {
+    justify-content: flex-start;
   }
 }
 
@@ -26,6 +30,10 @@
   width: 100%;
   height: 100%;
   stroke: currentcolor;
+}
+
+.mb-6 {
+  margin-block: var(--spacing-06)
 }
 
 .gap-1 {

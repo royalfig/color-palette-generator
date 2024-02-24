@@ -3,8 +3,7 @@
   grid-template-columns: repeat(2, 1fr);
   grid-template-columns: subgrid;
   grid-column: span 2;
-  align-content: space-between;
-  justify-content: center;
+  place-content: space-between center;
   color: #fff;
 }
 
@@ -21,44 +20,42 @@
 }
 
 .data-heading {
+  justify-content: flex-start;
+  font-size: var(--small);
+  text-transform: uppercase;
+
+  &.flex {
     justify-content: flex-start;
-    font-size: var(--small);
-    text-transform: uppercase;
+  }
 
-    &.flex {
-        justify-content: flex-start;
-    }
-
-    svg {
-        width: 1em;
-        height: 1em;
-        color: var(--border);
-    }
+  svg {
+    width: 1em;
+    height: 1em;
+    color: var(--border);
+  }
 }
 
 .palette-info-variation {
-    &.flex {
-        align-items: flex-start;
-        justify-content: flex-start;
-    }
+  &.flex {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
 
-    margin-block-end: var(--spacing-06);
-   
-
-    .variation-icons {
-        svg {
-            width: 20px;
-            height: 20px;
-            color: var(--border);
-        }
-
-        .active {
-            color: currentcolor;
-        }
-    }
+  margin-block-end: var(--spacing-06);
 
 }
 
+.variation-icons {
+  svg {
+    width: 20px;
+    height: 20px;
+    color: var(--border);
+  }
+
+  .active {
+    color: currentcolor;
+  }
+}
 
 .color-blocks-name {
   margin-block-end: var(--spacing-02);
@@ -79,21 +76,32 @@
 }
 
 .palette-info-gamut {
-    align-items: flex-start;
+  align-items: flex-start;
 }
 
 .palette-info-colorspace {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--spacing-02);
-    margin-block-start: var(--spacing-06);
-    font-size: var(--small);
-    opacity: .8;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-02);
+  margin-block-start: var(--spacing-06);
+  font-size: var(--small);
+  opacity: 0.8;
 
-    span {
-        margin-inline-end: .25em;
-        font-weight: 600;
-        text-transform: uppercase;
-        opacity: 1;
-    }
+  span {
+    margin-inline-end: 0.25em;
+    font-weight: 600;
+    text-transform: uppercase;
+    opacity: 1;
+  }
+}
+
+.color-border {
+  height: 0.5rem;
+  margin-block: var(--spacing-06);
+}
+
+.two-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-block: var(--spacing-06);
 }

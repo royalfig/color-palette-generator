@@ -17,9 +17,9 @@ import {
   SwatchIcon,
   VariableIcon,
   XCircleIcon,
-  
+  BellAlertIcon  
 } from '@heroicons/react/24/solid'
-import { BellAlertIcon } from '@heroicons/react/24/outline'
+import { Gradient } from './Gradient'
 
 function getFullName(palette: string) {
   switch (palette) {
@@ -174,9 +174,7 @@ export function PaletteInfo({
     exit: { opacity: 0 },
   }
 
-  const gradient = palettes[palette][variation].map(color => color[colorspaceType].string).join(', ')
 
-  // const colorSpaces2 = colorSpaces.slice(5)
   return (
     <div className="pallete-info">
       <div className="palette-info-main">
@@ -205,15 +203,14 @@ export function PaletteInfo({
           </div>
         </div>
 
-        {/* <div className="color-border" style={{backgroundImage: `linear-gradient(to right in lab, ${gradient})`}}></div> */}
 
-        <div className="flex start">
-          <div className="palette-info-variation flex col gap-2">
+        <TwoColumn>
+          <div>
             <DataHeading>
               <VariableIcon />
               <p>{variation} Variation</p>
             </DataHeading>
-            <div className="variation-icons flex gap-2">
+            <div className="variation-icons flex gap-2 justify-start">
               <AdjustmentsHorizontalIcon className={variation === 'og' ? 'active' : ''} />
               <ScaleIcon className={variation === 'keel' ? 'active' : ''} />
               <FilmIcon className={variation === 'film' ? 'active' : ''} />
@@ -222,7 +219,7 @@ export function PaletteInfo({
             </div>
           </div>
 
-          <div className="palette-info-gamut flex col start gap-2">
+          <div className="palette-info-gamut flex col align-start gap-2">
             <DataHeading>
               {base.hex.isInGamut ? (
                 <>
@@ -240,10 +237,10 @@ export function PaletteInfo({
               {base.hex.isInGamut ? 'Supported in all browsers' : 'Browser support may be limited'}
             </p>
           </div>
-        </div>
+        </TwoColumn>
 
 
-        <div className="flex start">
+        <TwoColumn>
           <div>
             <DataHeading>
               <BellAlertIcon />
@@ -257,8 +254,7 @@ export function PaletteInfo({
             </DataHeading>
             <p className='x-small'>{error}</p>
           </div>
-
-        </div>
+        </TwoColumn>
         
       </div>
 
@@ -280,6 +276,9 @@ export function PaletteInfo({
             </div>
           ))}
         </div>
+
+        <Gradient palettes={palettes} colorSpace={colorspaceType} palette={palette} variation={variation} />
+
       </div>
 
       <div className="palette-info-display-support flex gap-4 small">
@@ -292,9 +291,13 @@ export function PaletteInfo({
 }
 
 function removeNonNumericalElements(str: string) {
-  return str.replace(/[^0-9% .#-]/g, '')
+  return str.replace(/(hex|hsl|rgb|lch|lab|color|display-p3|oklch|oklab)|[()]/g, '')
 }
 
 function DataHeading({ children }: { children: React.ReactNode }) {
   return <div className="data-heading flex gap-2">{children}</div>
+}
+
+function TwoColumn({ children }: { children: React.ReactNode }) {
+  return <div className="two-column">{children}</div>
 }
