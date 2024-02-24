@@ -16,10 +16,10 @@ import {
   ScaleIcon,
   SwatchIcon,
   VariableIcon,
-} from '@heroicons/react/24/outline'
-import { Color } from 'culori'
-import { ExclamationCircle, InfoCircle } from 'react-bootstrap-icons'
-import { ErrorIcon } from 'react-hot-toast'
+  XCircleIcon,
+  
+} from '@heroicons/react/24/solid'
+import { BellAlertIcon } from '@heroicons/react/24/outline'
 
 function getFullName(palette: string) {
   switch (palette) {
@@ -246,13 +246,13 @@ export function PaletteInfo({
         <div className="flex start">
           <div>
             <DataHeading>
-              <InfoCircle />
+              <BellAlertIcon />
               <p>Info</p>
             </DataHeading>
           </div>
           <div>
             <DataHeading>
-              <ExclamationCircle />
+              <XCircleIcon />
               <p>Error</p>
             </DataHeading>
             <p className='x-small'>{error}</p>
