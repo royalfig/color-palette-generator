@@ -17,7 +17,8 @@ import {
   SwatchIcon,
   VariableIcon,
   XCircleIcon,
-  BellAlertIcon  
+  BellAlertIcon,
+  ComputerDesktopIcon,
 } from '@heroicons/react/24/solid'
 import { Gradient } from './Gradient'
 
@@ -102,21 +103,21 @@ function determineSupportedColorspace() {
   if (window.matchMedia('(color-gamut: rec2020)').matches) {
     return {
       colorGamut: 'REC.2020',
-      colorGamutDescription: 'This display supports up to 75% percent of the human visible spectrum.',
+      colorGamutDescription: 'This display supports up to 75% of the visible spectrum.',
     }
   }
 
   if (window.matchMedia('(color-gamut: p3)').matches) {
     return {
       colorGamut: 'P3',
-      colorGamutDescription: 'This display supports up to 45% percent of the human visible spectrum.',
+      colorGamutDescription: 'This display supports up to 45% of the visible spectrum.',
     }
   }
 
   if (window.matchMedia('(color-gamut: srgb)').matches) {
     return {
-      colorGamut: 'SRGB',
-      colorGamutDescription: 'This display supports sRGB, up to 35% percent of the human visible spectrum.',
+      colorGamut: 'sRGB',
+      colorGamutDescription: 'This display supports sRGB, up to 35% of the visible spectrum.',
     }
   }
 
@@ -174,7 +175,6 @@ export function PaletteInfo({
     exit: { opacity: 0 },
   }
 
-
   return (
     <div className="pallete-info">
       <div className="palette-info-main">
@@ -203,7 +203,6 @@ export function PaletteInfo({
           </div>
         </div>
 
-
         <TwoColumn>
           <div>
             <DataHeading>
@@ -219,26 +218,16 @@ export function PaletteInfo({
             </div>
           </div>
 
-          <div className="palette-info-gamut flex col align-start gap-2">
+          <div>
             <DataHeading>
-              {base.hex.isInGamut ? (
-                <>
-                  <LightBulbIcon />
-                  <p>in srgb gamut</p>
-                </>
-              ) : (
-                <>
-                  <NoSymbolIcon />
-                  <p>not in srgb gamut</p>
-                </>
-              )}
+              <ComputerDesktopIcon />
+              <p>Display Support</p>
             </DataHeading>
-            <p className="x-small">
-              {base.hex.isInGamut ? 'Supported in all browsers' : 'Browser support may be limited'}
+            <p className='x-small'>
+              <span>{displaySupport?.colorGamut}</span>: {displaySupport?.colorGamutDescription}
             </p>
           </div>
         </TwoColumn>
-
 
         <TwoColumn>
           <div>
@@ -252,16 +241,10 @@ export function PaletteInfo({
               <XCircleIcon />
               <p>Error</p>
             </DataHeading>
-            <p className='x-small'>{error}</p>
+            <p className="x-small">{error}</p>
           </div>
         </TwoColumn>
-        
       </div>
-
-
-
-
-
 
       <div className="palette-info-3">
         <p className="palette-info-description">{createNarrative(palette, variation, paletteTitle)}</p>
@@ -278,13 +261,22 @@ export function PaletteInfo({
         </div>
 
         <Gradient palettes={palettes} colorSpace={colorspaceType} palette={palette} variation={variation} />
-
       </div>
-
-      <div className="palette-info-display-support flex gap-4 small">
-        <p>
-          <span>{displaySupport?.colorGamut}</span>: {displaySupport?.colorGamutDescription}
-        </p>
+      <div className="palette-info-gamut flex col align-start gap-2">
+        <DataHeading>
+          {base.hex.isInGamut ? (
+            <>
+              <LightBulbIcon />
+              <p>in srgb gamut</p>
+            </>
+          ) : (
+            <>
+              <NoSymbolIcon />
+              <p>not in srgb gamut</p>
+            </>
+          )}
+        </DataHeading>
+        <p className="x-small">{base.hex.isInGamut ? 'Supported in all browsers' : 'Browser support may be limited'}</p>
       </div>
     </div>
   )

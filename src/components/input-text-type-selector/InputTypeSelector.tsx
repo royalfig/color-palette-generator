@@ -2,7 +2,7 @@ import Button from "../button/Button"
 import "./input-type-selector.css"
 
 export function InputTypeSelector({setColorSpace, current}: {setColorSpace: Function, current:string}) {
-  const colorSpaceTypes = ['hex', 'rgb', 'hsl', 'lch', 'oklch', 'lab', 'oklab', 'p3'] as const
+  const colorSpaceTypes = ['hex', 'rgb', 'hsl', 'p3', 'lch', 'oklch', 'lab', 'oklab'] as const
 
   return (
     <div className="input-type-selectors">

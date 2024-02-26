@@ -24,13 +24,18 @@
   font-size: var(--small);
   text-transform: uppercase;
 
+  &:first-child {
+    margin-block-end: var(--spacing-02);
+  }
+
   &.flex {
     justify-content: flex-start;
   }
 
   svg {
-    width: 1em;
-    height: 1em;
+    width: 20px;
+    height: 20px;
+    margin-inline-end: 2px;
     color: var(--border);
   }
 }

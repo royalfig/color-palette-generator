@@ -27,7 +27,7 @@ export function Gradient({
       inColorSpace = ` in ${colorSpace}`
   }
 
-  const cssGradient = `linear-gradient(90deg${inColorSpace}, ${gradient})`
+  const cssGradient = `linear-gradient(90deg${inColorSpace}, transparent, ${gradient}, transparent)`
 
   return (
     <div className='mb-6'>
