@@ -138,6 +138,7 @@ export function PaletteInfo({
   colorName,
   isActive,
   error,
+  msg
 }: {
   base: BaseColorData
   palette: PaletteKinds
@@ -147,6 +148,7 @@ export function PaletteInfo({
   colorName: ColorName
   isActive: boolean
   error: string
+  msg: string
 }) {
   console.log('🚀 ~ isActive:', isActive)
   const [displaySupport, setDisplaySupport] = useState<DisplaySupport | null>(null)
@@ -235,6 +237,7 @@ export function PaletteInfo({
               <BellAlertIcon />
               <p>Info</p>
             </DataHeading>
+            <p className="x-small">{msg}</p>
           </div>
           <div>
             <DataHeading>

@@ -23,7 +23,7 @@ import './css/Variables.css'
 import './css/utils.css'
 import { useBaseColor } from './hooks/useBaseColor'
 import { useFetchColorNames } from './hooks/useColorName'
-import { ColorSpace, Variations } from './types'
+import { ColorSpace, PaletteKinds, Variations } from './types'
 import { generateCss } from './util/generateCss'
 import { createPalettes } from './util/palettes'
 import { pickRandomColor } from './util/pickRandomColor'
@@ -42,11 +42,12 @@ export default function App() {
   const colorQueryParaCheck = new URLSearchParams(document.location.search).has('color')
   const colorQueryParam = colorQueryParaCheck ? new URLSearchParams(document.location.search).get('color') : null
   const [color, setColor] = useState<string | Color>(colorQueryParam || pickRandomColor())
-  const [palette, setPalette] = useState('com')
+  const [palette, setPalette] = useState<PaletteKinds>('com')
   const [variation, setVariation] = useState<keyof Variations>('og')
   const [colorspaceType, setColorspaceType] = useState<ColorSpace>('hex')
   const [isActive, setIsActive] = useState(false)
   const [error, setError] = useState('')
+  const [msg, setMsg] = useState('')
 
   const palettes = createPalettes(color)
   const css = generateCss(palettes)
@@ -115,6 +116,7 @@ export default function App() {
                 colorName={fetchColorName}
                 error={error}
                 isActive={isActive}
+                msg={msg}
               />
             </div>
           </Display>
@@ -164,6 +166,7 @@ export default function App() {
             variation={variation}
             colorSpace={colorspaceType}
             colorName={fetchColorName}
+            setMsg={setMsg}
           />
         </div>
       </main>
