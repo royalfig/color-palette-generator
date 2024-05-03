@@ -1,4 +1,6 @@
+import { UseCopy } from '../../hooks/useCopy'
 import { ColorSpace, PaletteKinds, Palettes, VariationKinds } from '../../types'
+import './gradient.css'
 
 export function Gradient({
   palettes,
@@ -12,6 +14,8 @@ export function Gradient({
   variation: VariationKinds
 }) {
   const gradient = palettes[palette][variation].map(color => color[colorSpace].css).join(', ')
+
+  const { copyToClipboard } = UseCopy()
 
   let inColorSpace
 
@@ -30,12 +34,11 @@ export function Gradient({
   const cssGradient = `linear-gradient(90deg${inColorSpace}, transparent, ${gradient}, transparent)`
 
   return (
-    <div className='mb-6'>
-      <div
-        className="gradient"
-        style={{ background: cssGradient, height: '.5rem', marginBlockEnd: 'var(--spacing-03)' }}
-      ></div>
-      <p className='x-small'>{cssGradient}</p>
+    <div>
+      <div className="gradient" style={{ background: cssGradient }}></div>
+      <button onClick={() => copyToClipboard(cssGradient)}>
+        <p className="x-small">{cssGradient}</p>
+      </button>
     </div>
   )
 }

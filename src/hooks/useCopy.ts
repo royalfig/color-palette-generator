@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 
-export function UseCopy({valueToCopy}: {valueToCopy: string}) {
+export function UseCopy() {
     const [copied, setCopied] = useState(false)
     
-    const copyToClipboard = () => {
+    const copyToClipboard = (valueToCopy: string) => {
         navigator.clipboard.writeText(valueToCopy)
         setCopied(true)
     }
@@ -20,5 +20,5 @@ export function UseCopy({valueToCopy}: {valueToCopy: string}) {
         }
     }, [copied])
     
-    return [copied, copyToClipboard]
+    return {copied, copyToClipboard}
 }

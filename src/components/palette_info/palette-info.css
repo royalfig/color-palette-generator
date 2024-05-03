@@ -3,7 +3,8 @@
   grid-template-columns: repeat(2, 1fr);
   grid-template-columns: subgrid;
   grid-column: span 2;
-  place-content: space-between center;
+
+  /* place-content: space-between center; */
   color: #fff;
 }
 
@@ -88,7 +89,6 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--spacing-02);
-  margin-block-start: var(--spacing-06);
   font-size: var(--small);
   opacity: 0.8;
 
@@ -109,4 +109,11 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-block: var(--spacing-06);
+}
+
+.palette-info-3 {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  
 }

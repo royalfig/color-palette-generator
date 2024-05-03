@@ -19,8 +19,11 @@ import {
   XCircleIcon,
   BellAlertIcon,
   ComputerDesktopIcon,
+  TableCellsIcon,
+  DocumentIcon,
 } from '@heroicons/react/24/solid'
 import { Gradient } from './Gradient'
+import { PaintBrushIcon } from '@heroicons/react/24/solid'
 
 function getFullName(palette: string) {
   switch (palette) {
@@ -138,7 +141,7 @@ export function PaletteInfo({
   colorName,
   isActive,
   error,
-  msg
+  msg,
 }: {
   base: BaseColorData
   palette: PaletteKinds
@@ -220,13 +223,22 @@ export function PaletteInfo({
             </div>
           </div>
 
-          <div>
+          <div className="palette-info-gamut flex col align-start gap-2">
             <DataHeading>
-              <ComputerDesktopIcon />
-              <p>Display Support</p>
+              {base.hex.isInGamut ? (
+                <>
+                  <LightBulbIcon />
+                  <p>in srgb gamut</p>
+                </>
+              ) : (
+                <>
+                  <NoSymbolIcon />
+                  <p>not in srgb gamut</p>
+                </>
+              )}
             </DataHeading>
-            <p className='x-small'>
-              <span>{displaySupport?.colorGamut}</span>: {displaySupport?.colorGamutDescription}
+            <p className="x-small">
+              {base.hex.isInGamut ? 'Supported in all browsers' : 'Browser support may be limited'}
             </p>
           </div>
         </TwoColumn>
@@ -247,39 +259,50 @@ export function PaletteInfo({
             <p className="x-small">{error}</p>
           </div>
         </TwoColumn>
+        <div>
+          <DataHeading>
+            <ComputerDesktopIcon />
+            <p>Display Support</p>
+          </DataHeading>
+          <p className="x-small">
+            <span>{displaySupport?.colorGamut}</span>: {displaySupport?.colorGamutDescription}
+          </p>
+        </div>
       </div>
 
       <div className="palette-info-3">
-        <p className="palette-info-description">{createNarrative(palette, variation, paletteTitle)}</p>
-
-        <div className="palette-info-colorspace">
-          {colorSpaces.map(([key, value]) => (
-            <div key={key}>
-              <p>
-                <span>{key}</span>
-                {removeNonNumericalElements(value.string)}
-              </p>
-            </div>
-          ))}
+        <div>
+          <DataHeading>
+            <DocumentIcon />
+            <p>Description</p>
+          </DataHeading>
+          <p className="palette-info-description">{createNarrative(palette, variation, paletteTitle)}</p>
         </div>
 
-        <Gradient palettes={palettes} colorSpace={colorspaceType} palette={palette} variation={variation} />
-      </div>
-      <div className="palette-info-gamut flex col align-start gap-2">
-        <DataHeading>
-          {base.hex.isInGamut ? (
-            <>
-              <LightBulbIcon />
-              <p>in srgb gamut</p>
-            </>
-          ) : (
-            <>
-              <NoSymbolIcon />
-              <p>not in srgb gamut</p>
-            </>
-          )}
-        </DataHeading>
-        <p className="x-small">{base.hex.isInGamut ? 'Supported in all browsers' : 'Browser support may be limited'}</p>
+        <div>
+          <DataHeading>
+            <PaintBrushIcon />
+            <p>Gradient</p>
+          </DataHeading>
+          <Gradient palettes={palettes} colorSpace={colorspaceType} palette={palette} variation={variation} />
+        </div>
+
+        <div>
+          <DataHeading>
+            <TableCellsIcon />
+            <p>Color Data</p>
+          </DataHeading>
+          <div className="palette-info-colorspace">
+            {colorSpaces.map(([key, value]) => (
+              <div key={key}>
+                <p>
+                  <span>{key}</span>
+                  {removeNonNumericalElements(value.string)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
