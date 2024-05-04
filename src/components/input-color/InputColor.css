@@ -1,4 +1,5 @@
 .input-color {
+  position: relative;
   gap: var(--gap);
 
   & .display {
@@ -17,33 +18,11 @@
   }
 }
 
-.input-color-metadata {
-  gap: var(--gap);
-  justify-content: space-around;
-
-  & svg {
-    width: 20px;
-    height: 20px;
-    color: var(--border);
-  }
-
-  & .warning {
-    color: rgb(217 193 13);
-  }
-
-  & .activity {
-    color: oklch(var(--tones-0-10) / 50%);
-  }
-
-  & .clipped {
-    color: rgb(204 6 6);
-  }
-}
 
 .blur-input {
   position: absolute;
-  top: calc(0.4rem + 4px);
-  left: calc(0.8rem + 4px);
+  top: .4em;
+  left: .8em;
   z-index: 0;
   display: inline-block;
   font-family: monospace;
@@ -51,7 +30,7 @@
   line-height: 1;
   color: #fff;
   filter: blur(5px);
-  opacity: 0.25;
+  opacity: 0.5;
 }
 
 .activity-monitor {

@@ -1,29 +1,28 @@
-import { useEffect, useState } from 'react'
-import { Circle } from '../circle/Circle'
-import './palette-info.css'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ColorName } from '../../App'
-import { BaseColorData, ColorSpace, PaletteKinds, Palettes, VariationKinds } from '../../types'
-import { LightUpSvg } from '../input-color/LightUpSvg'
 import {
   AdjustmentsHorizontalIcon,
+  BellAlertIcon,
   BoltIcon,
   CloudIcon,
+  ComputerDesktopIcon,
+  DocumentIcon,
   FilmIcon,
   FireIcon,
   LightBulbIcon,
   NoSymbolIcon,
+  PaintBrushIcon,
   ScaleIcon,
   SwatchIcon,
+  TableCellsIcon,
   VariableIcon,
   XCircleIcon,
-  BellAlertIcon,
-  ComputerDesktopIcon,
-  TableCellsIcon,
-  DocumentIcon,
-} from '@heroicons/react/24/solid'
+} from '@heroicons/react/24/outline'
+import { useEffect, useState } from 'react'
+import { ColorName } from '../../App'
+import { BaseColorData, ColorSpace, PaletteKinds, Palettes, VariationKinds } from '../../types'
+import { Circle } from '../circle/Circle'
+import { LightUpSvg } from '../input-color/LightUpSvg'
 import { Gradient } from './Gradient'
-import { PaintBrushIcon } from '@heroicons/react/24/solid'
+import './palette-info.css'
 
 function getFullName(palette: string) {
   switch (palette) {
@@ -52,28 +51,28 @@ function createNarrative(palette: string, variation: string, paletteTitle: strin
   let narrative = ''
   switch (palette) {
     case 'com':
-      narrative = `${paletteTitle} is a complementary palette features two colors opposite each other on the color wheel.`
+      narrative = `${paletteTitle} is a complementary palette that features two colors opposite each other on the color wheel.`
       break
     case 'ana':
-      narrative = `${paletteTitle} is an analogous palette features three colors next to each other on the color wheel.`
+      narrative = `${paletteTitle} is an analogous palette that features three colors next to each other on the color wheel.`
       break
     case 'ton':
-      narrative = `${paletteTitle} is a tones palette features a color with varying degrees of saturation and brightness.`
+      narrative = `${paletteTitle} is a tones palette that features a color with varying degrees of saturation and brightness.`
       break
     case 'tas':
-      narrative = `${paletteTitle} is a tints & shades palette features a color with varying degrees of lightness and darkness.`
+      narrative = `${paletteTitle} is a tints & shades palette that features a color with varying degrees of lightness and darkness.`
       break
     case 'pol':
-      narrative = `${paletteTitle} is a polychromia palette features a color with varying degrees of saturation.`
+      narrative = `${paletteTitle} is a polychromia palette that features a color with varying degrees of saturation.`
       break
     case 'tri':
-      narrative = `${paletteTitle} is a triadic palette features three colors evenly spaced around the color wheel.`
+      narrative = `${paletteTitle} is a triadic palette that features three colors evenly spaced around the color wheel.`
       break
     case 'tet':
-      narrative = `${paletteTitle} is a tetradic palette features four colors evenly spaced around the color wheel.`
+      narrative = `${paletteTitle} is a tetradic palette that features four colors evenly spaced around the color wheel.`
       break
     case 'spl':
-      narrative = `${paletteTitle} is a split complementary palette features three colors, one color and two colors adjacent to its complementary color.`
+      narrative = `${paletteTitle} is a split complementary palette that features three colors, one color and two colors adjacent to its complementary color.`
       break
     default:
       narrative = palette

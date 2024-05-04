@@ -117,3 +117,7 @@
   justify-content: space-between;
   
 }
+
+.palette-info-description {
+  text-wrap: pretty;
+}

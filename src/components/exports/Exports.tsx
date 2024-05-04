@@ -1,5 +1,8 @@
+import { create } from 'lodash-es'
 import { ColorName } from '../../App'
+import { ColorSpace, PaletteKinds, Palettes, VariationKinds } from '../../types'
 import Button from '../button/Button'
+import { useBaseColor } from '../../hooks/useBaseColor'
 
 function downloadAction(blobToDownload: string, filename: string, type: string) {
   const blob = new Blob([blobToDownload], { type })
@@ -28,58 +31,79 @@ export function ExportImage({
   colorSpace,
   colorNames,
 }: {
-  palettes: any
-  palette: string
-  variation: string
-  colorSpace: string
+  palettes: Palettes
+  palette: PaletteKinds
+  variation: VariationKinds
+  colorSpace: ColorSpace
   colorNames: ColorName
 }) {
-  const sample = {
-    name: 'red',
-    hex: '#FF0000',
-  }
-
+  const current = useBaseColor(palettes)
   const currentPalette = palettes[palette][variation]
-  const totalColors = currentPalette.length
-  const width = 2000
+  const totalColors = currentPalette.length > 5 ? 5 : currentPalette.length
   const outerPadding = 60
+  const width = 1920
+  const fontSize = 20
+  const largeFontSize = 64
+  const textMargin = 30
+  const totalSpaces = totalColors + 1
+  const totalPadding = totalSpaces * outerPadding
+  const squareSize = (width - totalPadding) / totalColors
+  const height = 64 + 60 + 36 + outerPadding * 2 + (outerPadding + squareSize) * (currentPalette.length > 5 ? 2 : 1)
+  function createHeader(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = 'black'
+
+    ctx.font = `bold ${largeFontSize}px system-ui`
+    ctx.fillText(colorNames.fetchedData?.paletteTitle || 'Palette', outerPadding, outerPadding + largeFontSize) // 64 + 60
+
+    ctx.font = '18px system-ui'
+    ctx.fillText(
+      `Based on ${current[colorSpace].string}, from https://colorpalette.pro on ${new Date().toLocaleString()}.`,
+      outerPadding,
+      outerPadding + largeFontSize + 36,
+    ) // 64 + 60 + 36
+  }
 
   function createFrame() {
     const canvas = document.createElement('canvas')
     canvas.width = width
-    canvas.height = outerPadding + Math.max((totalColors * outerPadding), 1000)
+    canvas.height = height
     const ctx = canvas.getContext('2d')
     if (ctx) {
-      ctx.fillStyle = '#000'
+      ctx.fillStyle = 'white'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
+      createHeader(ctx)
 
-      ctx.fillStyle = '#fff'
-      ctx.font = '20px system-ui'
-      ctx.fillText(colorNames.fetchedData?.paletteTitle || 'Palette', outerPadding, outerPadding)
-      ctx.font = '14px system-ui'
-      ctx.fillText(`Generated from Color Palette Pro at ${new Date().toLocaleString()}`, outerPadding, outerPadding * 2)
+      let last = 0
+
+      currentPalette.forEach((color, idx) => {
+        console.log({ idx, size: outerPadding + idx * (squareSize + outerPadding) })
+        let x = outerPadding + last
+        let y = 64 + 60 + 36 + outerPadding
+
+        if (idx > 4) {
+          if (idx === 5) {
+            last = 0
+          }
+          y += outerPadding + squareSize
+          x = outerPadding + last
+        }
+
+        ctx.fillStyle = color[colorSpace].string
+        ctx.fillRect(x, y, squareSize, squareSize)
+        ctx.fillStyle = color[colorSpace].contrast
+        ctx.font = 'bold 18px system-ui'
+        ctx.fillText(colorNames.fetchedData?.colorNames[idx] || "", x + (squareSize * .05), y + (squareSize - (squareSize * .05) - 27))
+        ctx.font = '16px system-ui'
+        ctx.fillText(color[colorSpace].string, x + (squareSize * .05), y + (squareSize - (squareSize * .05)))
+        last = x + squareSize
+      })
     }
 
-    return { ctx, canvas }
+    return canvas
   }
 
   function handler() {
-    const { ctx, canvas } = createFrame()
-
-    if (ctx) {
-      for (let idx = 0; idx < totalColors; idx++) {
-        ctx.fillStyle = currentPalette[idx][colorSpace].string
-        ctx.fillRect(outerPadding, outerPadding + (idx * outerPadding), width / 2, outerPadding)
-
-        // ctx.fillStyle = currentPalette[0][colorSpace].contrast
-        // ctx.font = '20px sans-serif'
-        // const colorSpaceWidth = ctx.measureText(currentPalette[0][colorSpace].string).width
-        // const colorNameWidth = ctx.measureText(colorNames.fetchedData?.colorNames[0] || "").width
-
-        // ctx.fillText(currentPalette[0][colorSpace].string, 500 - (Math.max(colorNameWidth,colorSpaceWidth) + 30), 500 - 30)
-        // ctx.fillText(colorNames.fetchedData?.colorNames[0] || "", 500 - (Math.max(colorNameWidth,colorSpaceWidth) + 30), 500 - 60)
-      }
-    }
+    const canvas = createFrame()
 
     const dataUrl = canvas.toDataURL('image/png')
     const dlLink = document.createElement('a')
