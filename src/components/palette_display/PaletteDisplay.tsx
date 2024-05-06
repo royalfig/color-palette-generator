@@ -45,9 +45,9 @@ export function PaletteDisplay({ palettes, colorSpace, palette, variation, color
           style={{ '--color': color[colorSpace].css, '--text': color[colorSpace].contrast }}
           onClick={() => handleCopy(color[colorSpace].string)}
         >
-          <span>{colorName.fetchedData?.colorNames[idx]}</span>{' '}
+          <span>{colorName.fetchedData?.colorNames[idx]} {color[colorSpace].isInGamut ? undefined : <ScissorsIcon className="icon"/>}</span>
           <span>
-            {color[colorSpace].string} {color[colorSpace].isInGamut ? undefined : <ScissorsIcon className="icon" />}
+            {color[colorSpace].string}
           </span>
         </button>
       ))}
