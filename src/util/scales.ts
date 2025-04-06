@@ -79,8 +79,9 @@ export function createScales(baseColor: Color | string) {
 
   const polyStartOriginal = new Color(baseColor)
   const polyEndOriginal = new Color(baseColor)
-  polyEndOriginal.hsl.h += 359
+  polyEndOriginal.hsl.h += 349
   polyEndOriginal.hsl.h = polyEndOriginal.hsl.h % 360
+  console.log(polyStartOriginal.hsl.h, polyEndOriginal.hsl.h)
   const polyOriginal = Color.steps(polyStartOriginal, polyEndOriginal, {
     space: 'hsl',
     steps: 10,
@@ -150,5 +151,5 @@ export function createScales(baseColor: Color | string) {
     fire: tintsOriginal.map((c, idx) => colorFactory(c, 'tints-sharkbite', idx)),
   }
 
-  return { ton, pol, tas }
+  return { pol, tas, ton }
 }

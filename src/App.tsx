@@ -27,6 +27,7 @@ import { ColorSpace, PaletteKinds, Variations } from './types'
 import { generateCss } from './util/generateCss'
 import { createPalettes } from './util/palettes'
 import { pickRandomColor } from './util/pickRandomColor'
+import { UiMode } from './components/ui/UiMode'
 
 export type ColorName = {
   fetchedData: {
@@ -53,6 +54,10 @@ export default function App() {
   const css = generateCss(palettes)
   const base = useBaseColor(palettes)
   const fetchColorName = useFetchColorNames(palettes, palette, variation)
+
+  function logChange(e: React.ChangeEvent<HTMLInputElement>) {
+    console.log(e.target.value)
+  }
 
   useEffect(() => {
     const styleEl = document.createElement('style')
@@ -133,6 +138,7 @@ export default function App() {
               <EyeDropper setColor={setColor} />
               <DarkMode />
               <Share base={base} />
+              <UiMode />
             </ControlGroup>
 
             <ControlGroup title="Export">
@@ -154,8 +160,9 @@ export default function App() {
               <PaletteSelector palettes={palettes} palette={palette} setPalette={setPalette} />
             </ControlGroup>
 
-            <ControlGroup title="Variations">
-              <VariationSelector variation={variation} setVariation={setVariation} />
+            <ControlGroup title="Fuzz">
+              <input type="range" min={0} max={100} onChange={logChange}/>
+              {/* <VariationSelector variation={variation} setVariation={setVariation} /> */}
             </ControlGroup>
           </section>
         </div>

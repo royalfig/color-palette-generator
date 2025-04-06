@@ -18,7 +18,7 @@ export function DarkMode() {
 
   return (
     <Button handler={() => setDarkMode(!darkMode)} active={darkMode} key="dark">
-      Dark Mode
+      Mode
     </Button>
   )
 }
