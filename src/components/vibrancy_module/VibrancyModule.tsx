@@ -20,26 +20,37 @@ export function VibrancyModule({ palettes }: { palettes: Palettes }) {
 
   const step = width / (hues.length - 1)
 
+  // Helper to get point coordinates
+  const getPoint = (i: number) => [i * step, height - (height * (isNaN(hues[i]) ? 0 : hues[i])) / 360]
+
+  // Catmull-Rom to Bezier conversion for rolling hills
   const generatePathD = (hues: number[]) => {
     if (hues.length < 2) return ''
 
-    const firstHue = isNaN(hues[0]) ? 0 : hues[0]
-    let pathD = `M0,${height - (height * firstHue) / 360}`
+    let d = ''
+    const points = hues.map((_, i) => getPoint(i))
+    d += `M${points[0][0]},${points[0][1]}`
 
-    for (let i = 0; i < hues.length - 1; i++) {
-      const startX = i * step
-      const startY = height - (height * (isNaN(hues[i]) ? 0 : hues[i])) / 360
-      const endX = (i + 1) * step
-      const endY = height - (height * (isNaN(hues[i + 1]) ? 0 : hues[i + 1])) / 360
-      const controlX1 = (startX + endX) / 2
-      const controlY1 = (startY + endY) / 2 // Adjust for a smoother curve
-      const controlX2 = (startX + endX) / 2
-      const controlY2 = (startY + endY) / 2 // Adjust for a smoother curve
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i - 1] || points[i]
+      const p1 = points[i]
+      const p2 = points[i + 1]
+      const p3 = points[i + 2] || p2
 
-      pathD += ` C${controlX1},${controlY1} ${controlX2},${controlY2} ${endX},${endY}`
+      // Catmull-Rom to Bezier
+      const control1x = p1[0] + (p2[0] - p0[0]) / 6
+      const control1y = p1[1] + (p2[1] - p0[1]) / 6
+      const control2x = p2[0] - (p3[0] - p1[0]) / 6
+      const control2y = p2[1] - (p3[1] - p1[1]) / 6
+
+      d += ` C${control1x},${control1y} ${control2x},${control2y} ${p2[0]},${p2[1]}`
     }
 
-    return pathD
+    // Close the path to fill the area under the curve
+    d += ` L${width},${height}`
+    d += ` L0,${height}`
+    d += ' Z'
+    return d
   }
 
   const pathD = generatePathD(hues)
@@ -55,15 +66,29 @@ export function VibrancyModule({ palettes }: { palettes: Palettes }) {
             />
           ))}
         </linearGradient>
+        <linearGradient id="black-to-transparent" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stopColor="black" stopOpacity="0.7" />
+          <stop offset="40%" stopColor="black" stopOpacity="0" />
+        </linearGradient>
       </defs>
       <motion.path
         d={pathD}
         stroke="url(#gradient)"
         strokeWidth="2"
-        fill="none"
+        fill="url(#gradient)"
+        strokeLinecap="round"
+        strokeLinejoin="round"
         initial={false}
         animate={{ d: pathD }}
         transition={{ duration: 0.4, ease: 'easeInOut' }}
+      />
+      <rect
+        x={0}
+        y={0}
+        width={width}
+        height={height}
+        fill="url(#black-to-transparent)"
+        style={{ pointerEvents: 'none' }}
       />
     </svg>
   )

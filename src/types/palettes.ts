@@ -23,6 +23,18 @@ export type BaseColorData = {
   p3: ColorObj
 }
 
+export type BaseColorData2 = {
+  color: Color
+  conversions: {
+    [key: string]: { Color: Color; css: string; outOfSRGB: boolean }
+  }
+  contrastColor: 'black' | 'white'
+  raw: number[]
+  fallback: string
+  outOfSRGB: boolean
+  css: string
+}
+
 export type VariationKinds = 'og' | 'keel' | 'film' | 'cloud' | 'fire'
 
 export type Variations = {

@@ -14,7 +14,7 @@ import { PaletteDisplay } from './components/palette_display/PaletteDisplay'
 import { PaletteInfo } from './components/palette_info/PaletteInfo'
 import PaletteSelector from './components/palette_selector/PaletteSelector'
 import { Share } from './components/share/Share'
-import { VariationSelector } from './components/variations/Variations'
+import { UiMode } from './components/ui/UiMode'
 import { VibrancyModule } from './components/vibrancy_module/VibrancyModule'
 import './css/App.css'
 import './css/Defaults.css'
@@ -27,7 +27,6 @@ import { ColorSpace, PaletteKinds, Variations } from './types'
 import { generateCss } from './util/generateCss'
 import { createPalettes } from './util/palettes'
 import { pickRandomColor } from './util/pickRandomColor'
-import { UiMode } from './components/ui/UiMode'
 
 export type ColorName = {
   fetchedData: {
@@ -78,15 +77,7 @@ export default function App() {
             <span>Color</span>Palette Pro
           </h1>
           <div className="flex gap-4">
-            <Button handler={() => console.log('about')} active={false}>
-              About
-            </Button>
-            <Button handler={() => console.log('halp')} active={false}>
-              Help
-            </Button>
-            <Display spacing="01">
-              <VibrancyModule palettes={palettes} />
-            </Display>
+            <InputTypeSelector setColorSpace={setColorspaceType} current={colorspaceType} />
           </div>
         </div>
         <section className="synth-display">
@@ -100,18 +91,18 @@ export default function App() {
                   setColor={setColor}
                   colorSpace={colorspaceType}
                 />
-                <ColorSelector palettes={palettes} setColor={setColor} />
-              <InputColorContainer
-                palettes={palettes}
-                setColor={setColor}
-                base={base}
-                colorspaceType={colorspaceType}
-                setColorspaceType={setColorspaceType}
-                setError={setError}
-                setIsActive={setIsActive}
-                isActive={isActive}
+                <ColorSelector palettes={palettes} setColor={setColor} colorSpace={colorspaceType} />
+                <InputColorContainer
+                  palettes={palettes}
+                  setColor={setColor}
+                  base={base}
+                  colorspaceType={colorspaceType}
+                  setColorspaceType={setColorspaceType}
+                  setError={setError}
+                  setIsActive={setIsActive}
+                  isActive={isActive}
                 />
-                </div>
+              </div>
               <PaletteInfo
                 palettes={palettes}
                 base={base}
@@ -127,11 +118,7 @@ export default function App() {
           </Display>
         </section>
         <div className="synth-left box-padding">
-          <section className="control-section">
-            <ControlGroup title="Color Space">
-              <InputTypeSelector setColorSpace={setColorspaceType} current={colorspaceType} />
-            </ControlGroup>
-          </section>
+          <section className="control-section"></section>
 
           <section className="control-section">
             <ControlGroup title="Controls">
@@ -161,7 +148,7 @@ export default function App() {
             </ControlGroup>
 
             <ControlGroup title="Fuzz">
-              <input type="range" min={0} max={100} onChange={logChange}/>
+              <input type="range" min={0} max={100} onChange={logChange} />
               {/* <VariationSelector variation={variation} setVariation={setVariation} /> */}
             </ControlGroup>
           </section>
