@@ -29,14 +29,14 @@
   }
 
   ::-webkit-slider-thumb {
-    width: 14px;
-    height: 14px;
+    width: 5px;
+    height: 15px;
     margin-top: -6px;
     appearance: none;
     cursor: pointer;
-    background: transparent;
-    border: 2px solid #fff;
-    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #fff;
+    border-radius: 4px;
     backdrop-filter: blur(10px);
   }
 

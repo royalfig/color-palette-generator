@@ -25,7 +25,7 @@ import { useBaseColor } from './hooks/useBaseColor'
 import { useFetchColorNames } from './hooks/useColorName'
 import { ColorSpace, PaletteKinds, Variations } from './types'
 import { generateCss } from './util/generateCss'
-import { createPalettes } from './util/palettes'
+import { createPalettes } from './util/complementary'
 import { pickRandomColor } from './util/pickRandomColor'
 
 export type ColorName = {
@@ -76,9 +76,7 @@ export default function App() {
           <h1 className="brand">
             <span>Color</span>Palette Pro
           </h1>
-          <div className="flex gap-4">
-            <InputTypeSelector setColorSpace={setColorspaceType} current={colorspaceType} />
-          </div>
+          <div className="flex gap-4"></div>
         </div>
         <section className="synth-display">
           <Display spacing="04">
@@ -118,7 +116,9 @@ export default function App() {
           </Display>
         </section>
         <div className="synth-left box-padding">
-          <section className="control-section"></section>
+          <section className="control-section">
+            <InputTypeSelector setColorSpace={setColorspaceType} current={colorspaceType} />
+          </section>
 
           <section className="control-section">
             <ControlGroup title="Controls">

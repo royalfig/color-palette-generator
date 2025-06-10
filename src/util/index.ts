@@ -1,2 +1,1 @@
-export { createPalettes } from './palettes'
-export { articleData } from './articleData'
+export { createPalettes } from './complementary'

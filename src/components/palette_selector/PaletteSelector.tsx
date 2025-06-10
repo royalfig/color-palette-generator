@@ -1,4 +1,4 @@
-import { Schemes } from '../../util/palettes'
+import { Schemes } from '../../util/complementary'
 import { Circle } from '../circle/Circle'
 import './PaletteSelector.css'
 
