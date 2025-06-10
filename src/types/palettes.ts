@@ -1,4 +1,5 @@
 import Color from 'colorjs.io'
+import { BaseColorData } from '../util/factory'
 
 export type ColorObj = {
   base: Color
@@ -9,18 +10,6 @@ export type ColorObj = {
   raw: number[]
   fallback: string
   outOfGamut: string
-}
-
-export type BaseColorData = {
-  code: `${string}-${number}`
-  hex: ColorObj
-  rgb: ColorObj
-  hsl: ColorObj
-  lch: ColorObj
-  oklch: ColorObj
-  lab: ColorObj
-  oklab: ColorObj
-  p3: ColorObj
 }
 
 export type BaseColorData2 = {

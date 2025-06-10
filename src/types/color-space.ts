@@ -1,2 +1,1 @@
-type RGBVariant = 'rgb' | 'srgb'
-export type ColorSpace = 'lch' | 'oklch' | 'lab' | 'oklab' | 'p3' | 'hsl' | 'hex' | 'rgb'
+export type ColorSpace = 'lch' | 'oklch' | 'lab' | 'oklab' | 'p3' | 'hsl' | 'hex' | 'srgb'
