@@ -128,13 +128,13 @@ export function generateAnalogous(
           color.oklch.l = values.l
           color.oklch.c = values.c
           color.oklch.h = values.h
-          return colorFactory(color, 'analogous', index, format).string
+          return colorFactory(color, 'analogous', index, format)
         }
         const values = clampOKLCH(baseColorObj.oklch.l * 1.1, baseColorObj.oklch.c, hue)
         color.oklch.l = values.l
         color.oklch.c = values.c
         color.oklch.h = values.h
-        return colorFactory(color, 'analogous', index, format).string
+        return colorFactory(color, 'analogous', index, format)
       }
 
       const variation = variations[index]
@@ -143,7 +143,7 @@ export function generateAnalogous(
       color.oklch.c = values.c
       color.oklch.h = values.h
 
-      return colorFactory(color, 'analogous', index, format).string
+      return colorFactory(color, 'analogous', index, format)
     })
   } catch (e) {
     throw new Error(`Failed to generate analogous colors for ${baseColor}: ${e}`)

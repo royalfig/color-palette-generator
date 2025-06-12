@@ -2,7 +2,7 @@ import Color from 'colorjs.io'
 import { colorFactory } from './factory'
 import { clampOKLCH, detectFormat } from './utils'
 
-function getWarmCoolComplement(hue: number) {
+export function getWarmCoolComplement(hue: number) {
   const adjustedHue = (hue + 180) % 360
 
   if (hue >= 0 && hue < 60) return (adjustedHue - 15 + 360) % 360 // Reds → deeper teals
@@ -157,12 +157,12 @@ export function generateComplementary(
     mutedComplement.oklch.h = mutedCompValues.h
 
     return [
-      colorFactory(baseColor, 'complementary', 0, format).string,
-      colorFactory(mainComplement, 'complementary', 1, format).string,
-      colorFactory(darkBase, 'complementary', 2, format).string,
-      colorFactory(mutedBase, 'complementary', 3, format).string,
-      colorFactory(lightComplement, 'complementary', 4, format).string,
-      colorFactory(mutedComplement, 'complementary', 5, format).string,
+      colorFactory(baseColor, 'complementary', 0, format),
+      colorFactory(mainComplement, 'complementary', 1, format),
+      colorFactory(darkBase, 'complementary', 2, format),
+      colorFactory(mutedBase, 'complementary', 3, format),
+      colorFactory(lightComplement, 'complementary', 4, format),
+      colorFactory(mutedComplement, 'complementary', 5, format),
     ]
   } catch (e) {
     throw new Error(`Failed to generate complementary colors for ${baseColor}: ${e}`)

@@ -1,6 +1,5 @@
 import Color from 'colorjs.io'
 import { useEffect, useState } from 'react'
-import Button from './components/button/Button'
 import { ColorSelector } from './components/color-selector/ColorSelector'
 import { ControlGroup } from './components/control-group/ControlGroup'
 import { CurrentColorDisplay } from './components/current-color-display/CurrentColorDisplay'
@@ -15,7 +14,6 @@ import { PaletteInfo } from './components/palette_info/PaletteInfo'
 import PaletteSelector from './components/palette_selector/PaletteSelector'
 import { Share } from './components/share/Share'
 import { UiMode } from './components/ui/UiMode'
-import { VibrancyModule } from './components/vibrancy_module/VibrancyModule'
 import './css/App.css'
 import './css/Defaults.css'
 import './css/Reset.css'
@@ -25,8 +23,10 @@ import { useBaseColor } from './hooks/useBaseColor'
 import { useFetchColorNames } from './hooks/useColorName'
 import { ColorSpace, PaletteKinds, Variations } from './types'
 import { generateCss } from './util/generateCss'
-import { createPalettes } from './util/complementary'
 import { pickRandomColor } from './util/pickRandomColor'
+import { createPalettes } from './util'
+import { ColorContext } from './components/ColorContext'
+import { Swatches } from './components/swatches'
 
 export type ColorName = {
   fetchedData: {
@@ -41,129 +41,140 @@ export default function App() {
   console.log('app rendering')
   const colorQueryParaCheck = new URLSearchParams(document.location.search).has('color')
   const colorQueryParam = colorQueryParaCheck ? new URLSearchParams(document.location.search).get('color') : null
-  const [color, setColor] = useState<string | Color>(colorQueryParam || pickRandomColor())
-  const [palette, setPalette] = useState<PaletteKinds>('com')
+  const [color, setColor] = useState<string>(colorQueryParam || pickRandomColor())
+  const [palette, setPalette] = useState<PaletteKinds>('tet')
+  const currentPalette = createPalettes(color, palette, 'adaptive')
+  const currentColor = new Color(color)
+
+  const c = {
+    currentPalette,
+    currentColor,
+  }
+
   const [variation, setVariation] = useState<keyof Variations>('og')
   const [colorspaceType, setColorspaceType] = useState<ColorSpace>('hex')
   const [isActive, setIsActive] = useState(false)
   const [error, setError] = useState('')
   const [msg, setMsg] = useState('')
 
-  const palettes = createPalettes(color)
-  const css = generateCss(palettes)
-  const base = useBaseColor(palettes)
-  const fetchColorName = useFetchColorNames(palettes, palette, variation)
+  // const css = generateCss(palettes)
+  // const base = useBaseColor(palettes)
+
+  // const fetchColorName = useFetchColorNames(palettes, palette, variation)
 
   function logChange(e: React.ChangeEvent<HTMLInputElement>) {
     console.log(e.target.value)
   }
 
-  useEffect(() => {
-    const styleEl = document.createElement('style')
-    styleEl.textContent = `:root { ${css} }`
-    styleEl.setAttribute('id', 'color-palette')
-    document.head.append(styleEl)
+  // useEffect(() => {
+  //   const styleEl = document.createElement('style')
+  //   styleEl.textContent = `:root { ${css} }`
+  //   styleEl.setAttribute('id', 'color-palette')
+  //   document.head.append(styleEl)
 
-    return () => {
-      document.head.removeChild(styleEl)
-    }
-  }, [css])
+  //   return () => {
+  //     document.head.removeChild(styleEl)
+  //   }
+  // }, [css])
 
   return (
-    <div className="bg">
-      <main className="synth-container">
-        <div className="synth-brand">
-          <h1 className="brand">
-            <span>Color</span>Palette Pro
-          </h1>
-          <div className="flex gap-4"></div>
-        </div>
-        <section className="synth-display">
-          <Display spacing="04">
-            <div className="synth-columns">
-              <div className="color-input-display">
-                <CurrentColorDisplay
-                  base={base}
-                  colorName={fetchColorName}
+    <ColorContext value={c}>
+      <Swatches />
+      {/* <div className="bg">
+        <main className="synth-container">
+          <div className="synth-brand">
+            <h1 className="brand">
+              <span>Color</span>Palette Pro
+            </h1>
+            <div className="flex gap-4"></div>
+          </div>
+          <section className="synth-display">
+            <Display spacing="04">
+              <div className="synth-columns">
+                <div className="color-input-display">
+                  <CurrentColorDisplay
+                    base={base}
+                    colorName={fetchColorName}
+                    palettes={palettes}
+                    setColor={setColor}
+                    colorSpace={colorspaceType}
+                  />
+                  <ColorSelector palettes={palettes} setColor={setColor} colorSpace={colorspaceType} />
+                  <InputColorContainer
+                    palettes={palettes}
+                    setColor={setColor}
+                    base={base}
+                    colorspaceType={colorspaceType}
+                    setColorspaceType={setColorspaceType}
+                    setError={setError}
+                    setIsActive={setIsActive}
+                    isActive={isActive}
+                  />
+                </div>
+                <PaletteInfo
                   palettes={palettes}
-                  setColor={setColor}
-                  colorSpace={colorspaceType}
-                />
-                <ColorSelector palettes={palettes} setColor={setColor} colorSpace={colorspaceType} />
-                <InputColorContainer
-                  palettes={palettes}
-                  setColor={setColor}
                   base={base}
+                  variation={variation}
                   colorspaceType={colorspaceType}
-                  setColorspaceType={setColorspaceType}
-                  setError={setError}
-                  setIsActive={setIsActive}
+                  palette={palette}
+                  colorName={fetchColorName}
+                  error={error}
                   isActive={isActive}
+                  msg={msg}
                 />
               </div>
-              <PaletteInfo
-                palettes={palettes}
-                base={base}
-                variation={variation}
-                colorspaceType={colorspaceType}
-                palette={palette}
-                colorName={fetchColorName}
-                error={error}
-                isActive={isActive}
-                msg={msg}
-              />
-            </div>
-          </Display>
-        </section>
-        <div className="synth-left box-padding">
-          <section className="control-section">
-            <InputTypeSelector setColorSpace={setColorspaceType} current={colorspaceType} />
+            </Display>
           </section>
+          <div className="synth-left box-padding">
+            <section className="control-section">
+              <InputTypeSelector setColorSpace={setColorspaceType} current={colorspaceType} />
+            </section>
 
-          <section className="control-section">
-            <ControlGroup title="Controls">
-              <EyeDropper setColor={setColor} />
-              <DarkMode />
-              <Share base={base} />
-              <UiMode />
-            </ControlGroup>
+            <section className="control-section">
+              <ControlGroup title="Controls">
+                <EyeDropper setColor={setColor} />
+                <DarkMode />
+                <Share base={base} />
+                <UiMode />
+              </ControlGroup>
 
-            <ControlGroup title="Export">
-              <ExportCSS css={css} />
-              <ExportImage
-                colorNames={fetchColorName}
-                palettes={palettes}
-                palette={palette}
-                variation={variation}
-                colorSpace={colorspaceType}
-              />
-              <ExportJSON data={palettes} />
-            </ControlGroup>
-          </section>
-        </div>
-        <div className="synth-center box-padding">
-          <section className="control-section">
-            <ControlGroup title="Palettes">
-              <PaletteSelector palettes={palettes} palette={palette} setPalette={setPalette} />
-            </ControlGroup>
+              <ControlGroup title="Export">
+                <ExportCSS css={css} />
+                <ExportImage
+                  colorNames={fetchColorName}
+                  palettes={palettes}
+                  palette={palette}
+                  variation={variation}
+                  colorSpace={colorspaceType}
+                />
+                <ExportJSON data={palettes} />
+              </ControlGroup>
+            </section>
+          </div>
+          <div className="synth-center box-padding">
+            <section className="control-section">
+              <ControlGroup title="Palettes">
+                <PaletteSelector palettes={palettes} palette={palette} setPalette={setPalette} />
+              </ControlGroup>
 
-            <ControlGroup title="Fuzz">
-              <input type="range" min={0} max={100} onChange={logChange} />
-              {/* <VariationSelector variation={variation} setVariation={setVariation} /> */}
-            </ControlGroup>
-          </section>
-        </div>
-        <div className="synth-right box-padding">
-          <PaletteDisplay
-            palettes={palettes}
-            palette={palette}
-            variation={variation}
-            colorSpace={colorspaceType}
-            colorName={fetchColorName}
-            setMsg={setMsg}
-          />
-        </div>
-      </main>
-    </div>
+              <ControlGroup title="Fuzz">
+                <input type="range" min={0} max={100} onChange={logChange} />
+                
+              </ControlGroup>
+            </section>
+          </div>
+          <div className="synth-right box-padding">
+            <PaletteDisplay
+              palettes={palettes}
+              palette={palette}
+              variation={variation}
+              colorSpace={colorspaceType}
+              colorName={fetchColorName}
+              setMsg={setMsg}
+            />
+          </div>
+        </main>
+      </div> */}
+    </ColorContext>
   )
 }

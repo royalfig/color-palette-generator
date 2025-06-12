@@ -30,7 +30,7 @@ export type Variations = {
   [key in VariationKinds]: BaseColorData[]
 }
 
-export type PaletteKinds = 'ana' | 'tri' | 'tet' | 'com' | 'spl' | 'ton' | 'pol' | 'tas'
+export type PaletteKinds = 'ana' | 'tri' | 'tet' | 'com' | 'spl' | 'ton' | 'tas'
 
 export type Palettes = {
   [key in PaletteKinds]: Variations

@@ -1,5 +1,11 @@
 import { generateAnalogous } from './src/util/analogous'
 import { generateComplementary } from './src/util/complementary'
+import { generateSplitComplementary } from './src/util/splitcomp'
+import { generateTetradic } from './src/util/tetradic'
+import { generateTintsAndShades } from './src/util/tints-and-shades'
+import { generateTones } from './src/util/tones'
+import { generateTriadic } from './src/util/triadic'
+import { generateMaterialUI } from './src/util/ui'
 
 const testValues = [
   //   {
@@ -33,7 +39,16 @@ const testValues = [
 ]
 
 const p = testValues.map(testValue => {
-  const colors = generateAnalogous(testValue.color, { style: 'warm-cool' })
-  return colors
+  const style = 'warm-cool'
+  return {
+    analogous: generateAnalogous(testValue.color, { style }),
+    complementary: generateComplementary(testValue.color, { style }),
+    triadic: generateTriadic(testValue.color, { style }),
+    tetradic: generateTetradic(testValue.color, { style }),
+    splitComplementary: generateSplitComplementary(testValue.color, { style }),
+    tintsAndShades: generateTintsAndShades(testValue.color, { style }),
+    tones: generateTones(testValue.color, { style }),
+    materialUI: generateMaterialUI(testValue.color, { style }),
+  }
 })
 console.log(JSON.stringify(p, null, 2))
