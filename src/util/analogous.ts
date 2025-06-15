@@ -87,11 +87,6 @@ export function generateAnalogous(
   try {
     const baseColorObj = new Color(baseColor)
 
-    // Handle achromatic colors
-    if (isNaN(baseColorObj.oklch.h) || baseColorObj.oklch.c < 0.01) {
-      return generateMonochromaticFallback(baseColorObj, format)
-    }
-
     let analogousHues: number[]
 
     switch (style) {
@@ -148,20 +143,4 @@ export function generateAnalogous(
   } catch (e) {
     throw new Error(`Failed to generate analogous colors for ${baseColor}: ${e}`)
   }
-}
-
-function generateMonochromaticFallback(
-  baseColor: Color,
-  format: 'hex' | 'rgb' | 'hsl' | 'oklch' | 'oklab' | 'lch' | 'lab' | 'p3' | undefined,
-): string[] {
-  // For grays, create lightness variations
-  const variations = [0.6, 0.8, 1.0, 1.2, 1.4, 1.6]
-
-  return variations.map((mult, index) => {
-    const color = baseColor.clone()
-    const values = clampOKLCH(baseColor.oklch.l * mult, baseColor.oklch.c, baseColor.oklch.h || 0)
-
-    color.oklch.l = values.l
-    return colorFactory(color, 'analogous', index, format).string
-  })
 }

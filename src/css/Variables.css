@@ -13,11 +13,12 @@
   --spacing-12: 6rem;
   --spacing-13: 10rem;
   --gap: var(--spacing-06);
-  --radius: 16px;
+  --radius: 12px;
+  --radius-sm: 2px;
   --small: 0.833rem;
   --x-small: min(0.75rem, 14px);
   --button-padding: 0.4em 0.8em;
-  --box-padding: 2rem;
+  --box-padding: 1rem;
   --space-after: 2rem;
   --max-viewport: 65rem;
   --letter-spacing: 0.3px;
@@ -31,20 +32,15 @@
   --synth-body: hsl(248deg 11% 85%);
   --element: hsl(248deg 11% 15%);
   --border: hsl(248deg 11% 65% / 75%);
-  --bg: linear-gradient(
-    to bottom right in oklab,
-    hsl(248deg 11% 98%),
-    hsl(248deg 11% 75%)
-  );
+  --dimmed: #333;
+  --error: rgb(237 7 38);
+  --warning: rgb(255 165 0);
+  --bg: linear-gradient(to bottom in oklab, hsl(248deg 11% 98%), hsl(248deg 11% 75%));
 }
 
 [data-mode='dark'] {
   --synth-body: hsl(248deg 11% 15%);
   --element: hsl(248deg 11% 85%);
   --border: hsl(248deg 11% 35%);
-  --bg: linear-gradient(
-    to bottom right in oklab,
-    hsl(248deg 11% 25%),
-    hsl(248deg 11% 5%)
-  );
+  --bg: linear-gradient(to bottom in oklab, hsl(248deg 11% 25%), hsl(248deg 11% 5%));
 }

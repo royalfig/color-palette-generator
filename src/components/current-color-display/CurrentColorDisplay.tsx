@@ -1,44 +1,84 @@
-import { motion } from 'framer-motion'
-import { ColorName } from '../../App'
-import ColorHistory from '../color-history/ColorHistory'
+import { useContext } from 'react'
+import { ColorContext } from '../ColorContext'
 import './current-color-display.css'
-import { ColorSpace } from '../../types'
+import { ScissorsIcon } from '@phosphor-icons/react/dist/csr/Scissors'
+import { Coords } from 'colorjs.io/fn'
+
+function formatCoords(coords: Coords) {
+  coords.map()
+}
 
 export function CurrentColorDisplay({
-  base,
-  colorName,
-  palettes,
-  setColor,
-  colorSpace,
+  fetchedData,
+  isLoading,
+  error,
 }: {
-  base: any
-  colorName: ColorName
-  palettes: any
-  setColor: Function
-  colorSpace: ColorSpace
+  fetchedData: { colorNames: string[]; paletteTitle: string } | null
+  isLoading: boolean
+  error: Error | null
 }) {
-  // TODO: use current color space
-  const color = base.hex.string
+  const colorName = fetchedData?.colorNames[0]
 
-  const baseColorName = colorName.isLoading ? 'Loading...' : colorName.fetchedData?.colorNames[0]
+  const context = useContext(ColorContext)
+  const color = context?.palette[0]
+
+  const { lch, oklch, lab, oklab, p3, hsl, rgb, hex } = color?.conversions || {}
+  const colorSpace = color?.colorSpace.toLowerCase()
+
+  const handleClick = async (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = (e.target as HTMLElement).closest('[data-value]')
+    if (el && el instanceof HTMLElement) {
+      const colorStr = el.dataset.value
+      if (colorStr) {
+        try {
+          await navigator.clipboard.writeText(colorStr)
+        } catch (error) {
+          console.error('Failed to copy color to clipboard:', error)
+        }
+      }
+    }
+  }
 
   return (
-    <div className="current-color-display flex">
-      <div className="name-group flex">
-        <div className="color-dot relative" style={{ backgroundColor: color }}></div>
-        <motion.p
-          className="color-name"
-          key={baseColorName}
-          initial={{ clipPath: 'inset(0 100% 0 0)' }} // Hides text initially
-          animate={{ clipPath: 'inset(0 0 0 0)' }} // Reveals text
-          exit={{ clipPath: 'inset(0 100% 0 0)' }} // Hides text again
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-        >
-          {baseColorName}
-        </motion.p>
+    <div className="current-color-display flex col align-start" onClick={handleClick}>
+      <div className="flex justify-start gap-4">
+        <div className="color-dot" style={{ '--color': context?.palette[0].string || '#000' }}></div>
+        <h1>{colorName}</h1>
       </div>
-      <div className="flex color-history-group">
-        <ColorHistory palettes={palettes} setColor={setColor} colorSpace={colorSpace} />
+      <div className={`color-details ${colorSpace}`}>
+        <div className="color-detail lch">
+          <ScissorsIcon weight="fill" color={lch?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
+          <p data-value={lch.value}>{lch?.value}</p>
+        </div>
+        <div className="color-detail oklch">
+          <ScissorsIcon weight="fill" color={oklch?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
+          <p data-value={oklch.value}>{oklch?.value}</p>
+        </div>
+        <div className="color-detail lab">
+          <ScissorsIcon weight="fill" color={lab?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
+          <p data-value={lab.value}>{lab?.value}</p>
+        </div>
+        <div className="color-detail oklab">
+          <ScissorsIcon weight="fill" color={oklab?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
+          <p data-value={oklab.value}>{oklab?.value}</p>
+        </div>
+        <div className="color-detail p3">
+          <ScissorsIcon weight="fill" color={p3?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
+          <p data-value={p3.value}>{p3?.value}</p>
+        </div>
+
+        <div className="color-detail hsl">
+          <ScissorsIcon weight="fill" color={hsl?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
+          <p data-value={hsl.value}>{hsl?.value}</p>
+        </div>
+        <div className="color-detail rgb">
+          <ScissorsIcon weight="fill" color={rgb?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
+          <p data-value={rgb.value}>{rgb?.value}</p>
+        </div>
+        <div className="color-detail hex">
+          <ScissorsIcon weight="fill" color={hex?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
+          <p data-value={hex.value}>{hex?.value}</p>
+        </div>
       </div>
     </div>
   )

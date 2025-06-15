@@ -5,7 +5,6 @@ import { generateComplementary } from './complementary'
 import { generateSplitComplementary } from './splitcomp'
 import { generateTetradic } from './tetradic'
 import { generateTintsAndShades } from './tints-and-shades'
-import { generateTones } from './tones'
 import { generateTriadic } from './triadic'
 
 export function createPalettes(
@@ -26,7 +25,7 @@ export function createPalettes(
       return generateSplitComplementary(color, { style })
     case 'tas':
       return generateTintsAndShades(color, { style })
-    case 'ton':
-      return generateTones(color, { style })
+    default:
+      throw new Error(`Invalid palette type: ${palette}`)
   }
 }

@@ -1,5 +1,5 @@
 import Color from 'colorjs.io'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { ColorSelector } from './components/color-selector/ColorSelector'
 import { ControlGroup } from './components/control-group/ControlGroup'
 import { CurrentColorDisplay } from './components/current-color-display/CurrentColorDisplay'
@@ -26,7 +26,8 @@ import { generateCss } from './util/generateCss'
 import { pickRandomColor } from './util/pickRandomColor'
 import { createPalettes } from './util'
 import { ColorContext } from './components/ColorContext'
-import { Swatches } from './components/swatches'
+import { Swatches } from './components/swatches/Swatches'
+import { SectionHeader } from './components/section-header/SectionHeader'
 
 export type ColorName = {
   fetchedData: {
@@ -42,14 +43,11 @@ export default function App() {
   const colorQueryParaCheck = new URLSearchParams(document.location.search).has('color')
   const colorQueryParam = colorQueryParaCheck ? new URLSearchParams(document.location.search).get('color') : null
   const [color, setColor] = useState<string>(colorQueryParam || pickRandomColor())
-  const [palette, setPalette] = useState<PaletteKinds>('tet')
-  const currentPalette = createPalettes(color, palette, 'adaptive')
-  const currentColor = new Color(color)
+  const [paletteType, setPaletteType] = useState<PaletteKinds>('com')
+  const palette = useMemo(() => createPalettes(color, paletteType, 'optical'), [color, paletteType])
+  const colorObj = new Color(color)
 
-  const c = {
-    currentPalette,
-    currentColor,
-  }
+  const colorContext = useMemo(() => ({ color, palette, colorObj }), [color, palette, colorObj])
 
   const [variation, setVariation] = useState<keyof Variations>('og')
   const [colorspaceType, setColorspaceType] = useState<ColorSpace>('hex')
@@ -60,8 +58,8 @@ export default function App() {
   // const css = generateCss(palettes)
   // const base = useBaseColor(palettes)
 
-  // const fetchColorName = useFetchColorNames(palettes, palette, variation)
-
+  const { fetchedData, isLoading, error: colorNameError } = useFetchColorNames(palette)
+  console.log(fetchedData)
   function logChange(e: React.ChangeEvent<HTMLInputElement>) {
     console.log(e.target.value)
   }
@@ -78,8 +76,19 @@ export default function App() {
   // }, [css])
 
   return (
-    <ColorContext value={c}>
-      <Swatches />
+    <ColorContext value={colorContext}>
+      <div className="bg">
+        <div className="bg-inner">
+          <main className="synth-container">
+            <SectionHeader />
+
+            <Display>
+              <CurrentColorDisplay fetchedData={fetchedData} isLoading={isLoading} error={colorNameError} />
+              <Swatches />
+            </Display>
+          </main>
+        </div>
+      </div>
       {/* <div className="bg">
         <main className="synth-container">
           <div className="synth-brand">

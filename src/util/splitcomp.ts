@@ -58,33 +58,6 @@ function getAdaptiveSplitComplementary(baseColor: Color): number[] {
   return complements
 }
 
-function generateGrayscaleSplitComplementary(
-  baseColor: Color,
-  format: 'hex' | 'rgb' | 'hsl' | 'oklch' | 'oklab' | 'lch' | 'lab' | 'p3' | undefined,
-): string[] {
-  // For grays, create 6 lightness variations
-  const variations = [
-    0, // Original
-    0.2, // Lighter (like first complement)
-    -0.15, // Darker (like second complement)
-    0.35, // Much lighter (variant of first)
-    -0.25, // Much darker (variant of second)
-    0.1, // Slight variation of base
-  ]
-
-  return variations.map((lightAdj, index) => {
-    if (index === 0) {
-      return colorFactory(baseColor, 'split-complementary', index, format).string
-    }
-
-    const gray = baseColor.clone()
-    const values = clampOKLCH(baseColor.oklch.l + lightAdj, 0, 0)
-    gray.oklch.l = values.l
-
-    return colorFactory(gray, 'split-complementary', index, format).string
-  })
-}
-
 export function generateSplitComplementary(
   baseColor: string,
   options: {
@@ -96,11 +69,6 @@ export function generateSplitComplementary(
 
   try {
     const baseColorObj = new Color(baseColor)
-
-    // Handle achromatic colors
-    if (isNaN(baseColorObj.oklch.h) || baseColorObj.oklch.c < 0.01) {
-      return generateGrayscaleSplitComplementary(baseColorObj, format)
-    }
 
     let splitHues: number[]
 

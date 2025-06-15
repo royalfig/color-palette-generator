@@ -55,30 +55,6 @@ function getAdaptiveTetradic(baseColor: Color): number[] {
   return [hue, ...spacing.map(s => (hue + s) % 360)]
 }
 
-function generateGrayscaleTetradic(baseColor: Color, format: string | undefined): string[] {
-  // For grays, create 6 different lightness values
-  const variations = [
-    0, // Original
-    -0.1, // Slightly darker
-    0.15, // Lighter
-    -0.25, // Much darker
-    0.3, // Much lighter
-    -0.4, // Very dark
-  ]
-
-  return variations.map((lightAdj, index) => {
-    if (index === 0) {
-      return colorFactory(baseColor, 'tetradic', index, format).string
-    }
-
-    const gray = baseColor.clone()
-    const values = clampOKLCH(baseColor.oklch.l + lightAdj, 0, 0)
-    gray.oklch.l = values.l
-
-    return colorFactory(gray, 'tetradic', index, format).string
-  })
-}
-
 export function generateTetradic(
   baseColor: string,
   options: {
@@ -90,11 +66,6 @@ export function generateTetradic(
 
   try {
     const baseColorObj = new Color(baseColor)
-
-    // Handle achromatic colors
-    if (isNaN(baseColorObj.oklch.h) || baseColorObj.oklch.c < 0.01) {
-      return generateGrayscaleTetradic(baseColorObj, format)
-    }
 
     let tetradicHues: number[]
 

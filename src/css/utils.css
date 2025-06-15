@@ -33,7 +33,7 @@
 }
 
 .mb-6 {
-  margin-block: var(--spacing-06)
+  margin-block: var(--spacing-06);
 }
 
 .gap-1 {
@@ -61,7 +61,7 @@
 }
 
 .small {
-  font-size: var(--small);
+  font-size: 0.8rem;
 }
 
 .x-small {
@@ -75,10 +75,10 @@
   padding: 0 !important;
   margin: -1px !important;
   overflow: hidden !important;
-  clip: rect(1px, 1px, 1px, 1px) !important; /* 1 */
-  clip-path: inset(50%) !important; /* 2 */
   white-space: nowrap !important; /* 3 */
   border: 0 !important;
+  clip: rect(1px, 1px, 1px, 1px) !important; /* 1 */
+  clip-path: inset(50%) !important; /* 2 */
 }
 
 .box-padding {

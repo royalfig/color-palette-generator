@@ -21,9 +21,9 @@ textarea {
   font-size: inherit;
   line-height: 1;
   color: var(--element);
+  outline: none;
   background-color: var(--surface-3);
   border: 1px solid var(--border-1);
-  outline: none;
 }
 
 input:hover,

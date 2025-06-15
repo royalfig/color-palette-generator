@@ -1,0 +1,50 @@
+.synth-brand {
+  display: flex;
+  gap: var(--spacing-08);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--box-padding);
+
+  & h1 {
+    flex: 1;
+    font-family: var(--font-brand);
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--element);
+    text-transform: uppercase;
+
+    & span {
+      font-weight: 700;
+    }
+  }
+}
+
+.vibrancy-module {
+  position: relative;
+  flex: 1;
+  height: 10px;
+  padding: 1px;
+
+  /* outline: 1px solid #000; */
+  background: linear-gradient(to bottom, #fff, #494949);
+  border-radius: 1000px;
+  box-shadow: inset 0 -2px 0 5px #0000002a;
+}
+
+.vibrancy-module-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 1000px;
+  box-shadow: inset 1px 1px 1px 0.5px #00000049;
+}
+
+.vibrancy-module-blur {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 1000px;
+  opacity: 0.25;
+  filter: blur(2px);
+}

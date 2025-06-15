@@ -1,4 +1,4 @@
-import Color from 'colorjs.io'
+import Color, { Coords } from 'colorjs.io'
 
 export type BaseColorData = {
   code: `${string}-${number}`
@@ -7,12 +7,13 @@ export type BaseColorData = {
   colorSpace: string
   cssValue: string
   contrast: string
-  inSrgbGamut: boolean
-  inP3Gamut: boolean
-  inLchGamut: boolean
   string: string
   conversions: {
-    [key: string]: string
+    [key: string]: {
+      value: string
+      isInGamut: boolean
+      coords: Coords
+    }
   }
   fallback: string
 }
@@ -32,20 +33,49 @@ export function colorFactory(
     colorSpace: color.spaceId,
     cssValue: color.display().toString(),
     contrast: color.contrastWCAG21('#fff') > color.contrastWCAG21('#000') ? '#fff' : '#000',
-    inSrgbGamut: color.inGamut('srgb'),
-    inP3Gamut: color.inGamut('p3'),
-    inLchGamut: color.inGamut('lch'),
     string: color.toString({ format }),
     fallback: color.to('srgb').toString({ clip: true, format }),
     conversions: {
-      hex: color.to('srgb').toString({ format: 'hex' }),
-      rgb: color.to('srgb').toString(),
-      hsl: color.to('hsl').toString(),
-      lch: color.to('lch').toString(),
-      oklch: color.to('oklch').toString(),
-      lab: color.to('lab').toString(),
-      oklab: color.to('oklab').toString(),
-      p3: color.to('p3').toString(),
+      hex: {
+        value: color.to('srgb').toString({ format: 'hex' }),
+        isInGamut: color.inGamut('srgb'),
+        coords: color.to('srgb').coords,
+      },
+      rgb: {
+        value: color.to('srgb').toString(),
+        isInGamut: color.inGamut('srgb'),
+        coords: color.to('srgb').coords,
+      },
+      hsl: {
+        value: color.to('hsl').toString(),
+        isInGamut: color.inGamut('hsl'),
+        coords: color.to('hsl').coords,
+      },
+      lch: {
+        value: color.to('lch').toString(),
+        isInGamut: color.inGamut('lch'),
+        coords: color.to('lch').coords,
+      },
+      oklch: {
+        value: color.to('oklch').toString(),
+        isInGamut: color.inGamut('oklch'),
+        coords: color.to('oklch').coords,
+      },
+      lab: {
+        value: color.to('lab').toString(),
+        isInGamut: color.inGamut('lab'),
+        coords: color.to('lab').coords,
+      },
+      oklab: {
+        value: color.to('oklab').toString(),
+        isInGamut: color.inGamut('oklab'),
+        coords: color.to('oklab').coords,
+      },
+      p3: {
+        value: color.to('p3').toString(),
+        isInGamut: color.inGamut('p3'),
+        coords: color.to('p3').coords,
+      },
     },
   }
 }

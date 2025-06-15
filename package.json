@@ -10,17 +10,13 @@
     "css": "npx stylelint **/*.css --fix"
   },
   "dependencies": {
-    "@heroicons/react": "^2.2.0",
+    "@phosphor-icons/react": "^2.1.10",
     "colorjs.io": "^0.5.2",
-    "framer-motion": "^12.16.0",
-    "lodash-es": "^4.17.21",
     "react": "^19.1.0",
     "react-colorful": "^5.6.1",
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@types/culori": "^4.0.0",
-    "@types/lodash-es": "^4.17.12",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
     "@typescript-eslint/eslint-plugin": "^8.33.1",

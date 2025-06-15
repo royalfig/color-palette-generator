@@ -73,38 +73,6 @@ export function generateComplementary(
     const lightComplement = baseColorObj.clone()
     const mutedComplement = baseColorObj.clone()
 
-    // Handle achromatic colors
-    if (isNaN(mainComplement.oklch.h) || mainComplement.oklch.c < 0.01) {
-      mainComplement.srgb.r = 1 - mainComplement.srgb.r
-      mainComplement.srgb.g = 1 - mainComplement.srgb.g
-      mainComplement.srgb.b = 1 - mainComplement.srgb.b
-
-      darkBase.oklch.l = Math.min(0.95, darkBase.oklch.l + 0.15)
-      darkBase.srgb.r = 1 - darkBase.srgb.r
-      darkBase.srgb.g = 1 - darkBase.srgb.g
-      darkBase.srgb.b = 1 - darkBase.srgb.b
-
-      lightComplement.oklch.l = Math.max(0.05, lightComplement.oklch.l - 0.15)
-      lightComplement.srgb.r = 1 - lightComplement.srgb.r
-      lightComplement.srgb.g = 1 - lightComplement.srgb.g
-      lightComplement.srgb.b = 1 - lightComplement.srgb.b
-
-      mutedBase.oklch.l = mutedBase.oklch.l + 0.05
-      mutedComplement.srgb.r = 1 - mutedComplement.srgb.r
-      mutedComplement.srgb.g = 1 - mutedComplement.srgb.g
-      mutedComplement.srgb.b = 1 - mutedComplement.srgb.b
-
-      return [
-        colorFactory(baseColor, 'complementary', 0, format).string,
-        colorFactory(mainComplement, 'complementary', 1, format).string,
-        colorFactory(darkBase, 'complementary', 2, format).string,
-        colorFactory(lightComplement, 'complementary', 3, format).string,
-        colorFactory(mutedBase, 'complementary', 4, format).string,
-        colorFactory(lightComplement, 'complementary', 5, format).string,
-        colorFactory(mutedComplement, 'complementary', 6, format).string,
-      ]
-    }
-
     let complementHue: number
 
     switch (options.style) {

@@ -7,12 +7,8 @@
 }
 
 .synth-container {
-  display: grid;
-  grid-template-rows: min-content auto auto;
-  grid-template-columns: repeat(3, 1fr);
-  max-width: 90rem;
-
-  /* padding-inline: 2px; */
+  width: 90vw;
+  max-width: 1180px;
   background-color: var(--synth-body);
   border-radius: var(--radius);
   box-shadow: 0 -1px 2px -0.5px #9194a3 inset, 2px 0 2px -0.5px #eaeaf2 inset, 0 1px 1px #eaeaf2 inset,
@@ -22,37 +18,6 @@
 [data-mode='dark'] .synth-container {
   box-shadow: 0 -1px 2px -0.5px hsl(230deg 9% 30%) inset, 2px 0 2px -0.5px hsl(240deg 24% 53%) inset,
     0 1px 1px hsl(240deg 24% 53%) inset, 0 25px 20px -15px rgb(0 0 0 / 10%), 10px 65px 50px -10px rgb(0 0 0 / 5%);
-}
-
-.synth-brand {
-  display: flex;
-  grid-column: 1 / -1;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--box-padding);
-
-  & h1 {
-    font-family: var(--font-brand);
-    font-size: 1.25rem;
-    font-weight: 400;
-    color: var(--element);
-    text-transform: uppercase;
-
-    & span {
-      font-weight: 700;
-    }
-  }
-}
-
-.synth-display {
-  display: grid;
-  grid-column: 1 / -1;
-
-  .display {
-    .display-inner {
-      padding: var(--box-padding);
-    }
-  }
 }
 
 .synth-left {
