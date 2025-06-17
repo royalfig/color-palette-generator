@@ -38,7 +38,7 @@ export function ColorDisplay({
 
   return (
     <div className="current-color-display flex col align-start" onClick={handleClick}>
-      <div className="flex justify-start gap-04">
+      <div className="header flex justify-start gap-04">
         <div
           className="color-dot"
           style={{ '--color': context?.palette[0].string || '#000' } as React.CSSProperties}

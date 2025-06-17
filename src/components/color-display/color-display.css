@@ -1,6 +1,10 @@
 .current-color-display {
   grid-column: 1 / 4;
 
+  & > .header {
+    height: 32px;
+  }
+
   h1 {
     font-weight: 400;
     color: #fff;

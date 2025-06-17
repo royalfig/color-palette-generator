@@ -71,8 +71,8 @@ export default function App() {
   const colorContext = useMemo(() => ({ color, palette, colorObj }), [color, palette, colorObj])
 
   const [colorSpace, setColorSpace] = useState<{ space: ColorSpace; format: ColorFormat }>({
-    space: 'srgb',
-    format: 'hex',
+    space: 'oklch',
+    format: 'oklch',
   })
   const [isActive, setIsActive] = useState(false)
   const [error, setError] = useState('')
