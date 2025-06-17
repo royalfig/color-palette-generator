@@ -1,2 +1,5 @@
-export * from './color-space'
-export * from './palettes'
+export type PaletteKinds = 'ana' | 'tri' | 'tet' | 'com' | 'spl' | 'ton' | 'tas'
+
+export type ColorSpace = 'oklch' | 'srgb' | 'lab' | 'lch' | 'hsl' | 'p3' | 'oklab'
+
+export type ColorFormat = 'oklch' | 'srgb' | 'lab' | 'lch' | 'hsl' | 'p3' | 'oklab' | 'hex' | 'rgb'

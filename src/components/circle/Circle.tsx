@@ -1,49 +1,47 @@
-import { Variations } from '../../types';
-import './circle.css';
+import { useContext } from 'react'
+import { BaseColorData } from '../../util/factory'
+import { ColorContext } from '../ColorContext'
+import './circle.css'
 
-function sizer(num: number, size: string) {
-  if (size === 'large') {
-    return num
-  }
+export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
+  const context = useContext(ColorContext)
+  const palette = context?.palette
 
-  return num / 2
-}
-
-export function Circle({ colors, type, size }: { colors: Variations; type: 'default' | 'circle'; size: string }) {
-  const className = size === 'large' ? 'large circle' : 'small circle'
+  if (!palette) return null
 
   return (
-    <div className={className}>
-      <svg viewBox={size === 'large' ? '-120 -120 240 240' : '-60 -60 120 120'}>
-        <circle cx="0" cy="0" r={sizer(100, size)} fill="none" stroke="var(--border)" strokeWidth="3" />
+    <div className="circle">
+      <svg viewBox="-120 -120 240 240">
+        <circle cx="0" cy="0" r={100} fill="none" stroke="var(--dimmed)" strokeWidth="4" />
         {type !== 'circle'
-          ? colors.og.map((color: any, idx: number) => {
-              let [h, s] = color.hsl.raw
+          ? palette.map((color: BaseColorData, idx: number) => {
+              let [h, s, l] = color.conversions.hsl.coords
+              let [ol, oc, oh] = color.conversions.oklch.coords
+              oh = Number(oh.toFixed(2))
 
               s = s > 100 ? 100 : s
-
-              const hRadians = (h * Math.PI) / 180
-              const sRadians = sizer(s, size)
+              const hRadians = (oh * Math.PI) / 180
+              const sRadians = s
 
               const x = sRadians * Math.sin(hRadians)
               const y = sRadians * Math.cos(hRadians)
 
               const xr = isNaN(x) ? 0 : x
               const yr = isNaN(y) ? 0 : y * -1
-              return <circle key={idx} cx={xr} cy={yr} r={size === 'large' ? 18 : 12} fill={color.hex.string}></circle>
+              return <circle key={idx} cx={xr} cy={yr} r={18} fill={color.string}></circle>
             })
-          : colors.og.map((color: any, idx: number) => {
-              const h = sizer((idx + 10) * (size === 'large' ? 36 : 72), size)
+          : palette.map((color: any, idx: number) => {
+              const h = (idx + 10) * 36
 
               const hRadians = (h * Math.PI) / 180
-              const sRadians = sizer(50, size)
+              const sRadians = 50
 
               const x = sRadians * Math.sin(hRadians)
               const y = sRadians * Math.cos(hRadians)
 
               const xr = isNaN(x) ? 0 : x
               const yr = isNaN(y) ? 0 : y * -1
-              return <circle key={idx} cx={xr} cy={yr} r={size === 'large' ? 18 : 12} fill={color.hex.string}></circle>
+              return <circle key={idx} cx={xr} cy={yr} r={18} fill={color.string}></circle>
             })}
       </svg>
     </div>

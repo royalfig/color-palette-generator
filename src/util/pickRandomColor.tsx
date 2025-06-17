@@ -138,5 +138,5 @@ const popularColorsOKLCH = [
   'oklch(0.721 0.074 195.87)', // Cadet Blue
 ]
 export function pickRandomColor(): string {
-  return popularColorsOKLCH[Math.floor(Math.random() * popularColorsOKLCH.length)]
+  return popularColors[Math.floor(Math.random() * popularColors.length)]
 }

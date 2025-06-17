@@ -152,7 +152,6 @@ export function PaletteInfo({
   error: string
   msg: string
 }) {
-  console.log('🚀 ~ isActive:', isActive)
   const [displaySupport, setDisplaySupport] = useState<DisplaySupport | null>(null)
 
   const colorSpaces = Object.entries(base).slice(1)
@@ -182,8 +181,8 @@ export function PaletteInfo({
   return (
     <div className="pallete-info">
       <div className="palette-info-main">
-        <div className="flex gap-4 palette-info-name-container">
-          <div className="flex gap-2">
+        <div className="flex gap-04 palette-info-name-container">
+          <div className="flex gap-02">
             {['ton', 'tas', 'pol'].includes(palette) ? (
               <Circle colors={palettes[palette]} type="circle" size="small" />
             ) : (
@@ -213,7 +212,7 @@ export function PaletteInfo({
               <VariableIcon />
               <p>{variation} Variation</p>
             </DataHeading>
-            <div className="variation-icons flex gap-2 justify-start">
+            <div className="variation-icons flex gap-02 justify-start">
               <AdjustmentsHorizontalIcon className={variation === 'og' ? 'active' : ''} />
               <ScaleIcon className={variation === 'keel' ? 'active' : ''} />
               <FilmIcon className={variation === 'film' ? 'active' : ''} />
@@ -222,7 +221,7 @@ export function PaletteInfo({
             </div>
           </div>
 
-          <div className="palette-info-gamut flex col align-start gap-2">
+          <div className="palette-info-gamut flex col align-start gap-02">
             <DataHeading>
               {base.hex.isInGamut ? (
                 <>
@@ -312,7 +311,7 @@ function removeNonNumericalElements(str: string) {
 }
 
 function DataHeading({ children }: { children: React.ReactNode }) {
-  return <div className="data-heading flex gap-2">{children}</div>
+  return <div className="data-heading flex gap-02">{children}</div>
 }
 
 function TwoColumn({ children }: { children: React.ReactNode }) {

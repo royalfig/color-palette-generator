@@ -5,9 +5,9 @@ import { clampOKLCH, detectFormat } from './utils'
 function getMathematicalAnalogous(hue: number): number[] {
   // Pure mathematical - rigid 30° steps
   return [
+    hue, // base
     (hue - 60 + 360) % 360,
     (hue - 30 + 360) % 360,
-    hue, // base
     hue,
     (hue + 30) % 360,
     (hue + 60) % 360,
@@ -20,9 +20,9 @@ function getWarmCoolAnalogous(hue: number): number[] {
   const spacing = isWarm ? 25 : 35 // Warmer colors closer together
 
   return [
+    hue,
     (hue - spacing * 2 + 360) % 360,
     (hue - spacing + 360) % 360,
-    hue,
     hue,
     (hue + spacing) % 360,
     (hue + spacing * 2) % 360,
@@ -33,19 +33,19 @@ function getVisuallyPleasingAnalogous(hue: number): number[] {
   // Adobe-style with curved progression
   if (hue >= 0 && hue < 60) {
     // Reds: tighter spacing to avoid muddy oranges
-    return [(hue - 40 + 360) % 360, (hue - 20 + 360) % 360, hue, hue, (hue + 15) % 360, (hue + 35) % 360]
+    return [hue, (hue - 40 + 360) % 360, (hue - 20 + 360) % 360, hue, (hue + 15) % 360, (hue + 35) % 360]
   }
   if (hue >= 60 && hue < 120) {
     // Yellows: wider spacing for more variety
-    return [(hue - 50 + 360) % 360, (hue - 25 + 360) % 360, hue, hue, (hue + 25) % 360, (hue + 50) % 360]
+    return [hue, (hue - 50 + 360) % 360, (hue - 25 + 360) % 360, hue, (hue + 25) % 360, (hue + 50) % 360]
   }
   if (hue >= 240 && hue < 300) {
     // Blues: moderate spacing
-    return [(hue - 35 + 360) % 360, (hue - 18 + 360) % 360, hue, hue, (hue + 18) % 360, (hue + 35) % 360]
+    return [hue, (hue - 35 + 360) % 360, (hue - 18 + 360) % 360, hue, (hue + 18) % 360, (hue + 35) % 360]
   }
 
   // Default spacing for other hues
-  return [(hue - 40 + 360) % 360, (hue - 20 + 360) % 360, hue, hue, (hue + 20) % 360, (hue + 40) % 360]
+  return [hue, (hue - 40 + 360) % 360, (hue - 20 + 360) % 360, hue, (hue + 20) % 360, (hue + 40) % 360]
 }
 
 function getAdaptiveAnalogous(baseColor: Color): number[] {
@@ -65,9 +65,9 @@ function getAdaptiveAnalogous(baseColor: Color): number[] {
   if (hue >= 30 && hue < 90) spacing *= 0.8 // Yellow-orange range
 
   return [
+    hue,
     (hue - spacing * 1.5 + 360) % 360,
     (hue - spacing * 0.7 + 360) % 360,
-    hue,
     hue,
     (hue + spacing * 0.7) % 360,
     (hue + spacing * 1.5) % 360,
@@ -85,6 +85,7 @@ export function generateAnalogous(
   const format = detectFormat(baseColor)
 
   try {
+    console.log(baseColor)
     const baseColorObj = new Color(baseColor)
 
     let analogousHues: number[]
@@ -106,9 +107,9 @@ export function generateAnalogous(
 
     // Create color variations with different lightness/chroma
     const variations = [
+      { l: 0, c: 1.0 }, // Base color
       { l: 0.15, c: 0.8 }, // Darker, less saturated
       { l: -0.05, c: 0.9 }, // Slightly darker
-      { l: 0, c: 1.0 }, // Base color
       { l: 0, c: 1.0 }, // Base color
       { l: 0.1, c: 0.85 }, // Lighter
       { l: 0.2, c: 0.7 }, // Much lighter, less saturated

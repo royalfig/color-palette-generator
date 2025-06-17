@@ -4,16 +4,6 @@
   align-items: center;
 }
 
-.small.circle {
-  width: 2.5rem;
-  height: 2.5rem;
-}
-
-.large.circle {
-  width: 5rem;
-  height: 5rem;
-}
-
 .circle svg {
   display: block;
 }

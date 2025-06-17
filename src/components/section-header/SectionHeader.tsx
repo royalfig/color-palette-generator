@@ -14,15 +14,15 @@ function VibrancyModule() {
 
   return (
     <div className="vibrancy-module">
-      <div className="vibrancy-module-blur" style={{ background: linearGradient }}></div>
       <div className="vibrancy-module-inner" style={{ background: linearGradient }}></div>
+      <div className="vibrancy-module-blur" style={{ background: linearGradient }}></div>
     </div>
   )
 }
 
 export function SectionHeader() {
   return (
-    <div className="synth-brand">
+    <div className="synth-brand col-12">
       <h1 className="brand">
         <span>Color</span>Palette Pro
       </h1>

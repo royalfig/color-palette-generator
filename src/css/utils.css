@@ -36,23 +36,23 @@
   margin-block: var(--spacing-06);
 }
 
-.gap-1 {
+.gap-01 {
   gap: var(--spacing-01);
 }
 
-.gap-2 {
+.gap-02 {
   gap: var(--spacing-02);
 }
 
-.gap-3 {
+.gap-03 {
   gap: var(--spacing-03);
 }
 
-.gap-4 {
+.gap-04 {
   gap: var(--spacing-04);
 }
 
-.gap-5 {
+.gap-05 {
   gap: var(--spacing-05);
 }
 
@@ -83,4 +83,10 @@
 
 .box-padding {
   padding: var(--box-padding);
+}
+
+.col-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--base-gap);
 }

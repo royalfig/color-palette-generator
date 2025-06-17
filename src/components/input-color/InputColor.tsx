@@ -1,99 +1,44 @@
-import Color from 'colorjs.io'
-import { debounce } from 'lodash-es'
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
-import { BaseColorData, ColorSpace } from '../../types'
-import './InputColor.css'
+import { useContext, useEffect, useState } from 'react'
+import Button from '../button/Button'
+import './input-color.css'
+import { PlayIcon } from '@phosphor-icons/react/dist/csr/Play'
+import { ColorFormat, ColorSpace } from '../../types'
+import { ColorContext } from '../ColorContext'
 
 export function InputColor({
-  setColorspaceType,
+  color,
   setColor,
-  type,
-  base,
-  setIsActive,
-  setError,
-  isActive,
+  colorSpace,
 }: {
-  setColorspaceType: Dispatch<SetStateAction<ColorSpace>>
-  setColor: Dispatch<SetStateAction<string | Color>>
-  type: ColorSpace
-  base: BaseColorData
-  setIsActive: Dispatch<SetStateAction<boolean>>
-  isActive: boolean
-  setError: Dispatch<SetStateAction<string>>
+  color: string
+  setColor: Function
+  colorSpace: { space: ColorSpace; format: ColorFormat }
 }) {
-  const current = base[type].string
-  const [inputColor, setInputColor] = useState<string>(current)
-  const [prevInputColor, setPrevInputColor] = useState<string>(current)
-  const inGamut = base[type].isInGamut
+  const context = useContext(ColorContext)
+  const [input, setInput] = useState(context?.palette[0].conversions[colorSpace.format].value)
 
-  console.log('inputColor rendering')
-
-  // if (current !== prevInputColor) {
-  //   console.log('🚀 ~ file: InputColor.tsx:30 ~ current !== prevInputColor:', current, prevInputColor)
-  //   setInputColor(current)
-  //   setPrevInputColor(inputColor)
-  //   setWarning(false)
-  // }
+  function handleSubmit() {
+    setColor(input)
+  }
 
   useEffect(() => {
-    console.log('🚀 ~ file: InputColor.tsx:30 ~ useEffect render', current, prevInputColor)
-    setInputColor(current)
-    // setPrevInputColor(inputColor)
-    setError('')
-  }, [current])
-
-  const debouncedParseColor = useCallback(debounce(parseColor, 1000), [])
-
-  function parseColor(value: string) {
-    console.log('handling change', Date.now())
-    try {
-      const parsed = new Color(value)
-      // setColorspaceType(parsed.spaceId)
-      console.log('🚀 ~ file: InputColor.tsx:57 ~ parseColor ~ parsed:', parsed)
-      setError('')
-      setIsActive(false)
-      setColor(parsed)
-    } catch (error: any) {
-      // setInputColor(error.message)
-      setIsActive(false)
-      setError(`Can't parse ${value} as a color`)
-      return
-    }
-  }
-
-  function validate(value: string) {
-    return value.split(' ').length === 3
-  }
-
-  function handleChange(value: string): void {
-    setError('')
-    setInputColor(value)
-
-    setIsActive(!isActive)
-
-    if (value.includes('#') && value.length < 7) return
-
-    if (!value.includes('#') && !validate(value)) {
-      return
-    }
-
-    debouncedParseColor(value)
-  }
+    setInput(context?.palette[0].conversions[colorSpace.format].value)
+  }, [colorSpace, context])
 
   return (
-    <div className="input-color flex">
-      <label className="sr-only" htmlFor={`input-color-${type}`}>
-        {type}
-      </label>
-
-      <input
-        id={`input-color-${type}`}
-        type="text"
-        value={inputColor}
-        onChange={e => handleChange(e.target.value)}
-        spellCheck="false"
-      />
-      <span className="blur-input">{inputColor}</span>
+    <div
+      className="input-color"
+      style={
+        {
+          '--input-bg': context?.palette[0].cssValue,
+          '--input-color': context?.palette[0].contrast,
+        } as React.CSSProperties
+      }
+    >
+      <input type="text" value={input} onChange={e => setInput(e.target.value)} />
+      <Button handler={handleSubmit} active={false}>
+        <PlayIcon size={20} color="var(--icon-element)" weight="fill" />
+      </Button>
     </div>
   )
 }

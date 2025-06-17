@@ -65,7 +65,6 @@ export function ColorSelector({
   const [values, setValues] = useState(currentColor[colorSpace].raw)
 
   const colorSpaceRange = colorSpaceOptions[colorSpace]
-  console.log(colorSpace)
 
   useEffect(() => {
     setValues(currentColor[colorSpace].raw)

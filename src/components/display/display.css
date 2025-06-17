@@ -1,24 +1,5 @@
 .synth-display {
   display: grid;
-  grid-column: 1 / -1;
-
-  .display {
-    padding: var(--box-padding);
-    background-color: #000;
-
-    /* &::after {
-      pointer-events: none;
-      background: conic-gradient(from 240deg at 62% 0%, rgb(255 255 255 / 5%), rgb(0 0 0 / 0%));
-    } */
-
-    .display-inner {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--spacing-08);
-      width: 100%;
-      padding: var(--inner-spacing);
-      background-color: #111;
-      border-radius: 2px;
-    }
-  }
+  padding: var(--box-padding);
+  background-color: #000;
 }

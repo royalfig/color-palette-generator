@@ -29,13 +29,15 @@
     1px 2px 2.5px -2.5px var(--shadow-color);
   --font-brand: 'Orbitron', system-ui, sans-serif;
   --border-color: hsl(0deg 0% 50% / 45%);
-  --synth-body: hsl(248deg 11% 85%);
   --element: hsl(248deg 11% 15%);
   --border: hsl(248deg 11% 65% / 75%);
   --dimmed: #333;
   --error: rgb(237 7 38);
   --warning: rgb(255 165 0);
-  --bg: linear-gradient(to bottom in oklab, hsl(248deg 11% 98%), hsl(248deg 11% 75%));
+  --synth-body: linear-gradient(to bottom, #e3e0dc, #afaeac);
+  --bg: #f8f8f8;
+  --icon-element: linear-gradient(to bottom, hsl(0deg 0% 5%), #e3e0dc, hsl(0deg 0% 5%));
+  --base-gap: 1.25rem;
 }
 
 [data-mode='dark'] {

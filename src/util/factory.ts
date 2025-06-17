@@ -1,4 +1,5 @@
 import Color, { Coords } from 'colorjs.io'
+import { ColorFormat } from '../types'
 
 export type BaseColorData = {
   code: `${string}-${number}`
@@ -22,10 +23,10 @@ export function colorFactory(
   base: string | Color,
   paletteInformation: string,
   idx = 0,
-  format?: 'hex' | 'rgb' | 'hsl' | 'oklch' | 'oklab' | 'lch' | 'lab' | 'p3',
+  format: ColorFormat,
 ): BaseColorData {
+  console.log(base)
   const color = base instanceof Color ? base : new Color(base)
-
   return {
     code: `${paletteInformation}-${idx + 1}`,
     base,

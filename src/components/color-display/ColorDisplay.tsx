@@ -1,21 +1,19 @@
 import { useContext } from 'react'
 import { ColorContext } from '../ColorContext'
-import './current-color-display.css'
+import './color-display.css'
 import { ScissorsIcon } from '@phosphor-icons/react/dist/csr/Scissors'
-import { Coords } from 'colorjs.io/fn'
+import { ColorSpace, ColorFormat } from '../../types'
 
-function formatCoords(coords: Coords) {
-  coords.map()
-}
-
-export function CurrentColorDisplay({
+export function ColorDisplay({
   fetchedData,
   isLoading,
   error,
+  colorSpace,
 }: {
   fetchedData: { colorNames: string[]; paletteTitle: string } | null
   isLoading: boolean
   error: Error | null
+  colorSpace: { space: ColorSpace; format: ColorFormat }
 }) {
   const colorName = fetchedData?.colorNames[0]
 
@@ -23,7 +21,6 @@ export function CurrentColorDisplay({
   const color = context?.palette[0]
 
   const { lch, oklch, lab, oklab, p3, hsl, rgb, hex } = color?.conversions || {}
-  const colorSpace = color?.colorSpace.toLowerCase()
 
   const handleClick = async (e: React.MouseEvent<HTMLDivElement>) => {
     const el = (e.target as HTMLElement).closest('[data-value]')
@@ -41,26 +38,30 @@ export function CurrentColorDisplay({
 
   return (
     <div className="current-color-display flex col align-start" onClick={handleClick}>
-      <div className="flex justify-start gap-4">
-        <div className="color-dot" style={{ '--color': context?.palette[0].string || '#000' }}></div>
+      <div className="flex justify-start gap-04">
+        <div
+          className="color-dot"
+          style={{ '--color': context?.palette[0].string || '#000' } as React.CSSProperties}
+        ></div>
         <h1>{colorName}</h1>
       </div>
-      <div className={`color-details ${colorSpace}`}>
-        <div className="color-detail lch">
-          <ScissorsIcon weight="fill" color={lch?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={lch.value}>{lch?.value}</p>
-        </div>
+
+      <div className={`color-details ${colorSpace.format}`}>
         <div className="color-detail oklch">
           <ScissorsIcon weight="fill" color={oklch?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
           <p data-value={oklch.value}>{oklch?.value}</p>
         </div>
-        <div className="color-detail lab">
-          <ScissorsIcon weight="fill" color={lab?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={lab.value}>{lab?.value}</p>
+        <div className="color-detail lch">
+          <ScissorsIcon weight="fill" color={lch?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
+          <p data-value={lch.value}>{lch?.value}</p>
         </div>
         <div className="color-detail oklab">
           <ScissorsIcon weight="fill" color={oklab?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
           <p data-value={oklab.value}>{oklab?.value}</p>
+        </div>
+        <div className="color-detail lab">
+          <ScissorsIcon weight="fill" color={lab?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
+          <p data-value={lab.value}>{lab?.value}</p>
         </div>
         <div className="color-detail p3">
           <ScissorsIcon weight="fill" color={p3?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />

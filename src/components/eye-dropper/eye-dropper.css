@@ -1,5 +1,13 @@
-.eyedropper-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: #333;
+.eyedropper-button {
+  grid-row: 2 / 3;
+  grid-column: 1 / 2;
+  width: 40px;
+  height: 40px;
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
 }
