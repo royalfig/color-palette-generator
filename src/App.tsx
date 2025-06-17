@@ -20,6 +20,7 @@ import { EyedropperIcon } from '@phosphor-icons/react/dist/csr/Eyedropper'
 import Button from './components/button/Button'
 import { EyeDropper } from './components/eye-dropper/EyeDropper'
 import { InputColor } from './components/input-color/InputColor'
+import { PaletteTypeSelector } from './palette-type-selector/PaletteTypeSelector'
 
 export type ColorName = {
   fetchedData: {
@@ -30,15 +31,43 @@ export type ColorName = {
   error: Error | null
 }
 
+function updateFavicon(color: string) {
+  const size = 64
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+
+  // Draw a filled circle with the current color
+  ctx.clearRect(0, 0, size, size)
+  ctx.beginPath()
+  ctx.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI)
+  ctx.fillStyle = color
+  ctx.fill()
+
+  // Convert canvas to data URL
+  const url = canvas.toDataURL('image/png')
+
+  // Find or create the favicon link element
+  let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement | null
+  if (!link) {
+    link = document.createElement('link')
+    link.rel = 'icon'
+    document.head.appendChild(link)
+  }
+  link.href = url
+}
+
 export default function App() {
   console.log('app rendering')
   const colorQueryParaCheck = new URLSearchParams(document.location.search).has('color')
   const colorQueryParam = colorQueryParaCheck ? new URLSearchParams(document.location.search).get('color') : null
   const [color, setColor] = useState<string>(colorQueryParam || pickRandomColor())
-  const [paletteType, setPaletteType] = useState<PaletteKinds>('ana')
+  const [paletteType, setPaletteType] = useState<PaletteKinds>('spl')
   const palette = useMemo(() => createPalettes(color, paletteType, 'mathematical'), [color, paletteType])
   const colorObj = new Color(color)
-
+  console.log(color)
   const colorContext = useMemo(() => ({ color, palette, colorObj }), [color, palette, colorObj])
 
   const [colorSpace, setColorSpace] = useState<{ space: ColorSpace; format: ColorFormat }>({
@@ -69,6 +98,10 @@ export default function App() {
   //   }
   // }, [css])
 
+  useEffect(() => {
+    updateFavicon(color)
+  }, [color])
+
   return (
     <ColorContext value={colorContext}>
       <div className="bg">
@@ -93,8 +126,11 @@ export default function App() {
             </Display>
             <div className="synth-body col-12">
               <ColorSpaceSelector colorSpace={colorSpace} setColorSpace={setColorSpace} />
-              <EyeDropper setColor={setColor} setColorSpace={setColorSpace} />
-              <InputColor color={color} setColor={setColor} colorSpace={colorSpace} />
+              <div className="input-color-container">
+                <EyeDropper setColor={setColor} setColorSpace={setColorSpace} />
+                <InputColor color={color} setColor={setColor} colorSpace={colorSpace} />
+              </div>
+              <PaletteTypeSelector paletteType={paletteType} setPaletteType={setPaletteType} />
             </div>
           </main>
         </div>

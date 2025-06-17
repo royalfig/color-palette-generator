@@ -85,7 +85,6 @@ export function generateAnalogous(
   const format = detectFormat(baseColor)
 
   try {
-    console.log(baseColor)
     const baseColorObj = new Color(baseColor)
 
     let analogousHues: number[]

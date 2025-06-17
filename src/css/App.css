@@ -26,3 +26,10 @@
   gap: var(--spacing-08);
   padding: var(--box-padding);
 }
+
+.input-color-container {
+  display: flex;
+  grid-row: 2;
+  grid-column: 1 / 7;
+  gap: var(--base-gap);
+}

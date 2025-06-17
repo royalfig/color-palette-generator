@@ -17,7 +17,6 @@ export function EyeDropper({ setColor, setColorSpace }: { setColor: Function; se
     eyeDropper
       .open()
       .then((result: { sRGBHex: string }) => {
-        console.log(result)
         setColorSpace({ space: 'srgb', format: 'hex' })
         setColor(result.sRGBHex)
         setActive(false)

@@ -1,5 +1,6 @@
 .synth-display {
   display: grid;
+  min-height: 269px;
   padding: var(--box-padding);
   background-color: #000;
 }

@@ -1,9 +1,9 @@
 .input-color {
   display: flex;
-  grid-column: 2 / 7;
-  gap: var(--spacing-03);
+  gap: var(--base-gap);
   align-items: center;
   justify-content: space-between;
+  width: 100%;
 
   input {
     width: 100%;

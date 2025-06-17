@@ -25,7 +25,6 @@ export function colorFactory(
   idx = 0,
   format: ColorFormat,
 ): BaseColorData {
-  console.log(base)
   const color = base instanceof Color ? base : new Color(base)
   return {
     code: `${paletteInformation}-${idx + 1}`,

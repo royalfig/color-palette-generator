@@ -16,11 +16,11 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
         {type !== 'circle'
           ? palette.map((color: BaseColorData, idx: number) => {
               let [h, s, l] = color.conversions.hsl.coords
-              let [ol, oc, oh] = color.conversions.oklch.coords
-              oh = Number(oh.toFixed(2))
+
+              h = Number(h.toFixed(2))
 
               s = s > 100 ? 100 : s
-              const hRadians = (oh * Math.PI) / 180
+              const hRadians = (h * Math.PI) / 180
               const sRadians = s
 
               const x = sRadians * Math.sin(hRadians)
