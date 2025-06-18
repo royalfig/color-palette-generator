@@ -10,12 +10,12 @@ export function ColorDisplay({
   error,
   colorSpace,
 }: {
-  fetchedData: { colorNames: string[]; paletteTitle: string } | null
+  fetchedData: { colorNames: string[]; paletteTitle: string; baseColorName: string } | null
   isLoading: boolean
   error: Error | null
   colorSpace: { space: ColorSpace; format: ColorFormat }
 }) {
-  const colorName = fetchedData?.colorNames[0]
+  const colorName = fetchedData?.baseColorName
 
   const context = useContext(ColorContext)
   const color = context?.palette.find(c => c.isBase)
@@ -46,36 +46,36 @@ export function ColorDisplay({
       <div className={`color-details ${colorSpace.format}`}>
         <div className="color-detail oklch">
           <ScissorsIcon weight="fill" color={oklch?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={oklch.value}>{oklch?.value}</p>
+          <p data-value={oklch?.value}>{oklch?.value}</p>
         </div>
         <div className="color-detail lch">
           <ScissorsIcon weight="fill" color={lch?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={lch.value}>{lch?.value}</p>
+          <p data-value={lch?.value}>{lch?.value}</p>
         </div>
         <div className="color-detail oklab">
           <ScissorsIcon weight="fill" color={oklab?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={oklab.value}>{oklab?.value}</p>
+          <p data-value={oklab?.value}>{oklab?.value}</p>
         </div>
         <div className="color-detail lab">
           <ScissorsIcon weight="fill" color={lab?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={lab.value}>{lab?.value}</p>
+          <p data-value={lab?.value}>{lab?.value}</p>
         </div>
         <div className="color-detail p3">
           <ScissorsIcon weight="fill" color={p3?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={p3.value}>{p3?.value}</p>
+          <p data-value={p3?.value}>{p3?.value}</p>
         </div>
 
         <div className="color-detail hsl">
           <ScissorsIcon weight="fill" color={hsl?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={hsl.value}>{hsl?.value}</p>
+          <p data-value={hsl?.value}>{hsl?.value}</p>
         </div>
         <div className="color-detail rgb">
           <ScissorsIcon weight="fill" color={rgb?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={rgb.value}>{rgb?.value}</p>
+          <p data-value={rgb?.value}>{rgb?.value}</p>
         </div>
         <div className="color-detail hex">
           <ScissorsIcon weight="fill" color={hex?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={hex.value}>{hex?.value}</p>
+          <p data-value={hex?.value}>{hex?.value}</p>
         </div>
       </div>
     </div>

@@ -383,7 +383,7 @@ export function generateAnalogous(
       // Preserve the base color at indices 2 and 3
       if (index === 2) {
         // Index 2: exact base color, no modifications
-        return colorFactory(color, 'analogous', index, format)
+        return colorFactory(color, 'analogous', index, format, true)
       }
 
       if (index === 3) {
@@ -393,7 +393,7 @@ export function generateAnalogous(
           color.oklch.l = values.l
           color.oklch.c = values.c
           color.oklch.h = values.h
-          return colorFactory(color, 'analogous', index, format, true)
+          return colorFactory(color, 'analogous', index, format)
         }
 
         const values = clampOKLCH(baseColorObj.oklch.l * 1.1, baseColorObj.oklch.c, baseColorObj.oklch.h)

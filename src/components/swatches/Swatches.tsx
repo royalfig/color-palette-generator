@@ -1,8 +1,9 @@
 import { useContext } from 'react'
+import type { ColorFormat, ColorSpace } from '../../types'
 import { ColorContext } from '../ColorContext'
 import './swatches.css'
 
-export function Swatches() {
+export function Swatches({ colorSpace }: { colorSpace: { space: ColorSpace; format: ColorFormat } }) {
   const context = useContext(ColorContext)
   if (!context) return null
 
@@ -27,10 +28,12 @@ export function Swatches() {
 
   return (
     <div
-      style={{
-        '--columns': columns,
-        '--rows': rows,
-      }}
+      style={
+        {
+          '--columns': columns,
+          '--rows': rows,
+        } as React.CSSProperties
+      }
       className="swatch-container"
       onClick={handleClick}
     >
@@ -43,10 +46,12 @@ export function Swatches() {
           <div
             key={i}
             className="swatch"
-            data-color={color.string}
-            style={{
-              '--color': color.string,
-            }}
+            data-color={color.conversions[colorSpace.format].value}
+            style={
+              {
+                '--color': color.cssValue,
+              } as React.CSSProperties
+            }
           />
         )
       })}

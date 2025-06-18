@@ -4,84 +4,200 @@ import { detectFormat, clampOKLCH } from './utils'
 import { ColorFormat, ColorSpace } from '../types'
 
 function getMathematicalTriadic(hue: number): number[] {
-  // Pure mathematical - rigid 30° steps
+  // Pure mathematical - rigid 120° steps
   return [hue, (hue + 120) % 360, (hue + 240) % 360]
 }
 
-function getVisuallyPleasingTriadic(hue: number): number[] {
+function getOpticalTriadic(baseColor: Color): number[] {
+  // Perceptual Harmony: Based on how human vision processes triadic relationships
+  const hue = baseColor.oklch.h
+
+  // Human vision processes triadic relationships differently based on hue regions
   if (hue >= 0 && hue < 60) {
-    return [hue, (hue + 125) % 360, (hue + 235) % 360]
+    // Red-orange base: create rich, vibrant triad avoiding muddy zones
+    return [
+      hue, // Base red-orange
+      (hue + 125) % 360, // Rich green (avoid muddy yellow-green)
+      (hue + 235) % 360, // Deep blue-purple
+    ]
   }
+
+  if (hue >= 60 && hue < 120) {
+    // Yellow-orange base: wider spacing to avoid brown/olive zones
+    return [
+      hue, // Base yellow-orange
+      (hue + 135) % 360, // Blue-green (skip muddy zone)
+      (hue + 225) % 360, // Red-purple
+    ]
+  }
+
+  if (hue >= 120 && hue < 180) {
+    // Green base: natural triadic relationships
+    return [
+      hue, // Base green
+      (hue + 115) % 360, // Red-orange
+      (hue + 245) % 360, // Blue-purple
+    ]
+  }
+
+  if (hue >= 180 && hue < 240) {
+    // Cyan-blue base: vibrant, clear triad
+    return [
+      hue, // Base cyan-blue
+      (hue + 120) % 360, // Red (perfect complement relationship)
+      (hue + 240) % 360, // Yellow-green
+    ]
+  }
+
   if (hue >= 240 && hue < 300) {
-    return [hue, (hue + 115) % 360, (hue + 245) % 360]
-  }
-  return [hue, (hue + 120) % 360, (hue + 240) % 360]
-}
-
-function getWarmCoolTriadic(hue: number): number[] {
-  // Adjust spacing for more pleasing relationships
-  const adjustments = {
-    second: hue >= 180 ? 125 : 115, // Slightly varied spacing
-    third: hue >= 180 ? 235 : 245,
+    // Blue-purple base: sophisticated triad
+    return [
+      hue, // Base blue-purple
+      (hue + 115) % 360, // Yellow-orange
+      (hue + 245) % 360, // Green
+    ]
   }
 
-  return [hue, (hue + adjustments.second) % 360, (hue + adjustments.third) % 360]
+  // Purple-magenta base: creative, energetic triad
+  return [
+    hue, // Base purple-magenta
+    (hue + 125) % 360, // Yellow
+    (hue + 235) % 360, // Cyan-green
+  ]
 }
 
 function getAdaptiveTriadic(baseColor: Color): number[] {
+  // Emotional Resonance: Creates triads that tell complete emotional stories
   const oklch = baseColor.to('oklch')
   const hue = oklch.h
-  let spacing1 = 120
-  let spacing2 = 240
+  const chroma = oklch.c
+  const lightness = oklch.l
 
-  // Adapt based on color properties
-  if (oklch.c > 0.25) {
-    // High saturation colors can handle more dramatic spacing
-    spacing1 = 125
-    spacing2 = 235
+  // Determine emotional profile and create three-part narrative
+  if (hue >= 345 || hue < 30) {
+    // Passionate reds → Fire, earth, and sky elements
+    return [
+      hue, // Fire (passionate base)
+      (hue + 130) % 360, // Earth (grounding green)
+      (hue + 230) % 360, // Sky (cooling blue)
+    ]
   }
 
-  if (oklch.l > 0.8) {
-    // Very light colors need closer harmony
-    spacing1 = 115
-    spacing2 = 245
-  }
-
-  // Avoid problematic triadic combinations
   if (hue >= 30 && hue < 90) {
-    // Yellow-orange range - tighten spacing
-    spacing1 = 110
-    spacing2 = 250
+    // Energetic oranges/yellows → Sun, sea, and night
+    const intensity = chroma * lightness
+    return [
+      hue, // Sun energy
+      (hue + 120 + intensity * 15) % 360, // Sea depth (varies with intensity)
+      (hue + 240 - intensity * 10) % 360, // Night mystery
+    ]
   }
 
-  return [hue, (hue + spacing1) % 360, (hue + spacing2) % 360]
+  if (hue >= 90 && hue < 150) {
+    // Natural greens → Forest, sunset, and ocean
+    return [
+      hue, // Forest (natural base)
+      (hue + 125) % 360, // Sunset (warm complement)
+      (hue + 235) % 360, // Ocean (cool complement)
+    ]
+  }
+
+  if (hue >= 150 && hue < 210) {
+    // Tranquil blues → Water, fire, and earth
+    return [
+      hue, // Water (tranquil base)
+      (hue + 115) % 360, // Fire (energizing contrast)
+      (hue + 245) % 360, // Earth (grounding warmth)
+    ]
+  }
+
+  if (hue >= 210 && hue < 270) {
+    // Mysterious blues → Night, dawn, and forest
+    return [
+      hue, // Night mystery
+      (hue + 130) % 360, // Dawn awakening
+      (hue + 230) % 360, // Forest depth
+    ]
+  }
+
+  // Creative purples → Magic, nature, and energy
+  return [
+    hue, // Magic (creative base)
+    (hue + 120) % 360, // Nature (grounding reality)
+    (hue + 240) % 360, // Energy (dynamic force)
+  ]
 }
 
-function generateGrayscaleTriadic(
-  baseColor: Color,
-  format: 'hex' | 'rgb' | 'hsl' | 'oklch' | 'oklab' | 'lch' | 'lab' | 'p3' | undefined,
-): BaseColorData[] {
-  // For grays, create 6 lightness variations
-  const variations = [
-    0, // Original
-    -0.15, // Darker
-    0.1, // Lighter
-    -0.25, // Much darker
-    0.2, // Much lighter
-    -0.35, // Very dark
-  ]
+function getWarmCoolTriadic(baseColor: Color): number[] {
+  // Luminosity Dance: Based on how three light sources create balanced illumination
+  const oklch = baseColor.to('oklch')
+  const hue = oklch.h
+  const chroma = oklch.c
+  const lightness = oklch.l
 
-  return variations.map((lightAdj, index) => {
-    if (index === 0) {
-      return colorFactory(baseColor, 'triadic', index, format)
+  // Determine lighting scenario and create three-point illumination
+
+  if (lightness > 0.8 && chroma < 0.3) {
+    // Bright daylight scenario: three balanced natural light sources
+    return [
+      hue, // Primary daylight
+      (hue + 125) % 360, // Reflected light (slightly shifted)
+      (hue + 235) % 360, // Shadow light (cooler)
+    ]
+  }
+
+  if (hue >= 30 && hue < 90 && lightness > 0.6) {
+    // Golden hour scenario: warm key with cool fills
+    return [
+      hue, // Golden key light
+      (hue + 110) % 360, // Cool fill light
+      (hue + 250) % 360, // Deep shadow/ambient
+    ]
+  }
+
+  if (hue >= 180 && hue < 240 && lightness < 0.5) {
+    // Cool/moonlight scenario: cool primary with warm accents
+    return [
+      hue, // Cool moonlight
+      (hue + 130) % 360, // Warm firelight
+      (hue + 230) % 360, // Warm candlelight
+    ]
+  }
+
+  if (chroma > 0.8 && lightness < 0.4) {
+    // Dramatic three-point lighting: strong contrast triangle
+    const isWarm = hue < 180
+    if (isWarm) {
+      return [
+        hue, // Warm dramatic key
+        (hue + 115) % 360, // Cool dramatic fill
+        (hue + 245) % 360, // Cool dramatic back
+      ]
+    } else {
+      return [
+        hue, // Cool dramatic key
+        (hue + 125) % 360, // Warm dramatic fill
+        (hue + 235) % 360, // Warm dramatic back
+      ]
     }
+  }
 
-    const gray = baseColor.clone()
-    const values = clampOKLCH(baseColor.oklch.l + lightAdj, 0, 0)
-    gray.oklch.l = values.l
+  if (hue >= 270 && hue < 330) {
+    // Artificial/stage lighting: three colored spots
+    return [
+      hue, // Primary colored light
+      (hue + 135) % 360, // Secondary colored light
+      (hue + 225) % 360, // Tertiary colored light
+    ]
+  }
 
-    return colorFactory(gray, 'triadic', index, format)
-  })
+  // Natural three-point setup: balanced, realistic
+  const lightInfluence = (lightness - 0.5) * 15 // -7.5 to +7.5 shift
+  return [
+    hue, // Key light
+    (hue + 120 + lightInfluence) % 360, // Fill light
+    (hue + 240 - lightInfluence) % 360, // Back light
+  ]
 }
 
 export function generateTriadic(
@@ -104,14 +220,111 @@ export function generateTriadic(
         triadicHues = getMathematicalTriadic(baseColorObj.oklch.h)
         break
       case 'optical':
-        triadicHues = getVisuallyPleasingTriadic(baseColorObj.oklch.h)
+        triadicHues = getOpticalTriadic(baseColorObj)
         break
       case 'adaptive':
         triadicHues = getAdaptiveTriadic(baseColorObj)
         break
       case 'warm-cool':
-        triadicHues = getWarmCoolTriadic(baseColorObj.oklch.h)
+        triadicHues = getWarmCoolTriadic(baseColorObj)
         break
+    }
+
+    // Style-specific lightness and chroma variations
+    let baseVariations = {
+      dark: { l: -0.2, c: 1.1 },
+    }
+
+    let triadVariations = {
+      first: { pure: { l: 0, c: 0.95 }, muted: { l: 0.1, c: 0.7 } },
+      second: { pure: { l: 0, c: 0.95 }, muted: { l: -0.1, c: 0.7 } },
+    }
+
+    if (style === 'optical') {
+      // Perceptual harmony: natural visual balance
+      baseVariations = {
+        dark: { l: -0.18, c: 1.0 }, // Less extreme, more natural
+      }
+      triadVariations = {
+        first: {
+          pure: { l: 0.05, c: 0.9 }, // Slightly lighter for balance
+          muted: { l: 0.12, c: 0.65 }, // Atmospheric muted
+        },
+        second: {
+          pure: { l: -0.02, c: 0.92 }, // Slightly darker balance
+          muted: { l: -0.08, c: 0.68 }, // Deep muted
+        },
+      }
+    } else if (style === 'adaptive') {
+      // Emotional resonance: varies by emotional type
+      const hue = baseColorObj.oklch.h
+      if (hue >= 345 || hue < 30) {
+        // passionate
+        baseVariations = {
+          dark: { l: -0.25, c: 1.2 }, // Deep passionate intensity
+        }
+        triadVariations = {
+          first: {
+            pure: { l: 0.08, c: 0.85 }, // Grounding earth tone
+            muted: { l: 0.15, c: 0.6 }, // Soft earth
+          },
+          second: {
+            pure: { l: 0.05, c: 0.9 }, // Cooling sky
+            muted: { l: -0.05, c: 0.65 }, // Deep sky
+          },
+        }
+      } else if (hue >= 150 && hue < 210) {
+        // tranquil
+        baseVariations = {
+          dark: { l: -0.15, c: 0.9 }, // Gentle depth
+        }
+        triadVariations = {
+          first: {
+            pure: { l: 0.1, c: 0.9 }, // Warming fire
+            muted: { l: 0.18, c: 0.7 }, // Gentle warmth
+          },
+          second: {
+            pure: { l: 0.05, c: 0.85 }, // Grounding earth
+            muted: { l: -0.08, c: 0.6 }, // Deep earth
+          },
+        }
+      }
+    } else if (style === 'warm-cool') {
+      // Luminosity dance: based on lighting scenario
+      const lightness = baseColorObj.oklch.l
+      const chroma = baseColorObj.oklch.c
+
+      if (lightness > 0.8 && chroma < 0.3) {
+        // daylight
+        baseVariations = {
+          dark: { l: -0.3, c: 1.0 }, // Strong natural shadow
+        }
+        triadVariations = {
+          first: {
+            pure: { l: 0.02, c: 0.85 }, // Reflected light
+            muted: { l: 0.15, c: 0.6 }, // Soft reflection
+          },
+          second: {
+            pure: { l: -0.08, c: 0.8 }, // Shadow light
+            muted: { l: -0.15, c: 0.5 }, // Deep shadow
+          },
+        }
+      } else if (chroma > 0.8 && lightness < 0.4) {
+        // dramatic
+        baseVariations = {
+          dark: { l: -0.35, c: 1.3 }, // Deep dramatic
+        }
+        triadVariations = {
+          first: {
+            pure: { l: 0.15, c: 1.0 }, // Dramatic fill
+            muted: { l: 0.08, c: 0.8 }, // Supporting drama
+          },
+          second: {
+            pure: { l: 0.2, c: 1.1 }, // Dramatic back light
+            muted: { l: -0.05, c: 0.75 }, // Dramatic ambient
+          },
+        }
+      }
     }
 
     const colors: BaseColorData[] = []
@@ -119,10 +332,14 @@ export function generateTriadic(
     // For each of the 3 triadic hues, create 2 variations
     triadicHues.forEach((hue, triadIndex) => {
       if (triadIndex === 0) {
-        // Base color family: original + darker variant
+        // Base color family: original (preserved) + darker variant
         colors.push(colorFactory(baseColor, 'triadic', 0, format, true))
 
-        const darkBaseValues = clampOKLCH(baseColorObj.oklch.l - 0.2, baseColorObj.oklch.c * 1.1, hue)
+        const darkBaseValues = clampOKLCH(
+          baseColorObj.oklch.l + baseVariations.dark.l,
+          baseColorObj.oklch.c * baseVariations.dark.c,
+          hue,
+        )
         const darkBase = baseColorObj.clone()
         darkBase.oklch.l = darkBaseValues.l
         darkBase.oklch.c = darkBaseValues.c
@@ -130,7 +347,14 @@ export function generateTriadic(
         colors.push(colorFactory(darkBase, 'triadic', 1, format))
       } else {
         // Other triadic families: pure + muted variant
-        const pureValues = clampOKLCH(baseColorObj.oklch.l, baseColorObj.oklch.c * 0.95, hue)
+        const isFirstTriad = triadIndex === 1
+        const variations = isFirstTriad ? triadVariations.first : triadVariations.second
+
+        const pureValues = clampOKLCH(
+          baseColorObj.oklch.l + variations.pure.l,
+          baseColorObj.oklch.c * variations.pure.c,
+          hue,
+        )
         const pureColor = baseColorObj.clone()
         pureColor.oklch.l = pureValues.l
         pureColor.oklch.c = pureValues.c
@@ -138,8 +362,8 @@ export function generateTriadic(
         colors.push(colorFactory(pureColor, 'triadic', triadIndex * 2, format))
 
         const mutedValues = clampOKLCH(
-          baseColorObj.oklch.l + (triadIndex === 1 ? 0.1 : -0.1),
-          baseColorObj.oklch.c * 0.7,
+          baseColorObj.oklch.l + variations.muted.l,
+          baseColorObj.oklch.c * variations.muted.c,
           hue,
         )
         const mutedColor = baseColorObj.clone()

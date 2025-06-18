@@ -1,28 +1,26 @@
-import Color from 'colorjs.io'
 import { useEffect, useMemo, useState } from 'react'
 import { ColorContext } from './components/ColorContext'
+import { AuxillaryDisplay } from './components/auxillary-display/AuxillaryDisplay'
 import { ColorDisplay } from './components/color-display/ColorDisplay'
+import { ColorSpaceSelector } from './components/color-space-selector/ColorSpaceSelector'
+import { DisplayInfo } from './components/display-info/DisplayInfo'
 import { Display } from './components/display/Display'
+import { EyeDropper } from './components/eye-dropper/EyeDropper'
+import { InputColor } from './components/input-color/InputColor'
 import { PaletteDisplay } from './components/palette-display/PaletteDisplay'
+import { PaletteStyleSelector } from './components/palette-style-selector/PaletteStyleSelector'
+import { PaletteToolSelector } from './components/palette-tool-selector/PaletteToolSelector'
 import { SectionHeader } from './components/section-header/SectionHeader'
-import { Swatches } from './components/swatches/Swatches'
 import './css/App.css'
 import './css/Defaults.css'
 import './css/Reset.css'
 import './css/Variables.css'
 import './css/utils.css'
 import { useFetchColorNames } from './hooks/useColorName'
-import type { ColorSpace, ColorFormat, PaletteKinds } from './types'
+import { PaletteTypeSelector } from './palette-type-selector/PaletteTypeSelector'
+import type { ColorFormat, ColorSpace, PaletteKinds } from './types'
 import { createPalettes } from './util'
 import { pickRandomColor } from './util/pickRandomColor'
-import { ColorSpaceSelector } from './components/color-space-selector/ColorSpaceSelector'
-import { EyedropperIcon } from '@phosphor-icons/react/dist/csr/Eyedropper'
-import Button from './components/button/Button'
-import { EyeDropper } from './components/eye-dropper/EyeDropper'
-import { InputColor } from './components/input-color/InputColor'
-import { PaletteTypeSelector } from './palette-type-selector/PaletteTypeSelector'
-import { PaletteStyleSelector } from './components/palette-style-selector/PaletteStyleSelector'
-import { DisplayInfo } from './components/display-info/DisplayInfo'
 
 export type ColorName = {
   fetchedData: {
@@ -66,6 +64,7 @@ export default function App() {
   const colorQueryParaCheck = new URLSearchParams(document.location.search).has('color')
   const colorQueryParam = colorQueryParaCheck ? new URLSearchParams(document.location.search).get('color') : null
   const [color, setColor] = useState<string>(colorQueryParam || pickRandomColor())
+  const [showPaletteColors, setShowPaletteColors] = useState(false)
   const [paletteType, setPaletteType] = useState<PaletteKinds>('spl')
   const [paletteStyle, setPaletteStyle] = useState<'mathematical' | 'optical' | 'adaptive' | 'warm-cool'>(
     'mathematical',
@@ -130,8 +129,7 @@ export default function App() {
                 paletteType={paletteType}
                 paletteStyle={paletteStyle}
               />
-
-              <Swatches />
+              <AuxillaryDisplay showPaletteColors={showPaletteColors} colorSpace={colorSpace} />
             </Display>
             <div className="synth-body col-12">
               <ColorSpaceSelector colorSpace={colorSpace} setColorSpace={setColorSpace} />
@@ -141,6 +139,7 @@ export default function App() {
               </div>
               <PaletteTypeSelector paletteType={paletteType} setPaletteType={setPaletteType} />
               <PaletteStyleSelector paletteStyle={paletteStyle} setPaletteStyle={setPaletteStyle} />
+              <PaletteToolSelector showPaletteColors={showPaletteColors} setShowPaletteColors={setShowPaletteColors} />
               <DisplayInfo />
             </div>
           </main>

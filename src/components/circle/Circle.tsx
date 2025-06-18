@@ -1,33 +1,55 @@
 // To use GSAP with React, install both:
 // npm install gsap @gsap/react
-import { useContext, useRef } from 'react'
+import { useContext, useRef, use } from 'react'
 import { BaseColorData } from '../../util/factory'
 import { ColorContext } from '../ColorContext'
 import './circle.css'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
+gsap.registerPlugin(useGSAP)
 
 function getCirclePosition(color: BaseColorData, idx: number, type: 'default' | 'circle') {
+  const [hue, saturation, lightness] = color.conversions.hsl.coords
   if (type !== 'circle') {
-    let [h, s] = color.conversions.hsl.coords
-    h = Number(h.toFixed(2))
-    s = s > 100 ? 100 : s
+    const h = Number(hue.toFixed(2))
+    const s = saturation > 100 ? 100 : saturation
+    const l = lightness
     const hRadians = (h * Math.PI) / 180
     const sRadians = s
     const x = sRadians * Math.sin(hRadians)
     const y = sRadians * Math.cos(hRadians)
     const xr = isNaN(x) ? 0 : x
     const yr = isNaN(y) ? 0 : y * -1
-    return { cx: xr, cy: yr, fill: color.string }
+    return {
+      cx: xr,
+      cy: yr,
+      h,
+      s,
+      l,
+      lightness,
+      hue,
+      saturation,
+    }
   } else {
     const h = (idx + 10) * 36
+    const s = saturation
+    const l = lightness
     const hRadians = (h * Math.PI) / 180
     const sRadians = 50
     const x = sRadians * Math.sin(hRadians)
     const y = sRadians * Math.cos(hRadians)
     const xr = isNaN(x) ? 0 : x
     const yr = isNaN(y) ? 0 : y * -1
-    return { cx: xr, cy: yr, fill: color.string }
+    return {
+      cx: xr,
+      cy: yr,
+      h,
+      s,
+      saturation,
+      hue,
+      lightness,
+      l,
+    }
   }
 }
 
@@ -39,54 +61,38 @@ function getElevationFilter(l: number) {
 }
 
 export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
-  const context = useContext(ColorContext)
-  const palette = context?.palette
+  const context = use(ColorContext)
+  const palette = context.palette
 
   // Sort palette by lightness (HSL L value) without mutating original
-  const sortedPalette = palette
-    ? [...palette].sort((a, b) => a.conversions.hsl.coords[2] - b.conversions.hsl.coords[2])
-    : undefined
+  const sortedPalette = palette.sort((a, b) => a.conversions.hsl.coords[2] - b.conversions.hsl.coords[2])
+
+  const paletteValues = sortedPalette.map((color, idx) => getCirclePosition(color, idx, type))
 
   // Refs for each circle
+  const circleContainerRef = useRef<HTMLDivElement>(null)
   const circlesRef = useRef<(SVGCircleElement | null)[]>([])
   // Store previous palette for animation
   const prevPaletteRef = useRef<BaseColorData[] | null>(null)
 
   useGSAP(
     () => {
-      if (!sortedPalette) return
-      sortedPalette.forEach((color: BaseColorData, idx: number) => {
-        const circle = circlesRef.current[idx]
-        if (!circle) return
-        // Get previous and new positions/colors
-        const prevPalette = prevPaletteRef.current
-        let from = { cx: 0, cy: 0, fill: color.string }
-        if (prevPalette && prevPalette[idx]) {
-          from = getCirclePosition(prevPalette[idx], idx, type)
-        } else {
-          // Animate in from center if no previous
-          from = { cx: 0, cy: 0, fill: color.string }
-        }
-        const to = getCirclePosition(color, idx, type)
-        // Set initial state
-        gsap.set(circle, { attr: from })
-        // Animate to new state
-        gsap.to(circle, {
+      paletteValues.forEach(({ cx, cy, h, s, l, hue, saturation, lightness }, idx) => {
+        gsap.to(`.circle-item:nth-child(${idx + 2})`, {
           duration: 0.7,
-          attr: to,
-          ease: 'power2.out',
+          ease: 'sine.out',
+          attr: { cx, cy },
+          '--h': hue,
+          '--s': saturation,
+          '--l': lightness,
         })
       })
-      // Update previous palette
-      prevPaletteRef.current = sortedPalette.map(c => ({ ...c }))
     },
-    { dependencies: [sortedPalette, type] },
+    { scope: circleContainerRef, dependencies: [sortedPalette, type] },
   )
 
-  if (!sortedPalette) return null
-
   return (
-    <div className="circle">
+    <div className="circle" ref={circleContainerRef}>
       <svg viewBox="-120 -120 240 240">
         <defs>
           <filter id="shadow-elevation-1" x="-50%" y="-50%" width="200%" height="200%">
@@ -104,9 +110,8 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
         </defs>
         <circle cx="0" cy="0" r={100} fill="none" stroke="var(--dimmed)" strokeWidth="4" />
 
-        {sortedPalette.map((color: BaseColorData, idx: number) => {
-          const { cx, cy, fill } = getCirclePosition(color, idx, type)
-          const l = color.conversions.hsl.coords[2]
+        {paletteValues.map(({ cx, cy, h, s, l, hue, saturation, lightness }, idx) => {
+          console.log(hue, saturation, lightness)
           return (
             <circle
               key={idx}
@@ -116,8 +121,10 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
               cx={cx}
               cy={cy}
               r={18}
-              fill={fill}
+              fill="hsl(var(--h) var(--s) var(--l))"
               filter={getElevationFilter(l)}
+              className="circle-item"
+              style={{ '--h': hue, '--s': saturation, '--l': lightness } as React.CSSProperties}
             ></circle>
           )
         })}

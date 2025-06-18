@@ -1,9 +1,12 @@
 import { createContext } from 'react'
-import { BaseColorData } from '../util/factory'
-import Color from 'colorjs.io'
+import type { BaseColorData } from '../util/factory'
 
-type ColorContextType = {
+export type ColorContextType = {
   originalColor: string
   palette: BaseColorData[]
 }
-export const ColorContext = createContext<ColorContextType | null>(null)
+
+export const ColorContext = createContext<ColorContextType>({
+  originalColor: '', // dummy, will never be used
+  palette: [],
+})
