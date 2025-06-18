@@ -1,15 +1,18 @@
 import Color from 'colorjs.io'
 import { BaseColorData, colorFactory } from './factory'
-import { detectFormat, clampOKLCH } from './utils'
+import { clampOKLCH, detectFormat } from './utils'
+import { ColorFormat } from '../types'
+import { ColorSpace } from '../types'
 
 export function generateTintsAndShades(
   baseColor: string,
   options: {
     style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+    colorSpace: { space: ColorSpace; format: ColorFormat }
   },
 ) {
   const { style } = options
-  const format = detectFormat(baseColor)
+  const format = options.colorSpace.format
 
   try {
     const baseColorObj = new Color(baseColor)
@@ -39,7 +42,7 @@ export function generateTintsAndShades(
     lightnessSteps.forEach((lightness, index) => {
       if (index === 5) {
         // Base color (unchanged) - position 6 of 12
-        colors.push(colorFactory(baseColor, 'tints-shades', index, format))
+        colors.push(colorFactory(baseColor, 'tints-shades', index, format, true))
         return
       }
 

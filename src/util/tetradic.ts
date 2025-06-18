@@ -1,6 +1,8 @@
 import Color from 'colorjs.io'
 import { BaseColorData, colorFactory } from './factory'
 import { clampOKLCH, detectFormat } from './utils'
+import { ColorFormat } from '../types'
+import { ColorSpace } from '../types'
 
 function getMathematicalTetradic(hue: number): number[] {
   // Perfect 90° spacing forming a square
@@ -59,10 +61,11 @@ export function generateTetradic(
   baseColor: string,
   options: {
     style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+    colorSpace: { space: ColorSpace; format: ColorFormat }
   },
 ) {
   const { style } = options
-  const format = detectFormat(baseColor)
+  const format = options.colorSpace.format
 
   try {
     const baseColorObj = new Color(baseColor)
@@ -90,7 +93,7 @@ export function generateTetradic(
     tetradicHues.forEach((hue, tetradIndex) => {
       if (tetradIndex === 0) {
         // Base color (unchanged)
-        colors.push(colorFactory(baseColor, 'tetradic', 0, format))
+        colors.push(colorFactory(baseColor, 'tetradic', 0, format, true))
       } else if (tetradIndex === 1) {
         // First tetradic color + muted variant
         const pureValues = clampOKLCH(baseColorObj.oklch.l + 0.05, baseColorObj.oklch.c * 0.9, hue)

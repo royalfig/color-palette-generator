@@ -15,14 +15,16 @@ export function InputColor({
   colorSpace: { space: ColorSpace; format: ColorFormat }
 }) {
   const context = useContext(ColorContext)
-  const [input, setInput] = useState(context?.palette[0].conversions[colorSpace.format].value)
+  const baseColor = context?.palette.find(c => c.isBase)
+  const [input, setInput] = useState(baseColor?.conversions[colorSpace.format].value)
+  const contrast = baseColor?.contrast
 
   function handleSubmit() {
     setColor(input)
   }
 
   useEffect(() => {
-    setInput(context?.palette[0].conversions[colorSpace.format].value)
+    setInput(baseColor?.conversions[colorSpace.format].value)
   }, [colorSpace, context])
 
   return (
@@ -30,8 +32,8 @@ export function InputColor({
       className="input-color"
       style={
         {
-          '--input-bg': context?.palette[0].cssValue,
-          '--input-color': context?.palette[0].contrast,
+          '--input-bg': baseColor?.string,
+          '--input-color': contrast,
         } as React.CSSProperties
       }
     >

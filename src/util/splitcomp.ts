@@ -2,6 +2,7 @@ import Color from 'colorjs.io'
 import { BaseColorData, colorFactory } from './factory'
 import { clampOKLCH, detectFormat } from './utils'
 import { getWarmCoolComplement } from './complementary'
+import { ColorFormat, ColorSpace } from '../types'
 
 function getMathematicalSplitComplementary(hue: number): number[] {
   // Pure mathematical - complement ±30°
@@ -62,10 +63,11 @@ export function generateSplitComplementary(
   baseColor: string,
   options: {
     style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+    colorSpace: { space: ColorSpace; format: ColorFormat }
   },
 ) {
   const { style } = options
-  const format = detectFormat(baseColor)
+  const format = options.colorSpace.format
 
   try {
     const baseColorObj = new Color(baseColor)
@@ -93,7 +95,7 @@ export function generateSplitComplementary(
     splitHues.forEach((hue, splitIndex) => {
       if (splitIndex === 0) {
         // Base color + darker variant
-        colors.push(colorFactory(baseColor, 'split-complementary', 0, format))
+        colors.push(colorFactory(baseColor, 'split-complementary', 0, format, true))
 
         const darkBaseValues = clampOKLCH(baseColorObj.oklch.l - 0.2, baseColorObj.oklch.c * 1.1, hue)
         const darkBase = baseColorObj.clone()

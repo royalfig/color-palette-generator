@@ -18,7 +18,7 @@ export function ColorDisplay({
   const colorName = fetchedData?.colorNames[0]
 
   const context = useContext(ColorContext)
-  const color = context?.palette[0]
+  const color = context?.palette.find(c => c.isBase)
 
   const { lch, oklch, lab, oklab, p3, hsl, rgb, hex } = color?.conversions || {}
 
@@ -39,10 +39,7 @@ export function ColorDisplay({
   return (
     <div className="current-color-display flex col align-start" onClick={handleClick}>
       <div className="header flex justify-start gap-04">
-        <div
-          className="color-dot"
-          style={{ '--color': context?.palette[0].string || '#000' } as React.CSSProperties}
-        ></div>
+        <div className="color-dot" style={{ '--color': color?.string || '#000' } as React.CSSProperties}></div>
         <h1>{colorName}</h1>
       </div>
 

@@ -1,11 +1,6 @@
 .container {
-  display: grid;
-  grid-column: 7 / 13;
-  gap: 0;
-}
-
-.buttons {
   display: flex;
+  grid-column: 9 / 13;
   gap: var(--base-gap);
 
   & > * {

@@ -42,6 +42,11 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
   const context = useContext(ColorContext)
   const palette = context?.palette
 
+  // Sort palette by lightness (HSL L value) without mutating original
+  const sortedPalette = palette
+    ? [...palette].sort((a, b) => a.conversions.hsl.coords[2] - b.conversions.hsl.coords[2])
+    : undefined
+
   // Refs for each circle
   const circlesRef = useRef<(SVGCircleElement | null)[]>([])
   // Store previous palette for animation
@@ -49,8 +54,8 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
 
   useGSAP(
     () => {
-      if (!palette) return
-      palette.forEach((color: BaseColorData, idx: number) => {
+      if (!sortedPalette) return
+      sortedPalette.forEach((color: BaseColorData, idx: number) => {
         const circle = circlesRef.current[idx]
         if (!circle) return
         // Get previous and new positions/colors
@@ -69,16 +74,16 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
         gsap.to(circle, {
           duration: 0.7,
           attr: to,
-          ease: 'power2.inOut',
+          ease: 'power2.out',
         })
       })
       // Update previous palette
-      prevPaletteRef.current = palette.map(c => ({ ...c }))
+      prevPaletteRef.current = sortedPalette.map(c => ({ ...c }))
     },
-    { dependencies: [palette, type] },
+    { dependencies: [sortedPalette, type] },
   )
 
-  if (!palette) return null
+  if (!sortedPalette) return null
 
   return (
     <div className="circle">
@@ -99,7 +104,7 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
         </defs>
         <circle cx="0" cy="0" r={100} fill="none" stroke="var(--dimmed)" strokeWidth="4" />
 
-        {palette.map((color: BaseColorData, idx: number) => {
+        {sortedPalette.map((color: BaseColorData, idx: number) => {
           const { cx, cy, fill } = getCirclePosition(color, idx, type)
           const l = color.conversions.hsl.coords[2]
           return (

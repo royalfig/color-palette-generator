@@ -1,6 +1,7 @@
 import Color from 'colorjs.io'
 import { BaseColorData, colorFactory } from './factory'
 import { detectFormat, clampOKLCH } from './utils'
+import { ColorFormat, ColorSpace } from '../types'
 
 function getMathematicalTriadic(hue: number): number[] {
   // Pure mathematical - rigid 30° steps
@@ -87,18 +88,14 @@ export function generateTriadic(
   baseColor: string,
   options: {
     style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+    colorSpace: { space: ColorSpace; format: ColorFormat }
   },
 ) {
   const { style } = options
-  const format = detectFormat(baseColor)
+  const format = options.colorSpace.format
 
   try {
     const baseColorObj = new Color(baseColor)
-
-    // Handle achromatic colors
-    if (isNaN(baseColorObj.oklch.h) || baseColorObj.oklch.c < 0.01) {
-      return generateGrayscaleTriadic(baseColorObj, format)
-    }
 
     let triadicHues: number[]
 
@@ -123,7 +120,7 @@ export function generateTriadic(
     triadicHues.forEach((hue, triadIndex) => {
       if (triadIndex === 0) {
         // Base color family: original + darker variant
-        colors.push(colorFactory(baseColor, 'triadic', 0, format))
+        colors.push(colorFactory(baseColor, 'triadic', 0, format, true))
 
         const darkBaseValues = clampOKLCH(baseColorObj.oklch.l - 0.2, baseColorObj.oklch.c * 1.1, hue)
         const darkBase = baseColorObj.clone()

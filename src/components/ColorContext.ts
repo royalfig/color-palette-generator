@@ -3,8 +3,7 @@ import { BaseColorData } from '../util/factory'
 import Color from 'colorjs.io'
 
 type ColorContextType = {
-  color: string
+  originalColor: string
   palette: BaseColorData[]
-  colorObj: Color
 }
 export const ColorContext = createContext<ColorContextType | null>(null)

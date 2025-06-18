@@ -3,6 +3,7 @@ import { ColorFormat } from '../types'
 
 export type BaseColorData = {
   code: `${string}-${number}`
+  isBase: boolean
   base: string | Color
   color: Color
   colorSpace: string
@@ -24,10 +25,12 @@ export function colorFactory(
   paletteInformation: string,
   idx = 0,
   format: ColorFormat,
+  isBase = false,
 ): BaseColorData {
   const color = base instanceof Color ? base : new Color(base)
   return {
     code: `${paletteInformation}-${idx + 1}`,
+    isBase,
     base,
     color,
     colorSpace: color.spaceId,

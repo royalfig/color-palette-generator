@@ -21,6 +21,8 @@ import Button from './components/button/Button'
 import { EyeDropper } from './components/eye-dropper/EyeDropper'
 import { InputColor } from './components/input-color/InputColor'
 import { PaletteTypeSelector } from './palette-type-selector/PaletteTypeSelector'
+import { PaletteStyleSelector } from './components/palette-style-selector/PaletteStyleSelector'
+import { DisplayInfo } from './components/display-info/DisplayInfo'
 
 export type ColorName = {
   fetchedData: {
@@ -65,15 +67,21 @@ export default function App() {
   const colorQueryParam = colorQueryParaCheck ? new URLSearchParams(document.location.search).get('color') : null
   const [color, setColor] = useState<string>(colorQueryParam || pickRandomColor())
   const [paletteType, setPaletteType] = useState<PaletteKinds>('spl')
-  const palette = useMemo(() => createPalettes(color, paletteType, 'mathematical'), [color, paletteType])
-  const colorObj = new Color(color)
-  console.log(color)
-  const colorContext = useMemo(() => ({ color, palette, colorObj }), [color, palette, colorObj])
-
+  const [paletteStyle, setPaletteStyle] = useState<'mathematical' | 'optical' | 'adaptive' | 'warm-cool'>(
+    'mathematical',
+  )
   const [colorSpace, setColorSpace] = useState<{ space: ColorSpace; format: ColorFormat }>({
     space: 'oklch',
     format: 'oklch',
   })
+
+  const palette = useMemo(
+    () => createPalettes(color, paletteType, paletteStyle, colorSpace),
+    [color, paletteType, paletteStyle],
+  )
+
+  const colorContext = useMemo(() => ({ originalColor: color, palette }), [color, palette])
+
   const [isActive, setIsActive] = useState(false)
   const [error, setError] = useState('')
   const [msg, setMsg] = useState('')
@@ -120,6 +128,7 @@ export default function App() {
                 isLoading={isLoading}
                 error={colorNameError}
                 paletteType={paletteType}
+                paletteStyle={paletteStyle}
               />
 
               <Swatches />
@@ -131,6 +140,8 @@ export default function App() {
                 <InputColor color={color} setColor={setColor} colorSpace={colorSpace} />
               </div>
               <PaletteTypeSelector paletteType={paletteType} setPaletteType={setPaletteType} />
+              <PaletteStyleSelector paletteStyle={paletteStyle} setPaletteStyle={setPaletteStyle} />
+              <DisplayInfo />
             </div>
           </main>
         </div>

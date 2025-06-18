@@ -25,11 +25,13 @@ export function PaletteDisplay({
   isLoading,
   error,
   paletteType,
+  paletteStyle,
 }: {
   fetchedData: { colorNames: string[]; paletteTitle: string } | null
   isLoading: boolean
   error: Error | null
   paletteType: PaletteKinds
+  paletteStyle: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
 }) {
   const paletteName = fetchedData?.paletteTitle
   const paletteTypeFullName = getPaletteType(paletteType)
@@ -40,8 +42,9 @@ export function PaletteDisplay({
         <Circle type="default" />
       </div>
       <div className="flex gap-02">
-        <SwatchesIcon size={18} color="var(--dimmed)" />
-        <h3 className="palette-type">{paletteTypeFullName}</h3>
+        <p className="palette-type">{paletteTypeFullName}</p>
+        <SwatchesIcon size={20} color="#777" weight="fill" />
+        <p className="palette-style">{paletteStyle}</p>
       </div>
     </div>
   )

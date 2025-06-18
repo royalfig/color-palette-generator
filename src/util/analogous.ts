@@ -1,13 +1,14 @@
 import Color from 'colorjs.io'
 import { colorFactory } from './factory'
 import { clampOKLCH, detectFormat } from './utils'
+import { ColorFormat, ColorSpace } from '../types'
 
 function getMathematicalAnalogous(hue: number): number[] {
   // Pure mathematical - rigid 30° steps
   return [
-    hue, // base
     (hue - 60 + 360) % 360,
     (hue - 30 + 360) % 360,
+    hue, // base
     hue,
     (hue + 30) % 360,
     (hue + 60) % 360,
@@ -20,9 +21,9 @@ function getWarmCoolAnalogous(hue: number): number[] {
   const spacing = isWarm ? 25 : 35 // Warmer colors closer together
 
   return [
-    hue,
     (hue - spacing * 2 + 360) % 360,
     (hue - spacing + 360) % 360,
+    hue,
     hue,
     (hue + spacing) % 360,
     (hue + spacing * 2) % 360,
@@ -45,7 +46,7 @@ function getVisuallyPleasingAnalogous(hue: number): number[] {
   }
 
   // Default spacing for other hues
-  return [hue, (hue - 40 + 360) % 360, (hue - 20 + 360) % 360, hue, (hue + 20) % 360, (hue + 40) % 360]
+  return [(hue - 40 + 360) % 360, (hue - 20 + 360) % 360, hue, hue, (hue + 20) % 360, (hue + 40) % 360]
 }
 
 function getAdaptiveAnalogous(baseColor: Color): number[] {
@@ -65,9 +66,9 @@ function getAdaptiveAnalogous(baseColor: Color): number[] {
   if (hue >= 30 && hue < 90) spacing *= 0.8 // Yellow-orange range
 
   return [
-    hue,
     (hue - spacing * 1.5 + 360) % 360,
     (hue - spacing * 0.7 + 360) % 360,
+    hue,
     hue,
     (hue + spacing * 0.7) % 360,
     (hue + spacing * 1.5) % 360,
@@ -79,13 +80,14 @@ export function generateAnalogous(
   options: {
     chromaAdjust?: number
     style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+    colorSpace: { space: ColorSpace; format: ColorFormat }
   },
 ) {
   const { chromaAdjust = 0.9, style } = options
-  const format = detectFormat(baseColor)
 
   try {
     const baseColorObj = new Color(baseColor)
+    const format = options.colorSpace.format
 
     let analogousHues: number[]
 
@@ -106,9 +108,9 @@ export function generateAnalogous(
 
     // Create color variations with different lightness/chroma
     const variations = [
-      { l: 0, c: 1.0 }, // Base color
       { l: 0.15, c: 0.8 }, // Darker, less saturated
       { l: -0.05, c: 0.9 }, // Slightly darker
+      { l: 0, c: 1.0 }, // Base color
       { l: 0, c: 1.0 }, // Base color
       { l: 0.1, c: 0.85 }, // Lighter
       { l: 0.2, c: 0.7 }, // Much lighter, less saturated
@@ -123,8 +125,9 @@ export function generateAnalogous(
           color.oklch.l = values.l
           color.oklch.c = values.c
           color.oklch.h = values.h
-          return colorFactory(color, 'analogous', index, format)
+          return colorFactory(color, 'analogous', index, format, true)
         }
+
         const values = clampOKLCH(baseColorObj.oklch.l * 1.1, baseColorObj.oklch.c, hue)
         color.oklch.l = values.l
         color.oklch.c = values.c

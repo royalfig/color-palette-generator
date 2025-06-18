@@ -1,6 +1,7 @@
 import Color from 'colorjs.io'
 import { colorFactory } from './factory'
 import { clampOKLCH, detectFormat } from './utils'
+import { ColorFormat, ColorSpace } from '../types'
 
 export function getWarmCoolComplement(hue: number) {
   const adjustedHue = (hue + 180) % 360
@@ -60,10 +61,14 @@ function getAdaptiveComplement(baseColor: Color): number {
 
 export function generateComplementary(
   baseColor: string,
-  options: { chromaAdjust?: number; style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool' },
+  options: {
+    chromaAdjust?: number
+    style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+    colorSpace: { space: ColorSpace; format: ColorFormat }
+  },
 ) {
   const { chromaAdjust = 0.9 } = options
-  const format = detectFormat(baseColor)
+  const format = options.colorSpace.format
 
   try {
     const baseColorObj = new Color(baseColor)
@@ -125,7 +130,7 @@ export function generateComplementary(
     mutedComplement.oklch.h = mutedCompValues.h
 
     return [
-      colorFactory(baseColor, 'complementary', 0, format),
+      colorFactory(baseColor, 'complementary', 0, format, true),
       colorFactory(mainComplement, 'complementary', 1, format),
       colorFactory(darkBase, 'complementary', 2, format),
       colorFactory(mutedBase, 'complementary', 3, format),

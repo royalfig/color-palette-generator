@@ -30,11 +30,15 @@
   margin-inline: auto;
 }
 
-.palette-type {
+.palette-type,
+.palette-style {
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 0.8rem;
   font-weight: 400;
   line-height: 1.4;
   color: #cbcbcb;
   text-align: center;
   text-transform: uppercase;
+  white-space: nowrap;
 }

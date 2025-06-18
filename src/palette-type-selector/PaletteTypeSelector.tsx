@@ -13,11 +13,18 @@ export function PaletteTypeSelector({
 }) {
   return (
     <div className={classes.container}>
-      {paletteTypeOptions.map(option => (
-        <Button key={option} handler={() => setPaletteType(option)} active={paletteType === option}>
-          {option}
-        </Button>
-      ))}
+      <div className="color-space-selector-header">
+        <div className="divider"></div>
+        <p>Palette Type</p>
+        <div className="divider"></div>
+      </div>
+      <div className={classes.buttons}>
+        {paletteTypeOptions.map(option => (
+          <Button key={option} handler={() => setPaletteType(option)} active={paletteType === option}>
+            {option}
+          </Button>
+        ))}
+      </div>
     </div>
   )
 }

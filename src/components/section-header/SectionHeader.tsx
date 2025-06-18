@@ -7,10 +7,11 @@ function VibrancyModule() {
   const context = useContext(ColorContext)
   if (!context) return null
 
-  const { palette, colorObj } = context
+  const { palette } = context
+  const baseColor = palette.find(c => c.isBase)
 
   const colors = palette.map(color => color.string)
-  const linearGradient = `linear-gradient(to right in ${palette[0].colorSpace}, ${colors.join(', ')})`
+  const linearGradient = `linear-gradient(to right in ${baseColor?.colorSpace}, ${colors.join(', ')})`
 
   return (
     <div className="vibrancy-module">
