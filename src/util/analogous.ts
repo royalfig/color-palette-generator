@@ -2,6 +2,7 @@ import Color from 'colorjs.io'
 import { colorFactory } from './factory'
 import { clampOKLCH, detectFormat } from './utils'
 import { ColorFormat, ColorSpace } from '../types'
+import { enhancePalette, avoidMuddyZones, applyEnhancementsToAnalogous } from './enhancer'
 
 function getMathematicalAnalogous(hue: number): number[] {
   // Pure mathematical - rigid 30° steps
@@ -282,6 +283,7 @@ export function generateAnalogous(
   },
 ) {
   const { chromaAdjust = 0.9, style } = options
+  const enhanced = style === 'mathematical' ? false : true
 
   try {
     const baseColorObj = new Color(baseColor)
@@ -377,43 +379,56 @@ export function generateAnalogous(
       }
     }
 
-    return analogousHues.map((hue, index) => {
+    // Create initial colors
+    const initialColors = analogousHues.map((hue, index) => {
       const color = baseColorObj.clone()
 
-      // Preserve the base color at indices 2 and 3
       if (index === 2) {
-        // Index 2: exact base color, no modifications
-        return colorFactory(color, 'analogous', index, format, true)
+        // Preserve base color
+        return new Color(baseColor)
       }
 
       if (index === 3) {
-        // Index 3: base color with slight lightness variation
-        if (color.oklch.l > 0.5) {
-          const values = clampOKLCH(baseColorObj.oklch.l * 0.9, baseColorObj.oklch.c, baseColorObj.oklch.h)
-          color.oklch.l = values.l
-          color.oklch.c = values.c
-          color.oklch.h = values.h
-          return colorFactory(color, 'analogous', index, format)
-        }
-
-        const values = clampOKLCH(baseColorObj.oklch.l * 1.1, baseColorObj.oklch.c, baseColorObj.oklch.h)
+        // Base variant
+        const values = clampOKLCH(baseColorObj.oklch.l * 0.9, baseColorObj.oklch.c, baseColorObj.oklch.h)
         color.oklch.l = values.l
         color.oklch.c = values.c
         color.oklch.h = values.h
-        return colorFactory(color, 'analogous', index, format)
+        return color
       }
 
-      // For all other indices, use the calculated analogous hue
       const variation = variations[index]
-      const values = clampOKLCH(
-        baseColorObj.oklch.l + variation.l,
-        baseColorObj.oklch.c * variation.c * chromaAdjust,
-        hue,
-      )
+
+      // Apply muddy zone avoidance if enhanced mode
+      let finalHue = hue
+      let finalLightness = baseColorObj.oklch.l + variation.l
+      let finalChroma = baseColorObj.oklch.c * variation.c * chromaAdjust
+
+      if (enhanced) {
+        const cleaned = avoidMuddyZones(finalHue, finalLightness, finalChroma)
+        finalHue = cleaned.h
+        finalLightness = cleaned.l
+        finalChroma = cleaned.c
+      }
+
+      const values = clampOKLCH(finalLightness, finalChroma, finalHue)
       color.oklch.l = values.l
       color.oklch.c = values.c
       color.oklch.h = values.h
 
+      return color
+    })
+
+    // Apply enhancements if enabled
+    const finalColors = enhanced
+      ? applyEnhancementsToAnalogous(initialColors, style, 2) // Base is at index 2
+      : initialColors
+
+    // Convert to your color factory format
+    return finalColors.map((color, index) => {
+      if (index === 2) {
+        return colorFactory(baseColor, 'analogous', index, format, true)
+      }
       return colorFactory(color, 'analogous', index, format)
     })
   } catch (e) {
