@@ -239,6 +239,7 @@ function getColorHierarchy(
   // Tints and shades - gradient hierarchy
   return Array.from({ length: 12 }, (_, i) => {
     const isBase = i === 5 || i === 6 // Assume base is in middle
+
     if (isBase) {
       return { name: 'protagonist', chromaMultiplier: 1.0, lightnessShift: 0, presence: 0.3 }
     }

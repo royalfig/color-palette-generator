@@ -129,7 +129,13 @@ export default function App() {
                 paletteType={paletteType}
                 paletteStyle={paletteStyle}
               />
-              <AuxillaryDisplay showPaletteColors={showPaletteColors} colorSpace={colorSpace} />
+              <AuxillaryDisplay
+                showPaletteColors={showPaletteColors}
+                colorSpace={colorSpace}
+                colorNames={fetchedData?.colorNames || []}
+                paletteType={paletteType}
+                paletteStyle={paletteStyle}
+              />
             </Display>
             <div className="synth-body col-12">
               <ColorSpaceSelector colorSpace={colorSpace} setColorSpace={setColorSpace} />

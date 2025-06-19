@@ -1,15 +1,12 @@
-// To use GSAP with React, install both:
-// npm install gsap @gsap/react
-import { useContext, useRef, use } from 'react'
+import { use } from 'react'
 import { BaseColorData } from '../../util/factory'
 import { ColorContext } from '../ColorContext'
+import { motion } from 'motion/react'
 import './circle.css'
-import gsap from 'gsap'
-import { useGSAP } from '@gsap/react'
-gsap.registerPlugin(useGSAP)
 
 function getCirclePosition(color: BaseColorData, idx: number, type: 'default' | 'circle') {
-  const [hue, saturation, lightness] = color.conversions.hsl.coords
+  const [hue, saturation, lightness] = color.conversions.hsl.value.match(/\d+(?:\.\d+)?/g)?.map(Number) || [0, 0, 0]
+  console.log(hue, saturation, lightness)
   if (type !== 'circle') {
     const h = Number(hue.toFixed(2))
     const s = saturation > 100 ? 100 : saturation
@@ -69,30 +66,8 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
 
   const paletteValues = sortedPalette.map((color, idx) => getCirclePosition(color, idx, type))
 
-  // Refs for each circle
-  const circleContainerRef = useRef<HTMLDivElement>(null)
-  const circlesRef = useRef<(SVGCircleElement | null)[]>([])
-  // Store previous palette for animation
-  const prevPaletteRef = useRef<BaseColorData[] | null>(null)
-
-  useGSAP(
-    () => {
-      paletteValues.forEach(({ cx, cy, h, s, l, hue, saturation, lightness }, idx) => {
-        gsap.to(`.circle-item:nth-child(${idx + 2})`, {
-          duration: 0.7,
-          ease: 'sine.out',
-          attr: { cx, cy },
-          '--h': hue,
-          '--s': saturation,
-          '--l': lightness,
-        })
-      })
-    },
-    { scope: circleContainerRef, dependencies: [sortedPalette, type] },
-  )
-
   return (
-    <div className="circle" ref={circleContainerRef}>
+    <div className="circle">
       <svg viewBox="-120 -120 240 240">
         <defs>
           <filter id="shadow-elevation-1" x="-50%" y="-50%" width="200%" height="200%">
@@ -108,26 +83,30 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
             <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor="#000" floodOpacity="0.55" />
           </filter>
         </defs>
+
+        {/* Background circle */}
         <circle cx="0" cy="0" r={100} fill="none" stroke="var(--dimmed)" strokeWidth="4" />
 
-        {paletteValues.map(({ cx, cy, h, s, l, hue, saturation, lightness }, idx) => {
-          console.log(hue, saturation, lightness)
-          return (
-            <circle
-              key={idx}
-              ref={el => {
-                circlesRef.current[idx] = el
-              }}
-              cx={cx}
-              cy={cy}
-              r={18}
-              fill="hsl(var(--h) var(--s) var(--l))"
-              filter={getElevationFilter(l)}
-              className="circle-item"
-              style={{ '--h': hue, '--s': saturation, '--l': lightness } as React.CSSProperties}
-            ></circle>
-          )
-        })}
+        {/* Animated color circles */}
+        {paletteValues.map(({ cx, cy, l, hue, saturation, lightness }, idx) => (
+          <motion.circle
+            key={`circle-${idx}`}
+            animate={{
+              cx,
+              cy,
+              fill: `hsl(${hue} ${saturation} ${lightness})`,
+            }}
+            transition={{
+              duration: 0.25,
+              ease: 'easeOut',
+              type: 'tween', // Use tween instead of spring for consistent timing
+            }}
+            initial={false} // Don't animate on mount
+            r={18}
+            filter={getElevationFilter(l)}
+            className="circle-item"
+          />
+        ))}
       </svg>
     </div>
   )
