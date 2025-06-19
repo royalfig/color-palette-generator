@@ -3,7 +3,7 @@ import { BaseColorData, colorFactory } from './factory'
 import { clampOKLCH, detectFormat } from './utils'
 import { ColorFormat } from '../types'
 import { ColorSpace } from '../types'
-import { enhancePalette, avoidMuddyZones, applyEnhancementsToTetradic } from './enhancer'
+import { enhancePalette, avoidMuddyZones, polishPalette, applyEnhancementsToTetradic } from './enhancer'
 
 function getMathematicalTetradic(hue: number): number[] {
   // Perfect 90° spacing forming a square
@@ -423,7 +423,7 @@ export function generateTetradic(
 
     // Apply enhancements if enabled
     const finalColors = enhanced
-      ? applyEnhancementsToTetradic(initialColors, style, 0) // Base is at index 0
+      ? polishPalette(applyEnhancementsToTetradic(initialColors, style, 0), 0) // Base is at index 0
       : initialColors
 
     // Convert to your color factory format

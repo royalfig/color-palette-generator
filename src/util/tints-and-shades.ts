@@ -299,6 +299,21 @@ function findBaseColorPosition(baseLightness: number, progression: number[]): nu
   return closestIndex
 }
 
+function preserveColorIdentity(originalHue: number, modifiedHue: number, maxAllowedShift: number = 5): number {
+  const shift = modifiedHue - originalHue
+
+  // Normalize shift to -180 to 180 range
+  const normalizedShift = ((shift + 180) % 360) - 180
+
+  // Clamp to maximum allowed shift
+  if (Math.abs(normalizedShift) > maxAllowedShift) {
+    const clampedShift = Math.sign(normalizedShift) * maxAllowedShift
+    return (originalHue + clampedShift + 360) % 360
+  }
+
+  return modifiedHue
+}
+
 function getStyleAdjustments(
   targetLightness: number,
   baseLightness: number,
@@ -308,88 +323,111 @@ function getStyleAdjustments(
   baseColor: Color,
 ): { chroma: number; hue: number } {
   const lightnessDiff = targetLightness - baseLightness
+  const isShade = lightnessDiff < 0
+  const intensity = Math.abs(lightnessDiff)
 
   if (style === 'mathematical') {
-    // Mathematical: no adjustments, pure lightness changes
+    // Pure tints/shades - no adjustments at all
     return { chroma: baseChroma, hue: baseHue }
   }
 
   if (style === 'optical') {
-    // Perceptual Harmony: natural color behavior
-    // Darker colors can hold more saturation, lighter colors become more muted
+    // Perceptual: mimic how paint/pigment behaves
     let chromaMultiplier = 1.0
+    let hueShift = 0
 
-    if (lightnessDiff < 0) {
-      // Getting darker: can increase saturation (shadows are richer)
-      chromaMultiplier = 1.0 + Math.abs(lightnessDiff) * 0.4
+    if (isShade) {
+      // Darker: slight chroma boost (rich shadows)
+      chromaMultiplier = 1.0 + intensity * 0.2 // Max 20% boost
+      // Minimal hue shift toward the "shadow" version of the color
+      hueShift = -intensity * 2 // Max -2° shift
     } else {
-      // Getting lighter: reduce saturation (atmospheric perspective)
-      chromaMultiplier = 1.0 - lightnessDiff * 0.6
+      // Lighter: chroma reduction (tints are naturally less saturated)
+      chromaMultiplier = 1.0 - intensity * 0.4 // Max 40% reduction
+      // Very slight warm shift (like adding white paint)
+      hueShift = intensity * 1 // Max +1° shift
     }
 
     return {
       chroma: Math.max(0, Math.min(0.37, baseChroma * chromaMultiplier)),
-      hue: baseHue,
+      hue: preserveColorIdentity(baseHue, (baseHue + hueShift + 360) % 360),
     }
   }
 
   if (style === 'adaptive') {
-    // Emotional Resonance: varies by emotional type
+    // Emotional: color-specific but subtle adjustments
     const hue = baseColor.oklch.h
     let chromaMultiplier = 1.0
     let hueShift = 0
 
+    // Keep hue shifts VERY subtle - max ±3°
     if (hue >= 345 || hue < 30) {
-      // passionate
-      if (lightnessDiff < 0) {
-        // Darker: more intense, slightly cooler (mysterious passion)
-        chromaMultiplier = 1.0 + Math.abs(lightnessDiff) * 0.5
-        hueShift = lightnessDiff * -5 // Slight cool shift
+      // Passionate reds
+      if (isShade) {
+        chromaMultiplier = 1.0 + intensity * 0.3 // Deeper = more intense
+        hueShift = -intensity * 3 // Very slight purple shift in shadows
       } else {
-        // Lighter: warm, radiant glow
-        chromaMultiplier = 1.0 - lightnessDiff * 0.4
-        hueShift = lightnessDiff * 8 // Warm shift
+        chromaMultiplier = 1.0 - intensity * 0.35
+        hueShift = intensity * 2 // Slight coral shift in highlights
       }
     } else if (hue >= 150 && hue < 210) {
-      // tranquil
-      if (lightnessDiff < 0) {
-        // Darker: deeper, more mysterious
-        chromaMultiplier = 1.0 + Math.abs(lightnessDiff) * 0.3
-        hueShift = lightnessDiff * -3
+      // Tranquil blues
+      if (isShade) {
+        chromaMultiplier = 1.0 + intensity * 0.15 // Subtle depth
+        hueShift = -intensity * 2 // Slight green shift in shadows
       } else {
-        // Lighter: ethereal, peaceful
-        chromaMultiplier = 1.0 - lightnessDiff * 0.5
-        hueShift = lightnessDiff * 5
+        chromaMultiplier = 1.0 - intensity * 0.45 // More ethereal
+        hueShift = intensity * 1.5 // Slight purple shift in highlights
+      }
+    } else if (hue >= 90 && hue < 150) {
+      // Natural greens
+      if (isShade) {
+        chromaMultiplier = 1.0 + intensity * 0.25
+        hueShift = -intensity * 2.5 // Slight blue shift (forest shadows)
+      } else {
+        chromaMultiplier = 1.0 - intensity * 0.4
+        hueShift = intensity * 2 // Slight yellow shift (sunlit leaves)
       }
     } else {
-      // Default emotional progression
-      chromaMultiplier = lightnessDiff < 0 ? 1.0 + Math.abs(lightnessDiff) * 0.3 : 1.0 - lightnessDiff * 0.5
+      // Default subtle progression
+      chromaMultiplier = isShade ? 1.0 + intensity * 0.2 : 1.0 - intensity * 0.4
+      hueShift = isShade ? -intensity * 2 : intensity * 1.5
     }
 
     return {
       chroma: Math.max(0, Math.min(0.37, baseChroma * chromaMultiplier)),
-      hue: (baseHue + hueShift + 360) % 360,
+      hue: preserveColorIdentity(baseHue, (baseHue + hueShift + 360) % 360, 3),
     }
   }
 
   if (style === 'warm-cool') {
-    // Luminosity Dance: temperature shifts based on lighting physics
+    // Temperature shifts but MUCH more subtle
     let hueShift = 0
     let chromaMultiplier = 1.0
 
-    if (lightnessDiff < 0) {
-      // Darker: shadows go cooler and can be more saturated
-      hueShift = lightnessDiff * -12 // Cooler (toward blue)
-      chromaMultiplier = 1.0 + Math.abs(lightnessDiff) * 0.3
+    // Maximum ±5° shift (was ±18°!)
+    if (isShade) {
+      // Shadows have cool undertones
+      hueShift = -intensity * 5 // Max -5° toward cool
+      chromaMultiplier = 1.0 + intensity * 0.15 // Slightly richer
     } else {
-      // Lighter: highlights go warmer and become less saturated
-      hueShift = lightnessDiff * 18 // Warmer (toward yellow)
-      chromaMultiplier = 1.0 - lightnessDiff * 0.5
+      // Highlights have warm undertones
+      hueShift = intensity * 4 // Max +4° toward warm
+      chromaMultiplier = 1.0 - intensity * 0.35 // Reduced saturation
+    }
+
+    // Extra subtle for already warm/cool colors
+    if (baseHue >= 180 && baseHue <= 240 && !isShade) {
+      // Already cool colors: less warming in tints
+      hueShift *= 0.5
+    } else if (baseHue >= 30 && baseHue <= 90 && isShade) {
+      // Already warm colors: less cooling in shades
+      hueShift *= 0.5
     }
 
     return {
       chroma: Math.max(0, Math.min(0.37, baseChroma * chromaMultiplier)),
-      hue: (baseHue + hueShift + 360) % 360,
+      hue: preserveColorIdentity(baseHue, (baseHue + hueShift + 360) % 360, 5),
     }
   }
 

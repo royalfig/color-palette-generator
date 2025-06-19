@@ -2,7 +2,7 @@ import Color from 'colorjs.io'
 import { colorFactory } from './factory'
 import { clampOKLCH, detectFormat } from './utils'
 import { ColorFormat, ColorSpace } from '../types'
-import { enhancePalette, avoidMuddyZones, applyEnhancementsToComplementary } from './enhancer'
+import { enhancePalette, avoidMuddyZones, polishPalette, applyEnhancementsToComplementary } from './enhancer'
 
 export function getWarmCoolComplement(hue: number) {
   const adjustedHue = (hue + 180) % 360
@@ -325,7 +325,7 @@ export function generateComplementary(
 
     // Apply enhancements if enabled
     const finalColors = enhanced
-      ? applyEnhancementsToComplementary(initialColors, options.style, 0) // Base is at index 0
+      ? polishPalette(applyEnhancementsToComplementary(initialColors, options.style, 0), 0) // Base is at index 0
       : initialColors
 
     // Convert to your color factory format

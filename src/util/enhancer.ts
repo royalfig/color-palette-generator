@@ -267,7 +267,7 @@ function getColorHierarchy(
 
 export function enhancePalette(
   colors: Color[],
-  paletteType: 'analogous' | 'complementary' | 'split-complementary' | 'tetradic' | 'tints-shades',
+  paletteType: 'analogous' | 'complementary' | 'split-complementary' | 'tetradic' | 'tints-shades' | 'triadic',
   style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool',
   baseColorIndex: number = 0,
 ): Color[] {
@@ -333,6 +333,10 @@ export function applyEnhancementsToTintsShades(colors: Color[], style: string, b
   return enhancePalette(colors, 'tints-shades', style as any, baseIndex)
 }
 
+export function applyEnhancementsToTriadic(colors: Color[], style: string, baseIndex: number = 0): Color[] {
+  return enhancePalette(colors, 'triadic', style as any, baseIndex)
+}
+
 // ===== MUDDY ZONE AVOIDANCE =====
 // Bonus: Fix muddy colors
 export function avoidMuddyZones(hue: number, lightness: number, chroma: number): { h: number; l: number; c: number } {
@@ -365,8 +369,12 @@ export function avoidMuddyZones(hue: number, lightness: number, chroma: number):
 
 // Add this to enhancer.ts
 
-export function polishPalette(colors: Color[]): Color[] {
+export function polishPalette(colors: Color[], baseColorIndex: number = 0): Color[] {
   return colors.map((color, index) => {
+    if (index === baseColorIndex) {
+      return color
+    }
+
     const polished = color.clone()
     const oklch = polished.oklch
 

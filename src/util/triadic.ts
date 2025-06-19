@@ -2,7 +2,7 @@ import Color from 'colorjs.io'
 import { BaseColorData, colorFactory } from './factory'
 import { detectFormat, clampOKLCH } from './utils'
 import { ColorFormat, ColorSpace } from '../types'
-import { avoidMuddyZones, applyEnhancementsToTriadic } from './enhancer'
+import { avoidMuddyZones, polishPalette, applyEnhancementsToTriadic } from './enhancer'
 
 function getMathematicalTriadic(hue: number): number[] {
   // Pure mathematical - rigid 120° steps
@@ -388,7 +388,7 @@ export function generateTriadic(
 
     // Apply enhancements if enabled
     const finalColors = enhanced
-      ? applyEnhancementsToTriadic(initialColors, style, 0) // Base is at index 0
+      ? polishPalette(applyEnhancementsToTriadic(initialColors, style, 0), 0) // Base is at index 0
       : initialColors
 
     // Convert to your color factory format

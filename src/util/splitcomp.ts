@@ -3,6 +3,7 @@ import { BaseColorData, colorFactory } from './factory'
 import { clampOKLCH, detectFormat } from './utils'
 import { getWarmCoolComplement } from './complementary'
 import { ColorFormat, ColorSpace } from '../types'
+import { applyEnhancementsToSplitComplementary, avoidMuddyZones, polishPalette } from './enhancer'
 
 function getMathematicalSplitComplementary(hue: number): number[] {
   // Pure mathematical - complement ±30°
@@ -199,6 +200,7 @@ export function generateSplitComplementary(
 ) {
   const { style } = options
   const format = options.colorSpace.format
+  const enhanced = options.style === 'mathematical' ? false : true
 
   try {
     const baseColorObj = new Color(baseColor)
@@ -317,13 +319,12 @@ export function generateSplitComplementary(
       }
     }
 
-    const colors: BaseColorData[] = []
+    const initialColors: Color[] = []
 
-    // Create 6 colors from 3 split complementary hues
     splitHues.forEach((hue, splitIndex) => {
       if (splitIndex === 0) {
-        // Base color (preserved) + darker variant
-        colors.push(colorFactory(baseColor, 'split-complementary', 0, format, true))
+        // Base color + darker variant
+        initialColors.push(new Color(baseColor)) // Preserve base
 
         const darkBaseValues = clampOKLCH(
           baseColorObj.oklch.l + baseVariations.dark.l,
@@ -334,16 +335,27 @@ export function generateSplitComplementary(
         darkBase.oklch.l = darkBaseValues.l
         darkBase.oklch.c = darkBaseValues.c
         darkBase.oklch.h = darkBaseValues.h
-        colors.push(colorFactory(darkBase, 'split-complementary', 1, format))
+        initialColors.push(darkBase)
       } else {
         // Split complement colors + their variants
         const isFirstSplit = splitIndex === 1
         const variations = isFirstSplit ? complementVariations.first : complementVariations.second
 
+        // Apply muddy zone avoidance if enhanced mode
+        let finalHue = hue
+        if (enhanced) {
+          const cleaned = avoidMuddyZones(
+            hue,
+            baseColorObj.oklch.l + variations.pure.l,
+            baseColorObj.oklch.c * variations.pure.c,
+          )
+          finalHue = cleaned.h
+        }
+
         const pureValues = clampOKLCH(
           baseColorObj.oklch.l + variations.pure.l,
           baseColorObj.oklch.c * variations.pure.c,
-          hue,
+          finalHue,
         )
         const pureColor = baseColorObj.clone()
         pureColor.oklch.l = pureValues.l
@@ -353,22 +365,33 @@ export function generateSplitComplementary(
         const mutedValues = clampOKLCH(
           baseColorObj.oklch.l + variations.muted.l,
           baseColorObj.oklch.c * variations.muted.c,
-          hue,
+          finalHue,
         )
         const mutedColor = baseColorObj.clone()
         mutedColor.oklch.l = mutedValues.l
         mutedColor.oklch.c = mutedValues.c
         mutedColor.oklch.h = mutedValues.h
 
-        if (splitIndex === 1) {
-          colors.push(colorFactory(pureColor, 'split-complementary', 2, format))
-          colors.push(colorFactory(mutedColor, 'split-complementary', 3, format))
-        } else {
-          colors.push(colorFactory(pureColor, 'split-complementary', 4, format))
-          colors.push(colorFactory(mutedColor, 'split-complementary', 5, format))
-        }
+        initialColors.push(pureColor, mutedColor)
       }
     })
+
+    const finalColors = enhanced
+      ? polishPalette(applyEnhancementsToSplitComplementary(initialColors, style, 0), 0) // Base is at index 0
+      : initialColors
+
+    // Convert to your color factory format
+    const colors: BaseColorData[] = []
+
+    finalColors.forEach((color, index) => {
+      if (index === 0) {
+        colors.push(colorFactory(baseColor, 'split-complementary', index, format, true))
+      } else {
+        colors.push(colorFactory(color, 'split-complementary', index, format))
+      }
+    })
+
+    return colors
 
     return colors
   } catch (e) {

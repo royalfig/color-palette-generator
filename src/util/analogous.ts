@@ -2,7 +2,7 @@ import Color from 'colorjs.io'
 import { colorFactory } from './factory'
 import { clampOKLCH, detectFormat } from './utils'
 import { ColorFormat, ColorSpace } from '../types'
-import { enhancePalette, avoidMuddyZones, applyEnhancementsToAnalogous } from './enhancer'
+import { enhancePalette, avoidMuddyZones, applyEnhancementsToAnalogous, polishPalette } from './enhancer'
 
 function getMathematicalAnalogous(hue: number): number[] {
   // Pure mathematical - rigid 30° steps
@@ -421,7 +421,7 @@ export function generateAnalogous(
 
     // Apply enhancements if enabled
     const finalColors = enhanced
-      ? applyEnhancementsToAnalogous(initialColors, style, 2) // Base is at index 2
+      ? polishPalette(applyEnhancementsToAnalogous(initialColors, style, 2), 2) // Base is at index 2
       : initialColors
 
     // Convert to your color factory format
