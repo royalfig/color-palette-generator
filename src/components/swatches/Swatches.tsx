@@ -45,17 +45,15 @@ export function Swatches({
       let colorIdx = Math.floor(col / columnsPerColor)
       if (colorIdx >= colorsCount) colorIdx = colorsCount - 1
       const targetColor = palette[colorIdx].cssValue
-      // Only animate if the color is different
-      if ((el as HTMLElement).style.backgroundColor !== targetColor) {
-        animate(
-          el as HTMLElement,
-          { backgroundColor: targetColor },
-          {
-            duration: 0.025,
-            delay: (row + col) * 0.01,
-          },
-        )
-      }
+
+      animate(
+        el as HTMLElement,
+        { backgroundColor: targetColor },
+        {
+          duration: 0.025,
+          delay: (row + col) * 0.01,
+        },
+      )
     })
   }, [palette, paletteType, paletteStyle, animate, columns, rows, columnsPerColor, colorsCount])
 

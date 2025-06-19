@@ -1,8 +1,57 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import type { ColorSpace, ColorFormat, PaletteStyle } from '../../types'
 import { Swatches } from '../swatches/Swatches'
 import { ColorContext } from '../ColorContext'
-import { ColorName } from '../../App'
+import { BaseColorData } from '../../util/factory'
+import './PaletteDetails.css'
+
+import { motion, useAnimate } from 'motion/react'
+
+function PaletteDetails({
+  palette,
+  colorNames,
+  colorSpace,
+}: {
+  palette: BaseColorData[]
+  colorNames: string[]
+  colorSpace: { space: ColorSpace; format: ColorFormat }
+}) {
+  const handleColorClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const colorValue = e.currentTarget.dataset.colorValue
+    if (colorValue) {
+      try {
+        navigator.clipboard.writeText(colorValue)
+      } catch (error) {
+        console.error('Failed to copy color value:', error)
+      }
+    }
+  }
+  const [scope, animate] = useAnimate()
+
+  useEffect(() => {
+    if (!scope.current) return
+    Array.from(scope.current.querySelectorAll('.palette-detail')).forEach((el, i) => {
+      animate(el as HTMLElement, { opacity: 1 }, { type: 'spring', stiffness: 100, damping: 10, delay: i * 0.05 })
+    })
+  }, [palette])
+
+  return (
+    <div className="palette-details" ref={scope} style={{ '--items': palette.length / 2 } as React.CSSProperties}>
+      {palette.map((color, index) => (
+        <div
+          key={color.code}
+          style={{ '--bg': color.cssValue, '--color': color.contrast } as React.CSSProperties}
+          className="palette-detail"
+          data-color-value={color.conversions[colorSpace.format].value}
+          onClick={handleColorClick}
+        >
+          {palette.length < 7 && <p>{colorNames?.[index]}</p>}
+          <p>{color.conversions[colorSpace.format].value}</p>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export function AuxillaryDisplay({
   showPaletteColors,
@@ -26,18 +75,7 @@ export function AuxillaryDisplay({
   const { palette } = context
 
   if (showPaletteColors) {
-    return (
-      <div style={{ gridColumn: '7 / 13' }}>
-        {palette.map((color, index) => (
-          <div key={color.code} style={{ backgroundColor: color.cssValue }}>
-            <div style={{ color: color.contrast, padding: '4px 8px', fontSize: '12px' }}>
-              <p>{colorNames?.[index]}</p>
-              <p>{color.conversions[colorSpace.format].value}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    )
+    return <PaletteDetails palette={palette} colorNames={colorNames} colorSpace={colorSpace} />
   }
   return <Swatches colorSpace={colorSpace} paletteType={paletteType} paletteStyle={paletteStyle} />
 }

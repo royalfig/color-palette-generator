@@ -21,6 +21,7 @@ import { PaletteTypeSelector } from './palette-type-selector/PaletteTypeSelector
 import type { ColorFormat, ColorSpace, PaletteKinds } from './types'
 import { createPalettes } from './util'
 import { pickRandomColor } from './util/pickRandomColor'
+import { HueSlider } from './components/hue-slider/HueSlider'
 
 export type ColorName = {
   fetchedData: {
@@ -147,6 +148,7 @@ export default function App() {
               <PaletteStyleSelector paletteStyle={paletteStyle} setPaletteStyle={setPaletteStyle} />
               <PaletteToolSelector showPaletteColors={showPaletteColors} setShowPaletteColors={setShowPaletteColors} />
               <DisplayInfo />
+              <HueSlider setColor={setColor} colorSpace={colorSpace} />
             </div>
           </main>
         </div>

@@ -1,0 +1,92 @@
+.hue-slider {
+  grid-column: 1/ 7;
+
+  input[type='range'] {
+    width: 100%;
+    padding: 0;
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+    background: transparent;
+    border: none;
+
+    &::-webkit-slider-runnable-track {
+      height: 10px;
+      background: var(--track-style);
+      border: 1px solid rgb(83 83 83);
+      border-radius: 1000px;
+    }
+
+    /* Thumb: webkit */
+    &::-webkit-slider-thumb {
+      position: relative;
+      width: 8px;
+      height: 24px;
+      margin-top: -8px;
+      appearance: none;
+      background: var(--thumb-style);
+      border: 2px solid #eee;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px 0 hsl(0deg 0% 0% / 10%), 0 0 0 1px hsl(0deg 0% 0% / 15%);
+
+      &::before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        content: '';
+        background: linear-gradient(to bottom, #fff, #000);
+        border-radius: 50%;
+      }
+
+      /*  slider progress trick  */
+    }
+
+    /* Thumb: Firefox */
+    &::-moz-range-thumb {
+      position: relative;
+      width: 5px;
+      height: 12px;
+      padding: 1px;
+      background-color: #fffa;
+      border: 1px solid #fffa;
+      border-radius: 50%;
+
+      &::before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        content: '';
+        background: linear-gradient(to bottom, #fff, #000);
+        border-radius: 50%;
+      }
+    }
+  }
+}
+
+.hue-slider-inputs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: fit-content;
+  padding: 4px;
+  margin-block-end: 10px;
+  margin-inline-start: auto;
+  color: #fff;
+  background: #000;
+  border-radius: 4px;
+
+  input {
+    width: 6em;
+    height: 20px;
+    font-size: 14px;
+    color: #fff;
+    text-align: center;
+    outline: none;
+    background: transparent;
+    border: none;
+  }
+}

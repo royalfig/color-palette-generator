@@ -6,7 +6,6 @@ import './circle.css'
 
 function getCirclePosition(color: BaseColorData, idx: number, type: 'default' | 'circle') {
   const [hue, saturation, lightness] = color.conversions.hsl.value.match(/\d+(?:\.\d+)?/g)?.map(Number) || [0, 0, 0]
-  console.log(hue, saturation, lightness)
   if (type !== 'circle') {
     const h = Number(hue.toFixed(2))
     const s = saturation > 100 ? 100 : saturation
