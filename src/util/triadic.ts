@@ -2,6 +2,7 @@ import Color from 'colorjs.io'
 import { BaseColorData, colorFactory } from './factory'
 import { detectFormat, clampOKLCH } from './utils'
 import { ColorFormat, ColorSpace } from '../types'
+import { avoidMuddyZones, applyEnhancementsToTriadic } from './enhancer'
 
 function getMathematicalTriadic(hue: number): number[] {
   // Pure mathematical - rigid 120° steps
@@ -209,6 +210,7 @@ export function generateTriadic(
 ) {
   const { style } = options
   const format = options.colorSpace.format
+  const enhanced = options.style === 'mathematical' ? false : true
 
   try {
     const baseColorObj = new Color(baseColor)
@@ -326,14 +328,13 @@ export function generateTriadic(
         }
       }
     }
-
-    const colors: BaseColorData[] = []
+    const initialColors: Color[] = []
 
     // For each of the 3 triadic hues, create 2 variations
     triadicHues.forEach((hue, triadIndex) => {
       if (triadIndex === 0) {
         // Base color family: original (preserved) + darker variant
-        colors.push(colorFactory(baseColor, 'triadic', 0, format, true))
+        initialColors.push(new Color(baseColor)) // Preserve base
 
         const darkBaseValues = clampOKLCH(
           baseColorObj.oklch.l + baseVariations.dark.l,
@@ -344,33 +345,59 @@ export function generateTriadic(
         darkBase.oklch.l = darkBaseValues.l
         darkBase.oklch.c = darkBaseValues.c
         darkBase.oklch.h = darkBaseValues.h
-        colors.push(colorFactory(darkBase, 'triadic', 1, format))
+        initialColors.push(darkBase)
       } else {
         // Other triadic families: pure + muted variant
         const isFirstTriad = triadIndex === 1
         const variations = isFirstTriad ? triadVariations.first : triadVariations.second
 
+        // Apply muddy zone avoidance if enhanced mode
+        let finalHue = hue
+        if (enhanced) {
+          const cleaned = avoidMuddyZones(
+            hue,
+            baseColorObj.oklch.l + variations.pure.l,
+            baseColorObj.oklch.c * variations.pure.c,
+          )
+          finalHue = cleaned.h
+        }
+
         const pureValues = clampOKLCH(
           baseColorObj.oklch.l + variations.pure.l,
           baseColorObj.oklch.c * variations.pure.c,
-          hue,
+          finalHue,
         )
         const pureColor = baseColorObj.clone()
         pureColor.oklch.l = pureValues.l
         pureColor.oklch.c = pureValues.c
         pureColor.oklch.h = pureValues.h
-        colors.push(colorFactory(pureColor, 'triadic', triadIndex * 2, format))
 
         const mutedValues = clampOKLCH(
           baseColorObj.oklch.l + variations.muted.l,
           baseColorObj.oklch.c * variations.muted.c,
-          hue,
+          finalHue,
         )
         const mutedColor = baseColorObj.clone()
         mutedColor.oklch.l = mutedValues.l
         mutedColor.oklch.c = mutedValues.c
         mutedColor.oklch.h = mutedValues.h
-        colors.push(colorFactory(mutedColor, 'triadic', triadIndex * 2 + 1, format))
+
+        initialColors.push(pureColor, mutedColor)
+      }
+    })
+
+    // Apply enhancements if enabled
+    const finalColors = enhanced
+      ? applyEnhancementsToTriadic(initialColors, style, 0) // Base is at index 0
+      : initialColors
+
+    // Convert to your color factory format
+    const colors: BaseColorData[] = []
+    finalColors.forEach((color, index) => {
+      if (index === 0) {
+        colors.push(colorFactory(baseColor, 'triadic', index, format, true))
+      } else {
+        colors.push(colorFactory(color, 'triadic', index, format))
       }
     })
 

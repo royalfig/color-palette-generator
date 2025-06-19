@@ -2,6 +2,7 @@ import Color from 'colorjs.io'
 import { colorFactory } from './factory'
 import { clampOKLCH, detectFormat } from './utils'
 import { ColorFormat, ColorSpace } from '../types'
+import { enhancePalette, avoidMuddyZones, applyEnhancementsToComplementary } from './enhancer'
 
 export function getWarmCoolComplement(hue: number) {
   const adjustedHue = (hue + 180) % 360
@@ -146,6 +147,7 @@ export function generateComplementary(
 ) {
   const { chromaAdjust = 0.9 } = options
   const format = options.colorSpace.format
+  const enhanced = options.style === 'mathematical' ? false : true
 
   try {
     const baseColorObj = new Color(baseColor)
@@ -251,6 +253,17 @@ export function generateComplementary(
       }
     }
 
+    let finalComplementHue = complementHue
+
+    if (enhanced) {
+      const cleaned = avoidMuddyZones(
+        complementHue,
+        baseColorObj.oklch.l + complementVariations.main.l,
+        baseColorObj.oklch.c * complementVariations.main.c,
+      )
+      finalComplementHue = cleaned.h
+    }
+
     // Dark base
     const darkBaseValues = clampOKLCH(
       baseColorObj.oklch.l + baseVariations.dark.l,
@@ -275,7 +288,7 @@ export function generateComplementary(
     const mainCompValues = clampOKLCH(
       baseColorObj.oklch.l + complementVariations.main.l,
       baseColorObj.oklch.c * chromaAdjust * complementVariations.main.c,
-      complementHue,
+      finalComplementHue,
     )
     mainComplement.oklch.l = mainCompValues.l
     mainComplement.oklch.c = mainCompValues.c
@@ -285,7 +298,7 @@ export function generateComplementary(
     const lightCompValues = clampOKLCH(
       baseColorObj.oklch.l + complementVariations.light.l,
       baseColorObj.oklch.c * complementVariations.light.c,
-      complementHue,
+      finalComplementHue,
     )
     lightComplement.oklch.l = lightCompValues.l
     lightComplement.oklch.c = lightCompValues.c
@@ -295,19 +308,34 @@ export function generateComplementary(
     const mutedCompValues = clampOKLCH(
       baseColorObj.oklch.l + complementVariations.muted.l,
       baseColorObj.oklch.c * complementVariations.muted.c,
-      complementHue,
+      finalComplementHue,
     )
     mutedComplement.oklch.l = mutedCompValues.l
     mutedComplement.oklch.c = mutedCompValues.c
     mutedComplement.oklch.h = mutedCompValues.h
 
+    const initialColors = [
+      new Color(baseColor), // Base (preserved)
+      mainComplement, // Main complement
+      darkBase, // Dark base
+      mutedBase, // Muted base
+      lightComplement, // Light complement
+      mutedComplement, // Muted complement
+    ]
+
+    // Apply enhancements if enabled
+    const finalColors = enhanced
+      ? applyEnhancementsToComplementary(initialColors, options.style, 0) // Base is at index 0
+      : initialColors
+
+    // Convert to your color factory format
     return [
-      colorFactory(baseColor, 'complementary', 0, format, true), // Preserve original base color
-      colorFactory(mainComplement, 'complementary', 1, format),
-      colorFactory(darkBase, 'complementary', 2, format),
-      colorFactory(mutedBase, 'complementary', 3, format),
-      colorFactory(lightComplement, 'complementary', 4, format),
-      colorFactory(mutedComplement, 'complementary', 5, format),
+      colorFactory(baseColor, 'complementary', 0, format, true), // Always preserve base
+      colorFactory(finalColors[1], 'complementary', 1, format),
+      colorFactory(finalColors[2], 'complementary', 2, format),
+      colorFactory(finalColors[3], 'complementary', 3, format),
+      colorFactory(finalColors[4], 'complementary', 4, format),
+      colorFactory(finalColors[5], 'complementary', 5, format),
     ]
   } catch (e) {
     throw new Error(`Failed to generate complementary colors for ${baseColor}: ${e}`)

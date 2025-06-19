@@ -3,6 +3,7 @@ import { BaseColorData, colorFactory } from './factory'
 import { clampOKLCH, detectFormat } from './utils'
 import { ColorFormat } from '../types'
 import { ColorSpace } from '../types'
+import { enhancePalette, avoidMuddyZones, applyEnhancementsToTetradic } from './enhancer'
 
 function getMathematicalTetradic(hue: number): number[] {
   // Perfect 90° spacing forming a square
@@ -240,6 +241,7 @@ export function generateTetradic(
 ) {
   const { style } = options
   const format = options.colorSpace.format
+  const enhanced = options.style === 'mathematical' ? false : true
 
   try {
     const baseColorObj = new Color(baseColor)
@@ -315,71 +317,122 @@ export function generateTetradic(
       }
     }
 
-    const colors: BaseColorData[] = []
+    const initialColors: Color[] = []
 
     // Create 6 colors from 4 tetradic hues
     tetradicHues.forEach((hue, tetradIndex) => {
       if (tetradIndex === 0) {
         // Base color (preserved)
-        colors.push(colorFactory(baseColor, 'tetradic', 0, format, true))
+        initialColors.push(new Color(baseColor))
       } else if (tetradIndex === 1) {
         // First tetradic color + muted variant
+
+        // Apply muddy zone avoidance if enhanced mode
+        let finalHue = hue
+        if (enhanced) {
+          const cleaned = avoidMuddyZones(
+            hue,
+            baseColorObj.oklch.l + variations.first.pure.l,
+            baseColorObj.oklch.c * variations.first.pure.c,
+          )
+          finalHue = cleaned.h
+        }
+
         const pureValues = clampOKLCH(
           baseColorObj.oklch.l + variations.first.pure.l,
           baseColorObj.oklch.c * variations.first.pure.c,
-          hue,
+          finalHue,
         )
         const pureColor = baseColorObj.clone()
         pureColor.oklch.l = pureValues.l
         pureColor.oklch.c = pureValues.c
         pureColor.oklch.h = pureValues.h
-        colors.push(colorFactory(pureColor, 'tetradic', 1, format))
+        initialColors.push(pureColor)
 
         const mutedValues = clampOKLCH(
           baseColorObj.oklch.l + variations.first.muted.l,
           baseColorObj.oklch.c * variations.first.muted.c,
-          hue,
+          finalHue,
         )
         const mutedColor = baseColorObj.clone()
         mutedColor.oklch.l = mutedValues.l
         mutedColor.oklch.c = mutedValues.c
         mutedColor.oklch.h = mutedValues.h
-        colors.push(colorFactory(mutedColor, 'tetradic', 2, format))
+        initialColors.push(mutedColor)
       } else if (tetradIndex === 2) {
         // Complement color
+
+        // Apply muddy zone avoidance if enhanced mode
+        let finalHue = hue
+        if (enhanced) {
+          const cleaned = avoidMuddyZones(
+            hue,
+            baseColorObj.oklch.l + variations.complement.l,
+            baseColorObj.oklch.c * variations.complement.c,
+          )
+          finalHue = cleaned.h
+        }
+
         const compValues = clampOKLCH(
           baseColorObj.oklch.l + variations.complement.l,
           baseColorObj.oklch.c * variations.complement.c,
-          hue,
+          finalHue,
         )
         const compColor = baseColorObj.clone()
         compColor.oklch.l = compValues.l
         compColor.oklch.c = compValues.c
         compColor.oklch.h = compValues.h
-        colors.push(colorFactory(compColor, 'tetradic', 3, format))
+        initialColors.push(compColor)
       } else if (tetradIndex === 3) {
         // Fourth tetradic color + dark variant
+
+        // Apply muddy zone avoidance if enhanced mode
+        let finalHue = hue
+        if (enhanced) {
+          const cleaned = avoidMuddyZones(
+            hue,
+            baseColorObj.oklch.l + variations.fourth.light.l,
+            baseColorObj.oklch.c * variations.fourth.light.c,
+          )
+          finalHue = cleaned.h
+        }
+
         const lightValues = clampOKLCH(
           baseColorObj.oklch.l + variations.fourth.light.l,
           baseColorObj.oklch.c * variations.fourth.light.c,
-          hue,
+          finalHue,
         )
         const lightColor = baseColorObj.clone()
         lightColor.oklch.l = lightValues.l
         lightColor.oklch.c = lightValues.c
         lightColor.oklch.h = lightValues.h
-        colors.push(colorFactory(lightColor, 'tetradic', 4, format))
+        initialColors.push(lightColor)
 
         const darkValues = clampOKLCH(
           baseColorObj.oklch.l + variations.fourth.dark.l,
           baseColorObj.oklch.c * variations.fourth.dark.c,
-          hue,
+          finalHue,
         )
         const darkColor = baseColorObj.clone()
         darkColor.oklch.l = darkValues.l
         darkColor.oklch.c = darkValues.c
         darkColor.oklch.h = darkValues.h
-        colors.push(colorFactory(darkColor, 'tetradic', 5, format))
+        initialColors.push(darkColor)
+      }
+    })
+
+    // Apply enhancements if enabled
+    const finalColors = enhanced
+      ? applyEnhancementsToTetradic(initialColors, style, 0) // Base is at index 0
+      : initialColors
+
+    // Convert to your color factory format
+    const colors: BaseColorData[] = []
+    finalColors.forEach((color, index) => {
+      if (index === 0) {
+        colors.push(colorFactory(baseColor, 'tetradic', index, format, true))
+      } else {
+        colors.push(colorFactory(color, 'tetradic', index, format))
       }
     })
 

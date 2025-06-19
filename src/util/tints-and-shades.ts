@@ -3,6 +3,7 @@ import { BaseColorData, colorFactory } from './factory'
 import { clampOKLCH, detectFormat } from './utils'
 import { ColorFormat } from '../types'
 import { ColorSpace } from '../types'
+import { avoidMuddyZones, applyEnhancementsToTintsShades } from './enhancer'
 
 export function generateTintsAndShades(
   baseColor: string,
@@ -12,6 +13,7 @@ export function generateTintsAndShades(
   },
 ) {
   const { style } = options
+  const enhanced = style === 'mathematical' ? false : true
   const format = options.colorSpace.format
 
   try {
@@ -39,12 +41,12 @@ export function generateTintsAndShades(
     // Find where the base color should be positioned
     const baseIndex = findBaseColorPosition(baseLightness, lightnessProgression)
 
-    const colors: BaseColorData[] = []
+    const initialColors: Color[] = []
 
     lightnessProgression.forEach((targetLightness, index) => {
       if (index === baseIndex) {
         // Preserve the exact base color
-        colors.push(colorFactory(baseColor, 'tints-shades', index, format, true))
+        initialColors.push(new Color(baseColor))
         return
       }
 
@@ -58,14 +60,39 @@ export function generateTintsAndShades(
         baseColorObj,
       )
 
-      const values = clampOKLCH(targetLightness, adjustments.chroma, adjustments.hue)
+      // Apply muddy zone avoidance if enhanced mode
+      let finalChroma = adjustments.chroma
+      let finalHue = adjustments.hue
+      let finalLightness = targetLightness
+
+      if (enhanced) {
+        const cleaned = avoidMuddyZones(finalHue, finalLightness, finalChroma)
+        finalHue = cleaned.h
+        finalLightness = cleaned.l
+        finalChroma = cleaned.c
+      }
+
+      const values = clampOKLCH(finalLightness, finalChroma, finalHue)
 
       const color = baseColorObj.clone()
       color.oklch.l = values.l
       color.oklch.c = values.c
       color.oklch.h = values.h
 
-      colors.push(colorFactory(color, 'tints-shades', index, format))
+      initialColors.push(color)
+    })
+
+    // Apply enhancements if enabled
+    const finalColors = enhanced ? applyEnhancementsToTintsShades(initialColors, style, baseIndex) : initialColors
+
+    // Convert to your color factory format
+    const colors: BaseColorData[] = []
+    finalColors.forEach((color, index) => {
+      if (index === baseIndex) {
+        colors.push(colorFactory(baseColor, 'tints-shades', index, format, true))
+      } else {
+        colors.push(colorFactory(color, 'tints-shades', index, format))
+      }
     })
 
     return colors

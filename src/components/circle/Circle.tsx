@@ -65,7 +65,7 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
   const palette = context.palette
 
   // Sort palette by lightness (HSL L value) without mutating original
-  const sortedPalette = palette.sort((a, b) => a.conversions.hsl.coords[2] - b.conversions.hsl.coords[2])
+  const sortedPalette = [...palette].sort((a, b) => a.conversions.hsl.coords[2] - b.conversions.hsl.coords[2])
 
   const paletteValues = sortedPalette.map((color, idx) => getCirclePosition(color, idx, type))
 

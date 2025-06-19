@@ -5,7 +5,6 @@ import './swatches.css'
 
 export function Swatches({ colorSpace }: { colorSpace: { space: ColorSpace; format: ColorFormat } }) {
   const context = useContext(ColorContext)
-  if (!context) return null
 
   const { palette } = context
   const totalSquares = 240
