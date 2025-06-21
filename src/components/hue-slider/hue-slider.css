@@ -1,6 +1,11 @@
 .hue-slider {
   grid-column: 1/ 7;
 
+  label {
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
   input[type='range'] {
     width: 100%;
     padding: 0;
@@ -15,30 +20,23 @@
       background: var(--track-style);
       border: 1px solid rgb(83 83 83);
       border-radius: 1000px;
+      box-shadow: inset 0 2px #00000068;
     }
 
     /* Thumb: webkit */
     &::-webkit-slider-thumb {
-      position: relative;
-      width: 8px;
-      height: 24px;
-      margin-top: -8px;
-      appearance: none;
-      background: var(--thumb-style);
-      border: 2px solid #eee;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px 0 hsl(0deg 0% 0% / 10%), 0 0 0 1px hsl(0deg 0% 0% / 15%);
+      --shadow-color: 40deg 2% 44%;
 
-      &::before {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        content: '';
-        background: linear-gradient(to bottom, #fff, #000);
-        border-radius: 50%;
-      }
+      position: relative;
+      width: 18px;
+      height: 18px;
+      margin-top: -5px;
+      appearance: none;
+      background-color: var(--thumb-style);
+      border-radius: 50%;
+      box-shadow: 0 3px 1px hsl(0deg 0% 0% / 45%), 0 3px 4px hsl(0deg 0% 0% / 25%),
+        0 -0.5px 0 0.5px color-mix(in oklch, var(--thumb-style), white 75%),
+        0 0.5px 0 1px color-mix(in oklch, var(--thumb-style), black 75%);
 
       /*  slider progress trick  */
     }
@@ -69,20 +67,21 @@
 
 .hue-slider-inputs {
   display: flex;
+  gap: 4px;
   align-items: center;
   justify-content: space-between;
   width: fit-content;
-  padding: 4px;
-  margin-block-end: 10px;
+  padding: 2px;
+  margin-block-end: 8px;
   margin-inline-start: auto;
   color: #fff;
   background: #000;
   border-radius: 4px;
 
   input {
-    width: 6em;
     height: 20px;
-    font-size: 14px;
+    padding: 0;
+    font-size: 12px;
     color: #fff;
     text-align: center;
     outline: none;

@@ -1,7 +1,0 @@
-.input-color-container {
-  margin-block-start: var(--spacing-06);
-
-  & > :first-child {
-    margin-block-end: var(--spacing-03);
-  }
-}

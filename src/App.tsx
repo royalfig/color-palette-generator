@@ -5,8 +5,8 @@ import { ColorDisplay } from './components/color-display/ColorDisplay'
 import { ColorSpaceSelector } from './components/color-space-selector/ColorSpaceSelector'
 import { DisplayInfo } from './components/display-info/DisplayInfo'
 import { Display } from './components/display/Display'
-import { EyeDropper } from './components/eye-dropper/EyeDropper'
-import { InputColor } from './components/input-color/InputColor'
+import { HueSlider } from './components/hue-slider/HueSlider'
+import { InputColorContainer } from './components/input-color-container/InputColorContainer'
 import { PaletteDisplay } from './components/palette-display/PaletteDisplay'
 import { PaletteStyleSelector } from './components/palette-style-selector/PaletteStyleSelector'
 import { PaletteToolSelector } from './components/palette-tool-selector/PaletteToolSelector'
@@ -18,10 +18,9 @@ import './css/Variables.css'
 import './css/utils.css'
 import { useFetchColorNames } from './hooks/useColorName'
 import { PaletteTypeSelector } from './palette-type-selector/PaletteTypeSelector'
-import type { ColorFormat, ColorSpace, PaletteKinds } from './types'
+import type { ColorFormat, ColorSpace, ColorSpaceAndFormat, PaletteKinds } from './types'
 import { createPalettes } from './util'
 import { pickRandomColor } from './util/pickRandomColor'
-import { HueSlider } from './components/hue-slider/HueSlider'
 
 export type ColorName = {
   fetchedData: {
@@ -70,7 +69,7 @@ export default function App() {
   const [paletteStyle, setPaletteStyle] = useState<'mathematical' | 'optical' | 'adaptive' | 'warm-cool'>(
     'mathematical',
   )
-  const [colorSpace, setColorSpace] = useState<{ space: ColorSpace; format: ColorFormat }>({
+  const [colorSpace, setColorSpace] = useState<ColorSpaceAndFormat>({
     space: 'oklch',
     format: 'oklch',
   })
@@ -138,15 +137,14 @@ export default function App() {
                 paletteStyle={paletteStyle}
               />
             </Display>
-            <div className="synth-body col-12">
+            <div className="synth-body col-14">
               <ColorSpaceSelector colorSpace={colorSpace} setColorSpace={setColorSpace} />
-              <div className="input-color-container">
-                <EyeDropper setColor={setColor} setColorSpace={setColorSpace} />
-                <InputColor color={color} setColor={setColor} colorSpace={colorSpace} />
-              </div>
+              <InputColorContainer setColor={setColor} setColorSpace={setColorSpace} colorSpace={colorSpace} />
+
               <PaletteTypeSelector paletteType={paletteType} setPaletteType={setPaletteType} />
               <PaletteStyleSelector paletteStyle={paletteStyle} setPaletteStyle={setPaletteStyle} />
               <PaletteToolSelector showPaletteColors={showPaletteColors} setShowPaletteColors={setShowPaletteColors} />
+
               <DisplayInfo />
               <HueSlider setColor={setColor} colorSpace={colorSpace} />
             </div>

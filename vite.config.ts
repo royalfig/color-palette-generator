@@ -6,5 +6,8 @@ export default defineConfig({
   plugins: [react()],
   css: {
     devSourcemap: true,
+    modules: {
+      localsConvention: 'camelCase',
+    },
   },
 })

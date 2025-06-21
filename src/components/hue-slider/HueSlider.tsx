@@ -111,16 +111,19 @@ export function HueSlider({
         } as React.CSSProperties
       }
     >
-      <div className="hue-slider-inputs">
-        <button onClick={handleIncrement}>
-          <CaretUpIcon weight="fill" size={18} />
-        </button>
-        <input value={hue} onChange={handleChange} />
-        <button onClick={handleDecrement}>
-          <CaretDownIcon weight="fill" size={18} />
-        </button>
+      <div className="flex">
+        <label htmlFor="hue-slider">Hue</label>
+        <div className="hue-slider-inputs">
+          <button onClick={handleIncrement}>
+            <CaretUpIcon weight="fill" size={18} />
+          </button>
+          <input value={hue} onChange={handleChange} size={3} />
+          <button onClick={handleDecrement}>
+            <CaretDownIcon weight="fill" size={18} />
+          </button>
+        </div>
       </div>
-      <input type="range" min="0" max="360" value={hue} onChange={handleChange} />
+      <input name="hue-slider" type="range" min="0" max="360" value={hue} onChange={handleChange} />
     </div>
   )
 }

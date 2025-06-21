@@ -1,0 +1,17 @@
+.container {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-row: 2;
+  grid-column: 1/7;
+  gap: var(--base-gap);
+}
+
+.input-color {
+  grid-column: span 4;
+  width: 100%;
+  height: 40px;
+  font-size: 1.2rem;
+  color: var(--input-color);
+  background-color: var(--input-bg);
+  box-shadow: inset 2px 2px 0.5em hsl(0deg 0% 0% / 15%), inset -2px -2px 0.5em hsl(0deg 0% 100% / 15%);
+}

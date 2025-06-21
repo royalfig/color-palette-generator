@@ -13,8 +13,10 @@ export default function Button({
 }) {
   const activeClass = active ? 'button active' : 'button'
 
+  const buttonClass = `button-container ${className || ''}`
+
   return (
-    <div className={`button-container ${className}`}>
+    <div className={buttonClass}>
       <div className="button-container-inner">
         <button className={activeClass} onClick={handler}>
           {children}

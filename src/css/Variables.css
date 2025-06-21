@@ -37,7 +37,7 @@
   --synth-body: linear-gradient(to bottom, #e3e0dc, #afaeac);
   --bg: #f8f8f8;
   --icon-element: linear-gradient(to bottom, hsl(0deg 0% 5%), #e3e0dc, hsl(0deg 0% 5%));
-  --base-gap: 1.25rem;
+  --base-gap: 2rem 1.25rem;
 }
 
 [data-mode='dark'] {

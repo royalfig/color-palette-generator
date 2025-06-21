@@ -1,6 +1,7 @@
 .container {
   display: flex;
-  grid-column: 11 / 13;
+  grid-row: 5;
+  grid-column: span 2 / -1;
   gap: var(--spacing-03);
   align-items: center;
   justify-content: center;
@@ -10,4 +11,5 @@
   color: #fff;
   text-transform: uppercase;
   background-color: #000;
+  border-radius: 4px;
 }

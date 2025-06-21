@@ -36,7 +36,7 @@ export function colorFactory(
     colorSpace: color.spaceId,
     cssValue: color.display().toString(),
     contrast: color.contrastWCAG21('#fff') > color.contrastWCAG21('#000') ? '#fff' : '#000',
-    string: color.toString({ format }),
+    string: color.toString({ format, precision: 3 }),
     fallback: color.to('srgb').toString({ clip: true, format }),
     conversions: {
       hex: {
@@ -45,37 +45,37 @@ export function colorFactory(
         coords: color.to('srgb').coords,
       },
       rgb: {
-        value: color.to('srgb').toString(),
+        value: color.to('srgb').toString({ precision: 3 }),
         isInGamut: color.inGamut('srgb'),
         coords: color.to('srgb').coords,
       },
       hsl: {
-        value: color.to('hsl').toString(),
+        value: color.to('hsl').toString({ precision: 3 }),
         isInGamut: color.inGamut('hsl'),
         coords: color.to('hsl').coords,
       },
       lch: {
-        value: color.to('lch').toString(),
+        value: color.to('lch').toString({ precision: 3 }),
         isInGamut: color.inGamut('lch'),
         coords: color.to('lch').coords,
       },
       oklch: {
-        value: color.to('oklch').toString(),
+        value: color.to('oklch').toString({ precision: 3 }),
         isInGamut: color.inGamut('oklch'),
         coords: color.to('oklch').coords,
       },
       lab: {
-        value: color.to('lab').toString(),
+        value: color.to('lab').toString({ precision: 3 }),
         isInGamut: color.inGamut('lab'),
         coords: color.to('lab').coords,
       },
       oklab: {
-        value: color.to('oklab').toString(),
+        value: color.to('oklab').toString({ precision: 3 }),
         isInGamut: color.inGamut('oklab'),
         coords: color.to('oklab').coords,
       },
       p3: {
-        value: color.to('p3').toString(),
+        value: color.to('p3').toString({ precision: 3 }),
         isInGamut: color.inGamut('p3'),
         coords: color.to('p3').coords,
       },
