@@ -4,6 +4,10 @@ import './color-display.css'
 import { ScissorsIcon } from '@phosphor-icons/react/dist/csr/Scissors'
 import { ColorSpace, ColorFormat } from '../../types'
 
+function extractColorValues(color: string) {
+  return color.toLowerCase().replace(/[a-z()]/g, '')
+}
+
 export function ColorDisplay({
   fetchedData,
   isLoading,
@@ -44,38 +48,58 @@ export function ColorDisplay({
       </div>
 
       <div className={`color-details ${colorSpace.format}`}>
-        <div className="color-detail oklch">
-          <ScissorsIcon weight="fill" color={oklch?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={oklch?.value}>{oklch?.value}</p>
+        <div className="color-detail ">
+          <div className="color-text">
+            <p className="color-label oklch">OKLCH</p>
+            <p data-value={oklch?.value}>{extractColorValues(oklch?.value)}</p>
+          </div>
         </div>
-        <div className="color-detail lch">
-          <ScissorsIcon weight="fill" color={lch?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={lch?.value}>{lch?.value}</p>
+        <div className="color-detail">
+          <div className="color-text">
+            <p className="color-label lch">LCH</p>
+            <p data-value={lch?.value}>{extractColorValues(lch?.value)}</p>
+          </div>
         </div>
-        <div className="color-detail oklab">
-          <ScissorsIcon weight="fill" color={oklab?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={oklab?.value}>{oklab?.value}</p>
+        <div className="color-detail">
+          <div className="color-text">
+            <p className="color-label oklab">OKLAB</p>
+            <p data-value={oklab?.value}>{extractColorValues(oklab?.value)}</p>
+          </div>
         </div>
-        <div className="color-detail lab">
-          <ScissorsIcon weight="fill" color={lab?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={lab?.value}>{lab?.value}</p>
+        <div className="color-detail">
+          <div className="color-text">
+            <p className="color-label lab">LAB</p>
+            <p data-value={lab?.value}>{extractColorValues(lab?.value)}</p>
+          </div>
         </div>
-        <div className="color-detail p3">
+        <div className="color-detail">
           <ScissorsIcon weight="fill" color={p3?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={p3?.value}>{p3?.value}</p>
+          <div className="color-text">
+            <p className="color-label p3">P3</p>
+            <p data-value={p3?.value}>{extractColorValues(p3?.value)}</p>
+          </div>
         </div>
 
-        <div className="color-detail hsl">
+        <div className="color-detail">
           <ScissorsIcon weight="fill" color={hsl?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={hsl?.value}>{hsl?.value}</p>
+          <div className="color-text">
+            <p className="color-label hsl">HSL</p>
+            <p data-value={hsl?.value}>{extractColorValues(hsl?.value)}</p>
+          </div>
         </div>
-        <div className="color-detail rgb">
+        <div className="color-detail ">
           <ScissorsIcon weight="fill" color={rgb?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={rgb?.value}>{rgb?.value}</p>
+          <div className="color-text">
+            <p className="color-label rgb">RGB</p>
+            <p data-value={rgb?.value}>{extractColorValues(rgb?.value)}</p>
+          </div>
         </div>
-        <div className="color-detail hex">
+        <div className="color-detail">
           <ScissorsIcon weight="fill" color={hex?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <p data-value={hex?.value}>{hex?.value}</p>
+          <div className="color-text">
+            <p className="color-label hex">HEX</p>
+            <p data-value={hex?.value}>{hex?.value}</p>
+          </div>
         </div>
       </div>
     </div>

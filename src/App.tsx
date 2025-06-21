@@ -21,6 +21,7 @@ import { PaletteTypeSelector } from './palette-type-selector/PaletteTypeSelector
 import type { ColorFormat, ColorSpace, ColorSpaceAndFormat, PaletteKinds } from './types'
 import { createPalettes } from './util'
 import { pickRandomColor } from './util/pickRandomColor'
+import { Knob } from './components/knob/Knob'
 
 export type ColorName = {
   fetchedData: {
@@ -137,13 +138,15 @@ export default function App() {
                 paletteStyle={paletteStyle}
               />
             </Display>
-            <div className="synth-body col-14">
+            <div className="synth-body col-12">
               <ColorSpaceSelector colorSpace={colorSpace} setColorSpace={setColorSpace} />
               <InputColorContainer setColor={setColor} setColorSpace={setColorSpace} colorSpace={colorSpace} />
 
               <PaletteTypeSelector paletteType={paletteType} setPaletteType={setPaletteType} />
               <PaletteStyleSelector paletteStyle={paletteStyle} setPaletteStyle={setPaletteStyle} />
               <PaletteToolSelector showPaletteColors={showPaletteColors} setShowPaletteColors={setShowPaletteColors} />
+
+              <Knob />
 
               <DisplayInfo />
               <HueSlider setColor={setColor} colorSpace={colorSpace} />

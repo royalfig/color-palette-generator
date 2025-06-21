@@ -43,8 +43,8 @@ export function PaletteDisplay({
       </div>
       <div className="flex gap-02">
         <p className="palette-type">{paletteTypeFullName}</p>
-        <SwatchesIcon size={20} color="#777" weight="fill" />
-        <p className="palette-style">{paletteStyle}</p>
+        {/* <SwatchesIcon size={20} color="#777" weight="fill" />
+        <p className="palette-style">{paletteStyle}</p> */}
       </div>
     </div>
   )

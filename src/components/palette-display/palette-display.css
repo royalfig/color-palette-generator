@@ -1,7 +1,7 @@
 .palette-display {
   display: flex;
   flex-direction: column;
-  grid-column: 4 / 7;
+  grid-column: 5 / 7;
   gap: 1rem;
   align-items: center;
   justify-content: space-between;
@@ -38,7 +38,8 @@
   font-weight: 400;
   line-height: 1.4;
   color: #cbcbcb;
-  text-align: center;
+
+  /* text-align: center; */
   text-transform: uppercase;
   white-space: nowrap;
 }

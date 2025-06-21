@@ -58,14 +58,17 @@ export function HueSlider({
 }) {
   const context = useContext(ColorContext)
   const space = getColorSpace(colorSpace.space)
-  const initialHue = Math.round(context.palette[0].color[space].h)
-  const initialSaturation = getSaturation(space, context.palette[0].color)
-  const initialLightness = context.palette[0].color[space].l
+
+  const base = context.palette.find(color => color.isBase)!
+
+  const initialHue = Math.round(base.color[space].h)
+  const initialSaturation = getSaturation(space, base.color)
+  const initialLightness = base?.color[space].l ?? 0
   const [hue, setHue] = useState(initialHue)
   const { thumbStyle, trackStyle } = generateThumbStyle(space)
 
   const debouncedColorUpdate = useDebouncedCallback((value: number) => {
-    const color = context.palette[0].color
+    const color = context.palette.find(color => color.isBase)!.color
     color[space].h = value
     setColor(color.toString())
   }, 100)

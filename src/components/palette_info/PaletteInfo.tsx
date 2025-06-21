@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react'
 import { ColorName } from '../../App'
 import { BaseColorData, ColorSpace, PaletteKinds, Palettes, VariationKinds } from '../../types'
 import { Circle } from '../circle/Circle'
-import { LightUpSvg } from '../input-color/LightUpSvg'
+import { LightUpSvg } from '../input-color-container/input-color/LightUpSvg'
 import { Gradient } from './Gradient'
 import './palette-info.css'
 

@@ -1,0 +1,36 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  grid-row: 2 / 4;
+  grid-column: 7/8;
+  align-items: center;
+  justify-content: center;
+}
+
+.knob {
+  flex: 1;
+  aspect-ratio: 1;
+  padding: 15px;
+  margin: 5px;
+  background: linear-gradient(to bottom, white, rgb(96 96 96));
+  border-radius: 50%;
+}
+
+.inner {
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(100 100 100), 0 5px 5px hsl(0deg 0% 0% / 25%);
+}
+
+.display {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  padding: 5px;
+  margin-block-start: 10px;
+  color: white;
+  background: black;
+  border-radius: 5px;
+}
