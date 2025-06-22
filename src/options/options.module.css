@@ -1,0 +1,7 @@
+.container {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-row: 5;
+  grid-column: 9 / 11;
+  gap: var(--base-gap);
+}

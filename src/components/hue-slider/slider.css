@@ -1,0 +1,101 @@
+.slider-group {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-row: 3 / 6;
+  grid-column: 1/ 7;
+  gap: var(--base-gap);
+}
+
+.slider {
+  grid-column: 1/ 7;
+
+  label {
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  input[type='range'] {
+    width: 100%;
+    padding: 0;
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+    background: transparent;
+    border: none;
+
+    &::-webkit-slider-runnable-track {
+      height: 10px;
+      background: var(--track-style);
+      border: 1px solid rgb(83 83 83);
+      border-radius: 1000px;
+      box-shadow: inset 0 2px #00000068;
+    }
+
+    /* Thumb: webkit */
+    &::-webkit-slider-thumb {
+      --shadow-color: 40deg 2% 44%;
+
+      position: relative;
+      width: 18px;
+      height: 18px;
+      margin-top: -5px;
+      appearance: none;
+      background-color: var(--thumb-style);
+      border-radius: 50%;
+      box-shadow: 0 3px 1px hsl(0deg 0% 0% / 45%), 0 3px 4px hsl(0deg 0% 0% / 25%),
+        0 -0.5px 0 0.5px color-mix(in oklch, var(--thumb-style), white 75%),
+        0 0.5px 0 1px color-mix(in oklch, var(--thumb-style), black 75%);
+
+      /*  slider progress trick  */
+    }
+
+    /* Thumb: Firefox */
+    &::-moz-range-thumb {
+      position: relative;
+      width: 5px;
+      height: 12px;
+      padding: 1px;
+      background-color: #fffa;
+      border: 1px solid #fffa;
+      border-radius: 50%;
+
+      &::before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        content: '';
+        background: linear-gradient(to bottom, #fff, #000);
+        border-radius: 50%;
+      }
+    }
+  }
+}
+
+.slider-inputs {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  justify-content: space-between;
+  width: 5rem;
+  padding: 2px;
+  color: #fff;
+  background: #000;
+  border-radius: 4px;
+
+  button {
+    height: 16px;
+  }
+
+  input {
+    /* height: 20px; */
+    padding: 0;
+    font-size: 10px;
+    color: #fff;
+    text-align: center;
+    outline: none;
+    background: transparent;
+    border: none;
+  }
+}

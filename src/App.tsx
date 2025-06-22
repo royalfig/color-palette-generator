@@ -22,6 +22,9 @@ import type { ColorFormat, ColorSpace, ColorSpaceAndFormat, PaletteKinds } from 
 import { createPalettes } from './util'
 import { pickRandomColor } from './util/pickRandomColor'
 import { Knob } from './components/knob/Knob'
+import { SliderGroup } from './components/hue-slider/SliderGroup'
+import { ExportOptions } from './export-options/ExportOptions'
+import { Options } from './options/Options'
 
 export type ColorName = {
   fetchedData: {
@@ -145,11 +148,15 @@ export default function App() {
               <PaletteTypeSelector paletteType={paletteType} setPaletteType={setPaletteType} />
               <PaletteStyleSelector paletteStyle={paletteStyle} setPaletteStyle={setPaletteStyle} />
               <PaletteToolSelector showPaletteColors={showPaletteColors} setShowPaletteColors={setShowPaletteColors} />
-
-              <Knob />
+              <ExportOptions />
+              {/* <Knob /> */}
 
               <DisplayInfo />
-              <HueSlider setColor={setColor} colorSpace={colorSpace} />
+              {/* <HueSlider setColor={setColor} colorSpace={colorSpace} /> */}
+
+              <Options setColor={setColor} />
+
+              <SliderGroup colorSpace={colorSpace} setColor={setColor} />
             </div>
           </main>
         </div>

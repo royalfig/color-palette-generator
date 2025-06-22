@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { CircleHalfIcon, DotsNineIcon, EyeIcon, MonitorIcon } from '@phosphor-icons/react'
-import classes from './display-info.module.css'
+import { container } from './display-info.module.css'
 
 export function useDisplayCapabilities() {
   const [capabilities, setCapabilities] = useState({
@@ -56,7 +56,7 @@ export function DisplayInfo() {
   if (loading) return <div>Detecting display capabilities...</div>
 
   return (
-    <div className={classes.container}>
+    <div className={container}>
       <div className="flex gap-01">
         <MonitorIcon weight="fill" />
         {colorGamut}
