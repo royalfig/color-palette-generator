@@ -1,31 +1,10 @@
-import { CSSProperties, useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { CaretUpIcon, CaretDownIcon } from '@phosphor-icons/react'
 import { ColorContext } from '../ColorContext'
 import { useDebouncedCallback } from 'use-debounce'
 import { ColorSpace, SliderType } from '../../types'
-import Color from 'colorjs.io'
 import { getSliderStrategy } from './slider-strategies'
 import { BaseColorData } from '../../util/factory'
-
-interface SliderStyle extends CSSProperties {
-  '--hue': number
-  '--saturation': string | number
-  '--lightness': string | number
-  '--track-style': string
-  '--thumb-style': string
-  '--value': number
-  '--r': number
-  '--g': number
-  '--b': number
-  '--p3-r': number
-  '--p3-g': number
-  '--p3-b': number
-  '--lab-a': number
-  '--lab-b': number
-  '--oklab-a': number
-  '--oklab-b': number
-  '--value-as-percent': string
-}
 
 export function Slider({
   setColor,
@@ -38,17 +17,16 @@ export function Slider({
 }) {
   const context = useContext(ColorContext)
   const strategy = getSliderStrategy(type, colorSpace.space)
-  const { min, max, step, label, getValue, updateColor, getTrackStyle } = strategy
+  const { min, max, step, label, getValue, updateColor, getTrackStyle, getThumbStyle } = strategy
 
   const base = context.palette.find(color => color.isBase)!
 
-  const initialValue = useMemo(() => getValue(base), [base.color, getValue])
+  const initialValue = useMemo(() => getValue(base), [base, getValue])
 
   const [value, setValue] = useState(initialValue)
 
   const debouncedColorUpdate = useDebouncedCallback((newValue: number) => {
     const newColor = updateColor(base.color.clone(), newValue)
-    console.log(newColor, newValue)
     setColor(newColor.toString())
   }, 100)
 
@@ -95,35 +73,40 @@ export function Slider({
     return base.conversions.hsl.coords[1]
   }
 
-  const thumbColor = strategy.thumbStyle
-  const trackStyle = getTrackStyle(base.color)
-
   const workingColor = base.color.clone().to(colorSpace.space).toGamut(colorSpace.space)
 
-  const style: SliderStyle = {
-    '--track-style': trackStyle,
-    '--thumb-style': thumbColor,
-    '--hue': workingColor.h,
-    '--saturation': getSaturation(base, colorSpace.space),
-    '--lightness': getLightness(base, colorSpace.space),
-    '--value': value,
-    '--r': base.color.srgb.r * 100,
-    '--g': base.color.srgb.g * 100,
-    '--b': base.color.srgb.b * 100,
-    '--p3-r': base.conversions.p3.coords[0],
-    '--p3-g': base.conversions.p3.coords[1],
-    '--p3-b': base.conversions.p3.coords[2],
-    '--lab-a': base.conversions.lab.coords[1],
-    '--lab-b': base.conversions.lab.coords[2],
-    '--oklab-a': base.conversions.oklab.coords[1],
-    '--oklab-b': base.conversions.oklab.coords[2],
-    '--value-as-percent': colorSpace.space === 'srgb' ? value + '%' : (value * 100).toFixed(2) + '%',
+  const placeholders = {
+    hue: workingColor.h,
+    saturation: getSaturation(base, colorSpace.space),
+    lightness: getLightness(base, colorSpace.space),
+    value: value,
+    'lab-a': base.conversions.lab.coords[1],
+    'lab-b': base.conversions.lab.coords[2],
+    'oklab-a': base.conversions.oklab.coords[1],
+    'oklab-b': base.conversions.oklab.coords[2],
+    'value-as-percent': colorSpace.space === 'srgb' ? value + '%' : (value * 100).toFixed(2) + '%',
   }
 
+  const thumbColor = getThumbStyle(placeholders)
+  const trackStyle = getTrackStyle(placeholders)
+
+  const sliderId = `slider-${label}`
+
+  const dynamicStyles = `
+    #${sliderId}::-webkit-slider-runnable-track {
+      background: ${trackStyle};
+    }
+    #${sliderId}::-webkit-slider-thumb {
+      background-color: ${thumbColor};
+      box-shadow: 0 3px 1px hsl(0deg 0% 0% / 45%), 0 3px 4px hsl(0deg 0% 0% / 25%), 0 -0.5px 0 0.5px color-mix(in oklch, ${thumbColor}, white 75%), 0 0.5px 0 1px color-mix(in oklch, ${thumbColor}, black 75%);
+    }
+    `
+
   return (
-    <div className="slider" style={style}>
+    <div className="slider">
+      <style>{dynamicStyles}</style>
       <div className="flex">
-        <label htmlFor={`slider-${label}`}>{label}</label>
+        <label htmlFor={sliderId}>{label}</label>
         <div className="slider-inputs">
           <button onClick={handleIncrement}>
             <CaretUpIcon weight="fill" size={16} />
@@ -139,7 +122,7 @@ export function Slider({
       </div>
       <input
         name="slider"
-        id={`slider-${label}`}
+        id={sliderId}
         type="range"
         min={min}
         max={max}

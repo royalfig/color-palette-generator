@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
 import { ColorContext } from './components/ColorContext'
 import { AuxillaryDisplay } from './components/auxillary-display/AuxillaryDisplay'
 import { ColorDisplay } from './components/color-display/ColorDisplay'
@@ -25,7 +25,8 @@ import { Knob } from './components/knob/Knob'
 import { SliderGroup } from './components/hue-slider/SliderGroup'
 import { ExportOptions } from './export-options/ExportOptions'
 import { Options } from './options/Options'
-
+import { useDarkMode } from './hooks/useDarkMode'
+import { MessageContext, MessageType } from './components/MessageContext'
 export type ColorName = {
   fetchedData: {
     colorNames: string[]
@@ -65,6 +66,7 @@ function updateFavicon(color: string) {
 
 export default function App() {
   console.log('app rendering')
+  const { isDarkMode, toggleDarkMode } = useDarkMode()
   const colorQueryParaCheck = new URLSearchParams(document.location.search).has('color')
   const colorQueryParam = colorQueryParaCheck ? new URLSearchParams(document.location.search).get('color') : null
   const [color, setColor] = useState<string>(colorQueryParam || pickRandomColor())
@@ -77,6 +79,19 @@ export default function App() {
     space: 'oklch',
     format: 'oklch',
   })
+
+  const [message, setMessage] = useState<string | null>(null)
+  const [messageType, setMessageType] = useState<MessageType | null>(null)
+
+  const showMessage = useCallback((msg: string, msgType: MessageType) => {
+    setMessage(msg)
+    setMessageType(msgType)
+
+    setTimeout(() => {
+      setMessage(null)
+      setMessageType(null)
+    }, 3000)
+  }, [])
 
   const palette = useMemo(
     () => createPalettes(color, paletteType, paletteStyle, colorSpace),
@@ -110,57 +125,68 @@ export default function App() {
   // }, [css])
 
   useEffect(() => {
-    updateFavicon(color)
-  }, [color])
+    const baseColor = palette.find(color => color.isBase)
+    if (baseColor) {
+      updateFavicon(baseColor.cssValue)
+      document.documentElement.style.setProperty('--base-color', baseColor.cssValue)
+    }
+  }, [palette])
 
   return (
-    <ColorContext value={colorContext}>
-      <div className="bg">
-        <div className="bg-inner">
-          <main className="synth-container">
-            <SectionHeader />
-            <Display>
-              <ColorDisplay
-                fetchedData={fetchedData}
-                isLoading={isLoading}
-                error={colorNameError}
-                colorSpace={colorSpace}
-              />
-              <PaletteDisplay
-                fetchedData={fetchedData}
-                isLoading={isLoading}
-                error={colorNameError}
-                paletteType={paletteType}
-                paletteStyle={paletteStyle}
-              />
-              <AuxillaryDisplay
-                showPaletteColors={showPaletteColors}
-                colorSpace={colorSpace}
-                colorNames={fetchedData?.colorNames || []}
-                paletteType={paletteType}
-                paletteStyle={paletteStyle}
-              />
-            </Display>
-            <div className="synth-body col-12">
-              <ColorSpaceSelector colorSpace={colorSpace} setColorSpace={setColorSpace} />
-              <InputColorContainer setColor={setColor} setColorSpace={setColorSpace} colorSpace={colorSpace} />
+    <ColorContext.Provider value={colorContext}>
+      <MessageContext.Provider value={{ message, messageType, showMessage }}>
+        <div className="bg">
+          <div className="bg-inner">
+            <main className="synth-container">
+              <SectionHeader />
+              <Display>
+                <ColorDisplay
+                  fetchedData={fetchedData}
+                  isLoading={isLoading}
+                  error={colorNameError}
+                  colorSpace={colorSpace}
+                />
+                <PaletteDisplay
+                  fetchedData={fetchedData}
+                  isLoading={isLoading}
+                  error={colorNameError}
+                  paletteType={paletteType}
+                  paletteStyle={paletteStyle}
+                />
+                <AuxillaryDisplay
+                  showPaletteColors={showPaletteColors}
+                  colorSpace={colorSpace}
+                  colorNames={fetchedData?.colorNames || []}
+                  paletteType={paletteType}
+                  paletteStyle={paletteStyle}
+                />
+              </Display>
+              <div className="synth-body col-12">
+                <ColorSpaceSelector colorSpace={colorSpace} setColorSpace={setColorSpace} />
+                <InputColorContainer setColor={setColor} setColorSpace={setColorSpace} colorSpace={colorSpace} />
 
-              <PaletteTypeSelector paletteType={paletteType} setPaletteType={setPaletteType} />
-              <PaletteStyleSelector paletteStyle={paletteStyle} setPaletteStyle={setPaletteStyle} />
-              <PaletteToolSelector showPaletteColors={showPaletteColors} setShowPaletteColors={setShowPaletteColors} />
-              <ExportOptions />
-              {/* <Knob /> */}
+                <PaletteTypeSelector paletteType={paletteType} setPaletteType={setPaletteType} />
+                <PaletteStyleSelector paletteStyle={paletteStyle} setPaletteStyle={setPaletteStyle} />
+                <PaletteToolSelector
+                  showPaletteColors={showPaletteColors}
+                  setShowPaletteColors={setShowPaletteColors}
+                  isDarkMode={isDarkMode}
+                  toggleDarkMode={toggleDarkMode}
+                />
+                <ExportOptions />
+                {/* <Knob /> */}
 
-              <DisplayInfo />
-              {/* <HueSlider setColor={setColor} colorSpace={colorSpace} /> */}
+                <DisplayInfo />
+                {/* <HueSlider setColor={setColor} colorSpace={colorSpace} /> */}
 
-              <Options setColor={setColor} />
+                <Options setColor={setColor} />
 
-              <SliderGroup colorSpace={colorSpace} setColor={setColor} />
-            </div>
-          </main>
+                <SliderGroup colorSpace={colorSpace} setColor={setColor} />
+              </div>
+            </main>
+          </div>
         </div>
-      </div>
-    </ColorContext>
+      </MessageContext.Provider>
+    </ColorContext.Provider>
   )
 }

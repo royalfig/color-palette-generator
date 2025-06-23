@@ -31,7 +31,7 @@ export function SliderGroup({
         initial={{ clipPath: 'inset(0 100% 0 0)' }}
         animate={{ clipPath: 'inset(0 0 0 0)' }}
         exit={{ clipPath: 'inset(0 0 0 100%)' }}
-        transition={{ duration: 0.4, ease: 'easeInOut' }}
+        transition={{ duration: 0.2, ease: 'easeIn' }}
         className="slider-group"
       >
         {(() => {

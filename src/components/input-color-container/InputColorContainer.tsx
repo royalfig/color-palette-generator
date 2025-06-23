@@ -1,9 +1,10 @@
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
 import { ColorSpaceAndFormat } from '../../types'
-import { container, inputColor } from './input-color-container.module.css'
+import styles from './input-color-container.module.css'
 import { EyedropperSampleIcon, PlayIcon } from '@phosphor-icons/react'
 import Button from '../button/Button'
 import { ColorContext } from '../ColorContext'
+import { MessageContext } from '../MessageContext'
 
 declare global {
   interface Window {
@@ -21,6 +22,7 @@ export function InputColorContainer({
   colorSpace: ColorSpaceAndFormat
 }) {
   const context = useContext(ColorContext)
+  const { showMessage } = useContext(MessageContext)
   const baseColor = context.palette.find(c => c.isBase)
   const [input, setInput] = useState(baseColor?.conversions[colorSpace.format].value)
   const contrast = baseColor?.contrast
@@ -34,15 +36,21 @@ export function InputColorContainer({
       .then((result: { sRGBHex: string }) => {
         setColorSpace({ space: 'srgb', format: 'hex' })
         setColor(result.sRGBHex)
+        showMessage(`Color set`, 'success')
         setActive(false)
       })
       .catch((e: Error) => {
         console.log(e)
+        showMessage('Cancelled', 'info')
       })
   }
 
   function handleSubmit() {
-    if (input) setColor(input)
+    if (input) {
+      console.log('input', input)
+      setColor(input)
+      showMessage(`Color set`, 'success')
+    }
   }
 
   useEffect(() => {
@@ -50,7 +58,7 @@ export function InputColorContainer({
   }, [colorSpace, context])
 
   return (
-    <div className={container}>
+    <div className={styles.container}>
       {window.EyeDropper ? (
         <Button handler={handleEyedropper} active={active} className="eyedropper-button">
           <EyedropperSampleIcon size={22} color="var(--icon-element)" weight="fill" />
@@ -58,7 +66,7 @@ export function InputColorContainer({
       ) : null}
 
       <input
-        className={inputColor}
+        className={styles.inputColor}
         style={
           {
             '--input-bg': baseColor?.string,

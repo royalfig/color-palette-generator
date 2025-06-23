@@ -1,6 +1,7 @@
 import Color from 'colorjs.io'
 import { ColorSpace, SliderType } from '../../types'
 import { BaseColorData } from '../../util/factory'
+import space from 'colorjs.io/types/src/space'
 
 export interface SliderStrategy {
   label: string
@@ -9,8 +10,8 @@ export interface SliderStrategy {
   step?: number
   getValue: (color: BaseColorData) => number
   updateColor: (color: Color, value: number) => Color
-  getTrackStyle: (color: Color) => string
-  thumbStyle: string
+  getTrackStyle: (values: Record<string, string | number>) => string
+  getThumbStyle: (values: Record<string, string | number>) => string
 }
 
 function getWorkingSpace(space: ColorSpace) {
@@ -23,6 +24,7 @@ const hueStrategy = (space: ColorSpace): SliderStrategy => ({
   label: 'Hue',
   min: 0,
   max: 360,
+  step: 0.1,
   getValue: color => {
     const hueIndex = space === 'hsl' ? 0 : 2
     return color.conversions[space].coords[hueIndex]
@@ -31,18 +33,18 @@ const hueStrategy = (space: ColorSpace): SliderStrategy => ({
     color[space].h = value
     return color
   },
-  getTrackStyle: () => {
+  getTrackStyle: values => {
     if (space === 'hsl') {
-      return `linear-gradient(to right in hsl longer hue, hsl(0deg var(--saturation) var(--lightness)), hsl(360deg var(--saturation) var(--lightness)))`
+      return `linear-gradient(to right in hsl longer hue, hsl(0deg ${values.saturation} ${values.lightness}), hsl(360deg ${values.saturation} ${values.lightness}))`
     }
-    return `linear-gradient(to right in ${space} longer hue, ${space}(var(--lightness) var(--saturation) 0deg), ${space}(var(--lightness) var(--saturation) 360deg))`
+    return `linear-gradient(to right in ${space} longer hue, ${space}(${values.lightness} ${values.saturation} 0deg), ${space}(${values.lightness} ${values.saturation} 360deg))`
   },
-  thumbStyle:
+  getThumbStyle: values =>
     space === 'hsl'
-      ? 'hsl(var(--hue) var(--saturation) var(--lightness))'
+      ? `hsl(${values.hue} ${values.saturation} ${values.lightness})`
       : space === 'lch'
-      ? 'lch(var(--lightness) var(--saturation) var(--hue))'
-      : 'oklch(var(--lightness) var(--saturation) var(--hue))',
+      ? `lch(${values.lightness} ${values.saturation} ${values.hue})`
+      : `oklch(${values.lightness} ${values.saturation} ${values.hue})`,
 })
 
 const saturationStrategy = (space: ColorSpace): SliderStrategy => {
@@ -57,9 +59,9 @@ const saturationStrategy = (space: ColorSpace): SliderStrategy => {
         color.oklch.c = value
         return color
       },
-      getTrackStyle: () =>
-        `linear-gradient(to right, oklch(var(--lightness) 0 var(--hue)), oklch(var(--lightness) 0.4 var(--hue)))`,
-      thumbStyle: 'oklch(var(--lightness) var(--saturation) var(--hue))',
+      getTrackStyle: values =>
+        `linear-gradient(to right, oklch(${values.lightness} 0 ${values.hue}), oklch(${values.lightness} 0.4 ${values.hue}))`,
+      getThumbStyle: values => `oklch(${values.lightness} ${values.saturation} ${values.hue})`,
     }
   }
 
@@ -74,9 +76,9 @@ const saturationStrategy = (space: ColorSpace): SliderStrategy => {
         return color
       },
       step: 1,
-      getTrackStyle: () =>
-        `linear-gradient(to right, lch(var(--lightness) 0 var(--hue)), lch(var(--lightness) 150 var(--hue)))`,
-      thumbStyle: 'lch(var(--lightness) var(--saturation) var(--hue))',
+      getTrackStyle: values =>
+        `linear-gradient(to right, lch(${values.lightness} 0 ${values.hue}), lch(${values.lightness} 150 ${values.hue}))`,
+      getThumbStyle: values => `lch(${values.lightness} ${values.saturation} ${values.hue})`,
     }
   }
 
@@ -90,9 +92,9 @@ const saturationStrategy = (space: ColorSpace): SliderStrategy => {
       color.hsl.s = value
       return color
     },
-    getTrackStyle: () =>
-      `linear-gradient(to right in hsl, hsl(var(--hue) 0% var(--lightness)), hsl(var(--hue) 100% var(--lightness)))`,
-    thumbStyle: 'hsl(var(--hue) var(--saturation) var(--lightness))',
+    getTrackStyle: values =>
+      `linear-gradient(to right in hsl, hsl(${values.hue} 0% ${values.lightness}), hsl(${values.hue} 100% ${values.lightness}))`,
+    getThumbStyle: values => `hsl(${values.hue} ${values.saturation} ${values.lightness})`,
   }
 }
 
@@ -108,9 +110,9 @@ const lightnessStrategy = (space: ColorSpace): SliderStrategy => {
         color.oklch.l = value
         return color
       },
-      getTrackStyle: () =>
-        `linear-gradient(to right, oklch(0 var(--saturation) var(--hue)), oklch(1 var(--saturation) var(--hue)))`,
-      thumbStyle: 'oklch(var(--value) var(--saturation) var(--hue))',
+      getTrackStyle: values =>
+        `linear-gradient(to right, oklch(0 ${values.saturation} ${values.hue}), oklch(1 ${values.saturation} ${values.hue}))`,
+      getThumbStyle: values => `oklch(${values.value} ${values.saturation} ${values.hue})`,
     }
   }
 
@@ -125,9 +127,9 @@ const lightnessStrategy = (space: ColorSpace): SliderStrategy => {
         color.lch.l = value
         return color
       },
-      getTrackStyle: () =>
-        `linear-gradient(to right, lch(0 var(--saturation) var(--hue)), lch(100 var(--saturation) var(--hue)))`,
-      thumbStyle: 'lch(var(--value) var(--saturation) var(--hue))',
+      getTrackStyle: values =>
+        `linear-gradient(to right, lch(0 ${values.saturation} ${values.hue}), lch(100 ${values.saturation} ${values.hue}))`,
+      getThumbStyle: values => `lch(${values.value} ${values.saturation} ${values.hue})`,
     }
   }
 
@@ -142,9 +144,9 @@ const lightnessStrategy = (space: ColorSpace): SliderStrategy => {
         color.oklab.l = value
         return color
       },
-      getTrackStyle: () =>
-        `linear-gradient(to right, oklab(0 var(--oklab-a) var(--oklab-b)), oklab(1 var(--oklab-a) var(--oklab-b)))`,
-      thumbStyle: 'oklab(var(--value) var(--oklab-a) var(--oklab-b))',
+      getTrackStyle: values =>
+        `linear-gradient(to right, oklab(0 ${values['oklab-a']} ${values['oklab-b']}), oklab(1 ${values['oklab-a']} ${values['oklab-b']}))`,
+      getThumbStyle: values => `oklab(${values.value} ${values['oklab-a']} ${values['oklab-b']})`,
     }
   }
 
@@ -158,9 +160,9 @@ const lightnessStrategy = (space: ColorSpace): SliderStrategy => {
         color.lab.l = value
         return color
       },
-      getTrackStyle: () =>
-        `linear-gradient(to right, lab(0 var(--lab-a) var(--lab-b)), lab(100 var(--lab-a) var(--lab-b)))`,
-      thumbStyle: 'lab(var(--value) var(--lab-a) var(--lab-b))',
+      getTrackStyle: values =>
+        `linear-gradient(to right, lab(0 ${values['lab-a']} ${values['lab-b']}), lab(100 ${values['lab-a']} ${values['lab-b']}))`,
+      getThumbStyle: values => `lab(${values.value} ${values['lab-a']} ${values['lab-b']})`,
     }
   }
 
@@ -173,21 +175,23 @@ const lightnessStrategy = (space: ColorSpace): SliderStrategy => {
       color.hsl.l = value
       return color
     },
-    getTrackStyle: () =>
-      `linear-gradient(to right, hsl(var(--hue) var(--saturation) 0%), hsl(var(--hue) var(--saturation) 50%), hsl(var(--hue) var(--saturation) 100%))`,
-    thumbStyle: 'hsl(var(--hue) var(--saturation) var(--value))',
+    getTrackStyle: values =>
+      `linear-gradient(to right, hsl(${values.hue} ${values.saturation} 0%), hsl(${values.hue} ${values.saturation} 50%), hsl(${values.hue} ${values.saturation} 100%))`,
+    getThumbStyle: values => `hsl(${values.hue} ${values.saturation} ${values.value})`,
   }
 }
 
 const rgbStrategy = (coord: 'r' | 'g' | 'b'): SliderStrategy => ({
   label: coord === 'r' ? 'Red' : coord === 'g' ? 'Green' : 'Blue',
   min: 0,
-  max: 100,
+  max: 1,
+  step: 0.01,
   getValue: color => {
     const index = coord === 'r' ? 0 : coord === 'g' ? 1 : 2
-    return color.conversions.rgb.coords[index] * 100
+    return color.conversions.rgb.coords[index]
   },
   updateColor: (color, value) => {
+    console.log(coord, value)
     color.srgb[coord] = value
     return color
   },
@@ -196,12 +200,12 @@ const rgbStrategy = (coord: 'r' | 'g' | 'b'): SliderStrategy => ({
     if (coord === 'g') return 'linear-gradient(to right, transparent, green)'
     return 'linear-gradient(to right, transparent, blue)'
   },
-  thumbStyle:
+  getThumbStyle: values =>
     coord === 'r'
-      ? 'color-mix(in srgb, red var(--value-as-percent), gray)'
+      ? `color-mix(in srgb, red ${values['value-as-percent']}, gray)`
       : coord === 'g'
-      ? 'color-mix(in srgb, green var(--value-as-percent), gray)'
-      : 'color-mix(in srgb, blue var(--value-as-percent), gray)',
+      ? `color-mix(in srgb, green ${values['value-as-percent']}, gray)`
+      : `color-mix(in srgb, blue ${values['value-as-percent']}, gray)`,
 })
 
 const p3Strategy = (coord: 'p3-r' | 'p3-g' | 'p3-b'): SliderStrategy => ({
@@ -214,7 +218,8 @@ const p3Strategy = (coord: 'p3-r' | 'p3-g' | 'p3-b'): SliderStrategy => ({
     return color.conversions.p3.coords[index]
   },
   updateColor: (color, value) => {
-    color.p3[coord] = value
+    const actualCoord = coord.replace('p3-', '')
+    color.p3[actualCoord] = value
     return color
   },
   getTrackStyle: () => {
@@ -222,12 +227,12 @@ const p3Strategy = (coord: 'p3-r' | 'p3-g' | 'p3-b'): SliderStrategy => ({
     if (coord === 'p3-g') return 'linear-gradient(to right, transparent, green)'
     return 'linear-gradient(to right, transparent, blue)'
   },
-  thumbStyle:
+  getThumbStyle: values =>
     coord === 'p3-r'
-      ? 'color-mix(in display-p3, red var(--value-as-percent), gray)'
+      ? `color-mix(in display-p3, red ${values['value-as-percent']}, gray)`
       : coord === 'p3-g'
-      ? 'color-mix(in display-p3, green var(--value-as-percent), gray)'
-      : 'color-mix(in display-p3, blue var(--value-as-percent), gray)',
+      ? `color-mix(in display-p3, green ${values['value-as-percent']}, gray)`
+      : `color-mix(in display-p3, blue ${values['value-as-percent']}, gray)`,
 })
 
 const labAStrategy = (): SliderStrategy => ({
@@ -239,9 +244,12 @@ const labAStrategy = (): SliderStrategy => ({
     color.lab.a = value
     return color
   },
-  getTrackStyle: () =>
-    `linear-gradient(to right, lab(var(--lightness) var(--lab-b) -125), lab(var(--lightness) var(--lab-b) 0), lab(var(--lightness) var(--lab-b) 125))`,
-  thumbStyle: 'lab(var(--lightness) var(--lab-b) var(--value))',
+  getTrackStyle: values =>
+    `linear-gradient(to right, 
+     lab(${values.lightness} -125 ${values['lab-b']}), 
+     lab(${values.lightness} 0 ${values['lab-b']}), 
+     lab(${values.lightness} 125 ${values['lab-b']}))`,
+  getThumbStyle: values => `lab(${values.lightness} ${values.value} ${values['lab-b']})`,
 })
 
 const labBStrategy = (): SliderStrategy => ({
@@ -253,9 +261,12 @@ const labBStrategy = (): SliderStrategy => ({
     color.lab.b = value
     return color
   },
-  getTrackStyle: () =>
-    `linear-gradient(to right, lab(var(--lightness) -125 var(--lab-b)), lab(var(--lightness) 0 var(--lab-b)), lab(var(--lightness) 125 var(--lab-b)))`,
-  thumbStyle: 'lab(var(--lightness) var(--lab-a) var(--value))',
+  getTrackStyle: values =>
+    `linear-gradient(to right, 
+     lab(${values.lightness} ${values['lab-a']} -125), 
+     lab(${values.lightness} ${values['lab-a']} 0), 
+     lab(${values.lightness} ${values['lab-a']} 125))`,
+  getThumbStyle: values => `lab(${values.lightness} ${values['lab-a']} ${values.value})`,
 })
 
 const oklabAStrategy = (): SliderStrategy => ({
@@ -268,9 +279,12 @@ const oklabAStrategy = (): SliderStrategy => ({
     color.oklab.a = value
     return color
   },
-  getTrackStyle: () =>
-    `linear-gradient(to right, oklab(var(--lightness) var(--oklab-b) -0.4), oklab(var(--lightness) var(--oklab-b) 0), oklab(var(--lightness) var(--oklab-b) 0.4))`,
-  thumbStyle: 'oklab(var(--lightness) var(--oklab-b) var(--value))',
+  getTrackStyle: values =>
+    `linear-gradient(to right, 
+    oklab(${values.lightness} -0.4 ${values['oklab-b']}), 
+    oklab(${values.lightness} 0 ${values['oklab-b']}),
+    oklab(${values.lightness} 0.4 ${values['oklab-b']}))`,
+  getThumbStyle: values => `oklab(${values.lightness} ${values.value} ${values['oklab-b']})`,
 })
 
 const oklabBStrategy = (): SliderStrategy => ({
@@ -283,9 +297,12 @@ const oklabBStrategy = (): SliderStrategy => ({
     color.oklab.b = value
     return color
   },
-  getTrackStyle: () =>
-    `linear-gradient(to right, oklab(var(--lightness) var(--oklab-a) -0.4), oklab(var(--lightness) var(--oklab-a) 0), oklab(var(--lightness) var(--oklab-a) 0.4))`,
-  thumbStyle: 'oklab(var(--lightness) var(--oklab-a) var(--value))',
+  getTrackStyle: values =>
+    `linear-gradient(to right, 
+     oklab(${values.lightness} ${values['oklab-a']} -0.4),
+     oklab(${values.lightness} ${values['oklab-a']} 0), 
+     oklab(${values.lightness} ${values['oklab-a']} 0.4))`,
+  getThumbStyle: values => `oklab(${values.lightness} ${values['oklab-a']} ${values.value})`,
 })
 
 export function getSliderStrategy(type: SliderType, colorSpace: ColorSpace): SliderStrategy {

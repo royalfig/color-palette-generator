@@ -6,13 +6,6 @@
   --dark-shadow-color: hsl(248deg 11% 5%);
   --button-container: #000;
   --button-container-shadow: 0.0625em 0.0625em 0.0625em rgb(255 255 255 / 60%);
-  --shadow-color: 0 2% 32%;
-  --shadow-elevation-high: 0px 0.5px 0.6px hsl(var(--shadow-color) / 34%),
-    0px 2.9px 3.3px -0.4px hsl(var(--shadow-color) / 34%), 0px 5.5px 6.2px -0.7px hsl(var(--shadow-color) / 34%),
-    -0.1px 9px 10.1px -1.1px hsl(var(--shadow-color) / 34%), -0.1px 14.4px 16.2px -1.4px hsl(var(--shadow-color) / 34%),
-    -0.2px 22.5px 25.3px -1.8px hsl(var(--shadow-color) / 34%),
-    -0.2px 34.2px 38.5px -2.1px hsl(var(--shadow-color) / 34%),
-    -0.4px 50.4px 56.7px -2.5px hsl(var(--shadow-color) / 34%);
 
   display: flex;
   align-items: center;
@@ -29,7 +22,7 @@
     width: 100%;
     height: 100%;
     padding: 1px;
-    background: linear-gradient(to bottom, #fff, #000);
+    background: var(--button-rim);
     border-radius: 5px;
 
     &:has(.active) {
@@ -51,7 +44,7 @@
     color: var(--element);
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    background-image: linear-gradient(to bottom, #cdcccb, #ccc);
+    background-image: var(--button-background);
     background-size: 80px 80px;
     border-radius: 5px;
     box-shadow: var(--shadow-elevation-high);
@@ -62,21 +55,12 @@
 
     &:active,
     &.active {
-      background-image: linear-gradient(to bottom, hsl(30deg 2% 75%), hsl(0deg 0% 75%));
+      color: var(--active-button-text-color);
+      text-shadow: var(--active-button-text-shadow);
+      background-image: var(--button-active);
       box-shadow: inset 3px 3px 0.75em hsl(0deg 0% 15% / 75%);
 
       /* transform: scale(0.98); */
     }
-  }
-}
-
-[data-mode='dark'] {
-  .button-container {
-    --background-color: hsl(248deg 11% 20%);
-    --background-color-active: hsl(248deg 11% 18%);
-    --light-shadow-color: hsl(248deg 11% 25%);
-    --dark-shadow-color: hsl(248deg 11% 5%);
-    --button-container: hsl(248deg 11% 15%);
-    --button-container-shadow: 0.0625em 0.0625em 0.0625em rgb(255 255 255 / 10%);
   }
 }

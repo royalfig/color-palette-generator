@@ -2,5 +2,5 @@
   display: grid;
   min-height: 269px;
   padding: var(--box-padding);
-  background-color: #252525;
+  background-color: #000;
 }

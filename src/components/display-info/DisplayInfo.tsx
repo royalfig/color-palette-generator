@@ -1,16 +1,10 @@
-import { useState, useEffect } from 'react'
-import { CircleHalfIcon, DotsNineIcon, EyeIcon, MonitorIcon } from '@phosphor-icons/react'
-import { container } from './display-info.module.css'
+import { useMemo, useContext } from 'react'
+import { CheckIcon, CircleHalfIcon, DotsNineIcon, EyeIcon, InfoIcon, MonitorIcon, XIcon } from '@phosphor-icons/react'
+import styles from './display-info.module.css'
+import { MessageContext, MessageType } from '../MessageContext'
 
 export function useDisplayCapabilities() {
-  const [capabilities, setCapabilities] = useState({
-    colorGamut: 'unknown',
-    dynamicRange: 'unknown',
-    dpr: 1,
-    loading: true,
-  })
-
-  useEffect(() => {
+  const capabilities = useMemo(() => {
     // Test color gamut
     let gamut = 'srgb' // default
     if (window.matchMedia('(color-gamut: rec2020)').matches) {
@@ -24,20 +18,31 @@ export function useDisplayCapabilities() {
     // Test dynamic range
     const hasHDR = window.matchMedia('(dynamic-range: high)').matches
 
-    setCapabilities({
+    return {
       colorGamut: gamut,
       dynamicRange: hasHDR ? 'high' : 'standard',
       dpr,
-      loading: false,
-    })
+    }
   }, []) // Empty dependency array - only run once
 
   return capabilities
 }
 
+function IconSelector({ messageType }: { messageType: MessageType }) {
+  switch (messageType) {
+    case 'success':
+      return <CheckIcon weight="fill" />
+    case 'error':
+      return <XIcon weight="fill" />
+    case 'info':
+      return <InfoIcon weight="fill" />
+  }
+}
+
 // Usage in component
 export function DisplayInfo() {
-  const { colorGamut, dynamicRange, loading, dpr } = useDisplayCapabilities()
+  const { colorGamut, dynamicRange, dpr } = useDisplayCapabilities()
+  const { message, messageType } = useContext(MessageContext)
 
   // Mapping from color gamut to human spectrum coverage
   const gamutCoverage: Record<string, number> = {
@@ -53,10 +58,17 @@ export function DisplayInfo() {
     unknown: 'Unknown',
   }
 
-  if (loading) return <div>Detecting display capabilities...</div>
+  if (message) {
+    return (
+      <div className={`${styles.container} ${styles[messageType || 'info']}`}>
+        <IconSelector messageType={messageType || 'info'} />
+        <p>{message}</p>
+      </div>
+    )
+  }
 
   return (
-    <div className={container}>
+    <div className={styles.container}>
       <div className="flex gap-01">
         <MonitorIcon weight="fill" />
         {colorGamut}

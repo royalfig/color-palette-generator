@@ -1,7 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" data-mode="light">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      ;(function () {
+        function getInitialTheme() {
+          const storedPreference = localStorage.getItem('dark-mode')
+          if (storedPreference !== null) {
+            return storedPreference === 'true' ? 'dark' : 'light'
+          }
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+        document.documentElement.dataset.mode = getInitialTheme()
+      })()
+    </script>
     <!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Color Palette Pro</title>
