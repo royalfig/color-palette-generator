@@ -1,13 +1,13 @@
 import { BombIcon } from '@phosphor-icons/react'
-import { container, display, inner, knob } from './knob.module.css'
+import './knob.css'
 
 export function Knob() {
   return (
-    <div className={container}>
-      <div className={knob}>
-        <div className={inner}></div>
+    <div className="knob-container">
+      <div className="knob-knob">
+        <div className="knob-inner"></div>
       </div>
-      <div className={display}>
+      <div className="knob-display">
         <BombIcon weight="fill" size={18} />
         <p>100</p>
       </div>

@@ -1,13 +1,14 @@
 import { DiceFourIcon } from '@phosphor-icons/react/dist/ssr'
 import Button from '../components/button/Button'
 import { LifebuoyIcon } from '@phosphor-icons/react'
-import { container } from './options.module.css'
+import './options.css'
 import { pickRandomColor } from '../util/pickRandomColor'
 import { Dispatch } from 'react'
+import { LinearGradientSVG } from '../components/LinearGradientSVG'
 
 export function Options({ setColor }: { setColor: React.Dispatch<React.SetStateAction<string>> }) {
   return (
-    <div className={container}>
+    <div className="options-container">
       <Button
         handler={() => {
           const randomColor = pickRandomColor()
@@ -15,10 +16,20 @@ export function Options({ setColor }: { setColor: React.Dispatch<React.SetStateA
         }}
         active={false}
       >
-        <DiceFourIcon weight="fill" size={24} />
+        <DiceFourIcon size={20} color="url(#gradient)">
+          <LinearGradientSVG />
+        </DiceFourIcon>
       </Button>
-      <Button handler={() => {}} active={false}>
-        <LifebuoyIcon weight="fill" size={24} />
+      <Button
+        handler={() => {
+          const windowFeatures = `width=500,height=800,resizable=false,scrollbars=yes,status=yes`
+          window.open('/manual', '_blank', windowFeatures)
+        }}
+        active={false}
+      >
+        <LifebuoyIcon size={20} color="url(#gradient)">
+          <LinearGradientSVG />
+        </LifebuoyIcon>
       </Button>
     </div>
   )

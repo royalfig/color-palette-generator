@@ -1,10 +1,11 @@
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
 import { ColorSpaceAndFormat } from '../../types'
-import styles from './input-color-container.module.css'
+import './input-color-container.css'
 import { EyedropperSampleIcon, PlayIcon } from '@phosphor-icons/react'
 import Button from '../button/Button'
 import { ColorContext } from '../ColorContext'
 import { MessageContext } from '../MessageContext'
+import { LinearGradientSVG } from '../LinearGradientSVG'
 
 declare global {
   interface Window {
@@ -58,15 +59,17 @@ export function InputColorContainer({
   }, [colorSpace, context])
 
   return (
-    <div className={styles.container}>
+    <div className="input-color-container">
       {window.EyeDropper ? (
         <Button handler={handleEyedropper} active={active} className="eyedropper-button">
-          <EyedropperSampleIcon size={22} color="var(--icon-element)" weight="fill" />
+          <EyedropperSampleIcon size={22} color="url(#gradient)">
+            <LinearGradientSVG />
+          </EyedropperSampleIcon>
         </Button>
       ) : null}
 
       <input
-        className={styles.inputColor}
+        className="input-color-container-input"
         style={
           {
             '--input-bg': baseColor?.string,
@@ -79,8 +82,10 @@ export function InputColorContainer({
         onChange={e => setInput(e.target.value)}
       />
 
-      <Button handler={handleSubmit} active={false}>
-        <PlayIcon size={20} color="var(--icon-element)" weight="fill" />
+      <Button handler={handleSubmit} active={false} className="inverse">
+        <PlayIcon size={20}>
+          <LinearGradientSVG />
+        </PlayIcon>
       </Button>
     </div>
   )

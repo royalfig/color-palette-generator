@@ -1,9 +1,0 @@
-.container {
-  display: flex;
-  grid-column: 9 / 13;
-  gap: var(--base-gap);
-
-  & > * {
-    flex: 1;
-  }
-}

@@ -1,0 +1,9 @@
+.palette-style-container {
+  display: flex;
+  grid-column: 9 / 13;
+  gap: var(--base-gap);
+}
+
+.palette-style-container > * {
+  flex: 1;
+}

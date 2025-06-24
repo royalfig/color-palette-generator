@@ -1,34 +1,58 @@
 import { RewindIcon, InfoIcon, LayoutIcon, MoonStarsIcon, SunIcon } from '@phosphor-icons/react'
 import Button from '../button/Button'
-import { container } from './palette-tool-selector.module.css'
+import './palette-tool-selector.css'
+import { LinearGradientSVG } from '../LinearGradientSVG'
 export function PaletteToolSelector({
   showPaletteColors,
   setShowPaletteColors,
   isDarkMode,
   toggleDarkMode,
+  showColorHistory,
+  setShowColorHistory,
 }: {
   showPaletteColors: boolean
-  setShowPaletteColors: (show: boolean) => void
+  setShowPaletteColors: React.Dispatch<React.SetStateAction<boolean>>
   isDarkMode: boolean
   toggleDarkMode: () => void
+  showColorHistory: boolean
+  setShowColorHistory: React.Dispatch<React.SetStateAction<boolean>>
 }) {
   function handleShowPaletteColors() {
     setShowPaletteColors(!showPaletteColors)
   }
 
   return (
-    <div className={container}>
+    <div className="palette-tool-container">
       <Button handler={handleShowPaletteColors} active={showPaletteColors}>
-        <InfoIcon weight="fill" size={20} />
+        <InfoIcon size={20} color="url(#gradient)">
+          <LinearGradientSVG />
+        </InfoIcon>
+      </Button>
+      <Button
+        handler={() => {
+          setShowColorHistory(!showColorHistory)
+        }}
+        active={showColorHistory}
+      >
+        <RewindIcon size={20} color="url(#gradient)">
+          <LinearGradientSVG />
+        </RewindIcon>
       </Button>
       <Button handler={() => {}} active={false}>
-        <RewindIcon weight="fill" size={20} />
-      </Button>
-      <Button handler={() => {}} active={false}>
-        <LayoutIcon weight="fill" size={20} />
+        <LayoutIcon size={20} color="url(#gradient)">
+          <LinearGradientSVG />
+        </LayoutIcon>
       </Button>
       <Button handler={toggleDarkMode} active={isDarkMode}>
-        {isDarkMode ? <SunIcon weight="fill" size={20} /> : <MoonStarsIcon weight="fill" size={20} />}
+        {isDarkMode ? (
+          <SunIcon size={20} color="url(#gradient)">
+            <LinearGradientSVG />
+          </SunIcon>
+        ) : (
+          <MoonStarsIcon size={20} color="url(#gradient)">
+            <LinearGradientSVG />
+          </MoonStarsIcon>
+        )}
       </Button>
     </div>
   )

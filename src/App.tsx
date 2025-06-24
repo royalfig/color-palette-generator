@@ -11,6 +11,7 @@ import { PaletteDisplay } from './components/palette-display/PaletteDisplay'
 import { PaletteStyleSelector } from './components/palette-style-selector/PaletteStyleSelector'
 import { PaletteToolSelector } from './components/palette-tool-selector/PaletteToolSelector'
 import { SectionHeader } from './components/section-header/SectionHeader'
+import { Manual } from './components/manual/Manual'
 import './css/App.css'
 import './css/Defaults.css'
 import './css/Reset.css'
@@ -65,21 +66,33 @@ function updateFavicon(color: string) {
 }
 
 export default function App() {
-  console.log('app rendering')
+  // Parse URL parameters for initial state
+  const params = new URLSearchParams(document.location.search)
+
+  const initialColor = params.get('color') || pickRandomColor()
+  const initialPaletteType = (params.get('paletteType') as PaletteKinds) || 'spl'
+  const initialPaletteStyle =
+    (params.get('paletteStyle') as 'mathematical' | 'optical' | 'adaptive' | 'warm-cool') || 'mathematical'
+  const initialColorFormat = (params.get('colorFormat') as ColorFormat) || 'oklch'
+  // If you want to support colorSpace as a param, otherwise default to 'oklch'
+  const initialColorSpace = (params.get('colorSpace') as ColorSpace) || 'oklch'
+
+  // State initialization using URL params or defaults
+  const [color, setColor] = useState<string>(initialColor)
+  const [showPaletteColors, setShowPaletteColors] = useState(false)
+  const [paletteType, setPaletteType] = useState<PaletteKinds>(initialPaletteType)
+  const [showColorHistory, setShowColorHistory] = useState(false)
+  const [paletteStyle, setPaletteStyle] = useState<'mathematical' | 'optical' | 'adaptive' | 'warm-cool'>(
+    initialPaletteStyle,
+  )
+  const [colorSpace, setColorSpace] = useState<ColorSpaceAndFormat>({
+    space: initialColorSpace,
+    format: initialColorFormat,
+  })
+
   const { isDarkMode, toggleDarkMode } = useDarkMode()
   const colorQueryParaCheck = new URLSearchParams(document.location.search).has('color')
   const colorQueryParam = colorQueryParaCheck ? new URLSearchParams(document.location.search).get('color') : null
-  const [color, setColor] = useState<string>(colorQueryParam || pickRandomColor())
-  const [showPaletteColors, setShowPaletteColors] = useState(false)
-  const [paletteType, setPaletteType] = useState<PaletteKinds>('spl')
-  const [paletteStyle, setPaletteStyle] = useState<'mathematical' | 'optical' | 'adaptive' | 'warm-cool'>(
-    'mathematical',
-  )
-  const [colorSpace, setColorSpace] = useState<ColorSpaceAndFormat>({
-    space: 'oklch',
-    format: 'oklch',
-  })
-
   const [message, setMessage] = useState<string | null>(null)
   const [messageType, setMessageType] = useState<MessageType | null>(null)
 
@@ -95,7 +108,7 @@ export default function App() {
 
   const palette = useMemo(
     () => createPalettes(color, paletteType, paletteStyle, colorSpace),
-    [color, paletteType, paletteStyle],
+    [color, paletteType, paletteStyle, colorSpace],
   )
 
   const colorContext = useMemo(() => ({ originalColor: color, palette }), [color, palette])
@@ -129,6 +142,30 @@ export default function App() {
     if (baseColor) {
       updateFavicon(baseColor.cssValue)
       document.documentElement.style.setProperty('--base-color', baseColor.cssValue)
+
+      const colorHistory = localStorage.getItem('color-history')
+      if (colorHistory) {
+        const colorHistoryArray = JSON.parse(colorHistory)
+        if (!colorHistoryArray.includes(baseColor.string)) {
+          colorHistoryArray.push(baseColor.string)
+          localStorage.setItem('color-history', JSON.stringify(colorHistoryArray))
+        } else {
+          const index = colorHistoryArray.indexOf(baseColor.string)
+          colorHistoryArray.splice(index, 1)
+          colorHistoryArray.push(baseColor.string)
+          localStorage.setItem('color-history', JSON.stringify(colorHistoryArray))
+        }
+      } else {
+        localStorage.setItem('color-history', JSON.stringify([baseColor.string]))
+      }
+      console.log(document.location.search)
+      const colorUrl = new URLSearchParams(document.location.search)
+      colorUrl.set('color', baseColor.string)
+      colorUrl.set('paletteType', paletteType)
+      colorUrl.set('paletteStyle', paletteStyle)
+      colorUrl.set('colorFormat', colorSpace.format)
+      console.log(colorUrl.toString())
+      window.history.pushState({}, '', `${window.location.pathname}?${colorUrl.toString()}`)
     }
   }, [palette])
 
@@ -159,6 +196,8 @@ export default function App() {
                   colorNames={fetchedData?.colorNames || []}
                   paletteType={paletteType}
                   paletteStyle={paletteStyle}
+                  showColorHistory={showColorHistory}
+                  setColor={setColor}
                 />
               </Display>
               <div className="synth-body col-12">
@@ -172,8 +211,10 @@ export default function App() {
                   setShowPaletteColors={setShowPaletteColors}
                   isDarkMode={isDarkMode}
                   toggleDarkMode={toggleDarkMode}
+                  showColorHistory={showColorHistory}
+                  setShowColorHistory={setShowColorHistory}
                 />
-                <ExportOptions />
+                <ExportOptions fetchedData={fetchedData} isLoading={isLoading} error={colorNameError} />
                 {/* <Knob /> */}
 
                 <DisplayInfo />

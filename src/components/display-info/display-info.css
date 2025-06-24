@@ -1,4 +1,4 @@
-.container {
+.display-info-container {
   display: flex;
   grid-row: 5;
   grid-column: span 2 / -1;
@@ -14,14 +14,20 @@
   border-radius: 4px;
 }
 
-.success {
-  background-color: #008000;
+.display-info-message {
+  justify-content: start;
+  padding-inline: var(--spacing-04);
+  font-weight: 700;
 }
 
-.error {
-  background-color: #f00;
+.display-info-success {
+  background-color: #001e00;
 }
 
-.info {
-  background-color: #00f;
+.display-info-error {
+  background-color: rgb(39 0 0);
+}
+
+.display-info-info {
+  background-color: rgb(0 0 38);
 }

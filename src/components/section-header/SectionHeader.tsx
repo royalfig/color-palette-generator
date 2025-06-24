@@ -1,7 +1,6 @@
 import { useContext } from 'react'
 import { ColorContext } from '../ColorContext'
 import './section-header.css'
-import { useFetchColorNames } from '../../hooks/useColorName'
 
 function VibrancyModule() {
   const context = useContext(ColorContext)

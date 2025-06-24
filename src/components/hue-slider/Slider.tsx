@@ -84,7 +84,7 @@ export function Slider({
     'lab-b': base.conversions.lab.coords[2],
     'oklab-a': base.conversions.oklab.coords[1],
     'oklab-b': base.conversions.oklab.coords[2],
-    'value-as-percent': colorSpace.space === 'srgb' ? value + '%' : (value * 100).toFixed(2) + '%',
+    'value-as-percent': value * 100 + '%',
   }
 
   const thumbColor = getThumbStyle(placeholders)

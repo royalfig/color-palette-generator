@@ -1,0 +1,30 @@
+.manual-container {
+  padding: var(--box-padding);
+  color: #313131;
+  background-color: #fffdc3;
+}
+
+.manual-content {
+  max-width: 65ch;
+  min-height: 100lvh;
+  padding: 2rem;
+  margin-inline: auto;
+  border: 5px solid #a7a100;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-block: 0 0.5lh;
+  }
+
+  & > * {
+    margin-block-end: 1lh;
+  }
+
+  ol {
+    list-style-position: inside;
+  }
+}

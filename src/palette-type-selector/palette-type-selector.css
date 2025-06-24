@@ -1,14 +1,14 @@
-.container {
+.palette-type-container {
   display: grid;
   grid-column: 7 / 13;
   gap: 0;
 }
 
-.buttons {
+.palette-type-buttons {
   display: flex;
   gap: var(--base-gap);
+}
 
-  & > * {
-    flex: 1;
-  }
+.palette-type-buttons > * {
+  flex: 1;
 }

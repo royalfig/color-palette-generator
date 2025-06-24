@@ -1,11 +1,11 @@
+import { useAnimate } from 'motion/react'
 import { useContext, useEffect } from 'react'
-import type { ColorSpace, ColorFormat, PaletteStyle } from '../../types'
-import { Swatches } from '../swatches/Swatches'
-import { ColorContext } from '../ColorContext'
+import type { ColorFormat, ColorSpace } from '../../types'
 import { BaseColorData } from '../../util/factory'
+import { ColorHistory } from '../color-history/ColorHistory'
+import { ColorContext } from '../ColorContext'
+import { Swatches } from '../swatches/Swatches'
 import './PaletteDetails.css'
-
-import { motion, useAnimate } from 'motion/react'
 
 function PaletteDetails({
   palette,
@@ -59,6 +59,8 @@ export function AuxillaryDisplay({
   colorNames,
   paletteType,
   paletteStyle,
+  showColorHistory,
+  setColor,
 }: {
   showPaletteColors: boolean
   colorSpace: {
@@ -68,6 +70,8 @@ export function AuxillaryDisplay({
   colorNames: string[]
   paletteType: string
   paletteStyle: string
+  showColorHistory: boolean
+  setColor: React.Dispatch<React.SetStateAction<string>>
 }) {
   const context = useContext(ColorContext)
   if (!context) return null
@@ -76,6 +80,9 @@ export function AuxillaryDisplay({
 
   if (showPaletteColors) {
     return <PaletteDetails palette={palette} colorNames={colorNames} colorSpace={colorSpace} />
+  }
+  if (showColorHistory) {
+    return <ColorHistory setColor={setColor} />
   }
   return <Swatches colorSpace={colorSpace} paletteType={paletteType} paletteStyle={paletteStyle} />
 }

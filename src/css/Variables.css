@@ -49,8 +49,10 @@
   --button-active: linear-gradient(to bottom, hsl(30deg 2% 75%), hsl(0deg 0% 75%));
   --active-button-text-shadow: 0 0 0.5px color-mix(in oklch, var(--base-color) 55%, var(--element));
   --active-button-text-color: color-mix(in oklch, var(--base-color) 25%, var(--element));
-  --icon-gradient-top: hsl(248deg 11% 5%);
-  --icon-gradient-center: hsl(248deg 11% 35%);
+  --icon-gradient-top: hsl(249deg 50% 0%);
+  --icon-gradient-center: hsl(249deg 18% 20%);
+  --inverse-element: #fff;
+  --inverse-button-background: linear-gradient(to bottom, hsl(248deg 11% 15%), hsl(248deg 11% 15%));
 }
 
 [data-mode='dark'] {

@@ -1,6 +1,15 @@
 import { useMemo, useContext } from 'react'
-import { CheckIcon, CircleHalfIcon, DotsNineIcon, EyeIcon, InfoIcon, MonitorIcon, XIcon } from '@phosphor-icons/react'
-import styles from './display-info.module.css'
+import {
+  CheckSquareIcon,
+  CheckIcon,
+  CircleHalfIcon,
+  DotsNineIcon,
+  EyeIcon,
+  InfoIcon,
+  MonitorIcon,
+  XIcon,
+} from '@phosphor-icons/react'
+import './display-info.css'
 import { MessageContext, MessageType } from '../MessageContext'
 
 export function useDisplayCapabilities() {
@@ -28,14 +37,14 @@ export function useDisplayCapabilities() {
   return capabilities
 }
 
-function IconSelector({ messageType }: { messageType: MessageType }) {
+function IconSelector({ size, messageType }: { size: number; messageType: MessageType }) {
   switch (messageType) {
     case 'success':
-      return <CheckIcon weight="fill" />
+      return <CheckSquareIcon weight="bold" size={size} />
     case 'error':
-      return <XIcon weight="fill" />
+      return <XIcon weight="bold" size={size} />
     case 'info':
-      return <InfoIcon weight="fill" />
+      return <InfoIcon weight="bold" size={size} />
   }
 }
 
@@ -60,15 +69,15 @@ export function DisplayInfo() {
 
   if (message) {
     return (
-      <div className={`${styles.container} ${styles[messageType || 'info']}`}>
-        <IconSelector messageType={messageType || 'info'} />
+      <div className={`display-info-container display-info-${messageType || 'info'} display-info-message`}>
+        <IconSelector size={20} messageType={messageType || 'info'} />
         <p>{message}</p>
       </div>
     )
   }
 
   return (
-    <div className={styles.container}>
+    <div className="display-info-container">
       <div className="flex gap-01">
         <MonitorIcon weight="fill" />
         {colorGamut}
@@ -84,7 +93,6 @@ export function DisplayInfo() {
       </div>
       <div className="flex gap-01">
         <DotsNineIcon weight="fill" />
-
         {dpr}
       </div>
     </div>

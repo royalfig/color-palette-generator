@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { BaseColorData } from '../util/factory'
 
 // Your type definitions remain the same
@@ -23,9 +23,10 @@ export function useFetchColorNames(palette: BaseColorData[]): IUseFetchWithAbort
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
-  const { formattedPalette, baseIdx } = prepareColorData(palette)
+  const { formattedPalette, baseIdx } = useMemo(() => prepareColorData(palette), [palette])
 
   useEffect(() => {
+    console.log('fetch effect running', formattedPalette, baseIdx)
     setIsLoading(true)
     setFetchedData(null)
     setError(null)
@@ -51,7 +52,7 @@ export function useFetchColorNames(palette: BaseColorData[]): IUseFetchWithAbort
     fetchColorName()
 
     return () => controller.abort()
-  }, [formattedPalette, baseIdx])
+  }, [palette])
 
   return { fetchedData, isLoading, error }
 }

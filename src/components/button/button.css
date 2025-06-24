@@ -25,7 +25,7 @@
     background: var(--button-rim);
     border-radius: 5px;
 
-    &:has(.active) {
+    &:has(.active, :active) {
       background: linear-gradient(to bottom, #000, #000);
     }
   }
@@ -43,7 +43,8 @@
     /* font-weight: 200; */
     color: var(--element);
     text-transform: uppercase;
-    letter-spacing: 0.8px;
+
+    /* letter-spacing: 0.8px; */
     background-image: var(--button-background);
     background-size: 80px 80px;
     border-radius: 5px;
@@ -62,5 +63,12 @@
 
       /* transform: scale(0.98); */
     }
+  }
+}
+
+.button-container.inverse {
+  button {
+    color: var(--inverse-element);
+    background-image: var(--inverse-button-background);
   }
 }

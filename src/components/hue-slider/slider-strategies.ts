@@ -14,12 +14,6 @@ export interface SliderStrategy {
   getThumbStyle: (values: Record<string, string | number>) => string
 }
 
-function getWorkingSpace(space: ColorSpace) {
-  if (space === 'oklab' || space === 'oklch') return 'oklch'
-  if (space === 'lab' || space === 'lch') return 'lch'
-  return 'hsl'
-}
-
 const hueStrategy = (space: ColorSpace): SliderStrategy => ({
   label: 'Hue',
   min: 0,
