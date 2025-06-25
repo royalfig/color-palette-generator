@@ -1,16 +1,13 @@
 import { useMemo, useContext } from 'react'
-import {
-  CheckSquareIcon,
-  CheckIcon,
-  CircleHalfIcon,
-  DotsNineIcon,
-  EyeIcon,
-  InfoIcon,
-  MonitorIcon,
-  XIcon,
-} from '@phosphor-icons/react'
+
 import './display-info.css'
 import { MessageContext, MessageType } from '../MessageContext'
+import { InfoIcon as InfoIconDist } from '@phosphor-icons/react/dist/csr/Info'
+import { CheckSquareIcon } from '@phosphor-icons/react/dist/csr/CheckSquare'
+import { XIcon } from '@phosphor-icons/react/dist/csr/X'
+import { MonitorIcon } from '@phosphor-icons/react/dist/csr/Monitor'
+import { EyeIcon } from '@phosphor-icons/react/dist/csr/Eye'
+import { CircleHalfIcon } from '@phosphor-icons/react/dist/csr/CircleHalf'
 
 export function useDisplayCapabilities() {
   const capabilities = useMemo(() => {
@@ -44,7 +41,7 @@ function IconSelector({ size, messageType }: { size: number; messageType: Messag
     case 'error':
       return <XIcon weight="bold" size={size} />
     case 'info':
-      return <InfoIcon weight="bold" size={size} />
+      return <InfoIconDist weight="bold" size={size} />
   }
 }
 
@@ -79,22 +76,22 @@ export function DisplayInfo() {
   return (
     <div className="display-info-container">
       <div className="flex gap-01">
-        <MonitorIcon weight="fill" />
-        {colorGamut}
+        <MonitorIcon weight="fill" size={14} />
+        <p>{colorGamut}</p>
       </div>
       <div className="flex gap-01">
-        <EyeIcon weight="fill" />
-        {gamutCoverage[colorGamut]}%
+        <EyeIcon weight="fill" size={14} />
+        <p>{gamutCoverage[colorGamut]}%</p>
       </div>
 
       <div className="flex gap-01">
-        <CircleHalfIcon weight="fill" />
-        {dynamicRangeMap[dynamicRange]}
+        <CircleHalfIcon weight="fill" size={14} />
+        <p>{dynamicRangeMap[dynamicRange]}</p>
       </div>
-      <div className="flex gap-01">
+      {/* <div className="flex gap-01">
         <DotsNineIcon weight="fill" />
         {dpr}
-      </div>
+      </div> */}
     </div>
   )
 }

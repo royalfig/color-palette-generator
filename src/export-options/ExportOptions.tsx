@@ -1,4 +1,7 @@
-import { CopyIcon, ImageIcon, LinkIcon, FileArrowDownIcon } from '@phosphor-icons/react'
+import { CopyIcon } from '@phosphor-icons/react/dist/csr/Copy'
+import { ImageIcon } from '@phosphor-icons/react/dist/csr/Image'
+import { LinkIcon } from '@phosphor-icons/react/dist/csr/Link'
+import { FileArrowDownIcon } from '@phosphor-icons/react/dist/csr/FileArrowDown'
 import Button from '../components/button/Button'
 import './export-options.css'
 import { ColorSpace } from 'colorjs.io/fn'
@@ -36,8 +39,7 @@ function downloadAction(
   cb('Downloaded', 'success')
 }
 
-function downloadPaletteAsImage(palette: BaseColorData[], colorNames: ColorName) {
-  const baseColor = palette.find(color => color.isBase)
+function downloadPaletteAsImage(baseColor: BaseColorData, palette: BaseColorData[], colorNames: ColorName) {
   const colorCount = palette.length
   const columns = Math.min(colorCount, 6)
   const rows = colorCount > 6 ? 2 : 1
@@ -115,7 +117,7 @@ interface ExportOptionsProps {
 }
 
 export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: ExportOptionsProps) {
-  const { palette } = useContext(ColorContext)
+  const { palette, originalColor } = useContext(ColorContext)
   const { showMessage } = useContext(MessageContext)
 
   const colorNames = { fetchedData, isLoading, error }
@@ -131,7 +133,7 @@ export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: Ex
   }
 
   function handleImageDownload() {
-    downloadPaletteAsImage(palette, colorNames)
+    downloadPaletteAsImage(originalColor, palette, colorNames)
     showMessage('Image created', 'success')
   }
 

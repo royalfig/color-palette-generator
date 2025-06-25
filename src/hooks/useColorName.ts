@@ -9,12 +9,7 @@ interface IUseFetchWithAbortResponse {
   error: Error | null
 }
 
-function prepareColorData(palette: BaseColorData[]) {
-  const baseIdx = palette.findIndex(color => color.isBase)
-  return { formattedPalette: palette.map(color => color.conversions.hex.value.replace('#', '')).join(','), baseIdx }
-}
-
-export function useFetchColorNames(palette: BaseColorData[]): IUseFetchWithAbortResponse {
+export function useFetchColorNames(palette: BaseColorData[], originalColor: BaseColorData): IUseFetchWithAbortResponse {
   const [fetchedData, setFetchedData] = useState<{
     colorNames: string[]
     paletteTitle: string
@@ -23,10 +18,7 @@ export function useFetchColorNames(palette: BaseColorData[]): IUseFetchWithAbort
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
-  const { formattedPalette, baseIdx } = useMemo(() => prepareColorData(palette), [palette])
-
   useEffect(() => {
-    console.log('fetch effect running', formattedPalette, baseIdx)
     setIsLoading(true)
     setFetchedData(null)
     setError(null)
@@ -36,10 +28,21 @@ export function useFetchColorNames(palette: BaseColorData[]): IUseFetchWithAbort
 
     async function fetchColorName() {
       try {
-        const res = await fetch(`https://api.colorpalette.pro/palette/${formattedPalette}`, { signal })
-        const { colors, palette_name } = (await res.json()) as { colors: any; palette_name: string }
+        const paletteResponse = await fetch(
+          `https://api.colorpalette.pro/palette/${palette
+            .map(color => color.conversions.hex.value.replace('#', ''))
+            .join(',')}`,
+          { signal },
+        )
+        const colorResponse = await fetch(
+          `https://api.colorpalette.pro/color/${originalColor.conversions.hex.value.replace('#', '')}`,
+          { signal },
+        )
+        const { colors, palette_name } = (await paletteResponse.json()) as { colors: any; palette_name: string }
+        const colorName = (await colorResponse.json()) as { color: { name: string } }
         const colorNames = colors.map((c: any) => c.name)
-        setFetchedData({ colorNames, paletteTitle: palette_name, baseColorName: colorNames[baseIdx] })
+
+        setFetchedData({ colorNames, paletteTitle: palette_name, baseColorName: colorName.color.name })
       } catch (e) {
         if (!signal.aborted) {
           setError(e instanceof Error ? e : new Error('An unexpected error occurred'))

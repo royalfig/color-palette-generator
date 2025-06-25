@@ -28,6 +28,8 @@ import { ExportOptions } from './export-options/ExportOptions'
 import { Options } from './options/Options'
 import { useDarkMode } from './hooks/useDarkMode'
 import { MessageContext, MessageType } from './components/MessageContext'
+import Color from 'colorjs.io'
+import { colorFactory } from './util/factory'
 export type ColorName = {
   fetchedData: {
     colorNames: string[]
@@ -125,20 +127,15 @@ export default function App() {
     [color, paletteType, paletteStyle, colorSpace],
   )
 
-  const colorContext = useMemo(() => ({ originalColor: color, palette }), [color, palette])
-
-  const [isActive, setIsActive] = useState(false)
-  const [error, setError] = useState('')
-  const [msg, setMsg] = useState('')
+  const colorContext = useMemo(
+    () => ({ originalColor: colorFactory(color, 'base', 0, colorSpace.format), palette }),
+    [color, palette],
+  )
 
   // const css = generateCss(palettes)
   // const base = useBaseColor(palettes)
 
-  const { fetchedData, isLoading, error: colorNameError } = useFetchColorNames(palette)
-
-  function logChange(e: React.ChangeEvent<HTMLInputElement>) {
-    console.log(e.target.value)
-  }
+  const { fetchedData, isLoading, error: colorNameError } = useFetchColorNames(palette, colorContext.originalColor)
 
   // useEffect(() => {
   //   const styleEl = document.createElement('style')
@@ -161,34 +158,28 @@ export default function App() {
 
   // Update color history in state and localStorage when base color changes
   useEffect(() => {
-    const baseColor = palette.find(color => color.isBase)
-    if (baseColor) {
-      setColorHistory(prev => {
-        let updated = prev.filter(c => c !== baseColor.string)
-        updated.push(baseColor.string)
-        localStorage.setItem('color-history', JSON.stringify(updated))
-        return updated
-      })
-      // Update URL params only if color actually changed
-      const colorUrl = new URLSearchParams(document.location.search)
-      const currentColor = colorUrl.get('color')
-      if (currentColor !== baseColor.string) {
-        colorUrl.set('color', baseColor.string)
-        colorUrl.set('paletteType', paletteType)
-        colorUrl.set('paletteStyle', paletteStyle)
-        colorUrl.set('colorFormat', colorSpace.format)
-        window.history.pushState({}, '', `${window.location.pathname}?${colorUrl.toString()}`)
-      }
+    setColorHistory(prev => {
+      let updated = prev.filter(c => c !== colorContext.originalColor.string)
+      updated.push(colorContext.originalColor.string)
+      localStorage.setItem('color-history', JSON.stringify(updated))
+      return updated
+    })
+    // Update URL params only if color actually changed
+    const colorUrl = new URLSearchParams(document.location.search)
+    const currentColor = colorUrl.get('color')
+    if (currentColor !== colorContext.originalColor.string) {
+      colorUrl.set('color', colorContext.originalColor.string)
+      colorUrl.set('paletteType', paletteType)
+      colorUrl.set('paletteStyle', paletteStyle)
+      colorUrl.set('colorFormat', colorSpace.format)
+      window.history.pushState({}, '', `${window.location.pathname}?${colorUrl.toString()}`)
     }
-  }, [color, paletteType, paletteStyle, colorSpace, palette])
+  }, [colorContext.originalColor.string, paletteType, paletteStyle, colorSpace, palette])
 
   useEffect(() => {
-    const baseColor = palette.find(color => color.isBase)
-    if (baseColor) {
-      updateFavicon(baseColor.cssValue)
-      document.documentElement.style.setProperty('--base-color', baseColor.cssValue)
-    }
-  }, [palette])
+    updateFavicon(colorContext.originalColor.cssValue)
+    document.documentElement.style.setProperty('--base-color', colorContext.originalColor.cssValue)
+  }, [colorContext.originalColor])
 
   useEffect(() => {
     const handlePopState = () => {

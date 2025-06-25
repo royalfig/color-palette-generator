@@ -2,7 +2,10 @@ import './palette-style-selector.css'
 import Button from '../button/Button'
 import { Dispatch, SetStateAction } from 'react'
 
-import { CircleIcon, SquareIcon, TriangleIcon, DiamondIcon } from '@phosphor-icons/react'
+import { CircleIcon } from '@phosphor-icons/react/dist/csr/Circle'
+import { SquareIcon } from '@phosphor-icons/react/dist/csr/Square'
+import { TriangleIcon } from '@phosphor-icons/react/dist/csr/Triangle'
+import { DiamondIcon } from '@phosphor-icons/react/dist/csr/Diamond'
 
 const paletteStyleOptions = ['square', 'triangle', 'circle', 'diamond'] as const
 

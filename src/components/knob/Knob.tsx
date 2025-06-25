@@ -1,4 +1,7 @@
-import { WaveSawtoothIcon, WaveSineIcon, WaveTriangleIcon, WaveSquareIcon } from '@phosphor-icons/react'
+import { WaveSawtoothIcon } from '@phosphor-icons/react/dist/csr/WaveSawtooth'
+import { WaveSineIcon } from '@phosphor-icons/react/dist/csr/WaveSine'
+import { WaveTriangleIcon } from '@phosphor-icons/react/dist/csr/WaveTriangle'
+import { WaveSquareIcon } from '@phosphor-icons/react/dist/csr/WaveSquare'
 import './knob.css'
 
 const knobs = [

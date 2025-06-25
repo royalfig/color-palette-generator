@@ -35,10 +35,8 @@ export function ColorDisplay({
   colorSpace: { space: ColorSpace; format: ColorFormat }
 }) {
   const colorName = fetchedData?.baseColorName
-
   const context = useContext(ColorContext)
-  const color = context?.palette.find(c => c.isBase)
-
+  const color = context?.originalColor
   const { lch, oklch, lab, oklab, p3, hsl, rgb, hex } = color?.conversions || {}
 
   const handleClick = async (e: React.MouseEvent<HTMLDivElement>) => {

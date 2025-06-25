@@ -12,6 +12,10 @@
   text-transform: uppercase;
   background-color: #000;
   border-radius: 4px;
+
+  p {
+    text-box: trim-both cap alphabetic;
+  }
 }
 
 .display-info-message {

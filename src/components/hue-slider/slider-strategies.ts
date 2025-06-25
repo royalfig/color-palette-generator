@@ -185,7 +185,6 @@ const rgbStrategy = (coord: 'r' | 'g' | 'b'): SliderStrategy => ({
     return color.conversions.rgb.coords[index]
   },
   updateColor: (color, value) => {
-    console.log(coord, value)
     color.srgb[coord] = value
     return color
   },

@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import './hue-slider.css'
-import { CaretUpIcon, CaretDownIcon } from '@phosphor-icons/react'
+import { CaretUpIcon } from '@phosphor-icons/react/dist/csr/CaretUp'
+import { CaretDownIcon } from '@phosphor-icons/react/dist/csr/CaretDown'
 import { ColorContext } from '../ColorContext'
 import { useDebouncedCallback } from 'use-debounce'
 import { ColorSpace } from '../../types'
@@ -37,7 +38,6 @@ function generateThumbStyle(colorSpace: string) {
 }
 
 function getSaturation(colorSpace: string, color: Color) {
-  console.log(color.oklch.c)
   if (colorSpace === 'oklch' || colorSpace === 'oklab') {
     return color.oklch.c
   }
@@ -59,7 +59,7 @@ export function HueSlider({
   const context = useContext(ColorContext)
   const space = getColorSpace(colorSpace.space)
 
-  const base = context.palette.find(color => color.isBase)!
+  const base = context.originalColor
 
   const initialHue = Math.round(base.color[space].h)
   const initialSaturation = getSaturation(space, base.color)
@@ -68,7 +68,7 @@ export function HueSlider({
   const { thumbStyle, trackStyle } = generateThumbStyle(space)
 
   const debouncedColorUpdate = useDebouncedCallback((value: number) => {
-    const color = context.palette.find(color => color.isBase)!.color
+    const color = context.originalColor.color
     color[space].h = value
     setColor(color.toString())
   }, 100)

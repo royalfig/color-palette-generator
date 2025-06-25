@@ -1,5 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from 'react'
-import { CaretUpIcon, CaretDownIcon } from '@phosphor-icons/react'
+import { CaretUpIcon } from '@phosphor-icons/react/dist/csr/CaretUp'
+import { CaretDownIcon } from '@phosphor-icons/react/dist/csr/CaretDown'
 import { ColorContext } from '../ColorContext'
 import { useDebouncedCallback } from 'use-debounce'
 import { ColorSpace, SliderType } from '../../types'
@@ -19,7 +20,7 @@ export function Slider({
   const strategy = getSliderStrategy(type, colorSpace.space)
   const { min, max, step, label, getValue, updateColor, getTrackStyle, getThumbStyle } = strategy
 
-  const base = context.palette.find(color => color.isBase)!
+  const base = context.originalColor
 
   const initialValue = useMemo(() => getValue(base), [base, getValue])
 

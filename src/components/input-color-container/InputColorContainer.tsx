@@ -1,7 +1,9 @@
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
 import { ColorSpaceAndFormat } from '../../types'
 import './input-color-container.css'
-import { EyedropperSampleIcon, PlayIcon } from '@phosphor-icons/react'
+import { EyedropperSampleIcon } from '@phosphor-icons/react/dist/csr/EyedropperSample'
+import { PlayIcon } from '@phosphor-icons/react/dist/csr/Play'
+
 import Button from '../button/Button'
 import { ColorContext } from '../ColorContext'
 import { MessageContext } from '../MessageContext'
@@ -24,7 +26,7 @@ export function InputColorContainer({
 }) {
   const context = useContext(ColorContext)
   const { showMessage } = useContext(MessageContext)
-  const baseColor = context.palette.find(c => c.isBase)
+  const baseColor = context.originalColor
   const [input, setInput] = useState(baseColor?.conversions[colorSpace.format].value)
   const contrast = baseColor?.contrast
   const [active, setActive] = useState(false)

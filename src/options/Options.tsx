@@ -1,9 +1,8 @@
-import { DiceFourIcon } from '@phosphor-icons/react/dist/ssr'
+import { DiceFourIcon } from '@phosphor-icons/react/dist/csr/DiceFour'
+import { LifebuoyIcon } from '@phosphor-icons/react/dist/csr/Lifebuoy'
 import Button from '../components/button/Button'
-import { LifebuoyIcon } from '@phosphor-icons/react'
 import './options.css'
 import { pickRandomColor } from '../util/pickRandomColor'
-import { Dispatch } from 'react'
 import { LinearGradientSVG } from '../components/LinearGradientSVG'
 
 export function Options({ setColor }: { setColor: React.Dispatch<React.SetStateAction<string>> }) {
