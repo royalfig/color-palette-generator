@@ -5,7 +5,7 @@ import { detectFormat, clampOKLCH } from './utils'
 export function generateMaterialUI(
   baseColor: string,
   options: {
-    style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+    style: 'square' | 'triangle' | 'circle' | 'diamond'
   },
 ) {
   const { style } = options
@@ -22,16 +22,16 @@ export function generateMaterialUI(
     // Generate the complement for secondary colors
     let complementHue: number
     switch (style) {
-      case 'mathematical':
+      case 'square':
         complementHue = (baseColorObj.oklch.h + 180) % 360
         break
-      case 'optical':
+      case 'triangle':
         complementHue = getVisuallyPleasingComplement(baseColorObj.oklch.h)
         break
-      case 'adaptive':
+      case 'circle':
         complementHue = getAdaptiveComplement(baseColorObj)
         break
-      case 'warm-cool':
+      case 'diamond':
         complementHue = getWarmCoolComplement(baseColorObj.oklch.h)
         break
     }
@@ -103,7 +103,7 @@ export function generateMaterialUI(
     colors.push(onTertiary)
 
     // 11. Error (standard red, but harmonized with base)
-    const errorHue = style === 'optical' ? 15 : 0 // Slightly orange-red for optical
+    const errorHue = style === 'triangle' ? 15 : 0 // Slightly orange-red for triangle
     const errorValues = clampOKLCH(0.5, 0.15, errorHue)
     const error = new Color('oklch', [errorValues.l, errorValues.c, errorValues.h])
     colors.push(error)

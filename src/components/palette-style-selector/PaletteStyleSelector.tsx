@@ -2,15 +2,15 @@ import './palette-style-selector.css'
 import Button from '../button/Button'
 import { Dispatch, SetStateAction } from 'react'
 
-import { CalculatorIcon, LogIcon, OrangeSliceIcon, VolleyballIcon } from '@phosphor-icons/react'
+import { CircleIcon, SquareIcon, TriangleIcon, DiamondIcon } from '@phosphor-icons/react'
 
-const paletteStyleOptions = ['mathematical', 'optical', 'adaptive', 'warm-cool'] as const
+const paletteStyleOptions = ['square', 'triangle', 'circle', 'diamond'] as const
 
 const paletteStyleIcons = {
-  mathematical: CalculatorIcon,
-  optical: LogIcon,
-  adaptive: VolleyballIcon,
-  'warm-cool': OrangeSliceIcon,
+  square: SquareIcon,
+  triangle: TriangleIcon,
+  circle: CircleIcon,
+  diamond: DiamondIcon,
 }
 
 export function PaletteStyleSelector({
@@ -25,15 +25,20 @@ export function PaletteStyleSelector({
       {paletteStyleOptions.map(style => {
         const Icon = paletteStyleIcons[style]
         return (
-          <Button key={style} handler={() => setPaletteStyle(style)} active={paletteStyle === style}>
-            <Icon size={20} color="url(#gradient)">
-              <defs>
+          <Button
+            key={style}
+            handler={() => setPaletteStyle(style)}
+            active={paletteStyle === style}
+            className="inverse"
+          >
+            <Icon size={20}>
+              {/* <defs>
                 <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="var(--icon-gradient-top)" />
                   <stop offset="50%" stopColor="var(--icon-gradient-center)" />
                   <stop offset="100%" stopColor="var(--icon-gradient-top)" />
                 </linearGradient>
-              </defs>
+              </defs> */}
             </Icon>
           </Button>
         )

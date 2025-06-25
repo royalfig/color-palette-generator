@@ -5,7 +5,7 @@ import { detectFormat, clampOKLCH } from './utils'
 export function generateTones(
   baseColor: string,
   options: {
-    style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+    style: 'square' | 'triangle' | 'circle' | 'diamond'
   },
 ) {
   const { style } = options
@@ -25,16 +25,16 @@ export function generateTones(
     let chromaSteps: number[]
 
     switch (style) {
-      case 'mathematical':
+      case 'square':
         chromaSteps = getMathematicalTones(baseColorObj.oklch.c)
         break
-      case 'optical':
+      case 'triangle':
         chromaSteps = getVisuallyPleasingTones(baseColorObj.oklch.c)
         break
-      case 'adaptive':
+      case 'circle':
         chromaSteps = getAdaptiveTones(baseColorObj)
         break
-      case 'warm-cool':
+      case 'diamond':
         chromaSteps = getWarmCoolTones(baseColorObj)
         break
     }
@@ -52,7 +52,7 @@ export function generateTones(
       let adjustedLightness = baseColorObj.oklch.l
       let adjustedHue = baseColorObj.oklch.h || 0
 
-      if (style === 'optical' || style === 'adaptive' || style === 'warm-cool') {
+      if (style === 'triangle' || style === 'circle' || style === 'diamond') {
         const adjustments = getLightnessHueAdjustmentsForTones(
           chroma,
           baseColorObj.oklch.c,
@@ -167,7 +167,7 @@ function getLightnessHueAdjustmentsForTones(
 ): { lightness: number; hue: number } {
   const chromaRatio = baseChroma > 0 ? targetChroma / baseChroma : 0
 
-  if (style === 'optical' || style === 'adaptive') {
+  if (style === 'triangle' || style === 'circle') {
     // As colors become less saturated, they can appear lighter
     const lightnessAdjust = (1 - chromaRatio) * 0.05 // Subtle lightness increase
 
@@ -177,7 +177,7 @@ function getLightnessHueAdjustmentsForTones(
     }
   }
 
-  if (style === 'warm-cool') {
+  if (style === 'diamond') {
     // As saturation decreases, shift slightly toward neutral temperature
     const isWarm = baseHue < 180
     const hueShift = (1 - chromaRatio) * (isWarm ? -3 : 3) // Slight shift toward neutral
@@ -189,7 +189,7 @@ function getLightnessHueAdjustmentsForTones(
     }
   }
 
-  // Mathematical: no adjustments
+  // Square: no adjustments
   return { lightness: baseLightness, hue: baseHue }
 }
 

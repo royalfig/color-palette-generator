@@ -23,6 +23,7 @@ export function Options({ setColor }: { setColor: React.Dispatch<React.SetStateA
       <Button
         handler={() => {
           const windowFeatures = `width=500,height=800,resizable=false,scrollbars=yes,status=yes`
+
           window.open('/manual', '_blank', windowFeatures)
         }}
         active={false}

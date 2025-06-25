@@ -61,6 +61,8 @@ export function AuxillaryDisplay({
   paletteStyle,
   showColorHistory,
   setColor,
+  colorHistory,
+  setColorHistory,
 }: {
   showPaletteColors: boolean
   colorSpace: {
@@ -72,6 +74,8 @@ export function AuxillaryDisplay({
   paletteStyle: string
   showColorHistory: boolean
   setColor: React.Dispatch<React.SetStateAction<string>>
+  colorHistory: string[]
+  setColorHistory: React.Dispatch<React.SetStateAction<string[]>>
 }) {
   const context = useContext(ColorContext)
   if (!context) return null
@@ -82,7 +86,7 @@ export function AuxillaryDisplay({
     return <PaletteDetails palette={palette} colorNames={colorNames} colorSpace={colorSpace} />
   }
   if (showColorHistory) {
-    return <ColorHistory setColor={setColor} />
+    return <ColorHistory setColor={setColor} colorHistory={colorHistory} setColorHistory={setColorHistory} />
   }
   return <Swatches colorSpace={colorSpace} paletteType={paletteType} paletteStyle={paletteStyle} />
 }

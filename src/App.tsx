@@ -71,28 +71,42 @@ export default function App() {
 
   const initialColor = params.get('color') || pickRandomColor()
   const initialPaletteType = (params.get('paletteType') as PaletteKinds) || 'spl'
-  const initialPaletteStyle =
-    (params.get('paletteStyle') as 'mathematical' | 'optical' | 'adaptive' | 'warm-cool') || 'mathematical'
+  const initialPaletteStyle = (params.get('paletteStyle') as 'square' | 'triangle' | 'circle' | 'diamond') || 'square'
   const initialColorFormat = (params.get('colorFormat') as ColorFormat) || 'oklch'
   // If you want to support colorSpace as a param, otherwise default to 'oklch'
-  const initialColorSpace = (params.get('colorSpace') as ColorSpace) || 'oklch'
+  const parsedInitialColorSpace = (initialColorFormat: ColorFormat): ColorSpaceAndFormat => {
+    switch (initialColorFormat) {
+      case 'oklch':
+        return { space: 'oklch', format: 'oklch' }
+      case 'oklab':
+        return { space: 'oklab', format: 'oklab' }
+      case 'rgb':
+        return { space: 'srgb', format: 'rgb' }
+      case 'hsl':
+        return { space: 'hsl', format: 'hsl' }
+      case 'p3':
+        return { space: 'p3', format: 'p3' }
+      case 'hex':
+        return { space: 'srgb', format: 'hex' }
+      case 'lab':
+        return { space: 'lab', format: 'lab' }
+      case 'lch':
+        return { space: 'lch', format: 'lch' }
+      default:
+        return { space: 'oklch', format: 'oklch' }
+    }
+  }
 
   // State initialization using URL params or defaults
   const [color, setColor] = useState<string>(initialColor)
   const [showPaletteColors, setShowPaletteColors] = useState(false)
   const [paletteType, setPaletteType] = useState<PaletteKinds>(initialPaletteType)
   const [showColorHistory, setShowColorHistory] = useState(false)
-  const [paletteStyle, setPaletteStyle] = useState<'mathematical' | 'optical' | 'adaptive' | 'warm-cool'>(
-    initialPaletteStyle,
-  )
-  const [colorSpace, setColorSpace] = useState<ColorSpaceAndFormat>({
-    space: initialColorSpace,
-    format: initialColorFormat,
-  })
+  const [colorHistory, setColorHistory] = useState<string[]>([])
+  const [paletteStyle, setPaletteStyle] = useState<'square' | 'triangle' | 'circle' | 'diamond'>(initialPaletteStyle)
+  const [colorSpace, setColorSpace] = useState<ColorSpaceAndFormat>(parsedInitialColorSpace(initialColorFormat))
 
   const { isDarkMode, toggleDarkMode } = useDarkMode()
-  const colorQueryParaCheck = new URLSearchParams(document.location.search).has('color')
-  const colorQueryParam = colorQueryParaCheck ? new URLSearchParams(document.location.search).get('color') : null
   const [message, setMessage] = useState<string | null>(null)
   const [messageType, setMessageType] = useState<MessageType | null>(null)
 
@@ -137,38 +151,68 @@ export default function App() {
   //   }
   // }, [css])
 
+  // Load color history from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('color-history')
+    if (stored) {
+      setColorHistory(JSON.parse(stored))
+    }
+  }, [])
+
+  // Update color history in state and localStorage when base color changes
+  useEffect(() => {
+    const baseColor = palette.find(color => color.isBase)
+    if (baseColor) {
+      setColorHistory(prev => {
+        let updated = prev.filter(c => c !== baseColor.string)
+        updated.push(baseColor.string)
+        localStorage.setItem('color-history', JSON.stringify(updated))
+        return updated
+      })
+      // Update URL params only if color actually changed
+      const colorUrl = new URLSearchParams(document.location.search)
+      const currentColor = colorUrl.get('color')
+      if (currentColor !== baseColor.string) {
+        colorUrl.set('color', baseColor.string)
+        colorUrl.set('paletteType', paletteType)
+        colorUrl.set('paletteStyle', paletteStyle)
+        colorUrl.set('colorFormat', colorSpace.format)
+        window.history.pushState({}, '', `${window.location.pathname}?${colorUrl.toString()}`)
+      }
+    }
+  }, [color, paletteType, paletteStyle, colorSpace, palette])
+
   useEffect(() => {
     const baseColor = palette.find(color => color.isBase)
     if (baseColor) {
       updateFavicon(baseColor.cssValue)
       document.documentElement.style.setProperty('--base-color', baseColor.cssValue)
-
-      const colorHistory = localStorage.getItem('color-history')
-      if (colorHistory) {
-        const colorHistoryArray = JSON.parse(colorHistory)
-        if (!colorHistoryArray.includes(baseColor.string)) {
-          colorHistoryArray.push(baseColor.string)
-          localStorage.setItem('color-history', JSON.stringify(colorHistoryArray))
-        } else {
-          const index = colorHistoryArray.indexOf(baseColor.string)
-          colorHistoryArray.splice(index, 1)
-          colorHistoryArray.push(baseColor.string)
-          localStorage.setItem('color-history', JSON.stringify(colorHistoryArray))
-        }
-      } else {
-        localStorage.setItem('color-history', JSON.stringify([baseColor.string]))
-      }
-      console.log(document.location.search)
-      const colorUrl = new URLSearchParams(document.location.search)
-      colorUrl.set('color', baseColor.string)
-      colorUrl.set('paletteType', paletteType)
-      colorUrl.set('paletteStyle', paletteStyle)
-      colorUrl.set('colorFormat', colorSpace.format)
-      console.log(colorUrl.toString())
-      window.history.pushState({}, '', `${window.location.pathname}?${colorUrl.toString()}`)
     }
   }, [palette])
 
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search)
+      const colorParam = params.get('color')
+      if (colorParam) {
+        setColor(colorParam)
+      }
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  if (window.location.pathname === '/manual') {
+    if (window.location.search) {
+      window.history.replaceState({}, '', '/manual')
+    }
+    return (
+      <ColorContext.Provider value={colorContext}>
+        <Manual />
+      </ColorContext.Provider>
+    )
+  }
   return (
     <ColorContext.Provider value={colorContext}>
       <MessageContext.Provider value={{ message, messageType, showMessage }}>
@@ -198,6 +242,8 @@ export default function App() {
                   paletteStyle={paletteStyle}
                   showColorHistory={showColorHistory}
                   setColor={setColor}
+                  colorHistory={colorHistory}
+                  setColorHistory={setColorHistory}
                 />
               </Display>
               <div className="synth-body col-12">
@@ -214,8 +260,13 @@ export default function App() {
                   showColorHistory={showColorHistory}
                   setShowColorHistory={setShowColorHistory}
                 />
-                <ExportOptions fetchedData={fetchedData} isLoading={isLoading} error={colorNameError} />
-                {/* <Knob /> */}
+                <ExportOptions
+                  fetchedData={fetchedData}
+                  isLoading={isLoading}
+                  error={colorNameError}
+                  colorFormat={colorSpace.format}
+                />
+                <Knob />
 
                 <DisplayInfo />
                 {/* <HueSlider setColor={setColor} colorSpace={colorSpace} /> */}

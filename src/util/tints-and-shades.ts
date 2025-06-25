@@ -8,12 +8,12 @@ import { avoidMuddyZones, applyEnhancementsToTintsShades } from './enhancer'
 export function generateTintsAndShades(
   baseColor: string,
   options: {
-    style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+    style: 'square' | 'triangle' | 'circle' | 'diamond'
     colorSpace: { space: ColorSpace; format: ColorFormat }
   },
 ) {
   const { style } = options
-  const enhanced = style === 'mathematical' ? false : true
+  const enhanced = style === 'square' ? false : true
   const format = options.colorSpace.format
 
   try {
@@ -29,34 +29,20 @@ export function generateTintsAndShades(
     const initialColors: Color[] = []
 
     lightnessProgression.forEach((targetLightness, index) => {
-      if (index === baseIndex) {
-        // Preserve the exact base color
-        initialColors.push(new Color(baseColor))
-        return
-      }
-
       // Apply style-specific chroma and hue adjustments
-      const adjustments = getStyleAdjustments(
-        targetLightness,
-        baseLightness,
-        baseColorObj.oklch.c,
-        baseColorObj.oklch.h || 0,
-        style,
-        index,
-        baseIndex,
-      )
-
+      const adjustments = adjustChroma(baseColorObj.oklch.c, style, index, baseIndex)
+      console.log(adjustments.chroma, index)
       // Apply muddy zone avoidance if enhanced mode
       let finalChroma = adjustments.chroma
       let finalHue = baseColorObj.oklch.h
-      let finalLightness = targetLightness
+      let finalLightness = index === baseIndex ? baseLightness : targetLightness
 
-      if (enhanced) {
-        const cleaned = avoidMuddyZones(finalHue, finalLightness, finalChroma)
-        finalHue = baseColorObj.oklch.h
-        finalLightness = cleaned.l
-        finalChroma = cleaned.c
-      }
+      // if (enhanced) {
+      //   const cleaned = avoidMuddyZones(finalHue, finalLightness, finalChroma)
+      //   finalHue = baseColorObj.oklch.h
+      //   finalLightness = cleaned.l
+      //   finalChroma = cleaned.c
+      // }
 
       const values = clampOKLCH(finalLightness, finalChroma, finalHue)
 
@@ -68,13 +54,9 @@ export function generateTintsAndShades(
       initialColors.push(color)
     })
 
-    // Apply enhancements if enabled
-    // const finalColors = enhanced ? applyEnhancementsToTintsShades(initialColors, style, baseIndex) : initialColors
-    const finalColors = enhanced ? applyEnhancementsToTintsShades(initialColors, style, baseIndex) : initialColors
-
     // Convert to your color factory format
     const colors: BaseColorData[] = []
-    finalColors.forEach((color, index) => {
+    initialColors.forEach((color, index) => {
       if (index === baseIndex) {
         colors.push(colorFactory(baseColor, 'tints-shades', index, format, true))
       } else {
@@ -108,20 +90,28 @@ function getLightnessProgression(baseLightness: number, style: string, baseColor
   ]
 
   // Slight style-specific tweaks for character
-  if (style === 'optical') {
+  if (style === 'triangle') {
     // Compress shadows slightly for perceptual uniformity
     return baseProgression.map((l, i) => {
-      if (i < 4) return l * 1.1 // Lighten deepest shadows slightly
-      if (i > 8) return l * 0.98 // Darken highlights slightly
+      if (i < 4) return l * 0.99 // Lighten deepest shadows slightly
+      if (i > 8) return l * 0.99 // Darken highlights slightly
       return l
     })
   }
 
-  if (style === 'adaptive') {
+  if (style === 'circle') {
     // More dramatic range for emotional impact
     return baseProgression.map((l, i) => {
       if (i === 0) return 0.01 // Deeper black
       if (i === 11) return 0.99 // Brighter white
+      return l
+    })
+  }
+
+  if (style === 'diamond') {
+    return baseProgression.map((l, i) => {
+      if (i < 4) return l * 0.75 // Lighten deepest shadows slightly
+      if (i > 8) return l * 1.2 // Darken highlights slightly
       return l
     })
   }
@@ -145,44 +135,30 @@ function findBaseColorPosition(baseLightness: number, progression: number[]): nu
   return closestIndex
 }
 
-function getStyleAdjustments(
-  targetLightness: number,
-  baseLightness: number,
-  baseChroma: number,
-  baseHue: number,
-  style: string,
-  index: number,
-  baseIndex: number,
-): { chroma: number; hue: number } {
-  const isShade = index < baseIndex
-  const distanceFromBase = Math.abs(index - baseIndex)
+function adjustChroma(baseChroma: number, style: string, index: number, baseIndex: number): { chroma: number } {
+  const isShade = index < 6
+  const distanceFromBase = Math.abs(index - 6)
   const normalizedDistance = distanceFromBase / 11 // 0 to 1
-
-  if (style === 'mathematical') {
+  // debugger
+  if (style === 'square') {
     // Pure tints/shades - no adjustments
-    return { chroma: baseChroma, hue: baseHue }
+    return { chroma: baseChroma }
   }
 
-  // MINIMAL HUE SHIFTS - Max 1-2 degrees
-  let hueShift = 0
   let chromaMultiplier = 1.0
 
-  if (style === 'optical') {
+  if (style === 'triangle') {
     // Perceptual: How pigments actually behave
     if (isShade) {
       // Shades: Chroma increases slightly (pigment concentration)
-      chromaMultiplier = 1.0 + normalizedDistance * 0.3 // Up to 30% boost
-      // Tiny cool shift (like adding black pigment)
-      hueShift = -normalizedDistance * 1 // Max -1° shift
+      chromaMultiplier = 1.0 + normalizedDistance * 0.6
     } else {
       // Tints: Chroma decreases (dilution with white)
-      chromaMultiplier = 1.0 - normalizedDistance * 0.6 // Up to 60% reduction
-      // Micro warm shift (like adding white pigment)
-      hueShift = normalizedDistance * 0.5 // Max +0.5° shift
+      chromaMultiplier = 1.0 - normalizedDistance * 0.9 // Up to 60% reduction
     }
   }
 
-  if (style === 'adaptive') {
+  if (style === 'circle') {
     // Emotional storytelling through chroma modulation
     if (isShade) {
       // Shades tell a story of depth and mystery
@@ -196,7 +172,6 @@ function getStyleAdjustments(
         // Deep shades: Mysterious, lower chroma
         chromaMultiplier = 1.0 - normalizedDistance * 0.3
       }
-      hueShift = -normalizedDistance * 1.5 // Max -1.5° shift
     } else {
       // Tints tell a story of light and air
       if (distanceFromBase <= 2) {
@@ -209,39 +184,26 @@ function getStyleAdjustments(
         // High tints: Whisper of color
         chromaMultiplier = 1.0 - normalizedDistance * 0.7
       }
-      hueShift = normalizedDistance * 1 // Max +1° shift
     }
   }
 
-  if (style === 'warm-cool') {
+  if (style === 'diamond') {
     // Temperature story through chroma, not hue
     if (isShade) {
       // Cool shadows through chroma modulation
       chromaMultiplier = 1.0 + normalizedDistance * 0.25
       // TINY hue shift for temperature hint
-      hueShift = -normalizedDistance * 2 // Max -2° toward cool
     } else {
       // Warm highlights through chroma reduction
       chromaMultiplier = 1.0 - normalizedDistance * 0.5
       // TINY hue shift for temperature hint
-      hueShift = normalizedDistance * 1.5 // Max +1.5° toward warm
-    }
-
-    // Extra chroma boost for colors that need it
-    if (baseHue >= 180 && baseHue <= 240) {
-      // Blues benefit from extra chroma in shades
-      if (isShade) chromaMultiplier *= 1.1
-    } else if (baseHue >= 30 && baseHue <= 90) {
-      // Yellows/oranges need chroma preservation in tints
-      if (!isShade) chromaMultiplier *= 1.2
     }
   }
-
+  console.log(chromaMultiplier, index)
   // Apply adjustments with safety limits
   const finalChroma = Math.max(0, Math.min(0.37, baseChroma * chromaMultiplier))
-  const finalHue = (baseHue + hueShift + 360) % 360
 
-  return { chroma: finalChroma, hue: baseHue }
+  return { chroma: finalChroma }
 }
 
 // Additional helper for creating distinct palettes while preserving identity
@@ -251,27 +213,27 @@ export function createTintsAndShadesVariations(
     colorSpace: { space: ColorSpace; format: ColorFormat }
   },
 ): {
-  mathematical: BaseColorData[]
-  optical: BaseColorData[]
-  adaptive: BaseColorData[]
-  warmCool: BaseColorData[]
+  square: BaseColorData[]
+  triangle: BaseColorData[]
+  circle: BaseColorData[]
+  diamond: BaseColorData[]
 } {
   return {
-    mathematical: generateTintsAndShades(baseColor, {
+    square: generateTintsAndShades(baseColor, {
       ...options,
-      style: 'mathematical',
+      style: 'square',
     }),
-    optical: generateTintsAndShades(baseColor, {
+    triangle: generateTintsAndShades(baseColor, {
       ...options,
-      style: 'optical',
+      style: 'triangle',
     }),
-    adaptive: generateTintsAndShades(baseColor, {
+    circle: generateTintsAndShades(baseColor, {
       ...options,
-      style: 'adaptive',
+      style: 'circle',
     }),
-    warmCool: generateTintsAndShades(baseColor, {
+    diamond: generateTintsAndShades(baseColor, {
       ...options,
-      style: 'warm-cool',
+      style: 'diamond',
     }),
   }
 }

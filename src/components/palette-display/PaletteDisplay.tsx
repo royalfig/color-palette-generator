@@ -31,7 +31,7 @@ export function PaletteDisplay({
   isLoading: boolean
   error: Error | null
   paletteType: PaletteKinds
-  paletteStyle: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+  paletteStyle: 'square' | 'triangle' | 'circle' | 'diamond'
 }) {
   const paletteName = fetchedData?.paletteTitle
   const paletteTypeFullName = getPaletteType(paletteType)

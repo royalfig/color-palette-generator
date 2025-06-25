@@ -17,19 +17,22 @@ export function PaletteToolSelector({
   showColorHistory: boolean
   setShowColorHistory: React.Dispatch<React.SetStateAction<boolean>>
 }) {
-  function handleShowPaletteColors() {
-    setShowPaletteColors(!showPaletteColors)
-  }
-
   return (
     <div className="palette-tool-container">
-      <Button handler={handleShowPaletteColors} active={showPaletteColors}>
+      <Button
+        handler={() => {
+          setShowPaletteColors(!showPaletteColors)
+          setShowColorHistory(false)
+        }}
+        active={showPaletteColors}
+      >
         <InfoIcon size={20} color="url(#gradient)">
           <LinearGradientSVG />
         </InfoIcon>
       </Button>
       <Button
         handler={() => {
+          setShowPaletteColors(false)
           setShowColorHistory(!showColorHistory)
         }}
         active={showColorHistory}

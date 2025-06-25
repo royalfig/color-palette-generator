@@ -278,12 +278,12 @@ export function generateAnalogous(
   baseColor: string,
   options: {
     chromaAdjust?: number
-    style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+    style: 'square' | 'triangle' | 'circle' | 'diamond'
     colorSpace: { space: ColorSpace; format: ColorFormat }
   },
 ) {
   const { chromaAdjust = 0.9, style } = options
-  const enhanced = style === 'mathematical' ? false : true
+  const enhanced = style === 'square' ? false : true
 
   try {
     const baseColorObj = new Color(baseColor)
@@ -292,16 +292,16 @@ export function generateAnalogous(
     let analogousHues: number[]
 
     switch (style) {
-      case 'mathematical':
+      case 'square':
         analogousHues = getMathematicalAnalogous(baseColorObj.oklch.h)
         break
-      case 'optical':
+      case 'triangle':
         analogousHues = getOpticalAnalogous(baseColorObj)
         break
-      case 'adaptive':
+      case 'circle':
         analogousHues = getAdaptiveAnalogous(baseColorObj)
         break
-      case 'warm-cool':
+      case 'diamond':
         analogousHues = getWarmCoolAnalogous(baseColorObj)
         break
     }
@@ -316,7 +316,7 @@ export function generateAnalogous(
       { l: 0.2, c: 0.7 },
     ]
 
-    if (style === 'optical') {
+    if (style === 'triangle') {
       // Perceptual harmony: natural atmospheric variations
       variations = [
         { l: -0.2, c: 0.65 }, // Deep shadow (less saturated)
@@ -326,7 +326,7 @@ export function generateAnalogous(
         { l: 0.18, c: 0.75 }, // Bright highlight (atmospheric)
         { l: 0.32, c: 0.5 }, // Atmospheric highlight (very desaturated)
       ]
-    } else if (style === 'adaptive') {
+    } else if (style === 'circle') {
       // Emotional resonance: varies by emotional type
       const hue = baseColorObj.oklch.h
       if (hue >= 345 || hue < 30) {
@@ -350,7 +350,7 @@ export function generateAnalogous(
           { l: 0.35, c: 0.45 }, // Ethereal mist
         ]
       }
-    } else if (style === 'warm-cool') {
+    } else if (style === 'diamond') {
       // Luminosity dance: varies by light type
       const hue = baseColorObj.oklch.h
       const chroma = baseColorObj.oklch.c

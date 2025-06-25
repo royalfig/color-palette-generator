@@ -11,30 +11,30 @@ interface ChromaNarrative {
 
 function getChromaNarrative(
   paletteType: 'analogous' | 'complementary' | 'split-complementary' | 'tetradic' | 'triadic' | 'tints-shades',
-  style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool',
+  style: 'square' | 'triangle' | 'circle' | 'diamond',
   baseChroma: number,
 ): ChromaNarrative {
   if (paletteType === 'analogous') {
     switch (style) {
-      case 'mathematical':
+      case 'square':
         return {
           pattern: [0.8, 0.9, 1.0, 1.0, 0.9, 0.8], // Gentle bell curve
           description: 'Mathematical harmony',
           breathingRoom: true,
         }
-      case 'optical':
+      case 'triangle':
         return {
           pattern: [0.7, 1.0, 0.85, 1.0, 0.75, 0.6], // Breathing rhythm
           description: 'Natural visual rhythm',
           breathingRoom: true,
         }
-      case 'adaptive':
+      case 'circle':
         return {
           pattern: [0.6, 0.9, 1.0, 1.0, 1.1, 0.8], // Emotional crescendo
           description: 'Emotional journey with climax',
           breathingRoom: false,
         }
-      case 'warm-cool':
+      case 'diamond':
         return {
           pattern: [0.8, 0.7, 1.0, 0.9, 1.1, 0.6], // Light and shadow play
           description: 'Luminosity dance',
@@ -45,25 +45,25 @@ function getChromaNarrative(
 
   if (paletteType === 'complementary') {
     switch (style) {
-      case 'mathematical':
+      case 'square':
         return {
           pattern: [1.0, 0.9, 0.7, 0.6, 0.8, 0.5], // Main colors pop
           description: 'Clear hierarchy',
           breathingRoom: true,
         }
-      case 'optical':
+      case 'triangle':
         return {
           pattern: [1.0, 0.85, 0.6, 0.5, 0.75, 0.4], // Perceptual balance
           description: 'Visual weight distribution',
           breathingRoom: true,
         }
-      case 'adaptive':
+      case 'circle':
         return {
           pattern: [1.0, 1.1, 0.8, 0.6, 0.9, 0.5], // Emotional contrast
           description: 'Emotional dialogue',
           breathingRoom: false,
         }
-      case 'warm-cool':
+      case 'diamond':
         return {
           pattern: [1.0, 0.9, 0.7, 0.5, 0.8, 0.4], // Temperature story
           description: 'Light temperature narrative',
@@ -74,25 +74,25 @@ function getChromaNarrative(
 
   if (paletteType === 'split-complementary') {
     switch (style) {
-      case 'mathematical':
+      case 'square':
         return {
           pattern: [1.0, 0.8, 0.9, 0.7, 0.85, 0.6], // Balanced triad
           description: 'Triadic balance',
           breathingRoom: true,
         }
-      case 'optical':
+      case 'triangle':
         return {
           pattern: [1.0, 0.7, 0.95, 0.6, 0.8, 0.5], // Visual triangle
           description: 'Perceptual triangle',
           breathingRoom: true,
         }
-      case 'adaptive':
+      case 'circle':
         return {
           pattern: [1.0, 0.9, 1.1, 0.8, 0.9, 0.7], // Three-act story
           description: 'Three-part emotional narrative',
           breathingRoom: false,
         }
-      case 'warm-cool':
+      case 'diamond':
         return {
           pattern: [1.0, 0.8, 0.9, 0.6, 0.85, 0.5], // Split lighting
           description: 'Multi-source lighting',
@@ -103,25 +103,25 @@ function getChromaNarrative(
 
   if (paletteType === 'tetradic') {
     switch (style) {
-      case 'mathematical':
+      case 'square':
         return {
           pattern: [1.0, 0.8, 0.7, 0.9, 0.75, 0.6], // Square balance
           description: 'Quadratic harmony',
           breathingRoom: true,
         }
-      case 'optical':
+      case 'triangle':
         return {
           pattern: [1.0, 0.7, 0.6, 0.85, 0.65, 0.5], // Visual square
           description: 'Perceptual quadrangle',
           breathingRoom: true,
         }
-      case 'adaptive':
+      case 'circle':
         return {
           pattern: [1.0, 0.9, 0.8, 1.0, 0.85, 0.7], // Four seasons
           description: 'Four-part epic',
           breathingRoom: false,
         }
-      case 'warm-cool':
+      case 'diamond':
         return {
           pattern: [1.0, 0.8, 0.6, 0.9, 0.7, 0.5], // Four-point lighting
           description: 'Professional lighting setup',
@@ -132,25 +132,25 @@ function getChromaNarrative(
 
   if (paletteType === 'triadic') {
     switch (style) {
-      case 'mathematical':
+      case 'square':
         return {
           pattern: [1.0, 0.8, 0.9, 0.85, 0.9, 0.7], // Balanced triangle
           description: 'Triangular harmony',
           breathingRoom: true,
         }
-      case 'optical':
+      case 'triangle':
         return {
           pattern: [1.0, 0.75, 0.95, 0.7, 0.85, 0.6], // Visual balance
           description: 'Perceptual triangle',
           breathingRoom: true,
         }
-      case 'adaptive':
+      case 'circle':
         return {
           pattern: [1.0, 0.9, 1.1, 0.8, 0.95, 0.75], // Three-act drama
           description: 'Three-part emotional story',
           breathingRoom: false,
         }
-      case 'warm-cool':
+      case 'diamond':
         return {
           pattern: [1.0, 0.8, 0.9, 0.7, 0.85, 0.65], // Three-point lighting
           description: 'Three-source illumination',
@@ -179,7 +179,7 @@ interface ColorRole {
 
 function getColorHierarchy(
   paletteType: 'analogous' | 'complementary' | 'split-complementary' | 'tetradic' | 'triadic' | 'tints-shades',
-  style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool',
+  style: 'square' | 'triangle' | 'circle' | 'diamond',
 ): ColorRole[] {
   if (paletteType === 'analogous') {
     return [
@@ -269,7 +269,7 @@ function getColorHierarchy(
 export function enhancePalette(
   colors: Color[],
   paletteType: 'analogous' | 'complementary' | 'split-complementary' | 'tetradic' | 'tints-shades' | 'triadic',
-  style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool',
+  style: 'square' | 'triangle' | 'circle' | 'diamond',
   baseColorIndex: number = 0,
 ): Color[] {
   const baseColor = colors[baseColorIndex]

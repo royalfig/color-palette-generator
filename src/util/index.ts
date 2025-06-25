@@ -10,7 +10,7 @@ import { generateTriadic } from './triadic'
 export function createPalettes(
   color: string,
   palette: PaletteKinds,
-  style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool',
+  style: 'square' | 'triangle' | 'circle' | 'diamond',
   colorSpace: { space: ColorSpace; format: ColorFormat },
 ) {
   switch (palette) {

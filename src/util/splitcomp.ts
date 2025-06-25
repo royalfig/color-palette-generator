@@ -194,13 +194,13 @@ function getLuminositySplitComplementary(baseColor: Color): number[] {
 export function generateSplitComplementary(
   baseColor: string,
   options: {
-    style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+    style: 'square' | 'triangle' | 'circle' | 'diamond'
     colorSpace: { space: ColorSpace; format: ColorFormat }
   },
 ) {
   const { style } = options
   const format = options.colorSpace.format
-  const enhanced = options.style === 'mathematical' ? false : true
+  const enhanced = options.style === 'square' ? false : true
 
   try {
     const baseColorObj = new Color(baseColor)
@@ -208,16 +208,16 @@ export function generateSplitComplementary(
     let splitHues: number[]
 
     switch (style) {
-      case 'mathematical':
+      case 'square':
         splitHues = getMathematicalSplitComplementary(baseColorObj.oklch.h)
         break
-      case 'optical':
+      case 'triangle':
         splitHues = getOpticalSplitComplementary(baseColorObj)
         break
-      case 'adaptive':
+      case 'circle':
         splitHues = getAdaptiveSplitComplementary(baseColorObj)
         break
-      case 'warm-cool':
+      case 'diamond':
         splitHues = getLuminositySplitComplementary(baseColorObj)
         break
     }
@@ -232,7 +232,7 @@ export function generateSplitComplementary(
       second: { pure: { l: -0.05, c: 0.9 }, muted: { l: 0.15, c: 0.7 } },
     }
 
-    if (style === 'optical') {
+    if (style === 'triangle') {
       // Perceptual harmony: natural atmospheric relationships
       baseVariations = {
         dark: { l: -0.18, c: 0.95 }, // Less extreme, more natural
@@ -247,7 +247,7 @@ export function generateSplitComplementary(
           muted: { l: 0.12, c: 0.68 }, // Lighter atmospheric
         },
       }
-    } else if (style === 'adaptive') {
+    } else if (style === 'circle') {
       // Emotional resonance: varies by emotional type
       const hue = baseColorObj.oklch.h
       if (hue >= 345 || hue < 30) {
@@ -281,7 +281,7 @@ export function generateSplitComplementary(
           },
         }
       }
-    } else if (style === 'warm-cool') {
+    } else if (style === 'diamond') {
       // Luminosity dance: based on lighting scenario
       const lightness = baseColorObj.oklch.l
       const chroma = baseColorObj.oklch.c

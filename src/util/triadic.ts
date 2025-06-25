@@ -204,13 +204,13 @@ function getWarmCoolTriadic(baseColor: Color): number[] {
 export function generateTriadic(
   baseColor: string,
   options: {
-    style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+    style: 'square' | 'triangle' | 'circle' | 'diamond'
     colorSpace: { space: ColorSpace; format: ColorFormat }
   },
 ) {
   const { style } = options
   const format = options.colorSpace.format
-  const enhanced = options.style === 'mathematical' ? false : true
+  const enhanced = options.style === 'square' ? false : true
 
   try {
     const baseColorObj = new Color(baseColor)
@@ -218,16 +218,16 @@ export function generateTriadic(
     let triadicHues: number[]
 
     switch (style) {
-      case 'mathematical':
+      case 'square':
         triadicHues = getMathematicalTriadic(baseColorObj.oklch.h)
         break
-      case 'optical':
+      case 'triangle':
         triadicHues = getOpticalTriadic(baseColorObj)
         break
-      case 'adaptive':
+      case 'circle':
         triadicHues = getAdaptiveTriadic(baseColorObj)
         break
-      case 'warm-cool':
+      case 'diamond':
         triadicHues = getWarmCoolTriadic(baseColorObj)
         break
     }
@@ -242,7 +242,7 @@ export function generateTriadic(
       second: { pure: { l: 0, c: 0.95 }, muted: { l: -0.1, c: 0.7 } },
     }
 
-    if (style === 'optical') {
+    if (style === 'triangle') {
       // Perceptual harmony: natural visual balance
       baseVariations = {
         dark: { l: -0.18, c: 1.0 }, // Less extreme, more natural
@@ -257,7 +257,7 @@ export function generateTriadic(
           muted: { l: -0.08, c: 0.68 }, // Deep muted
         },
       }
-    } else if (style === 'adaptive') {
+    } else if (style === 'circle') {
       // Emotional resonance: varies by emotional type
       const hue = baseColorObj.oklch.h
       if (hue >= 345 || hue < 30) {
@@ -291,7 +291,7 @@ export function generateTriadic(
           },
         }
       }
-    } else if (style === 'warm-cool') {
+    } else if (style === 'diamond') {
       // Luminosity dance: based on lighting scenario
       const lightness = baseColorObj.oklch.l
       const chroma = baseColorObj.oklch.c

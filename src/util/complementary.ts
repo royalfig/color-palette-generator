@@ -141,13 +141,13 @@ export function generateComplementary(
   baseColor: string,
   options: {
     chromaAdjust?: number
-    style: 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+    style: 'square' | 'triangle' | 'circle' | 'diamond'
     colorSpace: { space: ColorSpace; format: ColorFormat }
   },
 ) {
   const { chromaAdjust = 0.9 } = options
   const format = options.colorSpace.format
-  const enhanced = options.style === 'mathematical' ? false : true
+  const enhanced = options.style === 'square' ? false : true
 
   try {
     const baseColorObj = new Color(baseColor)
@@ -160,16 +160,16 @@ export function generateComplementary(
     let complementHue: number
 
     switch (options.style) {
-      case 'mathematical':
+      case 'square':
         complementHue = getMathematicalComplement(baseColorObj.oklch.h)
         break
-      case 'optical':
+      case 'triangle':
         complementHue = getOpticalComplement(baseColorObj)
         break
-      case 'adaptive':
+      case 'circle':
         complementHue = getAdaptiveComplement(baseColorObj)
         break
-      case 'warm-cool':
+      case 'diamond':
         complementHue = getLuminosityComplement(baseColorObj)
         break
     }
@@ -186,7 +186,7 @@ export function generateComplementary(
       muted: { l: -0.15, c: 0.4 },
     }
 
-    if (options.style === 'optical') {
+    if (options.style === 'triangle') {
       // Perceptual harmony: more natural contrast relationships
       baseVariations = {
         dark: { l: -0.2, c: 0.9 }, // Less extreme darks
@@ -197,7 +197,7 @@ export function generateComplementary(
         light: { l: 0.12, c: 0.75 }, // Lighter, atmospheric
         muted: { l: -0.12, c: 0.5 }, // Better muted balance
       }
-    } else if (options.style === 'adaptive') {
+    } else if (options.style === 'circle') {
       // Emotional resonance: varies by emotional type
       const hue = baseColorObj.oklch.h
       if (hue >= 345 || hue < 30) {
@@ -223,7 +223,7 @@ export function generateComplementary(
           muted: { l: -0.08, c: 0.6 }, // Subtle warmth
         }
       }
-    } else if (options.style === 'warm-cool') {
+    } else if (options.style === 'diamond') {
       // Luminosity dance: based on lighting scenario
       const lightness = baseColorObj.oklch.l
       const chroma = baseColorObj.oklch.c

@@ -1,36 +1,74 @@
+.knobs {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-template-columns: subgrid;
+  grid-row: 2 / 7;
+  grid-column: 7 / 9;
+}
+
 .knob-container {
   display: flex;
   flex-direction: column;
-  grid-row: 2 / 4;
-  grid-column: 7/8;
+  grid-row: span 2;
+  gap: 10px;
   align-items: center;
   justify-content: center;
 }
 
-.knob-knob {
-  flex: 1;
+.knob-outer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 60px;
   aspect-ratio: 1;
-  padding: 15px;
-  margin: 5px;
-  background: linear-gradient(to bottom, white, rgb(96 96 96));
+  background: linear-gradient(rgb(236 236 236), rgb(188 188 188));
   border-radius: 50%;
+  box-shadow: 0 -1px 0 1px rgb(245 245 245), 0 2px 2px hsl(0deg 0% 0% / 35%);
 }
 
 .knob-inner {
-  width: 100%;
-  height: 100%;
-  background-color: white;
+  position: relative;
+  width: 30px;
+  aspect-ratio: 1;
+  background: linear-gradient(rgb(238 238 238), rgb(227 226 226));
   border-radius: 50%;
-  box-shadow: inset 0 0 0 1px rgb(100 100 100), 0 5px 5px hsl(0deg 0% 0% / 25%);
+  transform: rotate(180deg);
+}
+
+.knob-inner-shadow {
+  position: absolute;
+  inset: 0;
+  width: 30px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: 0 -1px 0 1px white, 0 2px 2px hsl(0deg 0% 0% / 35%), var(--shadow-elevation-high);
+  translate: 50% 50%;
 }
 
 .knob-display {
   display: flex;
   gap: 5px;
   align-items: center;
-  padding: 5px;
-  margin-block-start: 10px;
-  color: white;
-  background: black;
+  justify-content: center;
+  padding: 4px;
+  font-size: var(--x-small);
+  color: #fff;
+  background: #000;
   border-radius: 5px;
+}
+
+.knob-indicator {
+  --angle: 30deg;
+  --radius: 15px;
+
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 5px;
+  background: #787878;
+  border-radius: 2px;
+  translate: 0 -50%;
 }

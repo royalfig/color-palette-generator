@@ -4,22 +4,36 @@ import './export-options.css'
 import { ColorSpace } from 'colorjs.io/fn'
 import { ColorName } from '../App'
 import { useBaseColor } from '../hooks/useBaseColor'
-import { PaletteKinds } from '../types'
-import { Color } from 'motion'
+import { ColorFormat, PaletteKinds } from '../types'
+import { color, Color } from 'motion'
 import { BaseColorData } from '../util/factory'
 import { useContext } from 'react'
 import { ColorContext } from '../components/ColorContext'
 import { MessageContext } from '../components/MessageContext'
 import { LinearGradientSVG } from '../components/LinearGradientSVG'
 
-function downloadAction(blobToDownload: string, filename: string, type: string) {
-  const blob = new Blob([blobToDownload], { type })
+function downloadAction(
+  palette: BaseColorData[],
+  paletteTitle: string,
+  colorFormat: ColorFormat,
+  cb: (msg: string, type: 'success' | 'error') => void,
+) {
+  const paletteString = palette.map((color, idx) => {
+    return `  --${color.code.substring(0, 3)}-${idx + 1}: ${color.conversions[colorFormat].value};
+  --${color.code.substring(0, 3)}-${idx + 1}-contrast: ${color.contrast};`
+  })
+  const paletteAsCss = ':root {\n' + paletteString.join('\n') + '\n}'
+  const filename = `${paletteTitle?.toLowerCase().replace(/\W/g, '-') || 'color-palette-pro'}.css`
+  const type = 'text'
+
+  const blob = new Blob([paletteAsCss], { type })
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
   link.download = filename
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
+  cb('Downloaded', 'success')
 }
 
 function downloadPaletteAsImage(palette: BaseColorData[], colorNames: ColorName) {
@@ -93,29 +107,26 @@ function downloadPaletteAsImage(palette: BaseColorData[], colorNames: ColorName)
   document.body.removeChild(dlLink)
 }
 
-function handleCopyToClipboard(palette: BaseColorData[], colorNames: ColorName) {
-  const paletteWithNames = palette.map((color, idx) => ({
-    name: colorNames.fetchedData?.colorNames[idx],
-    [`--${color.code}`]: color.string,
-    [`--${color.code}-contrast`]: color.contrast,
-  }))
-  navigator.clipboard.writeText(JSON.stringify(paletteWithNames, null, 2))
-}
-
 interface ExportOptionsProps {
   fetchedData: { colorNames: string[]; paletteTitle: string; baseColorName: string } | null
   isLoading: boolean
   error: Error | null
+  colorFormat: ColorFormat
 }
 
-export function ExportOptions({ fetchedData, isLoading, error }: ExportOptionsProps) {
+export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: ExportOptionsProps) {
   const { palette } = useContext(ColorContext)
   const { showMessage } = useContext(MessageContext)
 
   const colorNames = { fetchedData, isLoading, error }
 
   function handleCopyToClipboard() {
-    navigator.clipboard.writeText(JSON.stringify(palette, null, 2))
+    const paletteString = palette.map((color, idx) => {
+      return `  --${color.code.substring(0, 3)}-${idx + 1}: ${color.conversions[colorFormat].value};
+  --${color.code.substring(0, 3)}-${idx + 1}-contrast: ${color.contrast};`
+    })
+    const paletteAsCss = ':root {\n' + paletteString.join('\n') + '\n}'
+    navigator.clipboard.writeText(paletteAsCss)
     showMessage('Palette copied', 'success')
   }
 
@@ -133,7 +144,12 @@ export function ExportOptions({ fetchedData, isLoading, error }: ExportOptionsPr
           <LinearGradientSVG />
         </ImageIcon>
       </Button>
-      <Button handler={() => {}} active={false}>
+      <Button
+        handler={() => {
+          downloadAction(palette, colorNames.fetchedData?.paletteTitle || 'Palette', colorFormat, showMessage)
+        }}
+        active={false}
+      >
         <FileArrowDownIcon size={20} color="url(#gradient)">
           <LinearGradientSVG />
         </FileArrowDownIcon>
@@ -143,7 +159,13 @@ export function ExportOptions({ fetchedData, isLoading, error }: ExportOptionsPr
           <LinearGradientSVG />
         </CopyIcon>
       </Button>
-      <Button handler={() => {}} active={false}>
+      <Button
+        handler={() => {
+          navigator.clipboard.writeText(document.location.href)
+          showMessage('Link copied', 'success')
+        }}
+        active={false}
+      >
         <LinkIcon size={20} color="url(#gradient)">
           <LinearGradientSVG />
         </LinkIcon>

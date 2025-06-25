@@ -61,8 +61,8 @@ export function InputColorContainer({
   return (
     <div className="input-color-container">
       {window.EyeDropper ? (
-        <Button handler={handleEyedropper} active={active} className="eyedropper-button">
-          <EyedropperSampleIcon size={22} color="url(#gradient)">
+        <Button handler={handleEyedropper} active={active} className="eyedropper-button inverse">
+          <EyedropperSampleIcon size={20}>
             <LinearGradientSVG />
           </EyedropperSampleIcon>
         </Button>

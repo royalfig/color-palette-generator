@@ -6,7 +6,7 @@ export type ColorFormat = 'hex' | 'rgb' | 'hsl' | 'lch' | 'oklch' | 'lab' | 'okl
 
 export type ColorSpaceAndFormat = { space: ColorSpace; format: ColorFormat }
 
-export type PaletteStyle = 'mathematical' | 'optical' | 'adaptive' | 'warm-cool'
+export type PaletteStyle = 'square' | 'triangle' | 'circle' | 'diamond'
 
 export type SliderType =
   | 'hue'
