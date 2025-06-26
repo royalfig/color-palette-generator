@@ -16,7 +16,7 @@
   --radius: 12px;
   --radius-sm: 2px;
   --small: 0.833rem;
-  --x-small: min(0.75rem, 14px);
+  --x-small: min(0.75rem, 12px);
   --button-padding: 0.4em 0.8em;
   --box-padding: 1rem;
   --space-after: 2rem;
@@ -38,21 +38,12 @@
   --icon-element: linear-gradient(to bottom, hsl(0deg 0% 5%), #e3e0dc, hsl(0deg 0% 5%));
   --base-gap: 20px;
   --shadow-color: 0 2% 32%;
-  --button-background: linear-gradient(to bottom, #cdcccb, #ccc);
   --shadow-elevation-high: 0px 0.5px 0.6px hsl(var(--shadow-color) / 34%),
     0px 2.9px 3.3px -0.4px hsl(var(--shadow-color) / 34%), 0px 5.5px 6.2px -0.7px hsl(var(--shadow-color) / 34%),
     -0.1px 9px 10.1px -1.1px hsl(var(--shadow-color) / 34%), -0.1px 14.4px 16.2px -1.4px hsl(var(--shadow-color) / 34%),
     -0.2px 22.5px 25.3px -1.8px hsl(var(--shadow-color) / 34%),
     -0.2px 34.2px 38.5px -2.1px hsl(var(--shadow-color) / 34%),
     -0.4px 50.4px 56.7px -2.5px hsl(var(--shadow-color) / 34%);
-  --button-rim: linear-gradient(to bottom, #fff, #000);
-  --button-active: linear-gradient(to bottom, hsl(30deg 2% 75%), hsl(0deg 0% 75%));
-  --active-button-text-shadow: 0 0 0.5px color-mix(in oklch, var(--base-color) 55%, var(--element));
-  --active-button-text-color: color-mix(in oklch, var(--base-color) 25%, var(--element));
-  --icon-gradient-top: hsl(249deg 50% 0%);
-  --icon-gradient-center: hsl(249deg 18% 20%);
-  --inverse-element: #fff;
-  --inverse-button-background: linear-gradient(to bottom, hsl(248deg 11% 15%), hsl(248deg 11% 15%));
 }
 
 [data-mode='dark'] {
@@ -68,10 +59,4 @@
     -0.2px 22.5px 25.3px -1.8px hsl(var(--shadow-color) / 34%),
     -0.2px 34.2px 38.5px -2.1px hsl(var(--shadow-color) / 34%),
     -0.4px 50.4px 56.7px -2.5px hsl(var(--shadow-color) / 34%);
-  --button-rim: linear-gradient(to bottom, hsl(248deg 0% 29%), #000);
-  --button-active: linear-gradient(to bottom, hsl(248deg 2% 15%), hsl(0deg 0% 5%));
-  --active-button-text-shadow: 0 0 0.5px color-mix(in oklch, var(--base-color) 55%, var(--element));
-  --active-button-text-color: color-mix(in oklch, var(--base-color) 25%, var(--element));
-  --icon-gradient-top: hsl(248deg 11% 65%);
-  --icon-gradient-center: hsl(248deg 11% 95%);
 }

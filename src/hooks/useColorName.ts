@@ -28,6 +28,23 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
 
     async function fetchColorName() {
       try {
+        const baseIndex = palette.findIndex(p => p.string === originalColor.string)
+        console.log('baseIndex', baseIndex)
+        if (baseIndex !== -1) {
+          const paletteResponse = await fetch(
+            `https://api.colorpalette.pro/palette/${palette
+              .map(color => color.conversions.hex.value.replace('#', ''))
+              .join(',')}`,
+            { signal },
+          )
+          const { colors, palette_name } = (await paletteResponse.json()) as { colors: any; palette_name: string }
+          const colorNames = colors.map((c: any) => c.name)
+          const baseColorName = colorNames[baseIndex]
+
+          setFetchedData({ colorNames, paletteTitle: palette_name, baseColorName })
+          return
+        }
+
         const paletteResponse = await fetch(
           `https://api.colorpalette.pro/palette/${palette
             .map(color => color.conversions.hex.value.replace('#', ''))

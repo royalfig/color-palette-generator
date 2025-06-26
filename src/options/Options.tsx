@@ -1,5 +1,5 @@
-import { DiceFourIcon } from '@phosphor-icons/react/dist/csr/DiceFour'
-import { LifebuoyIcon } from '@phosphor-icons/react/dist/csr/Lifebuoy'
+import { ShuffleIcon } from '@phosphor-icons/react/dist/csr/Shuffle'
+import { QuestionIcon } from '@phosphor-icons/react/dist/csr/Question'
 import Button from '../components/button/Button'
 import './options.css'
 import { pickRandomColor } from '../util/pickRandomColor'
@@ -15,9 +15,9 @@ export function Options({ setColor }: { setColor: React.Dispatch<React.SetStateA
         }}
         active={false}
       >
-        <DiceFourIcon size={20} color="url(#gradient)">
-          <LinearGradientSVG />
-        </DiceFourIcon>
+        <ShuffleIcon size={22} color="url(#shuffle-gradient)" weight="fill">
+          <LinearGradientSVG id="shuffle-gradient" />
+        </ShuffleIcon>
       </Button>
       <Button
         handler={() => {
@@ -27,9 +27,9 @@ export function Options({ setColor }: { setColor: React.Dispatch<React.SetStateA
         }}
         active={false}
       >
-        <LifebuoyIcon size={20} color="url(#gradient)">
-          <LinearGradientSVG />
-        </LifebuoyIcon>
+        <QuestionIcon size={22} color="url(#question-gradient)" weight="fill">
+          <LinearGradientSVG id="question-gradient" />
+        </QuestionIcon>
       </Button>
     </div>
   )

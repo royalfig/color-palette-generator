@@ -17,11 +17,9 @@ export default function Button({
 
   return (
     <div className={buttonClass}>
-      <div className="button-container-inner">
-        <button className={activeClass} onClick={handler}>
-          {children}
-        </button>
-      </div>
+      <button className={activeClass} onClick={handler}>
+        {children}
+      </button>
     </div>
   )
 }

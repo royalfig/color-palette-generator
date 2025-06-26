@@ -1,33 +1,46 @@
 /* Src ❤️ https://codepen.io/nicolasjesenberger/details/gOqzJed */
-.button-container {
+:root {
   --background-color: hsl(248deg 11% 80%);
   --background-color-active: hsl(248deg 11% 78%);
   --light-shadow-color: hsl(248deg 11% 95%);
   --dark-shadow-color: hsl(248deg 11% 5%);
+  --button-container-shadow: ;
+  --button-rim: linear-gradient(to bottom, #fff, #000);
+  --button-active: linear-gradient(to bottom, hsl(30deg 2% 75%), hsl(0deg 0% 75%));
+  --active-button-text-shadow: 0 0 0.5px color-mix(in oklch, var(--base-color) 55%, var(--element));
+  --active-button-text-color: color-mix(in oklch, var(--base-color) 25%, var(--element));
+  --icon-gradient-top: hsl(249deg 50% 0%);
+  --icon-gradient-center: hsl(240deg 1% 55%);
+  --inverse-element: #fff;
   --button-container: #000;
-  --button-container-shadow: 0.0625em 0.0625em 0.0625em rgb(255 255 255 / 60%);
+  --button-background: linear-gradient(to bottom, #cdcccb, #ccc);
+  --inverse-button-background: linear-gradient(to bottom, hsl(248deg 0 30%), hsl(248deg 0 25%));
+}
 
+[data-mode='dark'] {
+  --button-rim: linear-gradient(to bottom, #000, #fff);
+  --button-active: linear-gradient(to bottom, hsl(30deg 2% 25%), hsl(0deg 0% 25%));
+  --active-button-text-shadow: 0 0 0.5px color-mix(in oklch, var(--base-color) 55%, var(--element));
+  --active-button-text-color: color-mix(in oklch, var(--base-color) 25%, var(--element));
+  --icon-gradient-top: hsl(0deg 4% 91%);
+  --icon-gradient-center: hsl(0deg 0% 55%);
+  --inverse-element: #fff;
+  --inverse-button-background: linear-gradient(to bottom, hsl(248deg 11% 15%), hsl(248deg 11% 15%));
+}
+
+.button-container {
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 40px;
   height: 40px;
-  padding: 2px;
-
-  /* padding: var(--spacing-01); */
   background-color: var(--button-container);
-  border-radius: 2px;
+  border: 2px solid transparent;
+  border-radius: 1px;
+  box-shadow: none;
 
-  .button-container-inner {
-    width: 100%;
-    height: 100%;
-    padding: 1px;
-    background: var(--button-rim);
-    border-radius: 5px;
-
-    &:has(.active, :active) {
-      background: linear-gradient(to bottom, #000, #000);
-    }
+  &:has(button:active, button.active) {
+    box-shadow: 0 1px 1px white;
   }
 
   & button {
@@ -37,36 +50,29 @@
     justify-content: center;
     width: 100%;
     height: 100%;
-    padding: var(--spacing-02);
-    font-size: var(--x-small);
 
-    /* font-weight: 200; */
+    /* padding: 0.625em 0.75em 0.4375em; */
+    font-size: var(--x-small);
     color: var(--element);
     text-transform: uppercase;
-
-    /* letter-spacing: 0.8px; */
     background-image: var(--button-background);
-    background-size: 80px 80px;
-    border-radius: 5px;
-    box-shadow: var(--shadow-elevation-high);
-
-    /* transition-timing-function: cubic-bezier(0.25, 0.5, 0.5, 1);
-    transition-duration: 0.2s;
-    transition-property: background-image, box-shadow; */
+    border-radius: 6px;
+    box-shadow: inset 0 1px 1px rgb(255 255 255 / 92.8%), inset 0 -1px 1px rgb(0 0 0 / 83.3%),
+      var(--shadow-elevation-high);
 
     &:active,
     &.active {
-      color: var(--active-button-text-color);
-      text-shadow: var(--active-button-text-shadow);
-      background-image: var(--button-active);
-      box-shadow: inset 3px 3px 0.75em hsl(0deg 0% 15% / 75%);
-
-      /* transform: scale(0.98); */
+      box-shadow: inset 0 1px 5px rgb(0 0 0 / 88.5%);
+      filter: brightness(0.9);
+      translate: 0 0.5px;
     }
   }
 }
 
 .button-container.inverse {
+  --icon-gradient-center: hsl(0deg 0% 59%);
+  --icon-gradient-top: hsl(260deg 5% 89%);
+
   button {
     color: var(--inverse-element);
     background-image: var(--inverse-button-background);

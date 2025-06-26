@@ -171,38 +171,18 @@ function generateCircleStyle(baseColor: Color, lightnesses: number[], baseIndex:
 
 // Diamond Style: Tonal variations using color mixing
 function generateDiamondStyle(baseColor: Color, lightnesses: number[], baseIndex: number): Color[] {
+  const steps = baseColor.steps('gray', {
+    space: 'oklch',
+    outputSpace: 'oklch',
+    maxDeltaE: 0, // max deltaE between consecutive steps (optional)
+    steps: 12, // min number of steps
+  })
+
   const colors: Color[] = []
-  const baseHue = baseColor.oklch.h || 0
-
-  // Create neutral anchors for mixing
-  const neutralDark = new Color('oklch', [0.3, 0.02, baseHue])
-  const neutralLight = new Color('oklch', [0.85, 0.02, baseHue])
-
-  // Use color.js range/mix for smooth tonal progression
-  lightnesses.forEach((targetLightness, index) => {
-    if (index === baseIndex) {
-      colors.push(baseColor.clone())
-      return
-    }
-
-    // Determine mix ratio based on how far we are from base
-    const isShade = index < baseIndex
-    let mixColor: Color
-    let mixRatio: number
-
-    if (isShade) {
-      // Mix with tonal dark
-      mixRatio = ((baseIndex - index) / baseIndex) * 0.5 // Max 50% neutral
-      mixColor = baseColor.mix(neutralDark, mixRatio, { space: 'oklch' })
-    } else {
-      // Mix with tonal light
-      mixRatio = ((index - baseIndex) / (11 - baseIndex)) * 0.5 // Max 50% neutral
-      mixColor = baseColor.mix(neutralLight, mixRatio, { space: 'oklch' })
-    }
-
-    // Adjust to target lightness
-    mixColor.oklch.l = targetLightness
-    colors.push(mixColor)
+  lightnesses.forEach((lightness, index) => {
+    const color = steps[index]
+    color.oklch.l = lightness
+    colors.push(color)
   })
 
   return colors
@@ -291,14 +271,10 @@ function getLightnessProgression(baseLightness: number, style: string): number[]
     })
   }
 
-  if (style === 'diamond') {
-    // Tonal compression for mixing
-    return baseProgression.map((l, i) => {
-      if (i < 4) return l * 1.2 // Lighter shadows (more tonal)
-      if (i > 8) return l * 0.95 // Slightly darker highlights
-      return l
-    })
-  }
+  // if (style === 'diamond') {
+  //   // Tonal compression for mixing
+  //   return
+  // }
 
   return baseProgression
 }

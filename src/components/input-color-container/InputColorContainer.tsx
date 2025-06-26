@@ -8,6 +8,7 @@ import Button from '../button/Button'
 import { ColorContext } from '../ColorContext'
 import { MessageContext } from '../MessageContext'
 import { LinearGradientSVG } from '../LinearGradientSVG'
+import Color from 'colorjs.io'
 
 declare global {
   interface Window {
@@ -50,9 +51,13 @@ export function InputColorContainer({
 
   function handleSubmit() {
     if (input) {
-      console.log('input', input)
-      setColor(input)
-      showMessage(`Color set`, 'success')
+      try {
+        new Color(input)
+        setColor(input)
+        showMessage(`Color set`, 'success')
+      } catch (e) {
+        showMessage('Invalid format', 'error')
+      }
     }
   }
 
@@ -64,8 +69,8 @@ export function InputColorContainer({
     <div className="input-color-container">
       {window.EyeDropper ? (
         <Button handler={handleEyedropper} active={active} className="eyedropper-button inverse">
-          <EyedropperSampleIcon size={20}>
-            <LinearGradientSVG />
+          <EyedropperSampleIcon size={20} color="url(#eyedropper-gradient)" weight="fill">
+            <LinearGradientSVG id="eyedropper-gradient" />
           </EyedropperSampleIcon>
         </Button>
       ) : null}
@@ -85,8 +90,8 @@ export function InputColorContainer({
       />
 
       <Button handler={handleSubmit} active={false} className="inverse">
-        <PlayIcon size={20}>
-          <LinearGradientSVG />
+        <PlayIcon size={20} color="url(#play-gradient)" weight="fill">
+          <LinearGradientSVG id="play-gradient" />
         </PlayIcon>
       </Button>
     </div>

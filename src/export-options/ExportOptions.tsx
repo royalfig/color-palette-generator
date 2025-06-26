@@ -1,4 +1,4 @@
-import { CopyIcon } from '@phosphor-icons/react/dist/csr/Copy'
+import { ClipboardTextIcon } from '@phosphor-icons/react/dist/csr/ClipboardText'
 import { ImageIcon } from '@phosphor-icons/react/dist/csr/Image'
 import { LinkIcon } from '@phosphor-icons/react/dist/csr/Link'
 import { FileArrowDownIcon } from '@phosphor-icons/react/dist/csr/FileArrowDown'
@@ -142,8 +142,8 @@ export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: Ex
   return (
     <div className="export-options-container">
       <Button handler={handleImageDownload} active={false}>
-        <ImageIcon size={20} color="url(#gradient)">
-          <LinearGradientSVG />
+        <ImageIcon size={22} color="url(#image-gradient)" weight="fill">
+          <LinearGradientSVG id="image-gradient" />
         </ImageIcon>
       </Button>
       <Button
@@ -152,14 +152,14 @@ export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: Ex
         }}
         active={false}
       >
-        <FileArrowDownIcon size={20} color="url(#gradient)">
-          <LinearGradientSVG />
+        <FileArrowDownIcon size={22} color="url(#file-arrow-down-gradient)" weight="fill">
+          <LinearGradientSVG id="file-arrow-down-gradient" />
         </FileArrowDownIcon>
       </Button>
       <Button handler={handleCopyToClipboard} active={false}>
-        <CopyIcon size={20} color="url(#gradient)">
-          <LinearGradientSVG />
-        </CopyIcon>
+        <ClipboardTextIcon size={22} color="url(#copy-gradient)" weight="fill">
+          <LinearGradientSVG id="copy-gradient" />
+        </ClipboardTextIcon>
       </Button>
       <Button
         handler={() => {
@@ -168,8 +168,8 @@ export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: Ex
         }}
         active={false}
       >
-        <LinkIcon size={20} color="url(#gradient)">
-          <LinearGradientSVG />
+        <LinkIcon size={22} color="url(#link-gradient)" weight="bold">
+          <LinearGradientSVG id="link-gradient" />
         </LinkIcon>
       </Button>
     </div>
