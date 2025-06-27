@@ -1,10 +1,6 @@
 .display-info-container {
-  display: flex;
   grid-row: 5;
   grid-column: span 2 / -1;
-  gap: var(--spacing-03);
-  align-items: center;
-  justify-content: center;
   height: 40px;
   padding: var(--spacing-02);
   font-size: var(--x-small);
@@ -18,20 +14,34 @@
   }
 }
 
+.display-info-default {
+  display: flex;
+  gap: var(--spacing-03);
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
 .display-info-message {
-  justify-content: start;
+  display: flex;
+  gap: var(--spacing-03);
+  align-items: center;
+  justify-content: center;
+  height: 100%;
   padding-inline: var(--spacing-04);
-  font-weight: 700;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.1px;
 }
 
 .display-info-success {
-  background-color: #001e00;
+  color: var(--success);
 }
 
 .display-info-error {
-  background-color: rgb(39 0 0);
+  color: var(--error);
 }
 
 .display-info-info {
-  background-color: rgb(0 0 38);
+  color: var(--warning);
 }

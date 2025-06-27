@@ -1,4 +1,5 @@
 import { useMemo, useContext } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 
 import './display-info.css'
 import { MessageContext, MessageType } from '../MessageContext'
@@ -64,34 +65,45 @@ export function DisplayInfo() {
     unknown: 'Unknown',
   }
 
-  if (message) {
-    return (
-      <div className={`display-info-container display-info-${messageType || 'info'} display-info-message`}>
-        <IconSelector size={20} messageType={messageType || 'info'} />
-        <p>{message}</p>
-      </div>
-    )
-  }
-
   return (
     <div className="display-info-container">
-      <div className="flex gap-01">
-        <MonitorIcon weight="fill" size={14} />
-        <p>{colorGamut}</p>
-      </div>
-      <div className="flex gap-01">
-        <EyeIcon weight="fill" size={14} />
-        <p>{gamutCoverage[colorGamut]}%</p>
-      </div>
-
-      <div className="flex gap-01">
-        <CircleHalfIcon weight="fill" size={14} />
-        <p>{dynamicRangeMap[dynamicRange]}</p>
-      </div>
-      {/* <div className="flex gap-01">
-        <DotsNineIcon weight="fill" />
-        {dpr}
-      </div> */}
+      <AnimatePresence mode="wait" initial={false}>
+        {message ? (
+          <motion.div
+            key="message"
+            className={`display-info-${messageType || 'info'} display-info-message`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <IconSelector size={20} messageType={messageType || 'info'} />
+            <p>{message}</p>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="default"
+            className="display-info-default"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <div className="flex gap-01">
+              <MonitorIcon weight="fill" size={14} />
+              <p>{colorGamut}</p>
+            </div>
+            <div className="flex gap-01">
+              <EyeIcon weight="fill" size={14} />
+              <p>{gamutCoverage[colorGamut]}%</p>
+            </div>
+            <div className="flex gap-01">
+              <CircleHalfIcon weight="fill" size={14} />
+              <p>{dynamicRangeMap[dynamicRange]}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

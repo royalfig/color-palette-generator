@@ -19,6 +19,7 @@
   font-size: 0.6rem;
   font-weight: 400;
   line-height: 1.4;
+  color: var(--element-dim);
   text-transform: uppercase;
 
   p {
@@ -31,7 +32,7 @@
   position: relative;
   width: 100%;
   height: 1px;
-  background-color: var(--element);
+  background-color: var(--element-dim);
 
   &:first-child::before {
     position: absolute;
@@ -40,7 +41,7 @@
     width: 1px;
     height: var(--spacing-03);
     content: '';
-    background-color: var(--element);
+    background-color: var(--element-dim);
   }
 
   &:last-child::before {
@@ -50,6 +51,6 @@
     width: 1px;
     height: var(--spacing-03);
     content: '';
-    background-color: var(--element);
+    background-color: var(--element-dim);
   }
 }

@@ -17,15 +17,30 @@
   --inverse-button-background: linear-gradient(to bottom, hsl(248deg 0 30%), hsl(248deg 0 25%));
 }
 
+.button-container.inverse {
+  --icon-gradient-center: hsl(0deg 0% 59%);
+  --icon-gradient-top: hsl(260deg 5% 89%);
+
+  button {
+    color: var(--inverse-element);
+    background-image: var(--inverse-button-background);
+  }
+}
+
 [data-mode='dark'] {
   --button-rim: linear-gradient(to bottom, #000, #fff);
   --button-active: linear-gradient(to bottom, hsl(30deg 2% 25%), hsl(0deg 0% 25%));
   --active-button-text-shadow: 0 0 0.5px color-mix(in oklch, var(--base-color) 55%, var(--element));
   --active-button-text-color: color-mix(in oklch, var(--base-color) 25%, var(--element));
-  --icon-gradient-top: hsl(0deg 4% 91%);
-  --icon-gradient-center: hsl(0deg 0% 55%);
   --inverse-element: #fff;
-  --inverse-button-background: linear-gradient(to bottom, hsl(248deg 11% 15%), hsl(248deg 11% 15%));
+  --inverse-button-background: linear-gradient(to bottom, hsl(0deg 0% 85%), hsl(248deg 11% 75%));
+  --icon-gradient-center: hsl(0deg 0% 59%);
+  --icon-gradient-top: hsl(260deg 5% 89%);
+
+  .button-container.inverse {
+    --icon-gradient-top: hsl(249deg 50% 0%);
+    --icon-gradient-center: hsl(240deg 1% 55%);
+  }
 }
 
 .button-container {
@@ -66,15 +81,5 @@
       filter: brightness(0.9);
       translate: 0 0.5px;
     }
-  }
-}
-
-.button-container.inverse {
-  --icon-gradient-center: hsl(0deg 0% 59%);
-  --icon-gradient-top: hsl(260deg 5% 89%);
-
-  button {
-    color: var(--inverse-element);
-    background-image: var(--inverse-button-background);
   }
 }

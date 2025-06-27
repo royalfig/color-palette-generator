@@ -29,9 +29,11 @@
   --font-brand: 'Orbitron', system-ui, sans-serif;
   --border-color: hsl(0deg 0% 50% / 45%);
   --element: hsl(248deg 11% 15%);
+  --element-dim: hsl(248deg 11% 10%);
   --border: hsl(248deg 11% 65% / 75%);
   --dimmed: #333;
-  --error: rgb(237 7 38);
+  --success: oklch(100% 0.4 150deg);
+  --error: oklch(100% 0.4 21deg);
   --warning: rgb(255 165 0);
   --synth-body: linear-gradient(to bottom, #e3e0dc, #afaeac);
   --bg: #f8f8f8;
@@ -49,6 +51,7 @@
 [data-mode='dark'] {
   --synth-body: hsl(248deg 11% 15%);
   --element: hsl(248deg 11% 85%);
+  --element-dim: hsl(248deg 11% 70%);
   --border: hsl(248deg 11% 35%);
   --bg: linear-gradient(to bottom in oklab, hsl(248deg 11% 25%), hsl(248deg 11% 5%));
   --button-background: linear-gradient(to bottom, hsl(248deg 11% 15%), hsl(248deg 11% 15%));

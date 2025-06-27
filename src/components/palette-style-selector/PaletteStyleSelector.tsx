@@ -6,6 +6,7 @@ import { CircleIcon } from '@phosphor-icons/react/dist/csr/Circle'
 import { SquareIcon } from '@phosphor-icons/react/dist/csr/Square'
 import { TriangleIcon } from '@phosphor-icons/react/dist/csr/Triangle'
 import { DiamondIcon } from '@phosphor-icons/react/dist/csr/Diamond'
+import { LinearGradientSVG } from '../LinearGradientSVG'
 
 const paletteStyleOptions = ['square', 'triangle', 'circle', 'diamond'] as const
 
@@ -34,14 +35,8 @@ export function PaletteStyleSelector({
             active={paletteStyle === style}
             className="inverse"
           >
-            <Icon size={18} weight="bold" fill="url(#gradient1)">
-              <defs>
-                <linearGradient id="gradient1" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ccc" />
-                  <stop offset="50%" stopColor="#fff" />
-                  <stop offset="100%" stopColor="#ccc" />
-                </linearGradient>
-              </defs>
+            <Icon size={18} weight="bold" fill={`url(#${style}-gradient)`}>
+              <LinearGradientSVG id={`${style}-gradient`} />
             </Icon>
           </Button>
         )
