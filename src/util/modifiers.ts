@@ -1,12 +1,6 @@
 import { ColorSpace } from '../types'
 import { BaseColorData, colorFactory } from './factory'
 
-function seededRandom(seed: number): number {
-  // Simple deterministic pseudo-random number generator
-  const x = Math.sin(seed) * 10000
-  return x - Math.floor(x)
-}
-
 function mapRange(value: number, inMin: number, inMax: number, outMin: number, outMax: number): number {
   return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin
 }
@@ -15,10 +9,6 @@ function sineModifier(palette: BaseColorData[], modifier: number): BaseColorData
   const intensity = mapRange(modifier, 0, 100, 0, 120) // 0-120 degree range
 
   return palette.map((color, idx) => {
-    if (color.isBase) {
-      return color
-    }
-
     // Create sine wave based on position in palette
     const wavePosition = (idx / (palette.length - 1)) * Math.PI * 2
     const sineValue = Math.sin(wavePosition + modifier * 0.01) // Phase shift based on modifier
@@ -36,10 +26,6 @@ function waveModifier(palette: BaseColorData[], modifier: number): BaseColorData
   const chaosLevel = mapRange(modifier, 0, 100, 0.1, 3.0)
 
   return palette.map((color, idx) => {
-    if (color.isBase) {
-      return color
-    }
-
     // Logistic map for chaotic behavior
     let x = 0.5 + (idx / palette.length) * 0.4 // Initial value
     for (let i = 0; i < 10; i++) {
@@ -68,10 +54,6 @@ function zapModifier(palette: BaseColorData[], modifier: number): BaseColorData[
   const spiralTightness = mapRange(modifier, 0, 100, 0.1, 2.0)
 
   return palette.map((color, idx) => {
-    if (color.isBase) {
-      return color
-    }
-
     // Logarithmic spiral formula
     const angle = idx * spiralTightness
     const radius = Math.log(idx + 1) * 10
@@ -95,10 +77,6 @@ function blockModifier(palette: BaseColorData[], modifier: number): BaseColorDat
   const amplitude = mapRange(modifier, 0, 100, 0, 0.3) // Lightness variation range
 
   return palette.map((color, idx) => {
-    if (color.isBase) {
-      return color
-    }
-
     // Create triangular wave for more dramatic effect
     const wavePosition = (idx / (palette.length - 1)) * Math.PI * 4 // Double frequency
     const triangleWave = (2 / Math.PI) * Math.asin(Math.sin(wavePosition))
