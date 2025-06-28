@@ -129,7 +129,7 @@ export default function App() {
 
   const colorContext = useMemo(
     () => ({ originalColor: colorFactory(color, 'base', 0, colorSpace.format), palette }),
-    [color, palette],
+    [color, palette, colorSpace.format],
   )
 
   // const css = generateCss(palettes)
