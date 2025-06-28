@@ -1,35 +1,34 @@
-import { useEffect, useMemo, useState, useCallback } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ColorContext } from './components/ColorContext'
+import { MessageContext, MessageType } from './components/MessageContext'
 import { AuxillaryDisplay } from './components/auxillary-display/AuxillaryDisplay'
 import { ColorDisplay } from './components/color-display/ColorDisplay'
 import { ColorSpaceSelector } from './components/color-space-selector/ColorSpaceSelector'
 import { DisplayInfo } from './components/display-info/DisplayInfo'
 import { Display } from './components/display/Display'
-import { HueSlider } from './components/hue-slider/HueSlider'
+import { SliderGroup } from './components/hue-slider/SliderGroup'
 import { InputColorContainer } from './components/input-color-container/InputColorContainer'
+import { Knob } from './components/knob/Knob'
+import { Manual } from './components/manual/Manual'
 import { PaletteDisplay } from './components/palette-display/PaletteDisplay'
 import { PaletteStyleSelector } from './components/palette-style-selector/PaletteStyleSelector'
 import { PaletteToolSelector } from './components/palette-tool-selector/PaletteToolSelector'
 import { SectionHeader } from './components/section-header/SectionHeader'
-import { Manual } from './components/manual/Manual'
 import './css/App.css'
 import './css/Defaults.css'
 import './css/Reset.css'
 import './css/Variables.css'
 import './css/utils.css'
-import { useFetchColorNames } from './hooks/useColorName'
-import { PaletteTypeSelector } from './palette-type-selector/PaletteTypeSelector'
-import type { ColorFormat, ColorSpace, ColorSpaceAndFormat, PaletteKinds } from './types'
-import { createPalettes } from './util'
-import { pickRandomColor } from './util/pickRandomColor'
-import { Knob } from './components/knob/Knob'
-import { SliderGroup } from './components/hue-slider/SliderGroup'
 import { ExportOptions } from './export-options/ExportOptions'
-import { Options } from './options/Options'
+import { useFetchColorNames } from './hooks/useColorName'
 import { useDarkMode } from './hooks/useDarkMode'
-import { MessageContext, MessageType } from './components/MessageContext'
-import Color from 'colorjs.io'
+import { Options } from './options/Options'
+import { PaletteTypeSelector } from './palette-type-selector/PaletteTypeSelector'
+import type { ColorFormat, ColorSpaceAndFormat, PaletteKinds } from './types'
+import { createPalettes } from './util'
 import { colorFactory } from './util/factory'
+import { pickRandomColor } from './util/pickRandomColor'
+
 export type ColorName = {
   fetchedData: {
     colorNames: string[]
@@ -107,6 +106,7 @@ export default function App() {
   const [colorHistory, setColorHistory] = useState<string[]>([])
   const [paletteStyle, setPaletteStyle] = useState<'square' | 'triangle' | 'circle' | 'diamond'>(initialPaletteStyle)
   const [colorSpace, setColorSpace] = useState<ColorSpaceAndFormat>(parsedInitialColorSpace(initialColorFormat))
+  const [knobValues, setKnobValues] = useState([0, 0, 0, 0])
 
   const { isDarkMode, toggleDarkMode } = useDarkMode()
   const [message, setMessage] = useState<string | null>(null)
@@ -123,8 +123,8 @@ export default function App() {
   }, [])
 
   const palette = useMemo(
-    () => createPalettes(color, paletteType, paletteStyle, colorSpace),
-    [color, paletteType, paletteStyle, colorSpace],
+    () => createPalettes(color, paletteType, paletteStyle, colorSpace, knobValues),
+    [color, paletteType, paletteStyle, colorSpace, knobValues],
   )
 
   const colorContext = useMemo(
@@ -194,6 +194,8 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
+  // Knob values state (4 knobs, default 0)
+
   if (window.location.pathname === '/manual') {
     if (window.location.search) {
       window.history.replaceState({}, '', '/manual')
@@ -257,7 +259,7 @@ export default function App() {
                   error={colorNameError}
                   colorFormat={colorSpace.format}
                 />
-                <Knob />
+                <Knob initialValues={knobValues} onChange={setKnobValues} />
 
                 <DisplayInfo />
                 {/* <HueSlider setColor={setColor} colorSpace={colorSpace} /> */}

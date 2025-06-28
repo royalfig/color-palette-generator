@@ -23,9 +23,14 @@
   width: 100%;
   max-width: 60px;
   aspect-ratio: 1;
+  cursor: ns-resize;
   background: linear-gradient(rgb(236 236 236), rgb(188 188 188));
   border-radius: 50%;
   box-shadow: 0 -1px 0 1px rgb(245 245 245), 0 2px 2px hsl(0deg 0% 0% / 35%);
+}
+
+.knob-outer.dragging {
+  cursor: ns-resize;
 }
 
 .knob-inner {
@@ -34,7 +39,6 @@
   aspect-ratio: 1;
   background: linear-gradient(rgb(238 238 238), rgb(227 226 226));
   border-radius: 50%;
-  transform: rotate(180deg);
 }
 
 .knob-inner-shadow {
@@ -57,18 +61,24 @@
   color: #fff;
   background: #000;
   border-radius: 5px;
+
+  input {
+    padding: 0;
+    color: #fff;
+  }
 }
 
 .knob-indicator {
-  --angle: 30deg;
-  --radius: 15px;
+  --radius: 10px;
+  --dot: 4px;
 
   position: absolute;
-  top: 0;
-  left: 50%;
-  width: 2px;
-  height: 5px;
-  background: #787878;
-  border-radius: 2px;
-  translate: 0 -50%;
+  top: calc(50% - var(--dot) / 2);
+  left: calc(50% - var(--dot) / 2);
+  width: var(--dot);
+  height: var(--dot);
+  background: #000;
+  border-radius: 50%;
+  transform-origin: center;
+  translate: calc(sin(var(--angle) * -1) * var(--radius)) calc(cos(var(--angle)) * var(--radius));
 }

@@ -6,27 +6,40 @@ import { generateSplitComplementary } from './splitcomp'
 import { generateTetradic } from './tetradic'
 import { generateTintsAndShades } from './tints-and-shades'
 import { generateTriadic } from './triadic'
+import { ModulateValuesType, paletteModulator } from './modifiers'
+import { BaseColorData } from './factory'
 
 export function createPalettes(
   color: string,
   palette: PaletteKinds,
   style: 'square' | 'triangle' | 'circle' | 'diamond',
   colorSpace: { space: ColorSpace; format: ColorFormat },
+  modulateValues = [0, 0, 0, 0],
 ) {
+  let basePalette: BaseColorData[] = []
+  console.log(palette)
   switch (palette) {
     case 'ana':
-      return generateAnalogous(color, { style, colorSpace })
+      basePalette = generateAnalogous(color, { style, colorSpace })
+      break
     case 'tri':
-      return generateTriadic(color, { style, colorSpace })
+      basePalette = generateTriadic(color, { style, colorSpace })
+      break
     case 'tet':
-      return generateTetradic(color, { style, colorSpace })
+      basePalette = generateTetradic(color, { style, colorSpace })
+      break
     case 'com':
-      return generateComplementary(color, { style, colorSpace })
+      basePalette = generateComplementary(color, { style, colorSpace })
+      break
     case 'spl':
-      return generateSplitComplementary(color, { style, colorSpace })
+      basePalette = generateSplitComplementary(color, { style, colorSpace })
+      break
     case 'tas':
-      return generateTintsAndShades(color, { style, colorSpace })
-    default:
-      throw new Error(`Invalid palette type: ${palette}`)
+      basePalette = generateTintsAndShades(color, { style, colorSpace })
+      break
   }
+
+  const modulatedPalette = paletteModulator(basePalette, modulateValues)
+  console.log(modulatedPalette)
+  return modulatedPalette
 }

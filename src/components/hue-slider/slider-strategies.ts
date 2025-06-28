@@ -105,7 +105,7 @@ const lightnessStrategy = (space: ColorSpace): SliderStrategy => {
         return color
       },
       getTrackStyle: values =>
-        `linear-gradient(to right, oklch(0 ${values.saturation} ${values.hue}), oklch(1 ${values.saturation} ${values.hue}))`,
+        `linear-gradient(to right in oklch, oklch(0 ${values.saturation} ${values.hue}), oklch(1 ${values.saturation} ${values.hue}))`,
       getThumbStyle: values => `oklch(${values.value} ${values.saturation} ${values.hue})`,
     }
   }
@@ -122,7 +122,7 @@ const lightnessStrategy = (space: ColorSpace): SliderStrategy => {
         return color
       },
       getTrackStyle: values =>
-        `linear-gradient(to right, lch(0 ${values.saturation} ${values.hue}), lch(100 ${values.saturation} ${values.hue}))`,
+        `linear-gradient(to right in lch, lch(0 ${values.saturation} ${values.hue}), lch(100 ${values.saturation} ${values.hue}))`,
       getThumbStyle: values => `lch(${values.value} ${values.saturation} ${values.hue})`,
     }
   }
@@ -139,7 +139,7 @@ const lightnessStrategy = (space: ColorSpace): SliderStrategy => {
         return color
       },
       getTrackStyle: values =>
-        `linear-gradient(to right, oklab(0 ${values['oklab-a']} ${values['oklab-b']}), oklab(1 ${values['oklab-a']} ${values['oklab-b']}))`,
+        `linear-gradient(to right in oklab, oklab(0 ${values['oklab-a']} ${values['oklab-b']}), oklab(1 ${values['oklab-a']} ${values['oklab-b']}))`,
       getThumbStyle: values => `oklab(${values.value} ${values['oklab-a']} ${values['oklab-b']})`,
     }
   }
@@ -155,7 +155,7 @@ const lightnessStrategy = (space: ColorSpace): SliderStrategy => {
         return color
       },
       getTrackStyle: values =>
-        `linear-gradient(to right, lab(0 ${values['lab-a']} ${values['lab-b']}), lab(100 ${values['lab-a']} ${values['lab-b']}))`,
+        `linear-gradient(to right in lab, lab(0 ${values['lab-a']} ${values['lab-b']}), lab(100 ${values['lab-a']} ${values['lab-b']}))`,
       getThumbStyle: values => `lab(${values.value} ${values['lab-a']} ${values['lab-b']})`,
     }
   }
@@ -216,9 +216,9 @@ const p3Strategy = (coord: 'p3-r' | 'p3-g' | 'p3-b'): SliderStrategy => ({
     return color
   },
   getTrackStyle: () => {
-    if (coord === 'p3-r') return 'linear-gradient(to right, transparent, red)'
-    if (coord === 'p3-g') return 'linear-gradient(to right, transparent, green)'
-    return 'linear-gradient(to right, transparent, blue)'
+    if (coord === 'p3-r') return 'linear-gradient(to right in display-p3, transparent, red)'
+    if (coord === 'p3-g') return 'linear-gradient(to right in display-p3, transparent, green)'
+    return 'linear-gradient(to right in display-p3, transparent, blue)'
   },
   getThumbStyle: values =>
     coord === 'p3-r'
@@ -238,7 +238,7 @@ const labAStrategy = (): SliderStrategy => ({
     return color
   },
   getTrackStyle: values =>
-    `linear-gradient(to right, 
+    `linear-gradient(to right in lab, 
      lab(${values.lightness} -125 ${values['lab-b']}), 
      lab(${values.lightness} 0 ${values['lab-b']}), 
      lab(${values.lightness} 125 ${values['lab-b']}))`,
@@ -255,7 +255,7 @@ const labBStrategy = (): SliderStrategy => ({
     return color
   },
   getTrackStyle: values =>
-    `linear-gradient(to right, 
+    `linear-gradient(to right in lab, 
      lab(${values.lightness} ${values['lab-a']} -125), 
      lab(${values.lightness} ${values['lab-a']} 0), 
      lab(${values.lightness} ${values['lab-a']} 125))`,
@@ -273,7 +273,7 @@ const oklabAStrategy = (): SliderStrategy => ({
     return color
   },
   getTrackStyle: values =>
-    `linear-gradient(to right, 
+    `linear-gradient(to right in oklab, 
     oklab(${values.lightness} -0.4 ${values['oklab-b']}), 
     oklab(${values.lightness} 0 ${values['oklab-b']}),
     oklab(${values.lightness} 0.4 ${values['oklab-b']}))`,
@@ -291,7 +291,7 @@ const oklabBStrategy = (): SliderStrategy => ({
     return color
   },
   getTrackStyle: values =>
-    `linear-gradient(to right, 
+    `linear-gradient(to right in oklab, 
      oklab(${values.lightness} ${values['oklab-a']} -0.4),
      oklab(${values.lightness} ${values['oklab-a']} 0), 
      oklab(${values.lightness} ${values['oklab-a']} 0.4))`,
