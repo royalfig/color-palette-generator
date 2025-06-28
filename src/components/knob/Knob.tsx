@@ -39,6 +39,8 @@ type KnobProps = {
 }
 
 export function Knob({ initialValues, onChange }: KnobProps) {
+  const SENSITIVITY = 1 // Dragging sensitivity: higher = faster
+  const WHEEL_STEP = 5 // Mouse wheel step size
   const [values, setValues] = useState(initialValues)
   const [dragging, setDragging] = useState<number | null>(null)
   const draggingIndex = useRef<number | null>(null)
@@ -67,7 +69,9 @@ export function Knob({ initialValues, onChange }: KnobProps) {
     const idx = draggingIndex.current
     const deltaY = e.clientY - lastY.current
     lastY.current = e.clientY
-    setValues(prev => prev.map((v, i) => (i === idx ? Math.max(0, Math.min(100, Math.round(v + deltaY))) : v)))
+    setValues(prev =>
+      prev.map((v, i) => (i === idx ? Math.max(0, Math.min(100, Math.round(v + deltaY * SENSITIVITY))) : v)),
+    )
   }
 
   const handlePointerUp = () => {
@@ -89,6 +93,13 @@ export function Knob({ initialValues, onChange }: KnobProps) {
     }
   }
 
+  // Mouse wheel support
+  const handleWheel = (idx: number, e: React.WheelEvent) => {
+    setValues(prev =>
+      prev.map((v, i) => (i === idx ? Math.max(0, Math.min(100, v - Math.sign(e.deltaY) * WHEEL_STEP)) : v)),
+    )
+  }
+
   // Double-click to reset
   const handleDoubleClick = (idx: number) => {
     setValues(prev => prev.map((v, i) => (i === idx ? knobConfigs[idx].defaultValue : v)))
@@ -108,6 +119,7 @@ export function Knob({ initialValues, onChange }: KnobProps) {
               onPointerDown={e => handlePointerDown(idx, e)}
               onKeyDown={e => handleKeyDown(idx, e)}
               onDoubleClick={() => handleDoubleClick(idx)}
+              onWheel={e => handleWheel(idx, e)}
             >
               <div className="knob-inner-shadow"></div>
               <div className="knob-inner">
