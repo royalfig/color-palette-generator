@@ -3,6 +3,7 @@ import { ColorContext } from '../ColorContext'
 import './color-display.css'
 import { ScissorsIcon } from '@phosphor-icons/react/dist/csr/Scissors'
 import { ColorSpace, ColorFormat } from '../../types'
+import { AnimatePresence, motion } from 'motion/react'
 
 function formatColorValues(values: number[] | undefined, format: string[], times100 = true) {
   if (!values) {
@@ -56,8 +57,37 @@ export function ColorDisplay({
   return (
     <div className="current-color-display flex col align-start" onClick={handleClick}>
       <div className="header flex justify-start gap-04">
-        <div className="color-dot" style={{ '--color': color?.string || '#000' } as React.CSSProperties}></div>
-        <h1>{colorName}</h1>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            className="color-dot"
+            style={{ '--color': color?.string || '#000' } as React.CSSProperties}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            key={color?.string + '-dot'}
+          ></motion.div>
+          <div>
+            <motion.h1
+              initial={{ opacity: 0, x: -3 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 3 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              key={colorName + '-name'}
+            >
+              {colorName}
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, x: 3 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -3 }}
+              transition={{ duration: 0.18, ease: 'easeOut', delay: 0.05 }}
+              key={colorName + '-palette'}
+            >
+              in {fetchedData?.paletteTitle}
+            </motion.p>
+          </div>
+        </AnimatePresence>
       </div>
 
       <div className={`color-details ${colorSpace.format}`}>

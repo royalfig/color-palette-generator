@@ -1,7 +1,6 @@
-import { SwatchesIcon } from '@phosphor-icons/react/dist/csr/Swatches'
-import './palette-display.css'
+import { PaletteKinds } from '../../types'
 import { Circle } from '../circle/Circle'
-import { ColorSpace, PaletteKinds } from '../../types'
+import './palette-display.css'
 
 function getPaletteType(paletteType: PaletteKinds) {
   switch (paletteType) {
@@ -20,31 +19,15 @@ function getPaletteType(paletteType: PaletteKinds) {
   }
 }
 
-export function PaletteDisplay({
-  fetchedData,
-  isLoading,
-  error,
-  paletteType,
-  paletteStyle,
-}: {
-  fetchedData: { colorNames: string[]; paletteTitle: string } | null
-  isLoading: boolean
-  error: Error | null
-  paletteType: PaletteKinds
-  paletteStyle: 'square' | 'triangle' | 'circle' | 'diamond'
-}) {
-  const paletteName = fetchedData?.paletteTitle
+export function PaletteDisplay({ paletteType }: { paletteType: PaletteKinds }) {
   const paletteTypeFullName = getPaletteType(paletteType)
   return (
     <div className="palette-display">
-      <h2 className="palette-name">{paletteName}</h2>
       <div className="circle-container">
         <Circle type="default" />
       </div>
       <div className="flex gap-02">
         <p className="palette-type">{paletteTypeFullName}</p>
-        {/* <SwatchesIcon size={20} color="#777" weight="fill" />
-        <p className="palette-style">{paletteStyle}</p> */}
       </div>
     </div>
   )
