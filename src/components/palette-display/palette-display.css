@@ -1,10 +1,5 @@
 .palette-display {
-  display: flex;
-  flex-direction: column;
-  grid-column: 5 / 7;
-  gap: 1rem;
-  align-items: center;
-  justify-content: space-between;
+  flex: 1;
 }
 
 .palette-name {
@@ -24,10 +19,8 @@
 }
 
 .circle-container {
-  width: 100%;
+  width: 130px;
   aspect-ratio: 1/1;
-
-  /* padding-inline: 0.5rem; */
   margin-inline: auto;
 }
 

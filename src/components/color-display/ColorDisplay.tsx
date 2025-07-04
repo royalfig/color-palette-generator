@@ -2,8 +2,13 @@ import { useContext } from 'react'
 import { ColorContext } from '../ColorContext'
 import './color-display.css'
 import { ScissorsIcon } from '@phosphor-icons/react/dist/csr/Scissors'
-import { ColorSpace, ColorFormat } from '../../types'
+import { ColorSpace, ColorFormat, PaletteKinds, PaletteStyle } from '../../types'
 import { AnimatePresence, motion } from 'motion/react'
+import { PaletteDisplay } from '../palette-display/PaletteDisplay'
+import { PaletteIcon } from '@phosphor-icons/react/dist/csr/Palette'
+import { SwatchesIcon } from '@phosphor-icons/react/dist/csr/Swatches'
+import { CirclesFourIcon } from '@phosphor-icons/react/dist/csr/CirclesFour'
+import { FadersHorizontalIcon } from '@phosphor-icons/react/dist/csr/FadersHorizontal'
 
 function formatColorValues(values: number[] | undefined, format: string[], times100 = true) {
   if (!values) {
@@ -24,21 +29,47 @@ function formatColorValues(values: number[] | undefined, format: string[], times
     .join(' ')
 }
 
+function getPaletteType(paletteType: PaletteKinds) {
+  switch (paletteType) {
+    case 'ana':
+      return 'Analogous'
+    case 'com':
+      return 'Complementary'
+    case 'tri':
+      return 'Triadic'
+    case 'tet':
+      return 'Tetradic'
+    case 'spl':
+      return 'Split Complementary'
+    case 'tas':
+      return 'Tints & Shades'
+  }
+}
+
 export function ColorDisplay({
   fetchedData,
   isLoading,
   error,
   colorSpace,
+  paletteType,
+  paletteStyle,
+  knobValues,
 }: {
   fetchedData: { colorNames: string[]; paletteTitle: string; baseColorName: string } | null
   isLoading: boolean
   error: Error | null
   colorSpace: { space: ColorSpace; format: ColorFormat }
+  paletteType: PaletteKinds
+  paletteStyle: PaletteStyle
+  knobValues: number[]
 }) {
   const colorName = fetchedData?.baseColorName
   const context = useContext(ColorContext)
   const color = context?.originalColor
   const { lch, oklch, lab, oklab, p3, hsl, rgb, hex } = color?.conversions || {}
+
+  const paletteTypeFull = getPaletteType(paletteType)
+  const effectsEnabled = knobValues.some(value => value > 0)
 
   const handleClick = async (e: React.MouseEvent<HTMLDivElement>) => {
     const el = (e.target as HTMLElement).closest('[data-value]')
@@ -56,92 +87,137 @@ export function ColorDisplay({
 
   return (
     <div className="current-color-display flex col align-start" onClick={handleClick}>
-      <div className="header flex justify-start gap-04">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            className="color-dot"
-            style={{ '--color': color?.string || '#000' } as React.CSSProperties}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
-            key={color?.string + '-dot'}
-          ></motion.div>
-          <div>
-            <motion.h1
-              initial={{ opacity: 0, x: -3 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 3 }}
+      <div className="header-container">
+        <div className="header flex justify-start gap-04">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              className="color-dot"
+              style={{ '--color': color?.string || '#000' } as React.CSSProperties}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
-              key={colorName + '-name'}
-            >
-              {colorName}
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, x: 3 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -3 }}
-              transition={{ duration: 0.18, ease: 'easeOut', delay: 0.05 }}
-              key={colorName + '-palette'}
-            >
-              in {fetchedData?.paletteTitle}
-            </motion.p>
-          </div>
-        </AnimatePresence>
-      </div>
+              key={color?.string + '-dot'}
+            ></motion.div>
+            <div>
+              <motion.h1
+                initial={{ opacity: 0, x: -3 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 3 }}
+                transition={{ duration: 0.18, ease: 'easeOut' }}
+                key={colorName + '-name'}
+              >
+                {colorName}
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0, x: 3 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -3 }}
+                transition={{ duration: 0.18, ease: 'easeOut', delay: 0.05 }}
+                key={colorName + '-palette'}
+              >
+                in {fetchedData?.paletteTitle}
+              </motion.p>
+            </div>
+          </AnimatePresence>
+        </div>
 
+        <PaletteDisplay paletteType={paletteType} />
+      </div>
       <div className={`color-details ${colorSpace.format}`}>
-        <div className="color-detail ">
-          <div className="color-text">
-            <p className="color-label oklch">OKLCH</p>
+        <div className="color-detail">
+          <div className="color-text oklch">
+            <p className="color-label">OKLCH</p>
             <p data-value={oklch?.value}>{formatColorValues(oklch?.coords, ['percent', 'none', 'none'])}</p>
           </div>
         </div>
         <div className="color-detail">
-          <div className="color-text">
-            <p className="color-label lch">LCH</p>
+          <div className="color-text lch">
+            <p className="color-label">LCH</p>
             <p data-value={lch?.value}>{lch.coords.join(' ')}</p>
           </div>
         </div>
         <div className="color-detail">
-          <div className="color-text">
-            <p className="color-label oklab">OKLAB</p>
+          <div className="color-text oklab">
+            <p className="color-label">OKLAB</p>
             <p data-value={oklab?.value}>{formatColorValues(oklab?.coords, ['percent', 'none', 'none'])}</p>
           </div>
         </div>
         <div className="color-detail">
-          <div className="color-text">
-            <p className="color-label lab">LAB</p>
+          <div className="color-text lab">
+            <p className="color-label">LAB</p>
             <p data-value={lab?.value}>{lab.coords.join(' ')}</p>
           </div>
         </div>
         <div className="color-detail">
           <ScissorsIcon weight="fill" color={p3?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <div className="color-text">
-            <p className="color-label p3">P3</p>
+          <div className="color-text p3">
+            <p className="color-label">P3</p>
             <p data-value={p3?.value}>{p3.coords.join(' ')}</p>
           </div>
         </div>
 
-        <div className="color-detail">
+        <div className="color-detail ">
           <ScissorsIcon weight="fill" color={hsl?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <div className="color-text">
-            <p className="color-label hsl">HSL</p>
+          <div className="color-text hsl">
+            <p className="color-label">HSL</p>
             <p data-value={hsl?.value}>{formatColorValues(hsl?.coords, ['none', 'percent', 'percent'], false)}</p>
           </div>
         </div>
-        <div className="color-detail ">
+        <div className="color-detail">
           <ScissorsIcon weight="fill" color={rgb?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <div className="color-text">
-            <p className="color-label rgb">RGB</p>
+          <div className="color-text rgb">
+            <p className="color-label">RGB</p>
             <p data-value={rgb?.value}>{formatColorValues(rgb?.coords, ['percent', 'percent', 'percent'])}</p>
           </div>
         </div>
         <div className="color-detail">
           <ScissorsIcon weight="fill" color={hex?.isInGamut ? 'var(--dimmed)' : 'var(--warning)'} size={14} />
-          <div className="color-text">
-            <p className="color-label hex">HEX</p>
+          <div className="color-text hex">
+            <p className="color-label">HEX</p>
             <p data-value={hex.value}>{hex.value}</p>
+          </div>
+        </div>
+        <div className="color-detail">
+          <PaletteIcon
+            weight="fill"
+            size={14}
+            color={context.palette[0].color.clone().to('lch').set({ l: 80 }).display()}
+          />
+          <div className="color-text">
+            <p>Palette Mode</p>
+          </div>
+        </div>
+        <div className="color-detail">
+          <SwatchesIcon
+            weight="fill"
+            size={14}
+            color={context.palette[1].color.clone().to('lch').set({ l: 80 }).display()}
+          />
+          <div className="color-text">
+            <p>{paletteTypeFull}</p>
+          </div>
+        </div>
+        <div className="color-detail">
+          <CirclesFourIcon
+            weight="fill"
+            color={context.palette[2].color.clone().to('lch').set({ l: 80 }).display()}
+            size={14}
+          />
+          <div className="color-text">
+            <p>{paletteStyle} Variant</p>
+          </div>
+        </div>
+        <div className="color-detail">
+          <FadersHorizontalIcon
+            weight="fill"
+            color={
+              effectsEnabled ? context.palette[3].color.clone().to('lch').set({ l: 80 }).display() : 'var(--dimmed)'
+            }
+            size={14}
+          />
+          <div className="color-text">
+            <p style={{ color: effectsEnabled ? '' : 'var(--dimmed)' }}>Effects Enabled</p>
           </div>
         </div>
       </div>

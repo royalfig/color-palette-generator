@@ -7,3 +7,10 @@
 .circle svg {
   display: block;
 }
+
+.circle text {
+  padding-block-end: 5px;
+  font-size: 14px;
+  text-transform: uppercase;
+  fill: #ddd;
+}

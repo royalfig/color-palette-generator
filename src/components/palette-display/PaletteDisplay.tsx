@@ -26,9 +26,6 @@ export function PaletteDisplay({ paletteType }: { paletteType: PaletteKinds }) {
       <div className="circle-container">
         <Circle type="default" />
       </div>
-      <div className="flex gap-02">
-        <p className="palette-type">{paletteTypeFullName}</p>
-      </div>
     </div>
   )
 }

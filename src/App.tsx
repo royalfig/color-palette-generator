@@ -161,6 +161,10 @@ export default function App() {
     setColorHistory(prev => {
       let updated = prev.filter(c => c !== colorContext.originalColor.string)
       updated.push(colorContext.originalColor.string)
+      // Limit to 240 colors, drop oldest if exceeded
+      if (updated.length > 240) {
+        updated = updated.slice(updated.length - 240)
+      }
       localStorage.setItem('color-history', JSON.stringify(updated))
       return updated
     })
@@ -219,14 +223,11 @@ export default function App() {
                   isLoading={isLoading}
                   error={colorNameError}
                   colorSpace={colorSpace}
-                />
-                <PaletteDisplay
-                  fetchedData={fetchedData}
-                  isLoading={isLoading}
-                  error={colorNameError}
                   paletteType={paletteType}
                   paletteStyle={paletteStyle}
+                  knobValues={knobValues}
                 />
+
                 <AuxillaryDisplay
                   showPaletteColors={showPaletteColors}
                   colorSpace={colorSpace}
