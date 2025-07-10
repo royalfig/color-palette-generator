@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 import { ColorContext } from '../ColorContext'
 import './section-header.css'
+import { motion } from 'motion/react'
 
 function VibrancyModule() {
   const context = useContext(ColorContext)
@@ -14,8 +15,8 @@ function VibrancyModule() {
 
   return (
     <div className="vibrancy-module">
-      <div className="vibrancy-module-inner" style={{ background: linearGradient }}></div>
-      <div className="vibrancy-module-blur" style={{ background: linearGradient }}></div>
+      <motion.div className="vibrancy-module-inner" animate={{ background: linearGradient }}></motion.div>
+      <motion.div className="vibrancy-module-blur" animate={{ background: linearGradient }}></motion.div>
     </div>
   )
 }

@@ -1,21 +1,4 @@
 /* Src ❤️ https://codepen.io/nicolasjesenberger/details/gOqzJed */
-:root {
-  --background-color: hsl(248deg 11% 80%);
-  --background-color-active: hsl(248deg 11% 78%);
-  --light-shadow-color: hsl(248deg 11% 95%);
-  --dark-shadow-color: hsl(248deg 11% 5%);
-  --button-container-shadow: ;
-  --button-rim: linear-gradient(to bottom, #fff, #000);
-  --button-active: linear-gradient(to bottom, hsl(30deg 2% 75%), hsl(0deg 0% 75%));
-  --active-button-text-shadow: 0 0 0.5px color-mix(in oklch, var(--base-color) 55%, var(--element));
-  --active-button-text-color: color-mix(in oklch, var(--base-color) 25%, var(--element));
-  --icon-gradient-top: hsl(249deg 50% 0%);
-  --icon-gradient-center: hsl(240deg 1% 55%);
-  --inverse-element: #fff;
-  --button-container: #000;
-  --button-background: linear-gradient(to bottom, #cdcccb, #ccc);
-  --inverse-button-background: linear-gradient(to bottom, hsl(248deg 0 30%), hsl(248deg 0 25%));
-}
 
 .button-container.inverse {
   --icon-gradient-center: hsl(0deg 0% 59%);
@@ -28,15 +11,6 @@
 }
 
 [data-mode='dark'] {
-  --button-rim: linear-gradient(to bottom, #000, #fff);
-  --button-active: linear-gradient(to bottom, hsl(30deg 2% 25%), hsl(0deg 0% 25%));
-  --active-button-text-shadow: 0 0 0.5px color-mix(in oklch, var(--base-color) 55%, var(--element));
-  --active-button-text-color: color-mix(in oklch, var(--base-color) 25%, var(--element));
-  --inverse-element: #fff;
-  --inverse-button-background: linear-gradient(to bottom, hsl(0deg 0% 85%), hsl(248deg 11% 75%));
-  --icon-gradient-center: hsl(0deg 0% 59%);
-  --icon-gradient-top: hsl(260deg 5% 89%);
-
   .button-container.inverse {
     --icon-gradient-top: hsl(249deg 50% 0%);
     --icon-gradient-center: hsl(240deg 1% 55%);
@@ -55,7 +29,7 @@
   box-shadow: none;
 
   &:has(button:active, button.active) {
-    box-shadow: 0 1px 1px white;
+    box-shadow: var(--button-active-shadow);
   }
 
   & button {
@@ -72,8 +46,7 @@
     text-transform: uppercase;
     background-image: var(--button-background);
     border-radius: 6px;
-    box-shadow: inset 0 1px 1px rgb(255 255 255 / 92.8%), inset 0 -1px 1px rgb(0 0 0 / 83.3%),
-      var(--shadow-elevation-high);
+    box-shadow: var(--button-shadow);
 
     &:active,
     &.active {

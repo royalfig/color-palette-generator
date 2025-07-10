@@ -28,7 +28,7 @@ export function Slider({
 
   const debouncedColorUpdate = useDebouncedCallback((newValue: number) => {
     const newColor = updateColor(base.color.clone(), newValue)
-    setColor(newColor.toString())
+    setColor(newColor.toString({ format: colorSpace.format, precision: 3 }))
   }, 100)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,6 +100,13 @@ export function Slider({
     #${sliderId}::-webkit-slider-thumb {
       background-color: ${thumbColor};
       box-shadow: 0 3px 1px hsl(0deg 0% 0% / 45%), 0 3px 4px hsl(0deg 0% 0% / 25%), 0 -0.5px 0 0.5px color-mix(in oklch, ${thumbColor}, white 75%), 0 0.5px 0 1px color-mix(in oklch, ${thumbColor}, black 75%);
+    }
+    #${sliderId}::-moz-range-thumb {
+      background-color: ${thumbColor};
+      box-shadow: 0 3px 1px hsl(0deg 0% 0% / 45%), 0 3px 4px hsl(0deg 0% 0% / 25%), 0 -0.5px 0 0.5px color-mix(in oklch, ${thumbColor}, white 75%), 0 0.5px 0 1px color-mix(in oklch, ${thumbColor}, black 75%);
+    }
+    #${sliderId}::-moz-range-track {
+      background: ${trackStyle};
     }
     `
 

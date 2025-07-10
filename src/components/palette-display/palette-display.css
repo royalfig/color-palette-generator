@@ -11,7 +11,7 @@
   font-size: 1.2rem;
   font-weight: 400;
   line-height: 1.4;
-  color: #fff;
+  color: var(--white);
 
   svg {
     flex-shrink: 0;
@@ -31,9 +31,7 @@
   font-size: 0.8rem;
   font-weight: 400;
   line-height: 1.4;
-  color: #cbcbcb;
-
-  /* text-align: center; */
+  color: var(--text-muted);
   text-transform: uppercase;
   white-space: nowrap;
 }

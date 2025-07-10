@@ -1,14 +1,14 @@
 .manual-container {
-  padding: var(--box-padding);
-  color: var(--elemnt);
-  background-color: var(--bg);
-}
+  line-height: 1.4;
+  color: var(--element);
+  background: color-mix(in oklch, black 10%, var(--paper));
 
-.manual-content {
-  max-width: 65ch;
-  min-height: 100lvh;
-  padding: 2rem;
-  margin-inline: auto;
+  .divider {
+    height: 1px;
+    margin-block: 1rem;
+    background: var(--element);
+    opacity: 0.15;
+  }
 
   h1,
   h2,
@@ -20,6 +20,7 @@
   }
 
   h1 {
+    margin: 0;
     font-family: Orbitron, sans-serif;
   }
 
@@ -29,5 +30,27 @@
 
   ol {
     list-style-position: inside;
+  }
+
+  .manual-section {
+    position: relative;
+    min-height: 100svh;
+    padding: 1rem;
+    margin-block: 1rem;
+    counter-increment: manual-section;
+    background: var(--paper);
+
+    &::after {
+      position: absolute;
+      right: 1rem;
+      bottom: 1rem;
+      font-size: 10px;
+      content: counter(manual-section);
+    }
+
+    & > * {
+      max-width: 50ch;
+      margin-inline: auto;
+    }
   }
 }

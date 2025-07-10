@@ -1,4 +1,5 @@
 :root {
+  /* === SPACING & LAYOUT === */
   --spacing-01: 0.125rem;
   --spacing-02: 0.25rem;
   --spacing-03: 0.5rem;
@@ -13,48 +14,99 @@
   --spacing-12: 6rem;
   --spacing-13: 10rem;
   --gap: var(--spacing-06);
-  --radius: 12px;
-  --radius-sm: 2px;
-  --small: 0.833rem;
-  --x-small: min(0.75rem, 12px);
+  --base-gap: 20px;
   --button-padding: 0.4em 0.8em;
   --box-padding: 1rem;
   --space-after: 2rem;
   --max-viewport: 65rem;
+
+  /* === TYPOGRAPHY === */
+  --font-brand: 'Orbitron', system-ui, sans-serif;
   --letter-spacing: 0.3px;
+  --small: 0.833rem;
+  --x-small: min(0.75rem, 12px);
+
+  /* === BORDERS & RADIUS === */
+  --radius: 12px;
+  --radius-sm: 2px;
+  --border-color: hsl(0deg 0% 50% / 45%);
+  --border: hsl(248deg 11% 65% / 75%);
+
+  /* === CORE COLORS === */
+  --white: #fff;
+  --black: #000;
+  --text-muted: #cbcbcb;
+  --dimmed: #333;
+
+  /* === SEMANTIC COLORS === */
+  --success: oklch(100% 0.4 150deg);
+  --error: oklch(100% 0.4 21deg);
+  --warning: rgb(255 165 0);
+
+  /* === THEME COLORS === */
+  --element: hsl(248deg 11% 15%);
+  --element-dim: hsl(248deg 11% 10%);
+  --bg: linear-gradient(to bottom, #f8f8f8, #e3e0dc);
+  --paper: #f8f8f8;
+  --synth-body: linear-gradient(to bottom, #e3e0dc, #afaeac);
+  --icon-element: linear-gradient(to bottom, hsl(0deg 0% 5%), #e3e0dc, hsl(0deg 0% 5%));
+
+  /* === SHADOWS === */
+  --shadow-color: 0 2% 32%;
   --shadow-md: 0.3px 0.5px 0.7px var(--shadow-color), 0.8px 1.6px 2px -0.8px var(--shadow-color),
     2.1px 4.1px 5.2px -1.7px var(--shadow-color), 5px 10px 12.6px -2.5px var(--shadow-color);
   --shadow-sm: 0.3px 0.5px 0.7px var(--shadow-color), 0.4px 0.8px 1px -1.2px var(--shadow-color),
     1px 2px 2.5px -2.5px var(--shadow-color);
-  --font-brand: 'Orbitron', system-ui, sans-serif;
-  --border-color: hsl(0deg 0% 50% / 45%);
-  --element: hsl(248deg 11% 15%);
-  --element-dim: hsl(248deg 11% 10%);
-  --border: hsl(248deg 11% 65% / 75%);
-  --dimmed: #333;
-  --success: oklch(100% 0.4 150deg);
-  --error: oklch(100% 0.4 21deg);
-  --warning: rgb(255 165 0);
-  --synth-body: linear-gradient(to bottom, #e3e0dc, #afaeac);
-  --bg: #f8f8f8;
-  --icon-element: linear-gradient(to bottom, hsl(0deg 0% 5%), #e3e0dc, hsl(0deg 0% 5%));
-  --base-gap: 20px;
-  --shadow-color: 0 2% 32%;
   --shadow-elevation-high: 0px 0.5px 0.6px hsl(var(--shadow-color) / 34%),
     0px 2.9px 3.3px -0.4px hsl(var(--shadow-color) / 34%), 0px 5.5px 6.2px -0.7px hsl(var(--shadow-color) / 34%),
     -0.1px 9px 10.1px -1.1px hsl(var(--shadow-color) / 34%), -0.1px 14.4px 16.2px -1.4px hsl(var(--shadow-color) / 34%),
     -0.2px 22.5px 25.3px -1.8px hsl(var(--shadow-color) / 34%),
     -0.2px 34.2px 38.5px -2.1px hsl(var(--shadow-color) / 34%),
     -0.4px 50.4px 56.7px -2.5px hsl(var(--shadow-color) / 34%);
+
+  /* === BUTTON COLORS === */
+  --button-background-color: hsl(248deg 11% 80%);
+  --button-background-color-active: hsl(248deg 11% 78%);
+  --button-light-shadow-color: hsl(248deg 11% 95%);
+  --button-dark-shadow-color: hsl(248deg 11% 5%);
+  --button-container: var(--black);
+  --button-background: linear-gradient(to bottom, #cdcccb, #ccc);
+  --button-rim: linear-gradient(to bottom, var(--white), var(--black));
+  --button-active: linear-gradient(to bottom, hsl(30deg 2% 75%), hsl(0deg 0% 75%));
+  --button-shadow: inset 0 1px 1px rgb(255 255 255 / 92.8%), inset 0 -1px 1px rgb(0 0 0 / 83.3%),
+    var(--shadow-elevation-high);
+  --button-active-shadow: 0 1px 1px var(--white);
+  --inverse-button-background: linear-gradient(to bottom, hsl(248deg 0 30%), hsl(248deg 0 25%));
+  --inverse-element: var(--white);
+  --active-button-text-shadow: 0 0 0.5px color-mix(in oklch, var(--base-color) 55%, var(--element));
+  --active-button-text-color: color-mix(in oklch, var(--base-color) 25%, var(--element));
+  --icon-gradient-top: hsl(249deg 50% 0%);
+  --icon-gradient-center: hsl(240deg 1% 55%);
+
+  /* === KNOB COLORS === */
+  --knob-background: linear-gradient(rgb(236 236 236), rgb(188 188 188));
+  --knob-shadow: 0 -1px 0 1px rgb(245 245 245), 0 2px 2px hsl(0deg 0% 0% / 35%);
+  --knob-inner-background: linear-gradient(rgb(238 238 238), rgb(227 226 226));
+  --knob-inner-shadow: 0 -1px 0 1px var(--white), 0 2px 2px hsl(0deg 0% 0% / 35%), var(--shadow-elevation-high);
+  --knob-indicator-background: var(--black);
+
+  /* === SLIDER COLORS === */
+  --slider-shadow-color: 40deg 2% 44%;
+  --slider-border-color: rgb(83 83 83);
+  --slider-shadow: #00000068;
 }
 
 [data-mode='dark'] {
+  /* === THEME COLORS === */
   --synth-body: hsl(248deg 11% 15%);
   --element: hsl(248deg 11% 85%);
   --element-dim: hsl(248deg 11% 70%);
   --border: hsl(248deg 11% 35%);
+  --paper: hsl(248deg 11% 15%);
   --bg: linear-gradient(to bottom in oklab, hsl(248deg 11% 25%), hsl(248deg 11% 5%));
   --button-background: linear-gradient(to bottom, hsl(248deg 11% 15%), hsl(248deg 11% 15%));
+
+  /* === SHADOWS === */
   --shadow-color: 0 2% 5%;
   --shadow-elevation-high: 0px 0.5px 0.6px hsl(var(--shadow-color) / 34%),
     0px 2.9px 3.3px -0.4px hsl(var(--shadow-color) / 34%), 0px 5.5px 6.2px -0.7px hsl(var(--shadow-color) / 34%),
@@ -62,4 +114,21 @@
     -0.2px 22.5px 25.3px -1.8px hsl(var(--shadow-color) / 34%),
     -0.2px 34.2px 38.5px -2.1px hsl(var(--shadow-color) / 34%),
     -0.4px 50.4px 56.7px -2.5px hsl(var(--shadow-color) / 34%);
+
+  /* === BUTTON COLORS === */
+  --button-rim: linear-gradient(to bottom, var(--black), var(--white));
+  --button-active: linear-gradient(to bottom, hsl(30deg 2% 25%), hsl(0deg 0% 25%));
+  --button-shadow: inset 0 1px 1px rgb(255 255 255 / 32.8%), inset 0 -1px 1px rgb(0 0 0 / 83.3%),
+    var(--shadow-elevation-high);
+  --button-active-shadow: 0 1px 1px rgb(255 255 255 / 32.8%);
+  --inverse-button-background: linear-gradient(to bottom, hsl(0deg 0% 85%), hsl(248deg 11% 75%));
+  --icon-gradient-center: hsl(0deg 0% 59%);
+  --icon-gradient-top: hsl(260deg 5% 89%);
+
+  /* === KNOB COLORS === */
+  --knob-background: linear-gradient(rgb(40 40 40), rgb(20 20 20));
+  --knob-shadow: 0 -1px 0 1px rgb(79 79 79), 0 2px 2px hsl(0deg 0% 0% / 35%);
+  --knob-inner-background: linear-gradient(rgb(40 40 40), rgb(20 20 20));
+  --knob-inner-shadow: 0 -1px 0 1px rgb(82 82 82), 0 2px 2px hsl(0deg 0% 0% / 35%), var(--shadow-elevation-high);
+  --knob-indicator-background: var(--white);
 }

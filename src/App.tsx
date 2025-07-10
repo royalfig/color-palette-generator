@@ -74,6 +74,9 @@ export default function App() {
   const initialPaletteType = (params.get('paletteType') as PaletteKinds) || 'spl'
   const initialPaletteStyle = (params.get('paletteStyle') as 'square' | 'triangle' | 'circle' | 'diamond') || 'square'
   const initialColorFormat = (params.get('colorFormat') as ColorFormat) || 'oklch'
+  const initialKnobValues = params.get('effects') 
+    ? params.get('effects')!.split(',').map(v => parseFloat(v) || 0)
+    : [0, 0, 0, 0]
   // If you want to support colorSpace as a param, otherwise default to 'oklch'
   const parsedInitialColorSpace = (initialColorFormat: ColorFormat): ColorSpaceAndFormat => {
     switch (initialColorFormat) {
@@ -106,7 +109,7 @@ export default function App() {
   const [colorHistory, setColorHistory] = useState<string[]>([])
   const [paletteStyle, setPaletteStyle] = useState<'square' | 'triangle' | 'circle' | 'diamond'>(initialPaletteStyle)
   const [colorSpace, setColorSpace] = useState<ColorSpaceAndFormat>(parsedInitialColorSpace(initialColorFormat))
-  const [knobValues, setKnobValues] = useState([0, 0, 0, 0])
+  const [knobValues, setKnobValues] = useState(initialKnobValues)
 
   const { isDarkMode, toggleDarkMode } = useDarkMode()
   const [message, setMessage] = useState<string | null>(null)
@@ -160,6 +163,7 @@ export default function App() {
   useEffect(() => {
     setColorHistory(prev => {
       let updated = prev.filter(c => c !== colorContext.originalColor.string)
+      console.log(updated)
       updated.push(colorContext.originalColor.string)
       // Limit to 240 colors, drop oldest if exceeded
       if (updated.length > 240) {
@@ -168,17 +172,34 @@ export default function App() {
       localStorage.setItem('color-history', JSON.stringify(updated))
       return updated
     })
-    // Update URL params only if color actually changed
+  }, [colorContext.originalColor.string])
+
+  // Update URL params whenever any relevant parameter changes
+  useEffect(() => {
     const colorUrl = new URLSearchParams(document.location.search)
     const currentColor = colorUrl.get('color')
-    if (currentColor !== colorContext.originalColor.string) {
+    const currentPaletteType = colorUrl.get('paletteType')
+    const currentPaletteStyle = colorUrl.get('paletteStyle')
+    const currentColorFormat = colorUrl.get('colorFormat')
+    const currentEffects = colorUrl.get('effects')
+    
+    const effectsString = knobValues.join(',')
+    const needsUpdate = 
+      currentColor !== colorContext.originalColor.string ||
+      currentPaletteType !== paletteType ||
+      currentPaletteStyle !== paletteStyle ||
+      currentColorFormat !== colorSpace.format ||
+      currentEffects !== effectsString
+    
+    if (needsUpdate) {
       colorUrl.set('color', colorContext.originalColor.string)
       colorUrl.set('paletteType', paletteType)
       colorUrl.set('paletteStyle', paletteStyle)
       colorUrl.set('colorFormat', colorSpace.format)
+      colorUrl.set('effects', effectsString)
       window.history.pushState({}, '', `${window.location.pathname}?${colorUrl.toString()}`)
     }
-  }, [colorContext.originalColor.string, paletteType, paletteStyle, colorSpace, palette])
+  }, [colorContext.originalColor.string, paletteType, paletteStyle, colorSpace.format, knobValues])
 
   useEffect(() => {
     updateFavicon(colorContext.originalColor.cssValue)
@@ -189,8 +210,25 @@ export default function App() {
     const handlePopState = () => {
       const params = new URLSearchParams(window.location.search)
       const colorParam = params.get('color')
+      const paletteTypeParam = params.get('paletteType')
+      const paletteStyleParam = params.get('paletteStyle')
+      const colorFormatParam = params.get('colorFormat')
+      const effectsParam = params.get('effects')
+      
       if (colorParam) {
         setColor(colorParam)
+      }
+      if (paletteTypeParam) {
+        setPaletteType(paletteTypeParam as PaletteKinds)
+      }
+      if (paletteStyleParam) {
+        setPaletteStyle(paletteStyleParam as 'square' | 'triangle' | 'circle' | 'diamond')
+      }
+      if (colorFormatParam) {
+        setColorSpace(parsedInitialColorSpace(colorFormatParam as ColorFormat))
+      }
+      if (effectsParam) {
+        setKnobValues(effectsParam.split(',').map(v => parseFloat(v) || 0))
       }
     }
 

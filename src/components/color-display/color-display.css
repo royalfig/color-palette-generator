@@ -10,9 +10,10 @@
   }
 
   .header {
+    min-width: 200px;
     height: 50px;
     margin-block-end: 1rem;
-    color: #fff;
+    color: var(--white);
   }
 
   h1 {
@@ -35,7 +36,7 @@
   gap: 0 var(--spacing-05);
   width: 100%;
   font-size: 12px;
-  color: #cbcbcb;
+  color: var(--text-muted);
   text-transform: uppercase;
 }
 
@@ -76,33 +77,33 @@ svg + .color-text > .color-label {
 }
 
 .lch .lch {
-  color: #fff;
+  color: var(--white);
 }
 
 .oklch .oklch {
-  color: #fff;
+  color: var(--white);
 }
 
 .lab .lab {
-  color: #fff;
+  color: var(--white);
 }
 
 .oklab .oklab {
-  color: #fff;
+  color: var(--white);
 }
 
 .p3 .p3 {
-  color: #fff;
+  color: var(--white);
 }
 
 .hsl .hsl {
-  color: #fff;
+  color: var(--white);
 }
 
 .rgb .rgb {
-  color: #fff;
+  color: var(--white);
 }
 
 .hex .hex {
-  color: #fff;
+  color: var(--white);
 }

@@ -25,7 +25,7 @@
 
     /* Thumb: webkit */
     &::-webkit-slider-thumb {
-      --shadow-color: 40deg 2% 44%;
+      --shadow-color: var(--slider-shadow-color);
 
       position: relative;
       width: 18px;

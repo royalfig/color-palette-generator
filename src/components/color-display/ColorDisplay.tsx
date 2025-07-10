@@ -3,7 +3,7 @@ import { ColorContext } from '../ColorContext'
 import './color-display.css'
 import { ScissorsIcon } from '@phosphor-icons/react/dist/csr/Scissors'
 import { ColorSpace, ColorFormat, PaletteKinds, PaletteStyle } from '../../types'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, LayoutGroup, motion } from 'motion/react'
 import { PaletteDisplay } from '../palette-display/PaletteDisplay'
 import { PaletteIcon } from '@phosphor-icons/react/dist/csr/Palette'
 import { SwatchesIcon } from '@phosphor-icons/react/dist/csr/Swatches'
@@ -89,37 +89,26 @@ export function ColorDisplay({
     <div className="current-color-display flex col align-start" onClick={handleClick}>
       <div className="header-container">
         <div className="header flex justify-start gap-04">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              className="color-dot"
-              style={{ '--color': color?.string || '#000' } as React.CSSProperties}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
-              key={color?.string + '-dot'}
-            ></motion.div>
-            <div>
-              <motion.h1
-                initial={{ opacity: 0, x: -3 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 3 }}
-                transition={{ duration: 0.18, ease: 'easeOut' }}
-                key={colorName + '-name'}
-              >
-                {colorName}
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, x: 3 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -3 }}
-                transition={{ duration: 0.18, ease: 'easeOut', delay: 0.05 }}
-                key={colorName + '-palette'}
-              >
-                in {fetchedData?.paletteTitle}
-              </motion.p>
-            </div>
-          </AnimatePresence>
+          <div className="color-dot" style={{ '--color': color?.string || '#000' } as React.CSSProperties}></div>
+          <div>
+            <motion.h1
+              initial={{ opacity: 0, x: -3 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 3 }}
+              key={colorName + '-name'}
+            >
+              {colorName}
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, x: 3 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -3 }}
+              transition={{ delay: 0.1 }}
+              key={colorName + '-palette'}
+            >
+              {fetchedData?.paletteTitle && `in ${fetchedData?.paletteTitle}`}
+            </motion.p>
+          </div>
         </div>
 
         <PaletteDisplay paletteType={paletteType} />

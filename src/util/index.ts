@@ -6,7 +6,7 @@ import { generateSplitComplementary } from './splitcomp'
 import { generateTetradic } from './tetradic'
 import { generateTintsAndShades } from './tints-and-shades'
 import { generateTriadic } from './triadic'
-import { ModulateValuesType, paletteModulator } from './modifiers'
+import { paletteModulator } from './modifiers'
 import { BaseColorData } from './factory'
 
 export function createPalettes(
