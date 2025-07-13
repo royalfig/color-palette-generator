@@ -28,7 +28,7 @@ export function Slider({
 
   const debouncedColorUpdate = useDebouncedCallback((newValue: number) => {
     const newColor = updateColor(base.color.clone(), newValue)
-    setColor(newColor.toString({ format: colorSpace.format, precision: 3 }))
+    setColor(newColor.to(colorSpace.space).toString({ precision: 3 }))
   }, 100)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

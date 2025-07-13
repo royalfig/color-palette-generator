@@ -77,22 +77,34 @@ export function colorFactory(
       lch: {
         value: color.to('lch').toString({ precision: 3 }),
         isInGamut: color.inGamut('lch'),
-        coords: color.to('lch').coords.map(n => toPrecision(n, 3)),
+        coords: color
+          .to('lch')
+          .toGamut()
+          .coords.map(n => toPrecision(n, 3)),
       },
       oklch: {
         value: color.to('oklch').toString({ precision: 3 }),
         isInGamut: color.inGamut('oklch'),
-        coords: color.to('oklch').coords.map(n => toPrecision(n, 3)),
+        coords: color
+          .to('oklch')
+          .toGamut()
+          .coords.map(n => toPrecision(n, 3)),
       },
       lab: {
         value: color.to('lab').toString({ precision: 3 }),
         isInGamut: color.inGamut('lab'),
-        coords: color.to('lab').coords.map(n => toPrecision(n, 3)),
+        coords: color
+          .to('lab')
+          .toGamut()
+          .coords.map(n => toPrecision(n, 3)),
       },
       oklab: {
         value: color.to('oklab').toString({ precision: 3 }),
         isInGamut: color.inGamut('oklab'),
-        coords: color.to('oklab').coords.map(n => toPrecision(n, 3)),
+        coords: color
+          .to('oklab')
+          .toGamut()
+          .coords.map(n => toPrecision(n, 3)),
       },
       p3: {
         value: color.to('p3').toString({ precision: 3 }),

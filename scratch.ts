@@ -1,54 +1,49 @@
-import { generateAnalogous } from './src/util/analogous'
-import { generateComplementary } from './src/util/complementary'
-import { generateSplitComplementary } from './src/util/splitcomp'
-import { generateTetradic } from './src/util/tetradic'
-import { generateTintsAndShades } from './src/util/tints-and-shades'
-import { generateTones } from './src/util/tones'
-import { generateTriadic } from './src/util/triadic'
-import { generateMaterialUI } from './src/util/ui'
+import { generateMaterialUI, generateUiColorPalette } from './src/util/ui'
+import Color from 'colorjs.io'
 
-const testValues = [
-  //   {
-  //     color: 'oklch(0.628 0.259 30.18)',
-  //     space: 'lch',
-  //   },
-  //   {
-  //     color: 'hsl(225 100% 50%)',
-  //     space: 'hsl',
-  //   },
-  {
-    color: '#ff0000',
-    space: 'hex',
-  },
-  //   {
-  //     color: 'oklab(90% -0.243 0.272)',
-  //     space: 'oklab',
-  //   },
-  //   {
-  //     color: 'hsl(50 80% 40%)',
-  //     space: 'hsl',
-  //   },
-  //   {
-  //     color: 'hsl(150deg 30% 60%)',
-  //     space: 'hsl',
-  //   },
-  //   {
-  //     color: '#fff',
-  //   },
-  //   { color: '#FFE0E0' },
-]
+function testMaterialUIGeneration() {
+  console.log('=== Testing Material UI Palette Generation ===')
+  
+  // Test with a vibrant blue color
+  const testColor = '#2196F3'
+  console.log('Base color:', testColor)
+  
+  // Test the export function
+  const result = generateMaterialUI(testColor, { style: 'square' })
+  
+  console.log('\nLight Mode Palette:')
+  Object.entries(result.light).forEach(([key, value]) => {
+    console.log(`  ${key}: ${value}`)
+  })
+  
+  console.log('\nDark Mode Palette:')
+  Object.entries(result.dark).forEach(([key, value]) => {
+    console.log(`  ${key}: ${value}`)
+  })
+  
+  // Test monochrome (TAS) palette
+  console.log('\n=== Testing Monochrome TAS Palette ===')
+  const baseColor = new Color(testColor)
+  const mockPalette = [
+    { color: baseColor } as any,
+    { color: baseColor.clone() } as any,
+    { color: baseColor.clone() } as any,
+  ]
+  
+  const monochromeLight = generateUiColorPalette(baseColor, mockPalette, false, 'tas')
+  const monochromeDark = generateUiColorPalette(baseColor, mockPalette, true, 'tas')
+  
+  console.log('\nMonochrome Light:')
+  console.log('Primary:', monochromeLight.primary.toString())
+  console.log('Secondary:', monochromeLight.secondary.toString())
+  console.log('Tertiary:', monochromeLight.tertiary.toString())
+  console.log('Surface:', monochromeLight.surface.toString())
+  
+  console.log('\nMonochrome Dark:')
+  console.log('Primary:', monochromeDark.primary.toString())
+  console.log('Secondary:', monochromeDark.secondary.toString())
+  console.log('Tertiary:', monochromeDark.tertiary.toString())
+  console.log('Surface:', monochromeDark.surface.toString())
+}
 
-const p = testValues.map(testValue => {
-  const style = 'warm-cool'
-  return {
-    analogous: generateAnalogous(testValue.color, { style }),
-    complementary: generateComplementary(testValue.color, { style }),
-    triadic: generateTriadic(testValue.color, { style }),
-    tetradic: generateTetradic(testValue.color, { style }),
-    splitComplementary: generateSplitComplementary(testValue.color, { style }),
-    tintsAndShades: generateTintsAndShades(testValue.color, { style }),
-    tones: generateTones(testValue.color, { style }),
-    materialUI: generateMaterialUI(testValue.color, { style }),
-  }
-})
-console.log(JSON.stringify(p, null, 2))
+testMaterialUIGeneration()
