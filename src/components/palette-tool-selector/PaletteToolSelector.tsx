@@ -13,6 +13,8 @@ export function PaletteToolSelector({
   toggleDarkMode,
   showColorHistory,
   setShowColorHistory,
+  isUiMode,
+  setIsUiMode,
 }: {
   showPaletteColors: boolean
   setShowPaletteColors: React.Dispatch<React.SetStateAction<boolean>>
@@ -20,6 +22,8 @@ export function PaletteToolSelector({
   toggleDarkMode: () => void
   showColorHistory: boolean
   setShowColorHistory: React.Dispatch<React.SetStateAction<boolean>>
+  isUiMode: boolean
+  setIsUiMode: React.Dispatch<React.SetStateAction<boolean>>
 }) {
   return (
     <div className="palette-tool-container">
@@ -45,7 +49,12 @@ export function PaletteToolSelector({
           <LinearGradientSVG id="rewind-gradient" />
         </RewindIcon>
       </Button>
-      <Button handler={() => {}} active={false}>
+      <Button
+        handler={() => {
+          setIsUiMode(!isUiMode)
+        }}
+        active={isUiMode}
+      >
         <AppWindowIcon size={20} color="url(#app-window-gradient)" weight="fill">
           <LinearGradientSVG id="app-window-gradient" />
         </AppWindowIcon>

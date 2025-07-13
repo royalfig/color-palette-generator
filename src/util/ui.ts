@@ -1,5 +1,5 @@
 import Color from 'colorjs.io'
-import { BaseColorData } from './factory'
+import { BaseColorData, colorFactory } from './factory'
 import { PaletteKinds } from '../types'
 
 // Material 3 tone mapping - creates specific lightness values for consistency
@@ -60,50 +60,44 @@ export function generateUiColorPalette(
   }
 
   // Material 3 Color Roles
-  return {
+  return [
     // Primary colors
-    primary: getMaterialTone(primaryBase, 40, 80, isDarkMode),
-    onPrimary: getMaterialTone(primaryBase, 100, 20, isDarkMode),
-    primaryContainer: getMaterialTone(primaryBase, 90, 30, isDarkMode),
-    onPrimaryContainer: getMaterialTone(primaryBase, 10, 90, isDarkMode),
+    colorFactory(getMaterialTone(primaryBase, 40, 80, isDarkMode), 'primary', 0, 'oklch', false),
+    colorFactory(getMaterialTone(primaryBase, 100, 20, isDarkMode), 'onPrimary', 0, 'oklch', false),
+    colorFactory(getMaterialTone(primaryBase, 90, 30, isDarkMode), 'primaryContainer', 0, 'oklch', false),
+    colorFactory(getMaterialTone(primaryBase, 10, 90, isDarkMode), 'onPrimaryContainer', 0, 'oklch', false),
 
     // Secondary colors
-    secondary: getMaterialTone(secondaryBase, 40, 80, isDarkMode),
-    onSecondary: getMaterialTone(secondaryBase, 100, 20, isDarkMode),
-    secondaryContainer: getMaterialTone(secondaryBase, 90, 30, isDarkMode),
-    onSecondaryContainer: getMaterialTone(secondaryBase, 10, 90, isDarkMode),
+    colorFactory(getMaterialTone(secondaryBase, 40, 80, isDarkMode), 'secondary', 0, 'oklch', false),
+    colorFactory(getMaterialTone(secondaryBase, 100, 20, isDarkMode), 'onSecondary', 0, 'oklch', false),
+    colorFactory(getMaterialTone(secondaryBase, 90, 30, isDarkMode), 'secondaryContainer', 0, 'oklch', false),
+    colorFactory(getMaterialTone(secondaryBase, 10, 90, isDarkMode), 'onSecondaryContainer', 0, 'oklch', false),
 
     // Tertiary colors
-    tertiary: getMaterialTone(tertiaryBase, 40, 80, isDarkMode),
-    onTertiary: getMaterialTone(tertiaryBase, 100, 20, isDarkMode),
-    tertiaryContainer: getMaterialTone(tertiaryBase, 90, 30, isDarkMode),
-    onTertiaryContainer: getMaterialTone(tertiaryBase, 10, 90, isDarkMode),
-
-    // Error colors (using a red base)
-    error: getTone(new Color('oklch(0.548 0.196 27.33)'), isDarkMode ? 80 : 40),
-    onError: getTone(new Color('oklch(0.548 0.196 27.33)'), isDarkMode ? 20 : 100),
-    errorContainer: getTone(new Color('oklch(0.548 0.196 27.33)'), isDarkMode ? 30 : 90),
-    onErrorContainer: getTone(new Color('oklch(0.548 0.196 27.33)'), isDarkMode ? 90 : 10),
+    colorFactory(getMaterialTone(tertiaryBase, 40, 80, isDarkMode), 'tertiary', 0, 'oklch', false),
+    colorFactory(getMaterialTone(tertiaryBase, 100, 20, isDarkMode), 'onTertiary', 0, 'oklch', false),
+    colorFactory(getMaterialTone(tertiaryBase, 90, 30, isDarkMode), 'tertiaryContainer', 0, 'oklch', false),
+    colorFactory(getMaterialTone(tertiaryBase, 10, 90, isDarkMode), 'onTertiaryContainer', 0, 'oklch', false),
 
     // Surface colors
-    surface: getNeutralColor(primaryBase, isDarkMode ? 10 : 99),
-    onSurface: getNeutralColor(primaryBase, isDarkMode ? 90 : 10),
-    onSurfaceVariant: getNeutralVariantColor(primaryBase, isDarkMode ? 80 : 30),
+    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 10 : 99), 'surface', 0, 'oklch', false),
+    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 90 : 10), 'onSurface', 0, 'oklch', false),
+    colorFactory(getNeutralVariantColor(primaryBase, isDarkMode ? 80 : 30), 'onSurfaceVariant', 0, 'oklch', false),
 
     // Surface container variants
-    surfaceContainerLowest: getNeutralColor(primaryBase, isDarkMode ? 4 : 100),
-    surfaceContainerLow: getNeutralColor(primaryBase, isDarkMode ? 10 : 96),
-    surfaceContainer: getNeutralColor(primaryBase, isDarkMode ? 12 : 94),
-    surfaceContainerHigh: getNeutralColor(primaryBase, isDarkMode ? 17 : 92),
-    surfaceContainerHighest: getNeutralColor(primaryBase, isDarkMode ? 22 : 90),
+    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 4 : 100), 'surfaceContainerLowest', 0, 'oklch', false),
+    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 10 : 96), 'surfaceContainerLow', 0, 'oklch', false),
+    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 12 : 94), 'surfaceContainer', 0, 'oklch', false),
+    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 17 : 92), 'surfaceContainerHigh', 0, 'oklch', false),
+    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 22 : 90), 'surfaceContainerHighest', 0, 'oklch', false),
 
     // Outline colors
-    outline: getNeutralVariantColor(primaryBase, isDarkMode ? 60 : 50),
-    outlineVariant: getNeutralVariantColor(primaryBase, isDarkMode ? 30 : 80),
+    colorFactory(getNeutralVariantColor(primaryBase, isDarkMode ? 60 : 50), 'outline', 0, 'oklch', false),
+    // colorFactory(getNeutralVariantColor(primaryBase, isDarkMode ? 30 : 80), 'outlineVariant', 0, 'oklch', false),
 
     // Inverse colors
-    inverseSurface: getNeutralColor(primaryBase, isDarkMode ? 90 : 20),
-    onInverseSurface: getNeutralColor(primaryBase, isDarkMode ? 20 : 95),
-    inversePrimary: getMaterialTone(primaryBase, 80, 40, !isDarkMode), // Opposite of primary
-  }
+    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 90 : 20), 'inverseSurface', 0, 'oklch', false),
+    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 20 : 95), 'onInverseSurface', 0, 'oklch', false),
+    colorFactory(getMaterialTone(primaryBase, 80, 40, !isDarkMode), 'inversePrimary', 0, 'oklch', false), // Opposite of primary
+  ]
 }

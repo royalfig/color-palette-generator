@@ -8,6 +8,7 @@ import { generateTintsAndShades } from './tints-and-shades'
 import { generateTriadic } from './triadic'
 import { paletteModulator } from './modifiers'
 import { BaseColorData } from './factory'
+import { generateUiColorPalette } from './ui'
 
 export function createPalettes(
   color: string,
@@ -15,6 +16,7 @@ export function createPalettes(
   style: 'square' | 'triangle' | 'circle' | 'diamond',
   colorSpace: { space: ColorSpace; format: ColorFormat },
   modulateValues = [0, 0, 0, 0],
+  isUiMode = false,
 ) {
   let basePalette: BaseColorData[] = []
   console.log(palette)
@@ -40,6 +42,8 @@ export function createPalettes(
   }
 
   const modulatedPalette = paletteModulator(basePalette, modulateValues)
-  console.log(modulatedPalette)
+  if (isUiMode) {
+    return generateUiColorPalette(modulatedPalette[0].color.clone(), modulatedPalette, isUiMode, palette)
+  }
   return modulatedPalette
 }

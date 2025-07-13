@@ -74,8 +74,11 @@ export default function App() {
   const initialPaletteType = (params.get('paletteType') as PaletteKinds) || 'spl'
   const initialPaletteStyle = (params.get('paletteStyle') as 'square' | 'triangle' | 'circle' | 'diamond') || 'square'
   const initialColorFormat = (params.get('colorFormat') as ColorFormat) || 'oklch'
-  const initialKnobValues = params.get('effects') 
-    ? params.get('effects')!.split(',').map(v => parseFloat(v) || 0)
+  const initialKnobValues = params.get('effects')
+    ? params
+        .get('effects')!
+        .split(',')
+        .map(v => parseFloat(v) || 0)
     : [0, 0, 0, 0]
   // If you want to support colorSpace as a param, otherwise default to 'oklch'
   const parsedInitialColorSpace = (initialColorFormat: ColorFormat): ColorSpaceAndFormat => {
@@ -110,6 +113,7 @@ export default function App() {
   const [paletteStyle, setPaletteStyle] = useState<'square' | 'triangle' | 'circle' | 'diamond'>(initialPaletteStyle)
   const [colorSpace, setColorSpace] = useState<ColorSpaceAndFormat>(parsedInitialColorSpace(initialColorFormat))
   const [knobValues, setKnobValues] = useState(initialKnobValues)
+  const [isUiMode, setUiMode] = useState(false)
 
   const { isDarkMode, toggleDarkMode } = useDarkMode()
   const [message, setMessage] = useState<string | null>(null)
@@ -126,9 +130,11 @@ export default function App() {
   }, [])
 
   const palette = useMemo(
-    () => createPalettes(color, paletteType, paletteStyle, colorSpace, knobValues),
-    [color, paletteType, paletteStyle, colorSpace, knobValues],
+    () => createPalettes(color, paletteType, paletteStyle, colorSpace, knobValues, isUiMode),
+    [color, paletteType, paletteStyle, colorSpace, knobValues, isUiMode],
   )
+
+  console.log(palette)
 
   const colorContext = useMemo(
     () => ({ originalColor: colorFactory(color, 'base', 0, colorSpace.format), palette }),
@@ -182,15 +188,15 @@ export default function App() {
     const currentPaletteStyle = colorUrl.get('paletteStyle')
     const currentColorFormat = colorUrl.get('colorFormat')
     const currentEffects = colorUrl.get('effects')
-    
+
     const effectsString = knobValues.join(',')
-    const needsUpdate = 
+    const needsUpdate =
       currentColor !== colorContext.originalColor.string ||
       currentPaletteType !== paletteType ||
       currentPaletteStyle !== paletteStyle ||
       currentColorFormat !== colorSpace.format ||
       currentEffects !== effectsString
-    
+
     if (needsUpdate) {
       colorUrl.set('color', colorContext.originalColor.string)
       colorUrl.set('paletteType', paletteType)
@@ -214,7 +220,7 @@ export default function App() {
       const paletteStyleParam = params.get('paletteStyle')
       const colorFormatParam = params.get('colorFormat')
       const effectsParam = params.get('effects')
-      
+
       if (colorParam) {
         setColor(colorParam)
       }
@@ -291,6 +297,8 @@ export default function App() {
                   toggleDarkMode={toggleDarkMode}
                   showColorHistory={showColorHistory}
                   setShowColorHistory={setShowColorHistory}
+                  isUiMode={isUiMode}
+                  setIsUiMode={setUiMode}
                 />
                 <ExportOptions
                   fetchedData={fetchedData}
