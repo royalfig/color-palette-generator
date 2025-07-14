@@ -9,7 +9,6 @@ import { Display } from './components/display/Display'
 import { SliderGroup } from './components/hue-slider/SliderGroup'
 import { InputColorContainer } from './components/input-color-container/InputColorContainer'
 import { Knob } from './components/knob/Knob'
-import { PaletteDisplay } from './components/palette-display/PaletteDisplay'
 import { PaletteStyleSelector } from './components/palette-style-selector/PaletteStyleSelector'
 import { PaletteToolSelector } from './components/palette-tool-selector/PaletteToolSelector'
 import { SectionHeader } from './components/section-header/SectionHeader'
@@ -28,7 +27,7 @@ import { createPalettes } from './util'
 import { colorFactory } from './util/factory'
 import { pickRandomColor } from './util/pickRandomColor'
 
-const Manual = lazy(() => import('./components/manual/Manual'))
+const Manual = lazy(() => import('./components/manual/Manual.js'))
 
 export type ColorName = {
   fetchedData: {
@@ -134,7 +133,6 @@ export default function App() {
     () => createPalettes(color, paletteType, paletteStyle, colorSpace, knobValues, isUiMode, isDarkMode),
     [color, paletteType, paletteStyle, colorSpace, knobValues, isUiMode, isDarkMode],
   )
-
 
   const colorContext = useMemo(
     () => ({ originalColor: colorFactory(color, 'base', 0, colorSpace.format), palette, isUiMode }),
