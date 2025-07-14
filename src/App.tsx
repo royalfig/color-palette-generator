@@ -28,7 +28,7 @@ import { createPalettes } from './util'
 import { colorFactory } from './util/factory'
 import { pickRandomColor } from './util/pickRandomColor'
 
-const Manual = lazy(() => import('./components/manual/Manual').then(module => ({ default: module.Manual })))
+const Manual = lazy(() => import('./components/manual/Manual'))
 
 export type ColorName = {
   fetchedData: {

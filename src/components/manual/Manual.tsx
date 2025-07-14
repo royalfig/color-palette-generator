@@ -1,6 +1,6 @@
 import './manual.css'
 
-export function Manual() {
+export default function Manual() {
   return (
     <div className="manual-container">
       <section className="manual-section">
