@@ -19,9 +19,14 @@ function downloadAction(
   palette: BaseColorData[],
   paletteTitle: string,
   colorFormat: ColorFormat,
+  isUiMode: boolean,
   cb: (msg: string, type: 'success' | 'error') => void,
 ) {
   const paletteString = palette.map((color, idx) => {
+    if (isUiMode) {
+      return `  --${color.code}: ${color.conversions[colorFormat].value};
+  --${color.code}-contrast: ${color.contrast};`
+    }
     return `  --${color.code.substring(0, 3)}-${idx + 1}: ${color.conversions[colorFormat].value};
   --${color.code.substring(0, 3)}-${idx + 1}-contrast: ${color.contrast};`
   })
@@ -39,10 +44,10 @@ function downloadAction(
   cb('Downloaded', 'success')
 }
 
-function downloadPaletteAsImage(baseColor: BaseColorData, palette: BaseColorData[], colorNames: ColorName) {
+function downloadPaletteAsImage(baseColor: BaseColorData, palette: BaseColorData[], colorNames: ColorName, isUiMode: boolean = false) {
   const colorCount = palette.length
-  const columns = Math.min(colorCount, 6)
-  const rows = colorCount > 6 ? 2 : 1
+  const columns = isUiMode ? Math.min(colorCount, 8) : Math.min(colorCount, 6)
+  const rows = isUiMode ? Math.ceil(colorCount / 8) : (colorCount > 6 ? 2 : 1)
   const outerPadding = 60
   const width = 1920
   const fontSize = 20
@@ -76,22 +81,70 @@ function downloadPaletteAsImage(baseColor: BaseColorData, palette: BaseColorData
       ctx.fillStyle = 'white'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
       createHeader(ctx)
-      palette.slice(0, 12).forEach((color, idx) => {
-        const row = Math.floor(idx / 6)
-        const col = idx % 6
+      palette.forEach((color, idx) => {
+        const row = Math.floor(idx / columns)
+        const col = idx % columns
         const x = outerPadding + col * (squareSize + outerPadding)
         const y = headerHeight + outerPadding + row * (squareSize + outerPadding)
         ctx.fillStyle = color.string
         ctx.fillRect(x, y, squareSize, squareSize)
         ctx.fillStyle = color.contrast
-        ctx.font = 'bold 18px system-ui'
-        ctx.fillText(
-          colorNames.fetchedData?.colorNames[idx] || '',
-          x + squareSize * 0.05,
-          y + (squareSize - squareSize * 0.05 - 27),
-        )
-        ctx.font = '16px system-ui'
-        ctx.fillText(color.string, x + squareSize * 0.05, y + (squareSize - squareSize * 0.05))
+        
+        // Handle text sizing and wrapping for UI mode
+        if (isUiMode) {
+          const colorName = color.code
+          const maxWidth = squareSize * 0.9
+          ctx.font = 'bold 12px system-ui'
+          
+          // Check if text fits, if not, try to wrap or truncate
+          const textWidth = ctx.measureText(colorName).width
+          if (textWidth > maxWidth) {
+            // Try to break at hyphens for long UI names
+            const parts = colorName.split('-')
+            if (parts.length > 1) {
+              const firstLine = parts[0]
+              const secondLine = parts.slice(1).join('-')
+              
+              ctx.fillText(firstLine, x + squareSize * 0.05, y + (squareSize - squareSize * 0.05 - 40))
+              ctx.fillText(secondLine, x + squareSize * 0.05, y + (squareSize - squareSize * 0.05 - 25))
+            } else {
+              // Single word too long, use smaller font
+              ctx.font = 'bold 10px system-ui'
+              ctx.fillText(colorName, x + squareSize * 0.05, y + (squareSize - squareSize * 0.05 - 27))
+            }
+          } else {
+            ctx.fillText(colorName, x + squareSize * 0.05, y + (squareSize - squareSize * 0.05 - 27))
+          }
+        } else {
+          ctx.font = 'bold 18px system-ui'
+          ctx.fillText(
+            colorNames.fetchedData?.colorNames[idx] || '',
+            x + squareSize * 0.05,
+            y + (squareSize - squareSize * 0.05 - 27),
+          )
+        }
+        
+        // Handle color value text sizing for UI mode
+        if (isUiMode) {
+          const colorValue = color.string
+          const maxWidth = squareSize * 0.9
+          ctx.font = '12px system-ui'
+          
+          const valueWidth = ctx.measureText(colorValue).width
+          if (valueWidth > maxWidth) {
+            // Use smaller font for long color values
+            ctx.font = '10px system-ui'
+            const smallValueWidth = ctx.measureText(colorValue).width
+            if (smallValueWidth > maxWidth) {
+              // If still too long, use even smaller font
+              ctx.font = '8px system-ui'
+            }
+          }
+          ctx.fillText(colorValue, x + squareSize * 0.05, y + (squareSize - squareSize * 0.05))
+        } else {
+          ctx.font = '16px system-ui'
+          ctx.fillText(color.string, x + squareSize * 0.05, y + (squareSize - squareSize * 0.05))
+        }
       })
     }
     return canvas
@@ -117,13 +170,17 @@ interface ExportOptionsProps {
 }
 
 export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: ExportOptionsProps) {
-  const { palette, originalColor } = useContext(ColorContext)
+  const { palette, originalColor, isUiMode } = useContext(ColorContext)
   const { showMessage } = useContext(MessageContext)
 
   const colorNames = { fetchedData, isLoading, error }
 
   function handleCopyToClipboard() {
     const paletteString = palette.map((color, idx) => {
+      if (isUiMode) {
+        return `  --${color.code}: ${color.conversions[colorFormat].value};
+  --${color.code}-contrast: ${color.contrast};`
+      }
       return `  --${color.code.substring(0, 3)}-${idx + 1}: ${color.conversions[colorFormat].value};
   --${color.code.substring(0, 3)}-${idx + 1}-contrast: ${color.contrast};`
     })
@@ -133,7 +190,7 @@ export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: Ex
   }
 
   function handleImageDownload() {
-    downloadPaletteAsImage(originalColor, palette, colorNames)
+    downloadPaletteAsImage(originalColor, palette, colorNames, isUiMode)
     showMessage('Image created', 'success')
   }
 
@@ -148,7 +205,7 @@ export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: Ex
       </Button>
       <Button
         handler={() => {
-          downloadAction(palette, colorNames.fetchedData?.paletteTitle || 'Palette', colorFormat, showMessage)
+          downloadAction(palette, colorNames.fetchedData?.paletteTitle || 'Palette', colorFormat, isUiMode, showMessage)
         }}
         active={false}
       >

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { ColorContext } from './components/ColorContext'
 import { MessageContext, MessageType } from './components/MessageContext'
 import { AuxillaryDisplay } from './components/auxillary-display/AuxillaryDisplay'
@@ -9,7 +9,6 @@ import { Display } from './components/display/Display'
 import { SliderGroup } from './components/hue-slider/SliderGroup'
 import { InputColorContainer } from './components/input-color-container/InputColorContainer'
 import { Knob } from './components/knob/Knob'
-import { Manual } from './components/manual/Manual'
 import { PaletteDisplay } from './components/palette-display/PaletteDisplay'
 import { PaletteStyleSelector } from './components/palette-style-selector/PaletteStyleSelector'
 import { PaletteToolSelector } from './components/palette-tool-selector/PaletteToolSelector'
@@ -28,6 +27,8 @@ import type { ColorFormat, ColorSpaceAndFormat, PaletteKinds } from './types'
 import { createPalettes } from './util'
 import { colorFactory } from './util/factory'
 import { pickRandomColor } from './util/pickRandomColor'
+
+const Manual = lazy(() => import('./components/manual/Manual').then(module => ({ default: module.Manual })))
 
 export type ColorName = {
   fetchedData: {
@@ -81,7 +82,7 @@ export default function App() {
         .map(v => parseFloat(v) || 0)
     : [0, 0, 0, 0]
   // If you want to support colorSpace as a param, otherwise default to 'oklch'
-  const parsedInitialColorSpace = (initialColorFormat: ColorFormat): ColorSpaceAndFormat => {
+  const parsedInitialColorSpace = useCallback((initialColorFormat: ColorFormat): ColorSpaceAndFormat => {
     switch (initialColorFormat) {
       case 'oklch':
         return { space: 'oklch', format: 'oklch' }
@@ -102,7 +103,7 @@ export default function App() {
       default:
         return { space: 'oklch', format: 'oklch' }
     }
-  }
+  }, [])
 
   // State initialization using URL params or defaults
   const [color, setColor] = useState<string>(initialColor)
@@ -130,15 +131,14 @@ export default function App() {
   }, [])
 
   const palette = useMemo(
-    () => createPalettes(color, paletteType, paletteStyle, colorSpace, knobValues, isUiMode),
-    [color, paletteType, paletteStyle, colorSpace, knobValues, isUiMode],
+    () => createPalettes(color, paletteType, paletteStyle, colorSpace, knobValues, isUiMode, isDarkMode),
+    [color, paletteType, paletteStyle, colorSpace, knobValues, isUiMode, isDarkMode],
   )
 
-  console.log(palette)
 
   const colorContext = useMemo(
-    () => ({ originalColor: colorFactory(color, 'base', 0, colorSpace.format), palette }),
-    [color, palette, colorSpace.format],
+    () => ({ originalColor: colorFactory(color, 'base', 0, colorSpace.format), palette, isUiMode }),
+    [color, palette, colorSpace.format, isUiMode],
   )
 
   // const css = generateCss(palettes)
@@ -250,7 +250,9 @@ export default function App() {
     }
     return (
       <ColorContext.Provider value={colorContext}>
-        <Manual />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Manual />
+        </Suspense>
       </ColorContext.Provider>
     )
   }

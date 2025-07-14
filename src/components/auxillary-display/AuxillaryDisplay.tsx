@@ -36,7 +36,11 @@ function PaletteDetails({
   }, [palette])
 
   return (
-    <div className="palette-details" ref={scope} style={{ '--items': palette.length / 2 } as React.CSSProperties}>
+    <div
+      className="palette-details"
+      ref={scope}
+      style={{ '--items': Math.min(palette.length / 2, 6) } as React.CSSProperties}
+    >
       {palette.map((color, index) => (
         <div
           key={color.code}

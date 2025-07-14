@@ -17,6 +17,7 @@ export function createPalettes(
   colorSpace: { space: ColorSpace; format: ColorFormat },
   modulateValues = [0, 0, 0, 0],
   isUiMode = false,
+  isDarkMode = false,
 ) {
   let basePalette: BaseColorData[] = []
   console.log(palette)
@@ -43,7 +44,8 @@ export function createPalettes(
 
   const modulatedPalette = paletteModulator(basePalette, modulateValues)
   if (isUiMode) {
-    return generateUiColorPalette(modulatedPalette[0].color.clone(), modulatedPalette, isUiMode, palette)
+    // Use the original user color, not the modulated palette color
+    return generateUiColorPalette(new Color(color), modulatedPalette, isDarkMode, palette, colorSpace.format)
   }
   return modulatedPalette
 }

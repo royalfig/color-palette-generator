@@ -13,7 +13,7 @@ function toPrecision(n: number, precision: number) {
   return Math.floor(n * multiplier + 0.5) / multiplier
 }
 export type BaseColorData = {
-  code: `${string}-${number}`
+  code: `${string}-${number}` | string
   isBase: boolean
   base: string | Color
   color: Color
@@ -37,10 +37,11 @@ export function colorFactory(
   idx = 0,
   format: ColorFormat,
   isBase = false,
+  isUiMode = false,
 ): BaseColorData {
   const color = base instanceof Color ? base : new Color(base)
   return {
-    code: `${paletteInformation}-${idx + 1}`,
+    code: isUiMode ? paletteInformation : `${paletteInformation}-${idx + 1}`,
     isBase,
     base,
     color,
