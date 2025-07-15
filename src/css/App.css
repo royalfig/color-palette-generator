@@ -9,15 +9,14 @@
 .synth-container {
   width: 90vw;
   max-width: 1180px;
-  background-image: var(--synth-body), url('/noise.svg');
+  background-image: url('/noise.svg'), var(--synth-body);
+  background-size: 200px 200px, auto;
   border-radius: var(--radius);
-  box-shadow: 0 -1px 2px -0.5px #9194a3 inset, 2px 0 2px -0.5px #eaeaf2 inset, 0 1px 1px #eaeaf2 inset,
-    0 25px 20px -15px rgb(0 0 0 / 10%), 10px 65px 50px -10px rgb(0 0 0 / 5%);
+  box-shadow: inset 0 1px 1px #eaeaf2, var(--shadow-elevation-high);
 }
 
 [data-mode='dark'] .synth-container {
-  box-shadow: 0 -1px 2px -0.5px hsl(230deg 9% 30%) inset, 2px 0 2px -0.5px hsl(240deg 24% 53%) inset,
-    0 1px 1px hsl(240deg 24% 53%) inset, 0 25px 20px -15px rgb(0 0 0 / 10%), 10px 65px 50px -10px rgb(0 0 0 / 5%);
+  box-shadow: inset 0 1px 1px hsl(248deg 11% 35%), var(--shadow-elevation-high);
 }
 
 .synth-body {
