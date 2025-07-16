@@ -10,6 +10,8 @@
     "css": "npx stylelint **/*.css --fix"
   },
   "dependencies": {
+    "@fontsource-variable/arimo": "^5.2.6",
+    "@fontsource-variable/orbitron": "^5.2.6",
     "@phosphor-icons/react": "^2.1.10",
     "colorjs.io": "^0.5.2",
     "motion": "^12.18.1",

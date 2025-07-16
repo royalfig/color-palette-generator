@@ -46,12 +46,43 @@ export default function Manual() {
 
       <section id="introduction" className="manual-section">
         <h2>Introduction</h2>
-        <p>XYZ</p>
+        <p>
+          The Color Palette Pro is a tool for creating, ah, yes, color palettes. And while it's a tool for that,
+          creating color palettes programmatically is damn near impossible. They say taste is reserved for the gods, and
+          you ain't a god.
+        </p>
+        <p>That's all to say, YMMV with this tool, and it can't be held responsible for your poor-ass taste.</p>
       </section>
 
       <section className="manual-section">
         <h2 id="color-space-selector">Color Space Selector</h2>
-        <p>XYZ</p>
+        <p>
+          The Color Space selector is poorly named. It should really be called the color format selector, but that
+          doesn't have the same ring to it.
+        </p>
+        <p>These buttons allows you to change how the color is displayed.</p>
+        <ul>
+          <li>
+            OKLCH: The default color space. It's a color space that is designed to be perceptually uniform, meaning that
+            the colors are evenly spaced in terms of how they are perceived by the human eye. It makes up for the
+            shortcomings of its brother, LCH.
+          </li>
+          <li>LCH: Lightness, Chroma, Hue. A perceptually uniform color space that is designed to be easy to use.</li>
+          <li>
+            OKLAB: A color space that is designed to be perceptually uniform, meaning that the colors are evenly spaced
+          </li>
+          <li>
+            LAB: Lightness, a, b. A color space that is designed to be perceptually uniform, meaning that the colors are
+            evenly spaced in terms of how they are perceived by the human eye.
+          </li>
+          <li>P3:</li>
+          <li>HSL: Hue, Saturation, Lightness. Widely supported, but not perceptually uniform.</li>
+          <li>
+            RGB: Red, Green, Blue. It operates in the sRGB color space, which is a standard color space for digital
+            displays. It can only represent a subset of the colors that can be represented in the other color spaces.
+          </li>
+          <li>HEX: Hexadecimal. Also sRGB color space. It's widely supported, but not intuitive or easy to use.</li>
+        </ul>
       </section>
 
       <section className="manual-section">

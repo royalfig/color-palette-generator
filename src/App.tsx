@@ -29,6 +29,29 @@ import { pickRandomColor } from './util/pickRandomColor'
 
 const Manual = lazy(() => import('./components/manual/Manual.js'))
 
+function parsedInitialColorSpace(initialColorFormat: ColorFormat): ColorSpaceAndFormat {
+  switch (initialColorFormat) {
+    case 'oklch':
+      return { space: 'oklch', format: 'oklch' }
+    case 'oklab':
+      return { space: 'oklab', format: 'oklab' }
+    case 'rgb':
+      return { space: 'srgb', format: 'rgb' }
+    case 'hsl':
+      return { space: 'hsl', format: 'hsl' }
+    case 'p3':
+      return { space: 'p3', format: 'p3' }
+    case 'hex':
+      return { space: 'srgb', format: 'hex' }
+    case 'lab':
+      return { space: 'lab', format: 'lab' }
+    case 'lch':
+      return { space: 'lch', format: 'lch' }
+    default:
+      return { space: 'oklch', format: 'oklch' }
+  }
+}
+
 export type ColorName = {
   fetchedData: {
     colorNames: string[]
@@ -81,28 +104,6 @@ export default function App() {
         .map(v => parseFloat(v) || 0)
     : [0, 0, 0, 0]
   // If you want to support colorSpace as a param, otherwise default to 'oklch'
-  const parsedInitialColorSpace = useCallback((initialColorFormat: ColorFormat): ColorSpaceAndFormat => {
-    switch (initialColorFormat) {
-      case 'oklch':
-        return { space: 'oklch', format: 'oklch' }
-      case 'oklab':
-        return { space: 'oklab', format: 'oklab' }
-      case 'rgb':
-        return { space: 'srgb', format: 'rgb' }
-      case 'hsl':
-        return { space: 'hsl', format: 'hsl' }
-      case 'p3':
-        return { space: 'p3', format: 'p3' }
-      case 'hex':
-        return { space: 'srgb', format: 'hex' }
-      case 'lab':
-        return { space: 'lab', format: 'lab' }
-      case 'lch':
-        return { space: 'lch', format: 'lch' }
-      default:
-        return { space: 'oklch', format: 'oklch' }
-    }
-  }, [])
 
   // State initialization using URL params or defaults
   const [color, setColor] = useState<string>(initialColor)
@@ -128,6 +129,15 @@ export default function App() {
       setMessageType(null)
     }, 3000)
   }, [])
+
+  const messageContextValue = useMemo(
+    () => ({
+      message,
+      messageType,
+      showMessage,
+    }),
+    [message, messageType, showMessage],
+  )
 
   const palette = useMemo(
     () => createPalettes(color, paletteType, paletteStyle, colorSpace, knobValues, isUiMode, isDarkMode),
@@ -167,7 +177,6 @@ export default function App() {
   useEffect(() => {
     setColorHistory(prev => {
       let updated = prev.filter(c => c !== colorContext.originalColor.string)
-      console.log(updated)
       updated.push(colorContext.originalColor.string)
       // Limit to 240 colors, drop oldest if exceeded
       if (updated.length > 240) {
@@ -256,7 +265,7 @@ export default function App() {
   }
   return (
     <ColorContext.Provider value={colorContext}>
-      <MessageContext.Provider value={{ message, messageType, showMessage }}>
+      <MessageContext.Provider value={messageContextValue}>
         <div className="bg">
           <div className="bg-inner">
             <main className="synth-container">

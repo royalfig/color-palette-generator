@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@fontsource-variable/arimo':
+        specifier: ^5.2.6
+        version: 5.2.6
+      '@fontsource-variable/orbitron':
+        specifier: ^5.2.6
+        version: 5.2.6
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -372,6 +378,12 @@ packages:
   '@eslint/plugin-kit@0.3.3':
     resolution: {integrity: sha512-1+WqvgNMhmlAambTvT3KPtCl/Ibr68VldY2XY40SL1CE0ZXiakFR/cbTspaF5HsnpDMvcYYoJHfl4980NBjGag==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@fontsource-variable/arimo@5.2.6':
+    resolution: {integrity: sha512-gRx40BoeuYva/kbyv5nSt2/riytVsi213G97icnG6lOAq7Mvi9pz5oeBxGtPkjjguPPd7R1GjviOCZIpBp3tnw==}
+
+  '@fontsource-variable/orbitron@5.2.6':
+    resolution: {integrity: sha512-WFoCQzrPHLyjiZjjE5esCjgLOyRHD2vHi8u0eEIezzBnNFnMe/Ws+G47crwChT26HRqfUMsOjy26byyvxcWkgw==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -2139,6 +2151,10 @@ snapshots:
     dependencies:
       '@eslint/core': 0.15.1
       levn: 0.4.1
+
+  '@fontsource-variable/arimo@5.2.6': {}
+
+  '@fontsource-variable/orbitron@5.2.6': {}
 
   '@humanfs/core@0.19.1': {}
 

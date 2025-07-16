@@ -21,15 +21,20 @@
 
   h1 {
     margin: 0;
-    font-family: Orbitron, sans-serif;
+    font-family: 'Orbitron Variable', sans-serif;
   }
 
   & > * {
     margin-block-end: 1lh;
   }
 
-  ol {
+  ol,
+  ul {
     list-style-position: inside;
+
+    li {
+      margin-block-end: 0.25lh;
+    }
   }
 
   .manual-section {
@@ -39,6 +44,10 @@
     margin-block: 1rem;
     counter-increment: manual-section;
     background: var(--paper);
+
+    &:first-of-type {
+      margin-block-start: 0;
+    }
 
     &::after {
       position: absolute;
@@ -50,6 +59,7 @@
 
     & > * {
       max-width: 50ch;
+      margin-block-end: 1lh;
       margin-inline: auto;
     }
   }

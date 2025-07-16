@@ -1,4 +1,4 @@
-import { useMemo, useContext } from 'react'
+import { useMemo, useContext, memo } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 
 import './display-info.css'
@@ -47,7 +47,7 @@ function IconSelector({ size, messageType }: { size: number; messageType: Messag
 }
 
 // Usage in component
-export function DisplayInfo() {
+export const DisplayInfo = memo(function DisplayInfo() {
   const { colorGamut, dynamicRange, dpr } = useDisplayCapabilities()
   const { message, messageType } = useContext(MessageContext)
 
@@ -106,4 +106,4 @@ export function DisplayInfo() {
       </AnimatePresence>
     </div>
   )
-}
+})

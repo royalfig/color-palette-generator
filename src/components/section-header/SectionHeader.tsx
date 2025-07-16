@@ -1,9 +1,9 @@
-import { useContext } from 'react'
+import { memo, useContext } from 'react'
 import { ColorContext } from '../ColorContext'
 import './section-header.css'
 import { motion } from 'motion/react'
 
-function VibrancyModule() {
+const VibrancyModule = memo(function VibrancyModule() {
   const context = useContext(ColorContext)
   if (!context) return null
 
@@ -19,7 +19,7 @@ function VibrancyModule() {
       <motion.div className="vibrancy-module-blur" animate={{ background: linearGradient }}></motion.div>
     </div>
   )
-}
+})
 
 export function SectionHeader() {
   return (

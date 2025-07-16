@@ -21,7 +21,7 @@
   --max-viewport: 65rem;
 
   /* === TYPOGRAPHY === */
-  --font-brand: 'Orbitron', system-ui, sans-serif;
+  --font-brand: 'Orbitron Variable', system-ui, sans-serif;
   --letter-spacing: 0.3px;
   --small: 0.833rem;
   --x-small: min(0.75rem, 12px);
