@@ -126,9 +126,9 @@
   --icon-gradient-top: hsl(260deg 5% 89%);
 
   /* === KNOB COLORS === */
-  --knob-background: linear-gradient(rgb(40 40 40), rgb(20 20 20));
-  --knob-shadow: 0 -1px 0 1px rgb(79 79 79), 0 2px 2px hsl(0deg 0% 0% / 35%);
-  --knob-inner-background: linear-gradient(rgb(40 40 40), rgb(20 20 20));
-  --knob-inner-shadow: 0 -1px 0 1px rgb(82 82 82), 0 2px 2px hsl(0deg 0% 0% / 35%), var(--shadow-elevation-high);
+  --knob-background: linear-gradient(hsl(248deg 11% 20%), hsl(248deg 11% 12%));
+  --knob-shadow: 0 -1px 0 1px hsl(248deg 11% 33%), 0 2px 2px hsl(0deg 0% 0% / 35%);
+  --knob-inner-background: linear-gradient(hsl(248deg 11% 20%), hsl(248deg 11% 16%));
+  --knob-inner-shadow: 0 -1px 0 1px hsl(248deg 11% 35%), 0 2px 2px hsl(0deg 0% 0% / 35%), var(--shadow-elevation-high);
   --knob-indicator-background: var(--white);
 }
