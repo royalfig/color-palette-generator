@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: subgrid;
   grid-row: 3 / 6;
-  grid-column: 1/ 7;
+  grid-column: 1 / 7;
   gap: var(--base-gap);
 }
 
@@ -87,5 +87,16 @@
     outline: none;
     background: transparent;
     border: none;
+  }
+}
+
+@container synth (width < 900px) {
+  .slider-group {
+    grid-row: 4 / 8;
+    grid-column: 1 / 9;
+  }
+
+  .slider {
+    grid-column: 1 / -1;
   }
 }

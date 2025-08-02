@@ -12,3 +12,10 @@
 .palette-type-buttons > * {
   flex: 1;
 }
+
+@container synth (width < 900px) {
+  .palette-type-container {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+}

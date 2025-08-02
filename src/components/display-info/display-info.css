@@ -45,3 +45,14 @@
 .display-info-info {
   color: var(--warning);
 }
+
+@container synth (width < 900px) {
+  .display-info-container {
+    grid-row: 7;
+    grid-column: 11 / -1;
+  }
+
+  .display-info-default > div:nth-child(2) {
+    display: none;
+  }
+}

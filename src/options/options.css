@@ -5,3 +5,10 @@
   grid-column: 9 / 11;
   gap: var(--base-gap);
 }
+
+@container synth (width < 900px) {
+  .options-container {
+    grid-row: 7;
+    grid-column: 9 / span 2;
+  }
+}

@@ -6,6 +6,12 @@
   grid-column: 7 / 9;
 }
 
+@container synth (width < 900px) {
+  .knobs {
+    display: none;
+  }
+}
+
 .knob-container {
   display: flex;
   flex-direction: column;

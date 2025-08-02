@@ -54,3 +54,10 @@
     background-color: var(--element-dim);
   }
 }
+
+@container synth (width < 900px) {
+  .color-space-selector {
+    grid-row: 1;
+    grid-column: 1 / -1;
+  }
+}

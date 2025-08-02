@@ -9,6 +9,7 @@
 .synth-container {
   width: 90vw;
   max-width: 1180px;
+  container: synth / inline-size;
   background-image: url('/noise.svg'), var(--synth-body);
   background-size: 200px 200px, auto;
   border-radius: var(--radius);
@@ -26,9 +27,8 @@
   padding: var(--box-padding);
 }
 
-.input-color-container {
-  display: flex;
-  grid-row: 2;
-  grid-column: 1 / 7;
-  gap: var(--base-gap);
+@container synth (width < 900px) {
+  .synth-body {
+    padding-block: var(--spacing-07);
+  }
 }

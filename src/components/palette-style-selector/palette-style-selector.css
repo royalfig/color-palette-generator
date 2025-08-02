@@ -7,3 +7,10 @@
 .palette-style-container > * {
   flex: 1;
 }
+
+@container synth (width < 900px) {
+  .palette-style-container {
+    grid-row: 4;
+    grid-column: 9 / -1;
+  }
+}

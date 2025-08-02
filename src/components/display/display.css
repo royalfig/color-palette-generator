@@ -1,6 +1,24 @@
 .synth-display {
-  display: grid;
   min-height: 269px;
   padding: var(--box-padding);
   background-color: #000;
+}
+
+@container synth (width < 900px) {
+  .synth-display.col-12 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+
+    .current-color-display,
+    .swatch-container {
+      grid-column: 1 / -1;
+    }
+
+    .header-container {
+      margin-bottom: var(--base-gap);
+    }
+
+    .swatch-container {
+      height: 150px;
+    }
+  }
 }
