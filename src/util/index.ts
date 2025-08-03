@@ -20,7 +20,7 @@ export function createPalettes(
   isDarkMode = false,
 ) {
   let basePalette: BaseColorData[] = []
-  console.log(palette)
+
   switch (palette) {
     case 'ana':
       basePalette = generateAnalogous(color, { style, colorSpace })

@@ -29,7 +29,6 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
     async function fetchColorName() {
       try {
         const baseIndex = palette.findIndex(p => p.string === originalColor.string)
-        console.log('baseIndex', baseIndex)
         if (baseIndex !== -1) {
           const paletteResponse = await fetch(
             `https://api.colorpalette.pro/palette/${palette

@@ -6,6 +6,7 @@ import { ColorSpace, ColorFormat, PaletteKinds, PaletteStyle } from '../../types
 import { AnimatePresence, LayoutGroup, motion } from 'motion/react'
 import { PaletteDisplay } from '../palette-display/PaletteDisplay'
 import { PaletteIcon } from '@phosphor-icons/react/dist/csr/Palette'
+import { AppWindowIcon } from '@phosphor-icons/react/dist/csr/AppWindow'
 import { SwatchesIcon } from '@phosphor-icons/react/dist/csr/Swatches'
 import { CirclesFourIcon } from '@phosphor-icons/react/dist/csr/CirclesFour'
 import { FadersHorizontalIcon } from '@phosphor-icons/react/dist/csr/FadersHorizontal'
@@ -168,13 +169,21 @@ export function ColorDisplay({
           </div>
         </div>
         <div className="color-detail">
-          <PaletteIcon
-            weight="fill"
-            size={14}
-            color={context.palette[0].color.clone().to('lch').set({ l: 80 }).display()}
-          />
+          {context.isUiMode ? (
+            <AppWindowIcon
+              weight="fill"
+              size={14}
+              color={context.palette[0].color.clone().to('lch').set({ l: 80 }).display()}
+            />
+          ) : (
+            <PaletteIcon
+              weight="fill"
+              size={14}
+              color={context.palette[0].color.clone().to('lch').set({ l: 80 }).display()}
+            />
+          )}
           <div className="color-text">
-            <p>Palette Mode</p>
+            <p>{context.isUiMode ? 'UI Mode' : 'Palette Mode'}</p>
           </div>
         </div>
         <div className="color-detail">

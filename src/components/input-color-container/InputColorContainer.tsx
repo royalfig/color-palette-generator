@@ -1,14 +1,13 @@
-import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
-import { ColorSpaceAndFormat } from '../../types'
-import './input-color-container.css'
 import { EyedropperSampleIcon } from '@phosphor-icons/react/dist/csr/EyedropperSample'
 import { PlayIcon } from '@phosphor-icons/react/dist/csr/Play'
-
+import Color from 'colorjs.io'
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
+import { ColorSpaceAndFormat } from '../../types'
 import Button from '../button/Button'
 import { ColorContext } from '../ColorContext'
-import { MessageContext } from '../MessageContext'
 import { LinearGradientSVG } from '../LinearGradientSVG'
-import Color from 'colorjs.io'
+import { MessageContext } from '../MessageContext'
+import './input-color-container.css'
 
 declare global {
   interface Window {
@@ -75,7 +74,11 @@ export function InputColorContainer({
         </Button>
       ) : null}
 
+      <label htmlFor="input-color-container-input" className="sr-only">
+        Color
+      </label>
       <input
+        id="input-color-container-input"
         className="input-color-container-input"
         style={
           {

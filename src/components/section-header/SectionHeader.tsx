@@ -1,7 +1,7 @@
+import { motion } from 'motion/react'
 import { memo, useContext } from 'react'
 import { ColorContext } from '../ColorContext'
 import './section-header.css'
-import { motion } from 'motion/react'
 
 const VibrancyModule = memo(function VibrancyModule() {
   const context = useContext(ColorContext)

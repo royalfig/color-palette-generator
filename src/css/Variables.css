@@ -106,6 +106,12 @@
   --bg: linear-gradient(to bottom in oklab, hsl(248deg 11% 25%), hsl(248deg 11% 1%));
   --button-background: linear-gradient(to bottom, hsl(248deg 11% 15%), hsl(248deg 11% 15%));
 
+  /* === MANUAL COLORS === */
+  --manual-bg: hsl(247deg 12.4% 1.43%);
+  --manual-paper: hsl(247deg 5.2% 7.15%);
+  --manual-element: hsl(246deg 4.43% 87.4%);
+  --manual-border: hsl(247deg 4.55% 18.6%);
+
   /* === SHADOWS === */
   --shadow-color: 0 2% 5%;
   --shadow-elevation-high: 0px 0.5px 0.6px hsl(var(--shadow-color) / 34%),
