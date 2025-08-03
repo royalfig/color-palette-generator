@@ -94,6 +94,12 @@
   --slider-shadow-color: 40deg 2% 44%;
   --slider-border-color: rgb(83 83 83);
   --slider-shadow: #00000068;
+
+  /* === MANUAL COLORS === */
+  --manual-bg: hsl(246deg 65.1% 99.1%);
+  --manual-paper: hsl(246deg 3.68% 84.8%);
+  --manual-element: hsl(247deg 12.4% 1.43%);
+  --manual-border: hsl(246deg 2.44% 39.6%);
 }
 
 [data-mode='dark'] {

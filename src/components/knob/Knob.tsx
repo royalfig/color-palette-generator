@@ -98,7 +98,6 @@ export function Knob({ initialValues, onChange }: KnobProps) {
 
   // Mouse wheel support
   const handleWheel = (idx: number, e: React.WheelEvent) => {
-    e.preventDefault() // Prevent page scrolling when adjusting knob
     setValues(prev =>
       prev.map((v, i) => (i === idx ? Math.max(0, Math.min(100, v - Math.sign(e.deltaY) * WHEEL_STEP)) : v)),
     )
