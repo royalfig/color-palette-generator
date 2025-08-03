@@ -8,7 +8,13 @@
 
 @container synth (width < 900px) {
   .palette-tool-container {
-    grid-row: 5;
+    grid-row: 4;
     grid-column: 9 / -1;
+  }
+}
+
+@container synth (width < 600px) {
+  .palette-tool-container {
+    display: none;
   }
 }

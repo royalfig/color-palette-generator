@@ -18,6 +18,17 @@
 @container synth (width < 900px) {
   .input-color-container {
     grid-row: 3;
+    grid-column: 1 / 9;
+  }
+}
+
+@container synth (width < 600px) {
+  .input-color-container {
+    grid-row: 1;
     grid-column: 1 / -1;
+  }
+
+  .input-color-container-input {
+    font-size: 1rem;
   }
 }

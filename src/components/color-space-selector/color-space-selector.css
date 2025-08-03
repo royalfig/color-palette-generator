@@ -61,3 +61,9 @@
     grid-column: 1 / -1;
   }
 }
+
+@container synth (width < 600px) {
+  .color-space-selector {
+    display: none;
+  }
+}

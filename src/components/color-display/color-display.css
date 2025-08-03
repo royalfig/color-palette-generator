@@ -109,3 +109,9 @@ svg + .color-text > .color-label {
 .hex .hex {
   color: var(--white);
 }
+
+@container synth (width < 600px) {
+  .color-details {
+    display: none;
+  }
+}

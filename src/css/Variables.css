@@ -102,7 +102,7 @@
   --element: hsl(248deg 11% 85%);
   --element-dim: hsl(248deg 11% 70% / 60%);
   --border: hsl(248deg 11% 35%);
-  --paper: hsl(248deg 11% 15%);
+  --paper: hsl(248deg 03% 15%);
   --bg: linear-gradient(to bottom in oklab, hsl(248deg 11% 25%), hsl(248deg 11% 1%));
   --button-background: linear-gradient(to bottom, hsl(248deg 11% 15%), hsl(248deg 11% 15%));
 

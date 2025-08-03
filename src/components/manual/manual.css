@@ -1,14 +1,10 @@
 .manual-container {
+  padding: var(--spacing-08);
   line-height: 1.4;
   color: var(--element);
-  background: color-mix(in oklch, black 10%, var(--paper));
+  background: color-mix(in oklch, var(--element) 2%, var(--paper));
 
-  .divider {
-    height: 1px;
-    margin-block: 1rem;
-    background: var(--element);
-    opacity: 0.15;
-  }
+  --border: color-mix(in oklch, var(--paper) 90%, var(--element));
 
   h1,
   h2,
@@ -17,11 +13,6 @@
   h5,
   h6 {
     margin-block: 0 0.5lh;
-  }
-
-  h1 {
-    margin: 0;
-    font-family: 'Orbitron Variable', sans-serif;
   }
 
   & > * {
@@ -36,31 +27,35 @@
       margin-block-end: 0.25lh;
     }
   }
+}
 
-  .manual-section {
-    position: relative;
-    min-height: 100svh;
-    padding: 1rem;
-    margin-block: 1rem;
-    counter-increment: manual-section;
-    background: var(--paper);
+.page-container {
+  max-width: 70ch;
+  min-height: calc(100svh - var(--spacing-12));
+  padding-block: var(--spacing-04);
+  margin-inline: auto;
+  background: var(--paper);
+  border: 1px solid var(--border);
 
-    &:first-of-type {
-      margin-block-start: 0;
-    }
+  & > *:not(.divider) {
+    padding-inline: var(--spacing-08);
+    margin-block: var(--spacing-04);
+  }
+}
 
-    &::after {
-      position: absolute;
-      right: 1rem;
-      bottom: 1rem;
-      font-size: 10px;
-      content: counter(manual-section);
-    }
+.divider {
+  height: 1px;
+  background-color: var(--border);
+}
 
-    & > * {
-      max-width: 50ch;
-      margin-block-end: 1lh;
-      margin-inline: auto;
-    }
+.brand {
+  font-family: var(--font-brand);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--element);
+  text-transform: uppercase;
+
+  span {
+    font-weight: 700;
   }
 }

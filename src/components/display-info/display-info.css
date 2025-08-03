@@ -48,11 +48,17 @@
 
 @container synth (width < 900px) {
   .display-info-container {
-    grid-row: 7;
+    grid-row: 6;
     grid-column: 11 / -1;
   }
 
   .display-info-default > div:nth-child(2) {
+    display: none;
+  }
+}
+
+@container synth (width < 600px) {
+  .display-info-container {
     display: none;
   }
 }

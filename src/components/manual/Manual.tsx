@@ -1,22 +1,30 @@
 import './manual.css'
+import { Page } from './Page'
 
 export default function Manual() {
   return (
     <div className="manual-container">
-      <section className="manual-section">
-        <h1>Color Palette Pro</h1>
+      <Page>
+        <h1 className="brand">
+          <span>Color</span>
+          Palette Pro
+        </h1>
 
         <div className="divider"></div>
 
         <p>
-          Congratulations on your purchase of the Color Palette Pro, the premium version of the Color Palette Tool.
-          You're well on your way to creating the kind of color palettes your parents warned you about.
+          Congratulations on your purchase of the Color Palette Pro! This manual will show you everything you need to
+          know to start creating color palettes that will make your parents proud.
         </p>
-      </section>
+      </Page>
 
-      <section className="manual-section">
+      <Page>
         <h2>Table of Contents</h2>
+        <div className="divider"></div>
         <ol>
+          <li>
+            <a href="#the-display">The Display</a>
+          </li>
           <li>
             <a href="#introduction">Introduction</a>
           </li>
@@ -33,28 +41,25 @@ export default function Manual() {
             <a href="#palette-type-selector">Palette Type Selector</a>
           </li>
           <li>
-            <a href="#the-display">The Display</a>
-          </li>
-          <li>
             <a href="#the-input-color-container">The Input Color Container</a>
           </li>
           <li>
             <a href="#the-palette-display">The Palette Display</a>
           </li>
         </ol>
-      </section>
+      </Page>
 
-      <section id="introduction" className="manual-section">
-        <h2>Introduction</h2>
+      <Page>
+        <h2 id="introduction">Introduction</h2>
         <p>
           The Color Palette Pro is a tool for creating, ah, yes, color palettes. And while it's a tool for that,
           creating color palettes programmatically is damn near impossible. They say taste is reserved for the gods, and
           you ain't a god.
         </p>
         <p>That's all to say, YMMV with this tool, and it can't be held responsible for your poor-ass taste.</p>
-      </section>
+      </Page>
 
-      <section className="manual-section">
+      <Page>
         <h2 id="color-space-selector">Color Space Selector</h2>
         <p>
           The Color Space selector is poorly named. It should really be called the color format selector, but that
@@ -83,37 +88,37 @@ export default function Manual() {
           </li>
           <li>HEX: Hexadecimal. Also sRGB color space. It's widely supported, but not intuitive or easy to use.</li>
         </ul>
-      </section>
+      </Page>
 
-      <section className="manual-section">
+      <Page>
         <h2 id="palette-style-selector">Palette Style Selector</h2>
         <p>XYZ</p>
-      </section>
+      </Page>
 
-      <section className="manual-section">
+      <Page>
         <h2 id="palette-tool-selector">Palette Tool Selector</h2>
         <p>XYZ</p>
-      </section>
+      </Page>
 
-      <section className="manual-section">
+      <Page>
         <h2 id="palette-type-selector">Palette Type Selector</h2>
         <p>XYZ</p>
-      </section>
+      </Page>
 
-      <section className="manual-section">
+      <Page>
         <h2 id="the-display">The Display</h2>
         <p>XYZ</p>
-      </section>
+      </Page>
 
-      <section className="manual-section">
+      <Page>
         <h2 id="the-input-color-container">The Input Color Container</h2>
         <p>XYZ</p>
-      </section>
+      </Page>
 
-      <section className="manual-section">
+      <Page>
         <h2 id="the-palette-display">The Palette Display</h2>
         <p>XYZ</p>
-      </section>
+      </Page>
     </div>
   )
 }
