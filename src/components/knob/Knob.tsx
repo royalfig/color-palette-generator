@@ -56,9 +56,11 @@ export function Knob({ initialValues, onChange }: KnobProps) {
   }, [values, debouncedOnChange])
 
   const handlePointerDown = (idx: number, e: React.PointerEvent) => {
+    e.preventDefault() // Prevent touch scrolling on mobile
     draggingIndex.current = idx
     lastY.current = e.clientY
     document.body.style.userSelect = 'none'
+    document.body.style.touchAction = 'none' // Prevent touch scrolling during drag
     setDragging(idx)
     window.addEventListener('pointermove', handlePointerMove)
     window.addEventListener('pointerup', handlePointerUp)
@@ -77,6 +79,7 @@ export function Knob({ initialValues, onChange }: KnobProps) {
   const handlePointerUp = () => {
     draggingIndex.current = null
     document.body.style.userSelect = ''
+    document.body.style.touchAction = '' // Restore touch scrolling
     setDragging(null)
     window.removeEventListener('pointermove', handlePointerMove)
     window.removeEventListener('pointerup', handlePointerUp)
@@ -95,6 +98,7 @@ export function Knob({ initialValues, onChange }: KnobProps) {
 
   // Mouse wheel support
   const handleWheel = (idx: number, e: React.WheelEvent) => {
+    e.preventDefault() // Prevent page scrolling when adjusting knob
     setValues(prev =>
       prev.map((v, i) => (i === idx ? Math.max(0, Math.min(100, v - Math.sign(e.deltaY) * WHEEL_STEP)) : v)),
     )
