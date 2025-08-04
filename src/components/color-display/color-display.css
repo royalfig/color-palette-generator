@@ -114,4 +114,18 @@ svg + .color-text > .color-label {
   .color-details {
     display: none;
   }
+
+  .current-color-display {
+    .header {
+      min-width: 30cqi;
+    }
+
+    h1 {
+      font-size: 5cqi;
+    }
+
+    p {
+      font-size: 3cqi;
+    }
+  }
 }

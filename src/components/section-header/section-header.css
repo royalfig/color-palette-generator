@@ -50,7 +50,7 @@
 @container synth (width < 600px) {
   .synth-brand {
     .brand {
-      font-size: 3cqi;
+      font-size: 3.5cqi;
     }
   }
 }
