@@ -44,10 +44,15 @@ function downloadAction(
   cb('Downloaded', 'success')
 }
 
-function downloadPaletteAsImage(baseColor: BaseColorData, palette: BaseColorData[], colorNames: ColorName, isUiMode: boolean = false) {
+function downloadPaletteAsImage(
+  baseColor: BaseColorData,
+  palette: BaseColorData[],
+  colorNames: ColorName,
+  isUiMode: boolean = false,
+) {
   const colorCount = palette.length
   const columns = isUiMode ? Math.min(colorCount, 8) : Math.min(colorCount, 6)
-  const rows = isUiMode ? Math.ceil(colorCount / 8) : (colorCount > 6 ? 2 : 1)
+  const rows = isUiMode ? Math.ceil(colorCount / 8) : colorCount > 6 ? 2 : 1
   const outerPadding = 60
   const width = 1920
   const fontSize = 20
@@ -66,7 +71,7 @@ function downloadPaletteAsImage(baseColor: BaseColorData, palette: BaseColorData
     ctx.fillText(colorNames.fetchedData?.paletteTitle || 'Palette', outerPadding, outerPadding + largeFontSize)
     ctx.font = '18px system-ui'
     ctx.fillText(
-      `Based on ${baseColor?.string}, from https://colorpalette.pro on ${new Date().toLocaleString()}.`,
+      `Based on ${baseColor?.string} from ${document.location.href} on ${new Date().toLocaleString()}.`,
       outerPadding,
       outerPadding + largeFontSize + 36,
     )
@@ -89,13 +94,13 @@ function downloadPaletteAsImage(baseColor: BaseColorData, palette: BaseColorData
         ctx.fillStyle = color.string
         ctx.fillRect(x, y, squareSize, squareSize)
         ctx.fillStyle = color.contrast
-        
+
         // Handle text sizing and wrapping for UI mode
         if (isUiMode) {
           const colorName = color.code
           const maxWidth = squareSize * 0.9
           ctx.font = 'bold 12px system-ui'
-          
+
           // Check if text fits, if not, try to wrap or truncate
           const textWidth = ctx.measureText(colorName).width
           if (textWidth > maxWidth) {
@@ -104,7 +109,7 @@ function downloadPaletteAsImage(baseColor: BaseColorData, palette: BaseColorData
             if (parts.length > 1) {
               const firstLine = parts[0]
               const secondLine = parts.slice(1).join('-')
-              
+
               ctx.fillText(firstLine, x + squareSize * 0.05, y + (squareSize - squareSize * 0.05 - 40))
               ctx.fillText(secondLine, x + squareSize * 0.05, y + (squareSize - squareSize * 0.05 - 25))
             } else {
@@ -123,13 +128,13 @@ function downloadPaletteAsImage(baseColor: BaseColorData, palette: BaseColorData
             y + (squareSize - squareSize * 0.05 - 27),
           )
         }
-        
+
         // Handle color value text sizing for UI mode
         if (isUiMode) {
           const colorValue = color.string
           const maxWidth = squareSize * 0.9
           ctx.font = '12px system-ui'
-          
+
           const valueWidth = ctx.measureText(colorValue).width
           if (valueWidth > maxWidth) {
             // Use smaller font for long color values

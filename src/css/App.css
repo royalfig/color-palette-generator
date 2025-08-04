@@ -2,7 +2,7 @@
   display: grid;
   place-items: center;
   min-height: 100svh;
-  padding: 1.5vw;
+  padding: 1vw 1.5vw 1.5vw;
   background-image: var(--bg);
 }
 
