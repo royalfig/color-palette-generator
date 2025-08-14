@@ -17,16 +17,18 @@ function getMaterialTone(color: Color, lightTone: number, darkTone: number, isDa
 // Generate neutral colors from a base color by reducing chroma
 function getNeutralColor(color: Color, tone: number): Color {
   const neutral = color.clone()
-  neutral.oklch.c = Math.min(neutral.oklch.c * 0.12, 0.04) // Very low chroma for neutrals
-  neutral.oklch.l = tone / 100
+  // Fixed very low chroma for true neutrals - almost grayscale
+  neutral.oklch.c = 0.005 // Extremely minimal tint, nearly imperceptible
+  neutral.oklch.l = tone / 100 // Linear mapping is correct for OKLCH
   return neutral
 }
 
 // Generate neutral variant colors (slightly more chromatic than neutrals)
 function getNeutralVariantColor(color: Color, tone: number): Color {
   const neutralVariant = color.clone()
-  neutralVariant.oklch.c = Math.min(neutralVariant.oklch.c * 0.24, 0.08) // Low chroma for neutral variants
-  neutralVariant.oklch.l = tone / 100
+  // Fixed low chroma - just enough to be noticeable but still neutral
+  neutralVariant.oklch.c = 0.015 // Subtle hint of color
+  neutralVariant.oklch.l = tone / 100 // Linear mapping is correct for OKLCH
   return neutralVariant
 }
 
