@@ -1,9 +1,9 @@
-import { useContext } from 'react'
-import { stagger, useAnimate } from 'motion/react'
+import { useAnimate } from 'motion/react'
+import React, { useContext, useEffect } from 'react'
 import type { ColorFormat, ColorSpace } from '../../types'
 import { ColorContext } from '../ColorContext'
+import { MessageContext } from '../MessageContext'
 import './swatches.css'
-import { useEffect } from 'react'
 
 export function Swatches({
   colorSpace,
@@ -22,6 +22,7 @@ export function Swatches({
   const rows = 10
   const colorsCount = palette.length
   const columnsPerColor = Math.floor(columns / colorsCount)
+  const { showMessage } = useContext(MessageContext)
 
   const handleClick = async (e: React.MouseEvent<HTMLDivElement>) => {
     const color = (e.target as HTMLDivElement).closest('.swatch') as HTMLDivElement
@@ -29,6 +30,7 @@ export function Swatches({
     if (color && color.dataset.color) {
       try {
         await navigator.clipboard.writeText(color.dataset.color)
+        showMessage('Color copied', 'success')
       } catch (error) {
         console.error('Failed to copy color to clipboard:', error)
       }

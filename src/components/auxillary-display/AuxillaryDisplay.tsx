@@ -6,6 +6,7 @@ import { ColorHistory } from '../color-history/ColorHistory'
 import { ColorContext } from '../ColorContext'
 import { Swatches } from '../swatches/Swatches'
 import './PaletteDetails.css'
+import { MessageContext } from '../MessageContext'
 
 function PaletteDetails({
   palette,
@@ -16,10 +17,12 @@ function PaletteDetails({
   colorNames: string[]
   colorSpace: { space: ColorSpace; format: ColorFormat }
 }) {
+  const { showMessage } = useContext(MessageContext)
   const handleColorClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const colorValue = e.currentTarget.dataset.colorValue
     if (colorValue) {
       try {
+        showMessage('Color copied', 'success')
         navigator.clipboard.writeText(colorValue)
       } catch (error) {
         console.error('Failed to copy color value:', error)

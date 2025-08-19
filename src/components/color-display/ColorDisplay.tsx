@@ -1,15 +1,16 @@
-import { useContext } from 'react'
-import { ColorContext } from '../ColorContext'
-import './color-display.css'
-import { ScissorsIcon } from '@phosphor-icons/react/dist/csr/Scissors'
-import { ColorSpace, ColorFormat, PaletteKinds, PaletteStyle } from '../../types'
-import { AnimatePresence, LayoutGroup, motion } from 'motion/react'
-import { PaletteDisplay } from '../palette-display/PaletteDisplay'
-import { PaletteIcon } from '@phosphor-icons/react/dist/csr/Palette'
 import { AppWindowIcon } from '@phosphor-icons/react/dist/csr/AppWindow'
-import { SwatchesIcon } from '@phosphor-icons/react/dist/csr/Swatches'
 import { CirclesFourIcon } from '@phosphor-icons/react/dist/csr/CirclesFour'
 import { FadersHorizontalIcon } from '@phosphor-icons/react/dist/csr/FadersHorizontal'
+import { PaletteIcon } from '@phosphor-icons/react/dist/csr/Palette'
+import { ScissorsIcon } from '@phosphor-icons/react/dist/csr/Scissors'
+import { SwatchesIcon } from '@phosphor-icons/react/dist/csr/Swatches'
+import { motion } from 'motion/react'
+import { useContext } from 'react'
+import { ColorFormat, ColorSpace, PaletteKinds, PaletteStyle } from '../../types'
+import { ColorContext } from '../ColorContext'
+import { MessageContext } from '../MessageContext'
+import { PaletteDisplay } from '../palette-display/PaletteDisplay'
+import './color-display.css'
 
 function formatColorValues(values: number[] | undefined, format: string[], times100 = true) {
   if (!values) {
@@ -68,6 +69,7 @@ export function ColorDisplay({
   const context = useContext(ColorContext)
   const color = context?.originalColor
   const { lch, oklch, lab, oklab, p3, hsl, rgb, hex } = color?.conversions || {}
+  const { showMessage } = useContext(MessageContext)
 
   const paletteTypeFull = getPaletteType(paletteType)
   const effectsEnabled = knobValues.some(value => value > 0)
@@ -79,6 +81,7 @@ export function ColorDisplay({
       if (colorStr) {
         try {
           await navigator.clipboard.writeText(colorStr)
+          showMessage('Color copied', 'success')
         } catch (error) {
           console.error('Failed to copy color to clipboard:', error)
         }

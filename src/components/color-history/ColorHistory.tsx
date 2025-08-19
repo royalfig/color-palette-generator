@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import { ColorContext } from '../ColorContext'
 import '../swatches/swatches.css'
+import { MessageContext } from '../MessageContext'
 
 export function ColorHistory({
   setColor,
@@ -11,6 +12,7 @@ export function ColorHistory({
   colorHistory: string[]
   setColorHistory: React.Dispatch<React.SetStateAction<string[]>>
 }) {
+  const { showMessage } = useContext(MessageContext)
   const totalSquares = 240
   const columns = 24
   const rows = 10
@@ -18,7 +20,10 @@ export function ColorHistory({
   const paddedHistory = colorHistory.concat(Array(totalSquares - colorHistory.length).fill(null))
 
   const handleClick = (color: string | null) => {
-    if (color) setColor(color)
+    if (color) {
+      setColor(color)
+      showMessage('Color set', 'success')
+    }
   }
 
   const handleRightClick = (e: React.MouseEvent<HTMLDivElement>, color: string | null) => {
