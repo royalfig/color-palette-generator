@@ -94,7 +94,7 @@ export default function App() {
   const params = new URLSearchParams(document.location.search)
 
   const initialColor = params.get('color') || pickRandomColor()
-  const initialPaletteType = (params.get('paletteType') as PaletteKinds) || 'spl'
+  const initialPaletteType = (params.get('paletteType') as PaletteKinds) || 'ana'
   const initialPaletteStyle = (params.get('paletteStyle') as 'square' | 'triangle' | 'circle' | 'diamond') || 'square'
   const initialColorFormat = (params.get('colorFormat') as ColorFormat) || 'oklch'
   const initialKnobValues = params.get('effects')
