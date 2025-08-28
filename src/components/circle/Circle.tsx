@@ -93,7 +93,7 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
             animate={{
               cx,
               cy,
-              fill: `hsl(${hue} ${saturation} ${lightness})`,
+              fill: `${sortedPalette[idx].cssValue}`,
             }}
             transition={{
               duration: 0.25,
