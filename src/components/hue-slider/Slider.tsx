@@ -25,6 +25,7 @@ export function Slider({
   const initialValue = useMemo(() => getValue(base), [base, getValue])
 
   const [value, setValue] = useState(initialValue)
+  const [inputValue, setInputValue] = useState(String(initialValue))
 
   const debouncedColorUpdate = useDebouncedCallback((newValue: number) => {
     const newColor = updateColor(base.color.clone(), newValue)
@@ -32,30 +33,47 @@ export function Slider({
   }, 100)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const numValue = Number(e.target.value)
-    if (isNaN(numValue) || numValue < min || numValue > max) {
-      return
+    const input = e.target.value
+    setInputValue(input)
+
+    const numValue = parseFloat(input)
+    if (!isNaN(numValue) && numValue >= min && numValue <= max) {
+      setValue(numValue)
+      debouncedColorUpdate(numValue)
     }
-    setValue(numValue)
-    debouncedColorUpdate(numValue)
   }
 
   useEffect(() => {
     setValue(initialValue)
+    setInputValue(String(initialValue))
   }, [initialValue])
 
   const handleIncrement = () => {
-    const newValue = value + (step ?? 1)
+    const increment = step ?? 1
+    const newValue = value + increment
     if (newValue > max) return
-    setValue(newValue)
-    debouncedColorUpdate(newValue)
+
+    // Round to the same decimal places as the step
+    const decimalPlaces = increment.toString().split('.')[1]?.length || 0
+    const roundedValue = Math.round(newValue * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces)
+
+    setValue(roundedValue)
+    setInputValue(String(roundedValue))
+    debouncedColorUpdate(roundedValue)
   }
 
   const handleDecrement = () => {
-    const newValue = value - (step ?? 1)
+    const decrement = step ?? 1
+    const newValue = value - decrement
     if (newValue < min) return
-    setValue(newValue)
-    debouncedColorUpdate(newValue)
+
+    // Round to the same decimal places as the step
+    const decimalPlaces = decrement.toString().split('.')[1]?.length || 0
+    const roundedValue = Math.round(newValue * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces)
+
+    setValue(roundedValue)
+    setInputValue(String(roundedValue))
+    debouncedColorUpdate(roundedValue)
   }
 
   function getLightness(base: BaseColorData, space: ColorSpace) {
@@ -122,7 +140,13 @@ export function Slider({
           <label htmlFor={`slider-input-${label}`} className="sr-only">
             number input
           </label>
-          <input name="slider-input" id={`slider-input-${label}`} value={value} onChange={handleChange} />
+          <input
+            name="slider-input"
+            id={`slider-input-${label}`}
+            type="text"
+            value={inputValue}
+            onChange={handleChange}
+          />
           <button onClick={handleDecrement}>
             <CaretDownIcon weight="fill" size={16} />
           </button>
