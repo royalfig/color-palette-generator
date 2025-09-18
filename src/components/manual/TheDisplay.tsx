@@ -20,7 +20,7 @@ export function TheDisplay() {
       </p>
       <h3>2. Color Wheel</h3>
       <p>
-        The color wheel provides a visual representation of the current palette, mapping colors by their hue/chroma and
+        The color wheel provides a visual representation of the current palette, mapping colors by their hue and
         lightness.
       </p>
       <h3>3. Color Data Display</h3>
@@ -31,7 +31,7 @@ export function TheDisplay() {
       <h3>4. Palette Display</h3>
       <p>
         The palette display shows the current palette, with each color being represented by a swatch. Clicking on a
-        color swatch copies its value.
+        color swatch copies its value (in the current color space and format).
       </p>
       <p>
         The palette display will also show additional palette information or your color history, when those modes are

@@ -46,10 +46,10 @@ export function ColorInputModule() {
           <strong>LCH:</strong> lch(64 65 46), lch(64% 65 46)
         </li>
         <li>
-          <strong>OKLAB:</strong> oklab(0.7 0.12 0.11)
+          <strong>OKLAB:</strong> oklab(0.7 0.12 0.11), oklab(70% 0.12 0.11)
         </li>
         <li>
-          <strong>OKLCH:</strong> oklch(0.7 0.16 42)
+          <strong>OKLCH:</strong> oklch(0.7 0.16 42), oklch(70% 0.16 42)
         </li>
         <li>
           <strong>Named colors:</strong> red, blue, tomato, etc.

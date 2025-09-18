@@ -18,17 +18,16 @@ export function PaletteTools() {
       <h3>1. Info Button (Information Display)</h3>
       <p>
         Click the <strong>Info</strong> button to display detailed information about each color in your current palette.
-        When active, the palette display shows:
+        When active, the palette display shows the color names and values.
       </p>
-      <ul>
-        <li>Color names and values.</li>
-      </ul>
 
       <h3>2. History Button (Color History)</h3>
       <p>
         The <strong>History</strong> button (rewind icon) reveals previous color selections (up to 240). Click any
         historical color to make it your current selection.
       </p>
+
+      <p>Pro tip: Remove a color from your history by right-clicking it.</p>
 
       <h3>3. App Mode Button (UI Mode Toggle)</h3>
       <p>
@@ -40,7 +39,9 @@ export function PaletteTools() {
           selected palette type.
         </li>
         <li>
-          <strong>UI Mode:</strong> Generates palettes for use in UIs.
+          <strong>UI Mode:</strong> Generates palettes for use in UIs, loosely following Google's Material Design
+          strategy for dynamic color palettes. Colors are semantically named: primary, on-primary, surface, on-surface,
+          outline, and so forth.
         </li>
       </ul>
 

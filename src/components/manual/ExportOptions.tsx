@@ -24,7 +24,6 @@ export function ExportOptions() {
         <li>Creates a 1920px wide image with color swatches</li>
         <li>Includes palette name, base color, and timestamp</li>
         <li>Shows color names and values on each swatch</li>
-        <li>Automatically adjusts layout for different palette sizes</li>
         <li>UI mode exports show semantic variable names</li>
       </ul>
       <p>Perfect for use in design apps like Figma.</p>
@@ -36,13 +35,13 @@ export function ExportOptions() {
       <ul>
         <li>Generates a .css file with CSS custom properties</li>
         <li>Includes both color values and contrast colors</li>
-        <li>In Palette mode: uses sequential naming (--ana-1, --ana-2)</li>
-        <li>In UI mode: uses semantic naming (--primary, --on-primary)</li>
+        <li>In Palette mode: Uses sequential naming (--ana-1, --ana-2)</li>
+        <li>In UI mode: Uses semantic naming (--primary, --on-primary)</li>
       </ul>
 
       <h3>3. Clipboard Copy</h3>
       <p>
-        The <strong>Clipboard</strong> button copies the CSS to your clipboard:
+        The <strong>Clipboard</strong> button copies the palette's CSS to your clipboard:
       </p>
       <ul>
         <li>Same format as file download, but copied to clipboard</li>

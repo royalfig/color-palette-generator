@@ -122,7 +122,7 @@ export function Slider({
           <label htmlFor={`slider-input-${label}`} className="sr-only">
             number input
           </label>
-          <input name="slider-input" id={`slider-input-${label}`} value={value} onChange={handleChange} size={5} />
+          <input name="slider-input" id={`slider-input-${label}`} value={value} onChange={handleChange} />
           <button onClick={handleDecrement}>
             <CaretDownIcon weight="fill" size={16} />
           </button>

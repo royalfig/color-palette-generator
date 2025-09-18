@@ -1,18 +1,17 @@
 .input-group {
-    & fieldset {
-        padding: var(--spacing-03);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius)
-    }
+  & fieldset {
+    padding: var(--spacing-03);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+  }
 
-    & legend {
-        padding-inline: var(--spacing-02);
-        font-size: var(--x-small);
-        font-weight: 700;
-        line-height: 1;
-        color: #c8c8c8;
-        text-shadow: 2px 2px 1rem hsl(0deg 0% 100% 0.83);
-        text-transform: uppercase;
-    }
+  & legend {
+    padding-inline: var(--spacing-02);
+    font-size: var(--x-small);
+    font-weight: 700;
+    line-height: 1;
+    color: #c8c8c8;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 1rem hsl(0deg 0% 100% 0.83);
+  }
 }
-

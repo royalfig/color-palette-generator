@@ -32,7 +32,7 @@ export function PaletteTypeSelector() {
           complement. Offers high contrast while being less jarring than pure complementary schemes.
         </li>
         <li>
-          <strong>Triadic (TRI)</strong>: Uses three colors evenly spaced around the color wheel (120° apart). Creates
+          <strong>Triadic (TRI)</strong>: Uses three colors evenly spaced around the color wheel (~120° apart). Creates
           vibrant, balanced palettes while maintaining harmony.
         </li>
         <li>
@@ -53,7 +53,7 @@ export function PaletteTypeSelector() {
       <ul>
         <li>Your chosen base color</li>
         <li>The selected palette style (Square, Triangle, Circle, Diamond)</li>
-        <li>Any adjustments made with sliders and knobs</li>
+        <li>Any adjustments made with sliders and knobs</li>w
       </ul>
     </Page>
   )

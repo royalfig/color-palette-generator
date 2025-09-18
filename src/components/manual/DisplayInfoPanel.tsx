@@ -46,6 +46,7 @@ export function DisplayInfoPanel() {
           <strong>Rec2020:</strong> ~63% coverage
         </li>
       </ul>
+      <p>Fuck yeah, human eye, let's go.</p>
       <p>
         This helps you understand the color reproduction limitations of your display. Colors outside your display's
         gamut will be clipped to the nearest displayable color.

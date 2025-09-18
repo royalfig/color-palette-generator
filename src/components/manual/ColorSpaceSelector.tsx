@@ -18,11 +18,11 @@ export function ColorSpaceSelector() {
       <p>Options include:</p>
       <ul style={{ listStyle: 'none' }}>
         <li>
-          <strong>OKLCH</strong>: Lightness, Chroma, Hue. The default color space for the Color Palette Pro. A modern
+          <strong>OKLCH</strong>: Lightness, Chroma, Hue. The default color space for the ColorPalette Pro. A modern
           perceptually uniform color space that improves upon LCH by providing more accurate color perception across the
           entire gamut. OKLCH ensures that equal numerical changes result in equal perceived changes, making it ideal
-          for creating harmonious color palettes. The hue component remains consistent across different lightness
-          levels, preventing hue shifts common in other color spaces.
+          for creating color palettes. The hue component remains consistent across different lightness levels,
+          preventing hue shifts common in other color spaces.
         </li>
         <li>
           <strong>LCH</strong>: Lightness, Chroma, Hue. A cylindrical representation of the LAB color space. While more

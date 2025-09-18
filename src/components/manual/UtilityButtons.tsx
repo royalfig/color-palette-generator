@@ -28,7 +28,7 @@ export function UtilityButtons() {
 
       <h3>2. Help Button (Manual)</h3>
       <p>
-        The <strong>Question Mark</strong> button opens this manual in a new window.
+        The <strong>Question Mark</strong> button opens this manual in a new window. But you probably already knew that.
       </p>
     </Page>
   )

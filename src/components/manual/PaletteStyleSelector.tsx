@@ -19,16 +19,19 @@ export function PaletteStyleSelector() {
       <h3>Color Generation Styles</h3>
 
       <h4>1. Square: Mathematics</h4>
-      <p>Uses pure mathematical calculations with rigid angular relationships between colors.</p>
+      <p>Uses (nearly) pure mathematical calculations with rigid angular relationships between colors.</p>
 
       <h4>2. Triangle: Perception</h4>
       <p>Based on opponent process theory and how human vision actually processes color.</p>
 
       <h4>3. Circle: Resonance</h4>
-      <p>Creates palettes that tell emotional stories through color progressions.</p>
+      <p>Creates palettes with smooth progressions that blend toward white/black.</p>
 
       <h4>4. Diamond: Luminosity</h4>
-      <p>Based on the physics of light and how different light sources affect color perception.</p>
+      <p>
+        Based on the physics of light and how different light sources affect color perception. Tends toward tonal
+        variations.
+      </p>
     </Page>
   )
 }

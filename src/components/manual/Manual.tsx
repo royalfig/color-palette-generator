@@ -26,10 +26,11 @@ export default function Manual() {
         </header>
 
         <p>
-          You are now the proud owner of the Color Palette Pro! This machine generates 6 different kinds of color
-          palettes, in 4 styles, across 8 color spaces and formats, and all can be shared, downloaded, copied, and
-          exported.
+          The ColorPalette Pro synthesizer generates 6 different color palettes, in 4 styles, across 8 color spaces and
+          formats.
         </p>
+
+        <p>Export, share, download, and copy palettes to create beautiful artworks, websites, and designs.</p>
 
         <p>
           Designed and developed by{' '}
