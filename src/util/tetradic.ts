@@ -263,36 +263,73 @@ export function generateTetradic(
         break
     }
 
-    // Style-specific lightness and chroma variations
-    let variations = {
-      first: { pure: { l: 0.05, c: 0.9 }, muted: { l: -0.1, c: 0.6 } },
-      complement: { l: 0, c: 0.95 },
-      fourth: { light: { l: 0.1, c: 0.8 }, dark: { l: -0.15, c: 1.1 } },
+    // Get base color properties for adaptive lightness
+    const baseLightness = baseColorObj.oklch.l
+    const baseChroma = baseColorObj.oklch.c
+
+    // Create adaptive lightness adjustments based on input color
+    function getAdaptiveLightnessAdjustments() {
+      // Ensure palette spans a good lightness range (0.15 to 0.9)
+      const targetRange = { min: 0.15, max: 0.9 }
+
+      let variations
+
+      if (baseLightness < 0.3) {
+        // Dark base: create lighter variants across tetrad
+        variations = {
+          first: { pure: { l: 0.25, c: 0.9 }, muted: { l: 0.1, c: 0.6 } },
+          complement: { l: 0.35, c: 0.95 },
+          fourth: { light: { l: 0.45, c: 0.8 }, dark: { l: 0.15, c: 1.1 } },
+        }
+      } else if (baseLightness > 0.7) {
+        // Light base: create darker variants across tetrad
+        variations = {
+          first: { pure: { l: -0.25, c: 0.9 }, muted: { l: -0.4, c: 0.6 } },
+          complement: { l: -0.35, c: 0.95 },
+          fourth: { light: { l: -0.15, c: 0.8 }, dark: { l: -0.45, c: 1.1 } },
+        }
+      } else {
+        // Mid-range base: balanced distribution
+        variations = {
+          first: { pure: { l: 0.1, c: 0.9 }, muted: { l: -0.15, c: 0.6 } },
+          complement: { l: 0.05, c: 0.95 },
+          fourth: { light: { l: 0.2, c: 0.8 }, dark: { l: -0.25, c: 1.1 } },
+        }
+      }
+
+      return variations
     }
 
+    let variations = getAdaptiveLightnessAdjustments()
+
     if (style === 'triangle') {
-      // Perceptual harmony: natural balance
+      // Perceptual harmony: adjust based on base lightness
+      const lightnessModifier = baseLightness < 0.4 ? 0.1 : baseLightness > 0.6 ? -0.1 : 0
+
       variations = {
-        first: { pure: { l: 0.08, c: 0.85 }, muted: { l: -0.08, c: 0.65 } },
-        complement: { l: 0.02, c: 0.9 },
-        fourth: { light: { l: 0.12, c: 0.75 }, dark: { l: -0.12, c: 0.95 } },
+        first: { pure: { l: 0.08 - lightnessModifier, c: 0.85 }, muted: { l: -0.08 - lightnessModifier, c: 0.65 } },
+        complement: { l: 0.02 - lightnessModifier, c: 0.9 },
+        fourth: { light: { l: 0.12 - lightnessModifier, c: 0.75 }, dark: { l: -0.12 - lightnessModifier, c: 0.95 } },
       }
     } else if (style === 'circle') {
       // Emotional resonance: varies by emotional type
       const hue = baseColorObj.oklch.h
+      // Emotional resonance: adapt for base lightness
+      const lightnessAdaptation = baseLightness < 0.4 ? 0.15 : baseLightness > 0.6 ? -0.15 : 0
+
       if (hue >= 345 || hue < 30) {
-        // passionate
+        // passionate - ensure visibility
         variations = {
-          first: { pure: { l: 0.1, c: 1.0 }, muted: { l: -0.05, c: 0.8 } },
-          complement: { l: 0.15, c: 0.8 }, // Calming water
-          fourth: { light: { l: 0.2, c: 0.7 }, dark: { l: -0.2, c: 1.2 } },
+          first: { pure: { l: 0.1 - lightnessAdaptation, c: 1.0 }, muted: { l: -0.05 - lightnessAdaptation, c: 0.8 } },
+          complement: { l: 0.15 - lightnessAdaptation, c: 0.8 },
+          fourth: { light: { l: 0.2 - lightnessAdaptation, c: 0.7 }, dark: { l: -0.2 - lightnessAdaptation, c: 1.2 } },
         }
       } else if (hue >= 150 && hue < 210) {
-        // tranquil
+        // tranquil - maintain balance
         variations = {
-          first: { pure: { l: 0.06, c: 0.8 }, muted: { l: -0.12, c: 0.5 } },
-          complement: { l: 0.08, c: 0.85 }, // Warm comfort
-          fourth: { light: { l: 0.15, c: 0.75 }, dark: { l: -0.1, c: 0.9 } },
+          first: { pure: { l: 0.06 - lightnessAdaptation, c: 0.8 }, muted: { l: -0.12 - lightnessAdaptation, c: 0.5 } },
+          complement: { l: 0.08 - lightnessAdaptation, c: 0.85 },
+          fourth: { light: { l: 0.15 - lightnessAdaptation, c: 0.75 }, dark: { l: -0.1 - lightnessAdaptation, c: 0.9 } },
         }
       }
     } else if (style === 'diamond') {
@@ -301,18 +338,18 @@ export function generateTetradic(
       const chroma = baseColorObj.oklch.c
 
       if (lightness > 0.8 && chroma < 0.3) {
-        // studio lighting
+        // studio lighting - prevent over-darkening
         variations = {
-          first: { pure: { l: 0.05, c: 0.8 }, muted: { l: -0.15, c: 0.5 } },
-          complement: { l: -0.05, c: 0.85 }, // Back light contrast
-          fourth: { light: { l: 0.15, c: 0.7 }, dark: { l: -0.25, c: 0.9 } },
+          first: { pure: { l: -0.05, c: 0.8 }, muted: { l: -0.2, c: 0.5 } },
+          complement: { l: -0.15, c: 0.85 },
+          fourth: { light: { l: 0.05, c: 0.7 }, dark: { l: Math.max(-0.3, 0.15 - lightness), c: 0.9 } },
         }
       } else if (chroma > 0.8 && lightness < 0.4) {
-        // dramatic
+        // dramatic - ensure visibility with lighter variants
         variations = {
-          first: { pure: { l: 0.15, c: 1.1 }, muted: { l: -0.05, c: 0.8 } },
-          complement: { l: 0.2, c: 1.0 }, // Strong back light
-          fourth: { light: { l: 0.25, c: 0.9 }, dark: { l: -0.3, c: 1.3 } },
+          first: { pure: { l: 0.25, c: 1.1 }, muted: { l: 0.1, c: 0.8 } },
+          complement: { l: 0.35, c: 1.0 },
+          fourth: { light: { l: 0.4, c: 0.9 }, dark: { l: Math.max(-0.15, 0.15 - lightness), c: 1.3 } },
         }
       }
     }

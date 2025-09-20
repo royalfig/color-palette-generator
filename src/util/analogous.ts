@@ -5,14 +5,14 @@ import { ColorFormat, ColorSpace } from '../types'
 import { enhancePalette, avoidMuddyZones, applyEnhancementsToAnalogous, polishPalette } from './enhancer'
 
 function getMathematicalAnalogous(hue: number): number[] {
-  // Pure mathematical - rigid 30° steps
+  // Pure mathematical - traditional analogous with 60° total spread
   return [
     hue, // base
-    (hue - 60 + 360) % 360,
     (hue - 30 + 360) % 360,
+    (hue - 20 + 360) % 360,
+    (hue - 10 + 360) % 360,
+    (hue + 15) % 360,
     (hue + 30) % 360,
-    (hue + 60) % 360,
-    (hue + 90) % 360,
   ]
 }
 
@@ -22,74 +22,86 @@ function getOpticalAnalogous(baseColor: Color): number[] {
   const hue = oklch.h
 
   if (hue >= 0 && hue < 30) {
-    // Deep reds: follow natural progression toward purples and oranges
-    // Avoid the "muddy brown" zone around 30-60°
+    // Deep reds: tight progression avoiding muddy browns
     return [
       hue, // Base red
-      (hue + 300) % 360, // Rich burgundy/wine
-      (hue + 330) % 360, // Deep red-purple
-      (hue + 15) % 360, // Warm red
-      (hue + 45) % 360, // Red-orange (skip the muddy zone)
-      (hue + 75) % 360, // Clear orange
+      (hue - 15 + 360) % 360, // Deep red-purple
+      (hue - 8 + 360) % 360, // Wine red
+      (hue + 8) % 360, // Warm red
+      (hue + 20) % 360, // Red-orange
+      (hue + 35) % 360, // Orange (carefully avoiding muddy zone)
     ]
   }
 
   if (hue >= 30 && hue < 90) {
-    // Orange-yellow range: avoid muddy browns, use "autumn palette" principle
-    return [
-      hue, // Base
-      (hue + 315) % 360, // Warm red (autumn)
-      (hue - 15 + 360) % 360, // Rich orange-red
-      (hue + 20) % 360, // Golden yellow
-      (hue + 50) % 360, // Clear yellow
-      (hue + 85) % 360, // Yellow-green (spring)
-    ]
+    // Orange-yellow range: tighter spread, avoid muddy zones
+    if (hue < 50) {
+      // Orange territory - bias toward reds
+      return [
+        hue, // Base orange
+        (hue - 25 + 360) % 360, // Red-orange
+        (hue - 12 + 360) % 360, // Deep orange
+        (hue + 10) % 360, // Light orange
+        (hue + 20) % 360, // Orange-yellow
+        (hue + 30) % 360, // Golden yellow
+      ]
+    } else {
+      // Yellow territory - bias toward greens
+      return [
+        hue, // Base yellow
+        (hue - 20 + 360) % 360, // Orange-yellow
+        (hue - 10 + 360) % 360, // Deep yellow
+        (hue + 8) % 360, // Light yellow
+        (hue + 18) % 360, // Yellow-green
+        (hue + 30) % 360, // Lime
+      ]
+    }
   }
 
   if (hue >= 120 && hue < 180) {
-    // Greens: follow natural plant color progressions
+    // Greens: natural plant progression, tighter range
     return [
       hue, // Base green
-      (hue - 40 + 360) % 360, // Blue-green (water/shadow)
-      (hue - 20 + 360) % 360, // Cool green
-      (hue + 15) % 360, // Warm green
-      (hue + 35) % 360, // Yellow-green (new growth)
-      (hue + 60) % 360, // Lime/chartreuse
+      (hue - 25 + 360) % 360, // Blue-green
+      (hue - 12 + 360) % 360, // Cool green
+      (hue + 10) % 360, // Warm green
+      (hue + 20) % 360, // Yellow-green
+      (hue + 35) % 360, // Spring green
     ]
   }
 
   if (hue >= 180 && hue < 240) {
-    // Cyans to blues: follow water/sky progressions
+    // Cyans to blues: water/sky progression, cohesive range
     return [
       hue, // Base cyan/blue
-      (hue - 30 + 360) % 360, // Deep blue-green
-      (hue - 15 + 360) % 360, // Teal
-      (hue + 12) % 360, // Sky blue
+      (hue - 20 + 360) % 360, // Deep teal
+      (hue - 10 + 360) % 360, // Teal
+      (hue + 8) % 360, // Sky blue
+      (hue + 18) % 360, // Light blue
       (hue + 30) % 360, // Bright blue
-      (hue + 55) % 360, // Blue-purple
     ]
   }
 
   if (hue >= 240 && hue < 300) {
-    // Blues to purples: follow twilight/night sky progressions
+    // Blues to purples: twilight progression, tighter
     return [
       hue, // Base blue-purple
-      (hue - 45 + 360) % 360, // Deep cyan
-      (hue - 20 + 360) % 360, // Blue
-      (hue + 18) % 360, // Purple
-      (hue + 40) % 360, // Red-purple
-      (hue + 70) % 360, // Magenta
+      (hue - 25 + 360) % 360, // Deep blue
+      (hue - 12 + 360) % 360, // Blue
+      (hue + 10) % 360, // Light purple
+      (hue + 20) % 360, // Purple
+      (hue + 35) % 360, // Red-purple
     ]
   }
 
-  // Magentas/purples: follow sunset/flower progressions
+  // Magentas/purples: flower progression, cohesive
   return [
     hue, // Base magenta
-    (hue - 60 + 360) % 360, // Blue-purple
     (hue - 25 + 360) % 360, // Purple
-    (hue + 20) % 360, // Pink-red
-    (hue + 45) % 360, // Warm pink
-    (hue + 80) % 360, // Coral/salmon
+    (hue - 12 + 360) % 360, // Light purple
+    (hue + 10) % 360, // Pink
+    (hue + 20) % 360, // Warm pink
+    (hue + 35) % 360, // Coral pink
   ]
 }
 
@@ -118,69 +130,69 @@ function getAdaptiveAnalogous(baseColor: Color): number[] {
 
   switch (emotionalType) {
     case 'passionate':
-      // Tell the story: ember → flame → fire → heat → glow → ash
+      // Tell the story: ember → flame → fire (tighter, more cohesive)
       return [
         hue, // Base flame
-        (hue + 320) % 360, // Deep ember (purple-red)
-        (hue + 340) % 360, // Glowing coal
-        (hue + 15) % 360, // Hot fire
-        (hue + 35) % 360, // Radiant heat
-        (hue + 60) % 360, // Golden glow
+        (hue - 20 + 360) % 360, // Deep ember
+        (hue - 10 + 360) % 360, // Glowing coal
+        (hue + 8) % 360, // Hot fire
+        (hue + 18) % 360, // Radiant heat
+        (hue + 30) % 360, // Orange glow
       ]
 
     case 'energetic':
-      // Tell the story: dawn → sunrise → golden hour → noon → warm afternoon → sunset
+      // Tell the story: sunrise → golden hour (focused range)
       return [
         hue, // Sunrise orange
-        (hue + 300) % 360, // Pre-dawn purple
-        (hue - 20 + 360) % 360, // Dawn red
-        (hue + 25) % 360, // Golden morning
-        (hue + 50) % 360, // Bright noon
-        (hue + 80) % 360, // Warm lime (afternoon energy)
+        (hue - 25 + 360) % 360, // Dawn red-orange
+        (hue - 12 + 360) % 360, // Deep orange
+        (hue + 10) % 360, // Golden
+        (hue + 20) % 360, // Bright yellow
+        (hue + 35) % 360, // Warm yellow
       ]
 
     case 'tranquil':
-      // Tell the story: deep ocean → shallow water → reflection → mist → sky → clouds
+      // Tell the story: water → sky (serene, tight range)
       return [
-        hue, // Clear reflection
-        (hue - 25 + 360) % 360, // Deep ocean green
+        hue, // Clear water
+        (hue - 20 + 360) % 360, // Deep water
         (hue - 10 + 360) % 360, // Shallow water
-        (hue + 12) % 360, // Misty blue
-        (hue + 28) % 360, // Open sky
-        (hue + 50) % 360, // Soft clouds (blue-purple)
+        (hue + 8) % 360, // Misty blue
+        (hue + 18) % 360, // Sky blue
+        (hue + 30) % 360, // Light sky
       ]
 
     case 'mysterious':
-      // Tell the story: abyss → shadow → twilight → midnight → dream → ethereal
+      // Tell the story: shadow → midnight (dark, cohesive)
       return [
         hue, // Twilight
-        (hue - 40 + 360) % 360, // Deep abyss
-        (hue - 18 + 360) % 360, // Shadow
-        (hue + 15) % 360, // Midnight
-        (hue + 35) % 360, // Dream state
-        (hue + 65) % 360, // Ethereal (toward magenta)
+        (hue - 25 + 360) % 360, // Deep shadow
+        (hue - 12 + 360) % 360, // Shadow
+        (hue + 10) % 360, // Midnight
+        (hue + 20) % 360, // Deep night
+        (hue + 35) % 360, // Dream purple
       ]
 
     case 'natural':
-      // Tell the story: forest floor → moss → leaves → new growth → sunlight → bloom
+      // Tell the story: forest → leaves (natural greens)
       return [
         hue, // Mature leaves
-        (hue - 35 + 360) % 360, // Deep forest (blue-green)
-        (hue - 15 + 360) % 360, // Moss
-        (hue + 18) % 360, // New growth
-        (hue + 40) % 360, // Sunlit leaves
-        (hue + 70) % 360, // Flower bloom (yellow)
+        (hue - 22 + 360) % 360, // Deep forest
+        (hue - 10 + 360) % 360, // Moss
+        (hue + 10) % 360, // New growth
+        (hue + 20) % 360, // Sunlit leaves
+        (hue + 35) % 360, // Spring green
       ]
 
     default: // creative
-      // Tell the story: inspiration → imagination → creation → expression → celebration → transcendence
+      // Tell the story: imagination → expression (focused creative)
       return [
         hue, // Creative base
-        (hue - 30 + 360) % 360, // Deep inspiration (blue)
-        (hue - 12 + 360) % 360, // Imagination
-        (hue + 20) % 360, // Expression
-        (hue + 45) % 360, // Celebration (pink)
-        (hue + 75) % 360, // Transcendence (coral/orange)
+        (hue - 20 + 360) % 360, // Deep inspiration
+        (hue - 10 + 360) % 360, // Imagination
+        (hue + 10) % 360, // Expression
+        (hue + 20) % 360, // Celebration
+        (hue + 35) % 360, // Joy
       ]
   }
 }
@@ -210,66 +222,58 @@ function getWarmCoolAnalogous(baseColor: Color): number[] {
 
   switch (lightType) {
     case 'golden':
-      // Golden hour: everything gets warm cast, shadows go purple-blue
-      const warmShift = 15
-      const shadowShift = -120
+      // Golden hour: warm cast with subtle variations
       return [
         hue, // True base
-        (hue + shadowShift + 360) % 360, // Cool shadow
-        (hue + shadowShift / 2 + 360) % 360, // Transitional shadow
-        (hue - warmShift / 3 + 360) % 360, // Slightly cool base
-        (hue + warmShift / 2) % 360, // Warmed by light
-        (hue + warmShift) % 360, // Fully sun-kissed
+        (hue - 20 + 360) % 360, // Slightly cooler
+        (hue - 10 + 360) % 360, // Cool-warm transition
+        (hue + 8) % 360, // Warm light
+        (hue + 18) % 360, // Golden light
+        (hue + 30) % 360, // Sun-kissed
       ]
 
     case 'cool':
-      // Moonlight: desaturated, cool cast, blue-silver illumination
-      const coolShift = 35
-      const blueShift = 60
+      // Moonlight: cool cast, cohesive blue tones
       return [
         hue, // Base
-        (hue - coolShift * 1.5 + 360) % 360, // Deep cool shadow
-        (hue - coolShift + 360) % 360, // Cool mid-tone
-        (hue + coolShift / 3) % 360, // Slight warm reflection
-        (hue + blueShift / 2) % 360, // Blue moonlight
-        (hue + blueShift) % 360, // Silver-blue highlight
+        (hue - 25 + 360) % 360, // Deep cool
+        (hue - 12 + 360) % 360, // Cool shadow
+        (hue + 10) % 360, // Moonlit
+        (hue + 20) % 360, // Blue moonlight
+        (hue + 35) % 360, // Silver-blue
       ]
 
     case 'magical':
-      // Magical/artificial light: creates impossible but beautiful combinations
-      const magicShift1 = 45
-      const magicShift2 = 90
+      // Magical light: ethereal but cohesive
       return [
         hue, // Base
-        (hue + 180) % 360, // Complementary magic shadow
-        (hue - magicShift1 + 360) % 360, // Cool magic
-        (hue + magicShift1 / 2) % 360, // Subtle magic influence
-        (hue + magicShift1) % 360, // Strong magic influence
-        (hue + magicShift2) % 360, // Pure magic highlight
+        (hue - 30 + 360) % 360, // Deep magic
+        (hue - 15 + 360) % 360, // Shadow magic
+        (hue + 12) % 360, // Light magic
+        (hue + 25) % 360, // Bright magic
+        (hue + 40) % 360, // Ethereal glow
       ]
 
     case 'dramatic':
-      // Dramatic lighting: strong contrasts, deep shadows, brilliant highlights
-      const dramaticSpread = 70
+      // Dramatic lighting: strong but controlled contrasts
       return [
         hue, // Dramatic base
-        (hue + 200 + 360) % 360, // Deep contrasting shadow
-        (hue - dramaticSpread / 2 + 360) % 360, // Dark transition
-        (hue + dramaticSpread / 3) % 360, // Lit area
-        (hue + dramaticSpread / 2) % 360, // Bright highlight
-        (hue + dramaticSpread) % 360, // Brilliant accent
+        (hue - 35 + 360) % 360, // Deep shadow
+        (hue - 18 + 360) % 360, // Dark transition
+        (hue + 15) % 360, // Lit area
+        (hue + 28) % 360, // Bright highlight
+        (hue + 45) % 360, // Brilliant accent
       ]
 
     default: // neutral/warm natural light
-      // Natural daylight: balanced, true colors with subtle atmospheric effects
-      const naturalSpread = 25
+      // Natural daylight: balanced, true colors
       return [
         hue, // True color
-        (hue - naturalSpread * 1.5 + 360) % 360, // Natural shadow
-        (hue - naturalSpread / 2 + 360) % 360, // Indirect light
-        (hue + naturalSpread / 3) % 360, // Direct light
-        (hue + naturalSpread / 2) % 360, // Bright light
-        (hue + naturalSpread) % 360, // Reflected light
+        (hue - 22 + 360) % 360, // Natural shadow
+        (hue - 10 + 360) % 360, // Indirect light
+        (hue + 8) % 360, // Direct light
+        (hue + 18) % 360, // Bright light
+        (hue + 30) % 360, // Reflected light
       ]
   }
 }
@@ -306,48 +310,86 @@ export function generateAnalogous(
         break
     }
 
-    // Style-specific lightness/chroma variations
-    let variations = [
-      { l: 0, c: 1.0 }, // base
-      { l: 0.15, c: 0.8 },
-      { l: -0.05, c: 0.9 },
-      { l: 0.1, c: 0.85 },
-      { l: 0.2, c: 0.7 },
-      { l: 0.3, c: 0.6 },
-    ]
+    // Get base color properties for adaptive lightness
+    const baseLightness = baseColorObj.oklch.l
+    const baseChroma = baseColorObj.oklch.c
+
+    // Create adaptive lightness adjustments
+    function getAdaptiveVariations() {
+      const targetRange = { min: 0.15, max: 0.9 }
+
+      if (baseLightness < 0.3) {
+        // Dark base: create more lighter variants
+        return [
+          { l: 0, c: 1.0 }, // base
+          { l: 0.25, c: 0.8 },
+          { l: 0.1, c: 0.9 },
+          { l: 0.35, c: 0.85 },
+          { l: 0.45, c: 0.7 },
+          { l: 0.55, c: 0.6 },
+        ]
+      } else if (baseLightness > 0.7) {
+        // Light base: create more darker variants
+        return [
+          { l: 0, c: 1.0 }, // base
+          { l: -0.35, c: 0.8 },
+          { l: -0.2, c: 0.9 },
+          { l: -0.45, c: 0.85 },
+          { l: -0.1, c: 0.7 },
+          { l: 0.05, c: 0.6 },
+        ]
+      } else {
+        // Mid-range base: balanced distribution
+        return [
+          { l: 0, c: 1.0 }, // base
+          { l: -0.2, c: 0.8 },
+          { l: -0.1, c: 0.9 },
+          { l: 0.15, c: 0.85 },
+          { l: 0.25, c: 0.7 },
+          { l: 0.35, c: 0.6 },
+        ]
+      }
+    }
+
+    let variations = getAdaptiveVariations()
 
     if (style === 'triangle') {
-      // Perceptual harmony: natural atmospheric variations
+      // Perceptual harmony: adjust based on base lightness
+      const lightnessModifier = baseLightness < 0.4 ? 0.15 : baseLightness > 0.6 ? -0.15 : 0
+
       variations = [
         { l: 0, c: 1.0 }, // Base color
-        { l: -0.2, c: 0.65 }, // Deep shadow (less saturated)
-        { l: -0.08, c: 0.85 }, // Mid shadow
-        { l: 0.06, c: 0.95 }, // Slight highlight
-        { l: 0.18, c: 0.75 }, // Bright highlight (atmospheric)
-        { l: 0.32, c: 0.5 }, // Atmospheric highlight (very desaturated)
+        { l: Math.max(-0.2 + lightnessModifier, -0.35), c: 0.65 },
+        { l: -0.08 + lightnessModifier, c: 0.85 },
+        { l: 0.06 + lightnessModifier, c: 0.95 },
+        { l: Math.min(0.18 + lightnessModifier, 0.4), c: 0.75 },
+        { l: Math.min(0.32 + lightnessModifier, 0.5), c: 0.5 },
       ]
     } else if (style === 'circle') {
       // Emotional resonance: varies by emotional type
       const hue = baseColorObj.oklch.h
+      // Emotional resonance: adapt for base lightness
+      const lightnessAdaptation = baseLightness < 0.4 ? 0.2 : baseLightness > 0.6 ? -0.2 : 0
+
       if (hue >= 345 || hue < 30) {
-        // passionate
+        // passionate - ensure visibility
         variations = [
           { l: 0, c: 1.0 }, // Base flame
-          { l: -0.25, c: 1.1 }, // Smoldering ember
-          { l: -0.08, c: 1.0 }, // Glowing coal
-          { l: 0.05, c: 0.95 }, // Bright fire
-          { l: 0.15, c: 0.85 }, // Radiant glow
-          { l: 0.3, c: 0.6 }, // Soft afterglow
+          { l: Math.max(-0.25 + lightnessAdaptation, -0.4), c: 1.1 },
+          { l: -0.08 + lightnessAdaptation, c: 1.0 },
+          { l: 0.05 + lightnessAdaptation, c: 0.95 },
+          { l: Math.min(0.15 + lightnessAdaptation, 0.35), c: 0.85 },
+          { l: Math.min(0.3 + lightnessAdaptation, 0.5), c: 0.6 },
         ]
       } else if (hue >= 150 && hue < 210) {
-        // tranquil
+        // tranquil - maintain serenity while ensuring range
         variations = [
           { l: 0, c: 1.0 }, // Base serenity
-          { l: -0.18, c: 0.7 }, // Deep calm
-          { l: -0.06, c: 0.85 }, // Gentle depth
-          { l: 0.08, c: 0.9 }, // Peaceful light
-          { l: 0.2, c: 0.7 }, // Soft luminosity
-          { l: 0.35, c: 0.45 }, // Ethereal mist
+          { l: Math.max(-0.18 + lightnessAdaptation, -0.35), c: 0.7 },
+          { l: -0.06 + lightnessAdaptation, c: 0.85 },
+          { l: 0.08 + lightnessAdaptation, c: 0.9 },
+          { l: Math.min(0.2 + lightnessAdaptation, 0.4), c: 0.7 },
+          { l: Math.min(0.35 + lightnessAdaptation, 0.55), c: 0.45 },
         ]
       }
     } else if (style === 'diamond') {
@@ -357,24 +399,24 @@ export function generateAnalogous(
       const lightness = baseColorObj.oklch.l
 
       if (hue >= 30 && hue < 90 && lightness > 0.6) {
-        // golden
+        // golden - prevent over-lightening
         variations = [
           { l: 0, c: 1.0 }, // Base
-          { l: -0.3, c: 0.6 }, // Deep warm shadow
-          { l: -0.12, c: 0.8 }, // Transition shadow
-          { l: 0.08, c: 1.05 }, // Warm light boost
-          { l: 0.22, c: 0.95 }, // Golden highlight
-          { l: 0.4, c: 0.75 }, // Sun-bleached highlight
+          { l: Math.max(-0.3, 0.15 - lightness), c: 0.6 },
+          { l: -0.12, c: 0.8 },
+          { l: Math.min(0.08, 0.85 - lightness), c: 1.05 },
+          { l: Math.min(0.22, 0.9 - lightness), c: 0.95 },
+          { l: Math.min(0.3, 0.9 - lightness), c: 0.75 },
         ]
       } else if (hue >= 180 && hue < 240 && lightness < 0.5) {
-        // cool
+        // cool - ensure adequate lightness
         variations = [
           { l: 0, c: 1.0 }, // Base
-          { l: -0.2, c: 0.5 }, // Deep shadow
-          { l: -0.08, c: 0.7 }, // Cool shadow
-          { l: 0.06, c: 0.85 }, // Moonlit
-          { l: 0.15, c: 0.65 }, // Silver light
-          { l: 0.25, c: 0.45 }, // Ethereal highlight
+          { l: Math.max(-0.2, 0.15 - lightness), c: 0.5 },
+          { l: -0.08, c: 0.7 },
+          { l: 0.1, c: 0.85 },
+          { l: 0.25, c: 0.65 },
+          { l: 0.35, c: 0.45 },
         ]
       }
     }

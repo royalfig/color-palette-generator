@@ -232,62 +232,102 @@ export function generateTriadic(
         break
     }
 
-    // Style-specific lightness and chroma variations
-    let baseVariations = {
-      dark: { l: -0.2, c: 1.1 },
+    // Get base color properties for adaptive lightness
+    const baseLightness = baseColorObj.oklch.l
+    const baseChroma = baseColorObj.oklch.c
+
+    // Create adaptive lightness adjustments based on input color
+    function getAdaptiveLightnessAdjustments() {
+      // Ensure palette spans a good lightness range (0.15 to 0.9)
+      const targetRange = { min: 0.15, max: 0.9 }
+
+      let baseVariations, triadVariations
+
+      if (baseLightness < 0.3) {
+        // Dark base: create lighter triad variants
+        baseVariations = {
+          dark: { l: Math.max(-0.1, targetRange.min - baseLightness), c: 1.0 },
+        }
+        triadVariations = {
+          first: { pure: { l: 0.2, c: 0.95 }, muted: { l: 0.35, c: 0.7 } },
+          second: { pure: { l: 0.15, c: 0.95 }, muted: { l: 0.3, c: 0.7 } },
+        }
+      } else if (baseLightness > 0.7) {
+        // Light base: create darker triad variants
+        baseVariations = {
+          dark: { l: Math.max(-0.4, targetRange.min - baseLightness), c: 1.1 },
+        }
+        triadVariations = {
+          first: { pure: { l: -0.2, c: 0.95 }, muted: { l: -0.35, c: 0.7 } },
+          second: { pure: { l: -0.25, c: 0.95 }, muted: { l: -0.15, c: 0.7 } },
+        }
+      } else {
+        // Mid-range base: create balanced distribution
+        baseVariations = {
+          dark: { l: -0.2, c: 1.1 },
+        }
+        triadVariations = {
+          first: { pure: { l: 0.1, c: 0.95 }, muted: { l: 0.2, c: 0.7 } },
+          second: { pure: { l: -0.1, c: 0.95 }, muted: { l: -0.2, c: 0.7 } },
+        }
+      }
+
+      return { baseVariations, triadVariations }
     }
 
-    let triadVariations = {
-      first: { pure: { l: 0, c: 0.95 }, muted: { l: 0.1, c: 0.7 } },
-      second: { pure: { l: 0, c: 0.95 }, muted: { l: -0.1, c: 0.7 } },
-    }
+    let { baseVariations, triadVariations } = getAdaptiveLightnessAdjustments()
 
     if (style === 'triangle') {
-      // Perceptual harmony: natural visual balance
+      // Perceptual harmony: adjust based on base lightness
+      const lightnessModifier = baseLightness < 0.4 ? 0.1 : baseLightness > 0.6 ? -0.1 : 0
+
       baseVariations = {
-        dark: { l: -0.18, c: 1.0 }, // Less extreme, more natural
+        dark: { l: Math.max(-0.18 + lightnessModifier, -0.3), c: 1.0 },
       }
       triadVariations = {
         first: {
-          pure: { l: 0.05, c: 0.9 }, // Slightly lighter for balance
-          muted: { l: 0.12, c: 0.65 }, // Atmospheric muted
+          pure: { l: 0.05 - lightnessModifier, c: 0.9 },
+          muted: { l: 0.12 - lightnessModifier, c: 0.65 },
         },
         second: {
-          pure: { l: -0.02, c: 0.92 }, // Slightly darker balance
-          muted: { l: -0.08, c: 0.68 }, // Deep muted
+          pure: { l: -0.02 - lightnessModifier, c: 0.92 },
+          muted: { l: -0.08 - lightnessModifier, c: 0.68 },
         },
       }
     } else if (style === 'circle') {
       // Emotional resonance: varies by emotional type
       const hue = baseColorObj.oklch.h
+      // Emotional resonance: adapt for base lightness
+      const lightnessAdaptation = baseLightness < 0.4 ? 0.15 : baseLightness > 0.6 ? -0.15 : 0
+
       if (hue >= 345 || hue < 30) {
-        // passionate
+        // passionate - ensure visibility
         baseVariations = {
-          dark: { l: -0.25, c: 1.2 }, // Deep passionate intensity
+          dark: { l: Math.max(-0.25 + lightnessAdaptation, -0.35), c: 1.2 },
         }
         triadVariations = {
           first: {
-            pure: { l: 0.08, c: 0.85 }, // Grounding earth tone
-            muted: { l: 0.15, c: 0.6 }, // Soft earth
+            pure: { l: 0.08 - lightnessAdaptation, c: 0.85 },
+            muted: { l: 0.15 - lightnessAdaptation, c: 0.6 },
           },
           second: {
-            pure: { l: 0.05, c: 0.9 }, // Cooling sky
-            muted: { l: -0.05, c: 0.65 }, // Deep sky
+            pure: { l: 0.05 - lightnessAdaptation, c: 0.9 },
+            muted: { l: -0.05 - lightnessAdaptation, c: 0.65 },
           },
         }
       } else if (hue >= 150 && hue < 210) {
-        // tranquil
+        // tranquil - maintain balance
         baseVariations = {
-          dark: { l: -0.15, c: 0.9 }, // Gentle depth
+          dark: { l: Math.max(-0.15 + lightnessAdaptation, -0.25), c: 0.9 },
         }
         triadVariations = {
           first: {
-            pure: { l: 0.1, c: 0.9 }, // Warming fire
-            muted: { l: 0.18, c: 0.7 }, // Gentle warmth
+            pure: { l: 0.1 - lightnessAdaptation, c: 0.9 },
+            muted: { l: 0.18 - lightnessAdaptation, c: 0.7 },
           },
           second: {
-            pure: { l: 0.05, c: 0.85 }, // Grounding earth
-            muted: { l: -0.08, c: 0.6 }, // Deep earth
+            pure: { l: 0.05 - lightnessAdaptation, c: 0.85 },
+            muted: { l: -0.08 - lightnessAdaptation, c: 0.6 },
           },
         }
       }
@@ -297,33 +337,33 @@ export function generateTriadic(
       const chroma = baseColorObj.oklch.c
 
       if (lightness > 0.8 && chroma < 0.3) {
-        // daylight
+        // daylight - prevent over-darkening
         baseVariations = {
-          dark: { l: -0.3, c: 1.0 }, // Strong natural shadow
+          dark: { l: Math.max(-0.25, 0.15 - lightness), c: 1.0 },
         }
         triadVariations = {
           first: {
-            pure: { l: 0.02, c: 0.85 }, // Reflected light
-            muted: { l: 0.15, c: 0.6 }, // Soft reflection
+            pure: { l: -0.05, c: 0.85 },
+            muted: { l: 0.1, c: 0.6 },
           },
           second: {
-            pure: { l: -0.08, c: 0.8 }, // Shadow light
-            muted: { l: -0.15, c: 0.5 }, // Deep shadow
+            pure: { l: -0.15, c: 0.8 },
+            muted: { l: -0.25, c: 0.5 },
           },
         }
       } else if (chroma > 0.8 && lightness < 0.4) {
-        // dramatic
+        // dramatic - ensure visibility
         baseVariations = {
-          dark: { l: -0.35, c: 1.3 }, // Deep dramatic
+          dark: { l: Math.max(-0.2, 0.15 - lightness), c: 1.3 },
         }
         triadVariations = {
           first: {
-            pure: { l: 0.15, c: 1.0 }, // Dramatic fill
-            muted: { l: 0.08, c: 0.8 }, // Supporting drama
+            pure: { l: 0.25, c: 1.0 },
+            muted: { l: 0.15, c: 0.8 },
           },
           second: {
-            pure: { l: 0.2, c: 1.1 }, // Dramatic back light
-            muted: { l: -0.05, c: 0.75 }, // Dramatic ambient
+            pure: { l: 0.35, c: 1.1 },
+            muted: { l: 0.1, c: 0.75 },
           },
         }
       }

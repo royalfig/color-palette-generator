@@ -222,62 +222,102 @@ export function generateSplitComplementary(
         break
     }
 
-    // Style-specific lightness and chroma variations
-    let baseVariations = {
-      dark: { l: -0.2, c: 1.1 },
+    // Get base color properties for adaptive lightness
+    const baseLightness = baseColorObj.oklch.l
+    const baseChroma = baseColorObj.oklch.c
+
+    // Create adaptive lightness adjustments based on input color
+    function getAdaptiveLightnessAdjustments() {
+      // Ensure palette spans a good lightness range (0.15 to 0.9)
+      const targetRange = { min: 0.15, max: 0.9 }
+
+      let baseVariations, complementVariations
+
+      if (baseLightness < 0.3) {
+        // Dark base: create lighter complement variants
+        baseVariations = {
+          dark: { l: Math.max(-0.1, targetRange.min - baseLightness), c: 1.0 },
+        }
+        complementVariations = {
+          first: { pure: { l: 0.3, c: 0.9 }, muted: { l: 0.15, c: 0.7 } },
+          second: { pure: { l: 0.2, c: 0.9 }, muted: { l: 0.4, c: 0.6 } },
+        }
+      } else if (baseLightness > 0.7) {
+        // Light base: create darker complement variants
+        baseVariations = {
+          dark: { l: Math.max(-0.4, targetRange.min - baseLightness), c: 1.1 },
+        }
+        complementVariations = {
+          first: { pure: { l: -0.2, c: 0.9 }, muted: { l: -0.35, c: 0.7 } },
+          second: { pure: { l: -0.3, c: 0.9 }, muted: { l: -0.15, c: 0.7 } },
+        }
+      } else {
+        // Mid-range base: create balanced distribution
+        baseVariations = {
+          dark: { l: -0.2, c: 1.1 },
+        }
+        complementVariations = {
+          first: { pure: { l: 0.15, c: 0.9 }, muted: { l: -0.15, c: 0.7 } },
+          second: { pure: { l: -0.1, c: 0.9 }, muted: { l: 0.2, c: 0.7 } },
+        }
+      }
+
+      return { baseVariations, complementVariations }
     }
 
-    let complementVariations = {
-      first: { pure: { l: 0.1, c: 0.9 }, muted: { l: -0.1, c: 0.7 } },
-      second: { pure: { l: -0.05, c: 0.9 }, muted: { l: 0.15, c: 0.7 } },
-    }
+    let { baseVariations, complementVariations } = getAdaptiveLightnessAdjustments()
 
     if (style === 'triangle') {
-      // Perceptual harmony: natural atmospheric relationships
+      // Perceptual harmony: adjust based on base lightness while maintaining natural feel
+      const lightnessModifier = baseLightness < 0.4 ? 0.1 : baseLightness > 0.6 ? -0.1 : 0
+
       baseVariations = {
-        dark: { l: -0.18, c: 0.95 }, // Less extreme, more natural
+        dark: { l: Math.max(-0.18 + lightnessModifier, -0.3), c: 0.95 },
       }
       complementVariations = {
         first: {
-          pure: { l: 0.08, c: 0.85 }, // Balanced brightness
-          muted: { l: -0.08, c: 0.65 }, // Natural muted
+          pure: { l: 0.08 - lightnessModifier, c: 0.85 },
+          muted: { l: -0.08 - lightnessModifier, c: 0.65 },
         },
         second: {
-          pure: { l: -0.02, c: 0.88 }, // Slightly darker balance
-          muted: { l: 0.12, c: 0.68 }, // Lighter atmospheric
+          pure: { l: -0.02 - lightnessModifier, c: 0.88 },
+          muted: { l: 0.12 - lightnessModifier, c: 0.68 },
         },
       }
     } else if (style === 'circle') {
       // Emotional resonance: varies by emotional type
       const hue = baseColorObj.oklch.h
+      // Emotional resonance: varies by emotional type, adapted for base lightness
+      const lightnessAdaptation = baseLightness < 0.4 ? 0.15 : baseLightness > 0.6 ? -0.15 : 0
+
       if (hue >= 345 || hue < 30) {
-        // passionate
+        // passionate - adapt intensity based on base lightness
         baseVariations = {
-          dark: { l: -0.25, c: 1.2 }, // Deep passionate intensity
+          dark: { l: Math.max(-0.2 + lightnessAdaptation, -0.35), c: 1.2 },
         }
         complementVariations = {
           first: {
-            pure: { l: 0.15, c: 0.8 }, // Calming but present
-            muted: { l: -0.05, c: 0.6 }, // Soothing depth
+            pure: { l: 0.15 - lightnessAdaptation, c: 0.8 },
+            muted: { l: -0.05 - lightnessAdaptation, c: 0.6 },
           },
           second: {
-            pure: { l: 0.1, c: 0.85 }, // Refreshing clarity
-            muted: { l: 0.2, c: 0.65 }, // Light refreshment
+            pure: { l: 0.1 - lightnessAdaptation, c: 0.85 },
+            muted: { l: 0.2 - lightnessAdaptation, c: 0.65 },
           },
         }
       } else if (hue >= 150 && hue < 210) {
-        // tranquil
+        // tranquil - maintain gentleness while ensuring range
         baseVariations = {
-          dark: { l: -0.15, c: 0.9 }, // Gentle depth
+          dark: { l: Math.max(-0.15 + lightnessAdaptation, -0.25), c: 0.9 },
         }
         complementVariations = {
           first: {
-            pure: { l: 0.12, c: 0.95 }, // Warm comfort
-            muted: { l: -0.08, c: 0.75 }, // Cozy warmth
+            pure: { l: 0.12 - lightnessAdaptation, c: 0.95 },
+            muted: { l: -0.08 - lightnessAdaptation, c: 0.75 },
           },
           second: {
-            pure: { l: 0.08, c: 0.9 }, // Golden warmth
-            muted: { l: 0.18, c: 0.7 }, // Soft glow
+            pure: { l: 0.08 - lightnessAdaptation, c: 0.9 },
+            muted: { l: 0.18 - lightnessAdaptation, c: 0.7 },
           },
         }
       }
@@ -287,33 +327,33 @@ export function generateSplitComplementary(
       const chroma = baseColorObj.oklch.c
 
       if (lightness > 0.8 && chroma < 0.3) {
-        // daylight
+        // daylight - strong contrast but prevent over-darkening
         baseVariations = {
-          dark: { l: -0.3, c: 1.0 }, // Strong shadow
+          dark: { l: Math.max(-0.25, 0.15 - lightness), c: 1.0 },
         }
         complementVariations = {
           first: {
-            pure: { l: 0.05, c: 0.8 }, // Gentle shadow
-            muted: { l: -0.12, c: 0.5 }, // Deep shadow
+            pure: { l: -0.05, c: 0.8 },
+            muted: { l: -0.2, c: 0.5 },
           },
           second: {
-            pure: { l: 0.02, c: 0.75 }, // Atmospheric shadow
-            muted: { l: 0.15, c: 0.55 }, // Light shadow
+            pure: { l: -0.08, c: 0.75 },
+            muted: { l: 0.05, c: 0.55 },
           },
         }
       } else if (chroma > 0.8 && lightness < 0.4) {
-        // dramatic
+        // dramatic - enhance contrast while ensuring visibility
         baseVariations = {
-          dark: { l: -0.35, c: 1.3 }, // Deep dramatic
+          dark: { l: Math.max(-0.2, 0.15 - lightness), c: 1.3 },
         }
         complementVariations = {
           first: {
-            pure: { l: 0.18, c: 1.1 }, // Dramatic highlight
-            muted: { l: -0.05, c: 0.8 }, // Supporting drama
+            pure: { l: 0.25, c: 1.1 },
+            muted: { l: 0.1, c: 0.8 },
           },
           second: {
-            pure: { l: 0.25, c: 1.0 }, // Bright drama
-            muted: { l: 0.1, c: 0.75 }, // Accent drama
+            pure: { l: 0.35, c: 1.0 },
+            muted: { l: 0.15, c: 0.75 },
           },
         }
       }
@@ -390,8 +430,6 @@ export function generateSplitComplementary(
         colors.push(colorFactory(color, 'split-complementary', index, format))
       }
     })
-
-    return colors
 
     return colors
   } catch (e) {
