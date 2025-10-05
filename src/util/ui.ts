@@ -143,25 +143,72 @@ export function generateUiColorPalette(
     tertiaryBase = tertiary
   }
 
+  // Helper to find color in palette by hue range
+  const findPaletteColorByHue = (targetHue: number, tolerance: number = 20): Color | null => {
+    for (const item of palette) {
+      if (item?.color?.oklch?.h !== undefined) {
+        const hue = item.color.oklch.h
+        const diff = Math.abs(hue - targetHue)
+        const distance = Math.min(diff, 360 - diff)
+        if (distance <= tolerance) {
+          return item.color.clone()
+        }
+      }
+    }
+    return null
+  }
+
+  // Helper to calculate average chroma from palette for harmony
+  const getAverageChroma = (): number => {
+    const chromas = palette
+      .filter(item => item?.color?.oklch?.c !== undefined)
+      .map(item => item.color.oklch.c)
+    if (chromas.length === 0) return 0.1 // Default moderate chroma
+    return chromas.reduce((sum, c) => sum + c, 0) / chromas.length
+  }
+
+  const avgChroma = getAverageChroma()
+
+  // Create semantic colors: prefer palette colors, fallback to adaptive generation
+  const errorBase = findPaletteColorByHue(30) || (() => {
+    const fallback = color.clone()
+    fallback.oklch.h = 30
+    // Adapt chroma to palette's average, but ensure visibility for error states
+    fallback.oklch.c = Math.min(Math.max(avgChroma * 0.9, 0.1), 0.15)
+    return fallback
+  })()
+
+  const successBase = findPaletteColorByHue(140) || (() => {
+    const fallback = color.clone()
+    fallback.oklch.h = 140
+    // Adapt chroma to palette's average
+    fallback.oklch.c = Math.min(Math.max(avgChroma * 0.9, 0.1), 0.15)
+    return fallback
+  })()
+
+  const warningBase = findPaletteColorByHue(80) || (() => {
+    const fallback = color.clone()
+    fallback.oklch.h = 80
+    // Adapt chroma to palette's average
+    fallback.oklch.c = Math.min(Math.max(avgChroma * 0.9, 0.1), 0.15)
+    return fallback
+  })()
+
   // Material 3 Color Roles
   return [
     // Primary colors
     colorFactory(getMaterialTone(primaryBase, 40, 80, isDarkMode), 'primary', 0, colorFormat, false, true),
     colorFactory(getMaterialTone(primaryBase, 100, 20, isDarkMode), 'on-primary', 0, colorFormat, false, true),
-    colorFactory(getMaterialTone(primaryBase, 90, 30, isDarkMode), 'primary-subtle', 0, colorFormat, false, true),
-    colorFactory(getMaterialTone(primaryBase, 10, 90, isDarkMode), 'on-primary-subtle', 0, colorFormat, false, true),
+    colorFactory(getMaterialTone(primaryBase, 90, 30, isDarkMode), 'primary-container', 0, colorFormat, false, true),
+    colorFactory(getMaterialTone(primaryBase, 10, 90, isDarkMode), 'on-primary-container', 0, colorFormat, false, true),
 
     // Secondary colors
     colorFactory(getMaterialTone(secondaryBase, 40, 80, isDarkMode), 'secondary', 0, colorFormat, false, true),
     colorFactory(getMaterialTone(secondaryBase, 100, 20, isDarkMode), 'on-secondary', 0, colorFormat, false, true),
-    colorFactory(getMaterialTone(secondaryBase, 90, 30, isDarkMode), 'secondary-subtle', 0, colorFormat, false, true),
-    colorFactory(getMaterialTone(secondaryBase, 10, 90, isDarkMode), 'on-secondary-subtle', 0, colorFormat, false, true),
 
     // Tertiary colors
     colorFactory(getMaterialTone(tertiaryBase, 40, 80, isDarkMode), 'tertiary', 0, colorFormat, false, true),
     colorFactory(getMaterialTone(tertiaryBase, 100, 20, isDarkMode), 'on-tertiary', 0, colorFormat, false, true),
-    colorFactory(getMaterialTone(tertiaryBase, 90, 30, isDarkMode), 'tertiary-subtle', 0, colorFormat, false, true),
-    colorFactory(getMaterialTone(tertiaryBase, 10, 90, isDarkMode), 'on-tertiary-subtle', 0, colorFormat, false, true),
 
     // Surface colors
     colorFactory(getNeutralColor(primaryBase, isDarkMode ? 10 : 99), 'surface', 0, colorFormat, false, true),
@@ -175,26 +222,10 @@ export function generateUiColorPalette(
       true,
     ),
 
-    // Surface container variants - improved dark and light mode differentiation
-    colorFactory(
-      getNeutralColor(primaryBase, isDarkMode ? 6 : 100),
-      'surface-container-lowest',
-      0,
-      colorFormat,
-      false,
-      true,
-    ),
-    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 12 : 94), 'surface-container-low', 0, colorFormat, false, true),
-    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 18 : 88), 'surface-container', 0, colorFormat, false, true),
-    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 24 : 82), 'surface-container-high', 0, colorFormat, false, true),
-    colorFactory(
-      getNeutralColor(primaryBase, isDarkMode ? 30 : 76),
-      'surface-container-highest',
-      0,
-      colorFormat,
-      false,
-      true,
-    ),
+    // Surface variants - simplified to 3 semantic levels
+    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 18 : 92), 'surface-elevated', 0, colorFormat, false, true),
+    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 14 : 94), 'surface-muted', 0, colorFormat, false, true),
+    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 12 : 97), 'surface-subtle', 0, colorFormat, false, true),
 
     // Outline colors
     colorFactory(getNeutralVariantColor(primaryBase, isDarkMode ? 60 : 50), 'outline', 0, colorFormat, false, true),
@@ -203,5 +234,17 @@ export function generateUiColorPalette(
     // Inverse colors
     colorFactory(getNeutralColor(primaryBase, isDarkMode ? 90 : 20), 'inverse-surface', 0, colorFormat, false, true),
     colorFactory(getNeutralColor(primaryBase, isDarkMode ? 20 : 95), 'on-inverse-surface', 0, colorFormat, false, true),
+
+    // Error colors
+    colorFactory(getMaterialTone(errorBase, 40, 80, isDarkMode), 'error', 0, colorFormat, false, true),
+    colorFactory(getMaterialTone(errorBase, 100, 20, isDarkMode), 'on-error', 0, colorFormat, false, true),
+
+    // Success colors
+    colorFactory(getMaterialTone(successBase, 40, 80, isDarkMode), 'success', 0, colorFormat, false, true),
+    colorFactory(getMaterialTone(successBase, 100, 20, isDarkMode), 'on-success', 0, colorFormat, false, true),
+
+    // Warning colors
+    colorFactory(getMaterialTone(warningBase, 50, 70, isDarkMode), 'warning', 0, colorFormat, false, true),
+    colorFactory(getMaterialTone(warningBase, 10, 20, isDarkMode), 'on-warning', 0, colorFormat, false, true),
   ]
 }
