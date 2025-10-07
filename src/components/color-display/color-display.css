@@ -20,6 +20,7 @@
   h1 {
     font-size: max(2.45cqi, 24px);
     font-weight: 400;
+    white-space: nowrap;
   }
 }
 
@@ -28,6 +29,7 @@
   height: 100%;
   background-color: var(--color);
   border-radius: 1px;
+  flex-shrink: 0;
 }
 
 .color-details {
