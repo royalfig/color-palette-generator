@@ -2,10 +2,22 @@ import Color from 'colorjs.io'
 import { BaseColorData, colorFactory } from './factory'
 import { PaletteKinds, ColorFormat } from '../types'
 
-// Material 3 tone mapping - creates specific lightness values for consistency
+// Helper to scale chroma based on lightness to prevent unwanted saturation in near-whites/blacks.
+function getScaledChroma(chroma: number, lightness: number): number {
+  // As lightness approaches 0 or 1, the scaling factor approaches 0.
+  const lightnessDistance = Math.abs(lightness - 0.5)
+  // A quadratic falloff ensures a smooth reduction.
+  const chromaScale = Math.max(0, 1 - Math.pow(lightnessDistance * 1.8, 2))
+  return chroma * chromaScale
+}
+
+// Creates a specific tone (lightness) for a color, with chroma scaling.
 function getTone(color: Color, tone: number): Color {
   const result = color.clone()
-  result.oklch.l = tone / 100
+  const targetLightness = tone / 100
+  // Scale the chroma based on the target lightness.
+  result.oklch.c = getScaledChroma(result.oklch.c, targetLightness)
+  result.oklch.l = targetLightness
   return result
 }
 
@@ -14,100 +26,82 @@ function getMaterialTone(color: Color, lightTone: number, darkTone: number, isDa
   return getTone(color, isDarkMode ? darkTone : lightTone)
 }
 
-// Generate neutral colors from a base color by reducing chroma
-function getNeutralColor(color: Color, tone: number): Color {
-  const neutral = color.clone()
-  // Fixed very low chroma for true neutrals - almost grayscale
-  neutral.oklch.c = 0.005 // Extremely minimal tint, nearly imperceptible
-  neutral.oklch.l = tone / 100 // Linear mapping is correct for OKLCH
+// AGGRESSIVE CAPPING: Generate neutral colors with a fixed, very low chroma target, scaled by lightness.
+function getNeutralColor(baseColor: Color, tone: number): Color {
+  const neutral = baseColor.clone()
+  const targetLightness = tone / 100
+  const targetChroma = 0.003 // Define the target chroma before scaling.
+  neutral.oklch.c = getScaledChroma(targetChroma, targetLightness)
+  neutral.oklch.l = targetLightness
   return neutral
 }
 
-// Generate neutral variant colors (slightly more chromatic than neutrals)
-function getNeutralVariantColor(color: Color, tone: number): Color {
-  const neutralVariant = color.clone()
-  // Fixed low chroma - just enough to be noticeable but still neutral
-  neutralVariant.oklch.c = 0.015 // Subtle hint of color
-  neutralVariant.oklch.l = tone / 100 // Linear mapping is correct for OKLCH
+// AGGRESSIVE CAPPING: Generate neutral variants with a fixed, low chroma target, scaled by lightness.
+function getNeutralVariantColor(baseColor: Color, tone: number): Color {
+  const neutralVariant = baseColor.clone()
+  const targetLightness = tone / 100
+  const targetChroma = 0.01 // Define the target chroma before scaling.
+  neutralVariant.oklch.c = getScaledChroma(targetChroma, targetLightness)
+  neutralVariant.oklch.l = targetLightness
   return neutralVariant
 }
 
 // Intelligently select secondary and tertiary colors based on palette type
 function getOptimalSecondaryTertiary(paletteType: PaletteKinds, palette: BaseColorData[], fallbackColor: Color): { secondary: Color, tertiary: Color } {
-  // Ensure we have enough colors, fallback to generated colors if needed
   const safeGetColor = (index: number): Color => {
     if (palette[index]?.color) {
       return palette[index].color.clone()
     }
-    // Generate fallback color with hue shift
     const fallback = fallbackColor.clone()
     fallback.oklch.h = (fallback.oklch.h + (index * 60)) % 360
-    // Reduce chroma slightly for harmony
     fallback.oklch.c = Math.min(fallback.oklch.c * 0.8, 0.12)
     return fallback
   }
 
   switch (paletteType) {
-    case 'com': // Complementary - high contrast, great for UI
+    case 'com':
       return {
-        secondary: safeGetColor(1), // Main complement - maximum contrast
-        tertiary: enhanceForUI(safeGetColor(4), 'tertiary') // Light complement
+        secondary: enhanceForUI(safeGetColor(1), 'secondary'),
+        tertiary: enhanceForUI(safeGetColor(4), 'tertiary'),
       }
-    
-    case 'spl': // Split-complementary - most versatile for UI
+    case 'spl':
       return {
-        secondary: enhanceForUI(safeGetColor(2), 'secondary'), // First split - balanced contrast
-        tertiary: enhanceForUI(safeGetColor(4), 'tertiary') // Second split - alternative accent
+        secondary: enhanceForUI(safeGetColor(2), 'secondary'),
+        tertiary: enhanceForUI(safeGetColor(4), 'tertiary'),
       }
-    
-    case 'tri': // Triadic - energetic, good for creative UIs
+    case 'tri':
       return {
-        secondary: enhanceForUI(safeGetColor(2), 'secondary'), // First triad pure
-        tertiary: enhanceForUI(safeGetColor(4), 'tertiary') // Second triad pure
+        secondary: enhanceForUI(safeGetColor(2), 'secondary'),
+        tertiary: enhanceForUI(safeGetColor(4), 'tertiary'),
       }
-    
-    case 'tet': // Tetradic - complex but balanced
+    case 'tet':
       return {
-        secondary: enhanceForUI(safeGetColor(1), 'secondary'), // First tetradic - balanced contrast
-        tertiary: enhanceForUI(safeGetColor(4), 'tertiary') // Fourth tetradic light
+        secondary: enhanceForUI(safeGetColor(1), 'secondary'),
+        tertiary: enhanceForUI(safeGetColor(4), 'tertiary'),
       }
-    
-    case 'ana': // Analogous - harmonious, good for content-focused UIs
+    case 'ana':
       return {
-        secondary: enhanceForUI(safeGetColor(3), 'secondary'), // Subtle contrast, maintains harmony
-        tertiary: enhanceForUI(safeGetColor(1), 'tertiary') // Muted nearby hue
+        secondary: enhanceForUI(safeGetColor(3), 'secondary'),
+        tertiary: enhanceForUI(safeGetColor(1), 'tertiary'),
       }
-    
     default:
-      // Fallback to original simple logic
       return {
         secondary: safeGetColor(1),
-        tertiary: safeGetColor(2)
+        tertiary: safeGetColor(2),
       }
   }
 }
 
-// Enhance colors specifically for UI roles
+// GENERAL CAPPING: Tame colors for UI roles by capping their chroma.
 function enhanceForUI(color: Color, role: 'secondary' | 'tertiary'): Color {
   const enhanced = color.clone()
-  
   if (role === 'secondary') {
-    // Secondary should be vibrant and accessible
-    // Ensure adequate chroma for visual interest
-    enhanced.oklch.c = Math.max(enhanced.oklch.c, 0.08)
-    // Optimize lightness for accessibility (not too light, not too dark)
+    enhanced.oklch.c = Math.min(enhanced.oklch.c, 0.08) // Moderate cap
     if (enhanced.oklch.l > 0.85) enhanced.oklch.l = 0.75
     if (enhanced.oklch.l < 0.25) enhanced.oklch.l = 0.35
-  } else {
-    // Tertiary should be softer, more subtle
-    // Reduce chroma for subtlety
-    enhanced.oklch.c = Math.min(enhanced.oklch.c * 0.7, 0.1)
-    // Adjust lightness to be lighter and more approachable
-    if (enhanced.oklch.l < 0.5) {
-      enhanced.oklch.l = Math.min(enhanced.oklch.l + 0.2, 0.7)
-    }
+  } else { // Tertiary
+    enhanced.oklch.c = Math.min(enhanced.oklch.c, 0.04) // Low cap
   }
-  
   return enhanced
 }
 
@@ -118,32 +112,25 @@ export function generateUiColorPalette(
   paletteType: PaletteKinds,
   colorFormat: ColorFormat,
 ) {
-  // For TAS (tints and shades), create a monochrome UI with minimal secondary/tertiary colors
-  const isMonochrome = paletteType === 'tas'
+  // --- Tiered Chroma Capping with Lightness Scaling ---
 
-  // Get base colors for primary, secondary, and tertiary
-  // Use the original user color as the primary base, not from palette
-  let primaryBase = color.clone()
-  let secondaryBase: Color
-  let tertiaryBase: Color
+  // 1. Primary role uses the original, uncapped color for full vibrancy.
+  const primaryBase = color.clone()
 
-  if (isMonochrome) {
-    // For monochrome, use the primary color as base but shift hue slightly for variety
-    secondaryBase = color.clone()
-    secondaryBase.oklch.h = (secondaryBase.oklch.h + 30) % 360
-    secondaryBase.oklch.c = Math.min(secondaryBase.oklch.c * 0.6, 0.05) // Very low chroma
+  // 2. Primary containers get a general chroma cap.
+  const primaryContainerBase = primaryBase.clone()
+  primaryContainerBase.oklch.c = Math.min(primaryContainerBase.oklch.c, 0.05)
 
-    tertiaryBase = color.clone()
-    tertiaryBase.oklch.h = (tertiaryBase.oklch.h + 60) % 360
-    tertiaryBase.oklch.c = Math.min(tertiaryBase.oklch.c * 0.4, 0.03) // Even lower chroma
-  } else {
-    // Intelligently select secondary and tertiary colors based on palette type
-    const { secondary, tertiary } = getOptimalSecondaryTertiary(paletteType, palette, color)
-    secondaryBase = secondary
-    tertiaryBase = tertiary
-  }
+  // 3. Secondary and Tertiary colors are selected and capped via `enhanceForUI`.
+  const { secondary: secondaryBase, tertiary: tertiaryBase } = getOptimalSecondaryTertiary(
+    paletteType,
+    palette,
+    color,
+  )
 
-  // Helper to find color in palette by hue range
+  // 4. The neutralBase provides the hue for the aggressively capped neutral functions.
+  const neutralBase = primaryBase
+
   const findPaletteColorByHue = (targetHue: number, tolerance: number = 20): Color | null => {
     for (const item of palette) {
       if (item?.color?.oklch?.h !== undefined) {
@@ -158,92 +145,66 @@ export function generateUiColorPalette(
     return null
   }
 
-  // Helper to calculate average chroma from palette for harmony
-  const getAverageChroma = (): number => {
-    const chromas = palette
-      .filter(item => item?.color?.oklch?.c !== undefined)
-      .map(item => item.color.oklch.c)
-    if (chromas.length === 0) return 0.1 // Default moderate chroma
-    return chromas.reduce((sum, c) => sum + c, 0) / chromas.length
-  }
-
-  const avgChroma = getAverageChroma()
-
-  // Create semantic colors: prefer palette colors, fallback to adaptive generation
+  const avgChroma = 0.12
   const errorBase = findPaletteColorByHue(30) || (() => {
     const fallback = color.clone()
     fallback.oklch.h = 30
-    // Adapt chroma to palette's average, but ensure visibility for error states
-    fallback.oklch.c = Math.min(Math.max(avgChroma * 0.9, 0.1), 0.15)
+    fallback.oklch.c = avgChroma
     return fallback
   })()
 
   const successBase = findPaletteColorByHue(140) || (() => {
     const fallback = color.clone()
     fallback.oklch.h = 140
-    // Adapt chroma to palette's average
-    fallback.oklch.c = Math.min(Math.max(avgChroma * 0.9, 0.1), 0.15)
+    fallback.oklch.c = avgChroma
     return fallback
   })()
 
   const warningBase = findPaletteColorByHue(80) || (() => {
     const fallback = color.clone()
     fallback.oklch.h = 80
-    // Adapt chroma to palette's average
-    fallback.oklch.c = Math.min(Math.max(avgChroma * 0.9, 0.1), 0.15)
+    fallback.oklch.c = avgChroma
     return fallback
   })()
 
-  // Material 3 Color Roles
+  // --- Material 3 Color Roles ---
   return [
-    // Primary colors
+    // Primary colors (Vibrant, but scaled at light/dark extremes)
     colorFactory(getMaterialTone(primaryBase, 40, 80, isDarkMode), 'primary', 0, colorFormat, false, true),
     colorFactory(getMaterialTone(primaryBase, 100, 20, isDarkMode), 'on-primary', 0, colorFormat, false, true),
-    colorFactory(getMaterialTone(primaryBase, 90, 30, isDarkMode), 'primary-container', 0, colorFormat, false, true),
-    colorFactory(getMaterialTone(primaryBase, 10, 90, isDarkMode), 'on-primary-container', 0, colorFormat, false, true),
+    // Primary containers (Capped and scaled)
+    colorFactory(getMaterialTone(primaryContainerBase, 90, 30, isDarkMode), 'primary-container', 0, colorFormat, false, true),
+    colorFactory(getMaterialTone(primaryContainerBase, 10, 90, isDarkMode), 'on-primary-container', 0, colorFormat, false, true),
 
-    // Secondary colors
+    // Secondary colors (Capped and scaled)
     colorFactory(getMaterialTone(secondaryBase, 40, 80, isDarkMode), 'secondary', 0, colorFormat, false, true),
     colorFactory(getMaterialTone(secondaryBase, 100, 20, isDarkMode), 'on-secondary', 0, colorFormat, false, true),
 
-    // Tertiary colors
+    // Tertiary colors (Capped and scaled)
     colorFactory(getMaterialTone(tertiaryBase, 40, 80, isDarkMode), 'tertiary', 0, colorFormat, false, true),
     colorFactory(getMaterialTone(tertiaryBase, 100, 20, isDarkMode), 'on-tertiary', 0, colorFormat, false, true),
 
-    // Surface colors
-    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 10 : 99), 'surface', 0, colorFormat, false, true),
-    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 90 : 10), 'on-surface', 0, colorFormat, false, true),
-    colorFactory(
-      getNeutralVariantColor(primaryBase, isDarkMode ? 80 : 30),
-      'on-surface-variant',
-      0,
-      colorFormat,
-      false,
-      true,
-    ),
+    // Surface colors (Aggressively Capped and scaled)
+    colorFactory(getNeutralColor(neutralBase, isDarkMode ? 10 : 99), 'surface', 0, colorFormat, false, true),
+    colorFactory(getNeutralColor(neutralBase, isDarkMode ? 90 : 10), 'on-surface', 0, colorFormat, false, true),
+    colorFactory(getNeutralVariantColor(neutralBase, isDarkMode ? 80 : 30), 'on-surface-variant', 0, colorFormat, false, true),
+    colorFactory(getNeutralColor(neutralBase, isDarkMode ? 18 : 92), 'surface-elevated', 0, colorFormat, false, true),
+    colorFactory(getNeutralColor(neutralBase, isDarkMode ? 14 : 94), 'surface-muted', 0, colorFormat, false, true),
+    colorFactory(getNeutralColor(neutralBase, isDarkMode ? 12 : 97), 'surface-subtle', 0, colorFormat, false, true),
 
-    // Surface variants - simplified to 3 semantic levels
-    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 18 : 92), 'surface-elevated', 0, colorFormat, false, true),
-    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 14 : 94), 'surface-muted', 0, colorFormat, false, true),
-    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 12 : 97), 'surface-subtle', 0, colorFormat, false, true),
+    // Outline colors (Aggressively Capped and scaled)
+    colorFactory(getNeutralVariantColor(neutralBase, isDarkMode ? 60 : 50), 'outline', 0, colorFormat, false, true),
+    colorFactory(getNeutralVariantColor(neutralBase, isDarkMode ? 30 : 80), 'outline-variant', 0, colorFormat, false, true),
 
-    // Outline colors
-    colorFactory(getNeutralVariantColor(primaryBase, isDarkMode ? 60 : 50), 'outline', 0, colorFormat, false, true),
-    colorFactory(getNeutralVariantColor(primaryBase, isDarkMode ? 30 : 80), 'outline-variant', 0, colorFormat, false, true),
+    // Inverse colors (Aggressively Capped and scaled)
+    colorFactory(getNeutralColor(neutralBase, isDarkMode ? 90 : 20), 'inverse-surface', 0, colorFormat, false, true),
+    colorFactory(getNeutralColor(neutralBase, isDarkMode ? 20 : 95), 'on-inverse-surface', 0, colorFormat, false, true),
 
-    // Inverse colors
-    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 90 : 20), 'inverse-surface', 0, colorFormat, false, true),
-    colorFactory(getNeutralColor(primaryBase, isDarkMode ? 20 : 95), 'on-inverse-surface', 0, colorFormat, false, true),
-
-    // Error colors
+    // Error, Success, Warning colors (Capped and scaled)
     colorFactory(getMaterialTone(errorBase, 40, 80, isDarkMode), 'error', 0, colorFormat, false, true),
     colorFactory(getMaterialTone(errorBase, 100, 20, isDarkMode), 'on-error', 0, colorFormat, false, true),
-
-    // Success colors
     colorFactory(getMaterialTone(successBase, 40, 80, isDarkMode), 'success', 0, colorFormat, false, true),
     colorFactory(getMaterialTone(successBase, 100, 20, isDarkMode), 'on-success', 0, colorFormat, false, true),
-
-    // Warning colors
     colorFactory(getMaterialTone(warningBase, 50, 70, isDarkMode), 'warning', 0, colorFormat, false, true),
     colorFactory(getMaterialTone(warningBase, 10, 20, isDarkMode), 'on-warning', 0, colorFormat, false, true),
   ]
