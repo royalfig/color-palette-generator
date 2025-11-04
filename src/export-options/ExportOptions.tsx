@@ -21,11 +21,11 @@ function downloadAction(
 ) {
   const paletteString = palette.map((color, idx) => {
     if (isUiMode) {
-      return `  --${color.code}: ${color.conversions[colorFormat].value};
-  --${color.code}-contrast: ${color.contrast};`
+      return `  --color-${color.code}: ${color.conversions[colorFormat].value};
+  --color-${color.code}-contrast: ${color.contrast};`
     }
-    return `  --${color.code.substring(0, 3)}-${idx + 1}: ${color.conversions[colorFormat].value};
-  --${color.code.substring(0, 3)}-${idx + 1}-contrast: ${color.contrast};`
+    return `  --color-${color.code.substring(0, 3)}-${idx + 1}: ${color.conversions[colorFormat].value};
+  --color-${color.code.substring(0, 3)}-${idx + 1}-contrast: ${color.contrast};`
   })
   const paletteAsCss = ':root {\n' + paletteString.join('\n') + '\n}'
   const filename = `${paletteTitle?.toLowerCase().replace(/\W/g, '-') || 'color-palette-pro'}.css`
@@ -180,13 +180,13 @@ export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: Ex
   function handleCopyToClipboard() {
     const paletteString = palette.map((color, idx) => {
       if (isUiMode) {
-        return `  --${color.code}: ${color.conversions[colorFormat].value};
-  --${color.code}-contrast: ${color.contrast};`
+        return `--color-${color.code}: ${color.conversions[colorFormat].value};
+--color-${color.code}-contrast: ${color.contrast};`
       }
-      return `  --${color.code.substring(0, 3)}-${idx + 1}: ${color.conversions[colorFormat].value};
-  --${color.code.substring(0, 3)}-${idx + 1}-contrast: ${color.contrast};`
+      return `--color-${color.code.substring(0, 3)}-${idx + 1}: ${color.conversions[colorFormat].value};
+--color-${color.code.substring(0, 3)}-${idx + 1}-contrast: ${color.contrast};`
     })
-    const paletteAsCss = ':root {\n' + paletteString.join('\n') + '\n}'
+    const paletteAsCss = paletteString.join('\n')
     navigator.clipboard.writeText(paletteAsCss)
     showMessage('Palette copied', 'success')
   }
