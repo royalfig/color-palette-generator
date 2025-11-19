@@ -1,7 +1,7 @@
-import { use } from 'react'
+import { use, useMemo, useRef, useEffect } from 'react'
 import { BaseColorData } from '../../util/factory'
 import { ColorContext } from '../ColorContext'
-import { motion } from 'motion/react'
+import { useReducedMotion } from 'motion/react'
 import './circle.css'
 
 function getCirclePosition(color: BaseColorData, idx: number, type: 'default' | 'circle') {
@@ -59,15 +59,80 @@ function getElevationFilter(l: number) {
 export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
   const context = use(ColorContext)
   const palette = context.palette
+  const shouldReduceMotion = useReducedMotion()
+  const svgRef = useRef<SVGSVGElement>(null)
+  const previousPaletteKeyRef = useRef<string>('')
 
-  // Sort palette by lightness (HSL L value) without mutating original
-  const sortedPalette = [...palette].sort((a, b) => a.conversions.hsl.coords[2] - b.conversions.hsl.coords[2])
+  // Memoize sorted palette and positions to avoid recalculation
+  const sortedPalette = useMemo(
+    () => [...palette].sort((a, b) => a.conversions.hsl.coords[2] - b.conversions.hsl.coords[2]),
+    [palette],
+  )
 
-  const paletteValues = sortedPalette.map((color, idx) => getCirclePosition(color, idx, type))
+  const paletteValues = useMemo(
+    () => sortedPalette.map((color, idx) => ({
+      ...getCirclePosition(color, idx, type),
+      fill: sortedPalette[idx].cssValue,
+      filter: getElevationFilter(getCirclePosition(color, idx, type).l),
+    })),
+    [sortedPalette, type],
+  )
+
+   const paletteKey = useMemo(
+    () => `${type}:${sortedPalette.map(p => p.cssValue).join('|')}`,
+    [sortedPalette, type],
+  )
+  
+  // High-performance CSS transition approach for SVG circles
+  // Modern browsers support CSS transitions on SVG attributes (cx, cy, fill)
+  useEffect(() => {
+    if (!svgRef.current || paletteKey === previousPaletteKeyRef.current) return
+
+    previousPaletteKeyRef.current = paletteKey
+
+    const svg = svgRef.current
+    const circles = Array.from(svg.querySelectorAll('.circle-item')) as SVGCircleElement[]
+
+    if (shouldReduceMotion) {
+      // Instant update for reduced motion
+      circles.forEach((circle, idx) => {
+        const { cx, cy, fill } = paletteValues[idx]
+        circle.setAttribute('cx', String(cx))
+        circle.setAttribute('cy', String(cy))
+        circle.setAttribute('fill', fill)
+      })
+      return
+    }
+
+    // Batch all DOM reads first
+    const updates: Array<{ circle: SVGCircleElement; cx: number; cy: number; fill: string }> = []
+    circles.forEach((circle, idx) => {
+      const { cx, cy, fill } = paletteValues[idx]
+      updates.push({ circle, cx, cy, fill })
+    })
+
+    // Use double RAF to ensure transitions are set before attribute changes
+    requestAnimationFrame(() => {
+      // First frame: Set all transitions
+      // Modern browsers support CSS transitions on SVG attributes
+      updates.forEach(({ circle }) => {
+        circle.style.transition = 'cx 0.25s ease-out, cy 0.25s ease-out, fill 0.25s ease-out'
+      })
+
+      // Second frame: Trigger transitions by updating attributes
+      requestAnimationFrame(() => {
+        updates.forEach(({ circle, cx, cy, fill }) => {
+          circle.setAttribute('cx', String(cx))
+          circle.setAttribute('cy', String(cy))
+          circle.setAttribute('fill', fill)
+        })
+      })
+    })
+  }, [paletteKey, paletteValues, shouldReduceMotion])
 
   return (
     <div className="circle">
-      <svg viewBox="-120 -120 240 240">
+      <svg ref={svgRef} viewBox="-120 -120 240 240">
         <defs>
           <filter id="shadow-elevation-1" x="-50%" y="-50%" width="200%" height="200%">
             <feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="#000" floodOpacity="0.25" />
@@ -87,23 +152,16 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
         <circle cx="0" cy="0" r={100} fill="none" stroke="var(--dimmed)" strokeWidth="4" />
 
         {/* Animated color circles */}
-        {paletteValues.map(({ cx, cy, l, hue, saturation, lightness }, idx) => (
-          <motion.circle
+        {/* Using CSS transitions for SVG attributes - much more performant than JS animations */}
+        {paletteValues.map(({ cx, cy, fill, filter }, idx) => (
+          <circle
             key={`circle-${idx}`}
-            animate={{
-              cx,
-              cy,
-              fill: `${sortedPalette[idx].cssValue}`,
-            }}
-            transition={{
-              duration: 0.25,
-              ease: 'easeOut',
-              type: 'tween', // Use tween instead of spring for consistent timing
-            }}
-            initial={false} // Don't animate on mount
-            r={18}
-            filter={getElevationFilter(l)}
             className="circle-item"
+            cx={cx}
+            cy={cy}
+            fill={fill}
+            filter={filter}
+            r={18}
           />
         ))}
       </svg>

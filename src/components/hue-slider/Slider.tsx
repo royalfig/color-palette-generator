@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState, memo } from 'react'
 import { CaretUpIcon } from '@phosphor-icons/react/dist/csr/CaretUp'
 import { CaretDownIcon } from '@phosphor-icons/react/dist/csr/CaretDown'
 import { ColorContext } from '../ColorContext'
@@ -7,7 +7,24 @@ import { ColorSpace, SliderType } from '../../types'
 import { getSliderStrategy } from './slider-strategies'
 import { BaseColorData } from '../../util/factory'
 
-export function Slider({
+// Move helper functions outside component to avoid recreation
+function getLightness(base: BaseColorData, space: ColorSpace) {
+  if (space === 'oklab') return base.conversions.oklab.coords[0]
+  if (space === 'oklch') return base.conversions.oklch.coords[0]
+  if (space === 'lab') return base.conversions.lab.coords[0]
+  if (space === 'lch') return base.conversions.lch.coords[0]
+  return base.conversions.hsl.coords[2]
+}
+
+function getSaturation(base: BaseColorData, space: ColorSpace) {
+  if (space === 'oklab') return base.conversions.oklab.coords[1]
+  if (space === 'oklch') return base.conversions.oklch.coords[1]
+  if (space === 'lab') return base.conversions.lab.coords[1]
+  if (space === 'lch') return base.conversions.lch.coords[1]
+  return base.conversions.hsl.coords[1]
+}
+
+export const Slider = memo(function Slider({
   setColor,
   colorSpace,
   type,
@@ -76,42 +93,37 @@ export function Slider({
     debouncedColorUpdate(roundedValue)
   }
 
-  function getLightness(base: BaseColorData, space: ColorSpace) {
-    if (space === 'oklab') return base.conversions.oklab.coords[0]
-    if (space === 'oklch') return base.conversions.oklch.coords[0]
-    if (space === 'lab') return base.conversions.lab.coords[0]
-    if (space === 'lch') return base.conversions.lch.coords[0]
-    return base.conversions.hsl.coords[2]
-  }
+  // Memoize expensive color calculations
+  const workingColor = useMemo(
+    () => base.color.clone().to(colorSpace.space).toGamut(colorSpace.space),
+    [base.color, colorSpace.space],
+  )
 
-  function getSaturation(base: BaseColorData, space: ColorSpace) {
-    if (space === 'oklab') return base.conversions.oklab.coords[1]
-    if (space === 'oklch') return base.conversions.oklch.coords[1]
-    if (space === 'lab') return base.conversions.lab.coords[1]
-    if (space === 'lch') return base.conversions.lch.coords[1]
-    return base.conversions.hsl.coords[1]
-  }
+  // Memoize placeholders object to avoid recreation
+  const placeholders = useMemo(
+    () => ({
+      hue: workingColor.h,
+      saturation: getSaturation(base, colorSpace.space),
+      lightness: getLightness(base, colorSpace.space),
+      value: value,
+      'lab-a': base.conversions.lab.coords[1],
+      'lab-b': base.conversions.lab.coords[2],
+      'oklab-a': base.conversions.oklab.coords[1],
+      'oklab-b': base.conversions.oklab.coords[2],
+      'value-as-percent': value * 100 + '%',
+    }),
+    [workingColor, base, colorSpace.space, value],
+  )
 
-  const workingColor = base.color.clone().to(colorSpace.space).toGamut(colorSpace.space)
-
-  const placeholders = {
-    hue: workingColor.h,
-    saturation: getSaturation(base, colorSpace.space),
-    lightness: getLightness(base, colorSpace.space),
-    value: value,
-    'lab-a': base.conversions.lab.coords[1],
-    'lab-b': base.conversions.lab.coords[2],
-    'oklab-a': base.conversions.oklab.coords[1],
-    'oklab-b': base.conversions.oklab.coords[2],
-    'value-as-percent': value * 100 + '%',
-  }
-
-  const thumbColor = getThumbStyle(placeholders)
-  const trackStyle = getTrackStyle(placeholders)
+  // Memoize style calculations
+  const thumbColor = useMemo(() => getThumbStyle(placeholders), [placeholders, getThumbStyle])
+  const trackStyle = useMemo(() => getTrackStyle(placeholders), [placeholders, getTrackStyle])
 
   const sliderId = `slider-${label}`
 
-  const dynamicStyles = `
+  // Memoize dynamic styles to avoid recreating on every render
+  const dynamicStyles = useMemo(
+    () => `
     #${sliderId}::-webkit-slider-runnable-track {
       background: ${trackStyle};
     }
@@ -126,7 +138,9 @@ export function Slider({
     #${sliderId}::-moz-range-track {
       background: ${trackStyle};
     }
-    `
+    `,
+    [sliderId, thumbColor, trackStyle],
+  )
 
   return (
     <div className="slider">
@@ -164,4 +178,4 @@ export function Slider({
       />
     </div>
   )
-}
+})

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { BaseColorData } from '../util/factory'
 
 // Your type definitions remain the same
@@ -17,16 +18,13 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
   } | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
-  useEffect(() => {
-    setIsLoading(true)
-    setFetchedData(null)
-    setError(null)
+  // Create a stable palette key for comparison
+  const paletteKey = useMemo(() => palette.map(p => p.string).join('|'), [palette])
 
-    const controller = new AbortController()
-    const signal = controller.signal
-
-    async function fetchColorName() {
+  const fetchColorName = useDebouncedCallback(
+    async (palette: BaseColorData[], originalColor: BaseColorData, signal: AbortSignal) => {
       try {
         const baseIndex = palette.findIndex(p => p.string === originalColor.string)
         if (baseIndex !== -1) {
@@ -40,7 +38,10 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
           const colorNames = colors.map((c: any) => c.name)
           const baseColorName = colorNames[baseIndex]
 
-          setFetchedData({ colorNames, paletteTitle: palette_name, baseColorName })
+          if (!signal.aborted) {
+            setFetchedData({ colorNames, paletteTitle: palette_name, baseColorName })
+            setIsLoading(false)
+          }
           return
         }
 
@@ -58,20 +59,42 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
         const colorName = (await colorResponse.json()) as { color: { name: string } }
         const colorNames = colors.map((c: any) => c.name)
 
-        setFetchedData({ colorNames, paletteTitle: palette_name, baseColorName: colorName.color.name })
+        if (!signal.aborted) {
+          setFetchedData({ colorNames, paletteTitle: palette_name, baseColorName: colorName.color.name })
+          setIsLoading(false)
+        }
       } catch (e) {
         if (!signal.aborted) {
           setError(e instanceof Error ? e : new Error('An unexpected error occurred'))
+          setIsLoading(false)
         }
-      } finally {
-        setIsLoading(false)
       }
+    },
+    400, // 400ms debounce delay
+  )
+
+  useEffect(() => {
+    // Abort previous request if it exists
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
     }
 
-    fetchColorName()
+    // Create new abort controller
+    const controller = new AbortController()
+    abortControllerRef.current = controller
 
-    return () => controller.abort()
-  }, [palette])
+    setIsLoading(true)
+    setFetchedData(null)
+    setError(null)
+
+    // Trigger debounced fetch
+    fetchColorName(palette, originalColor, controller.signal)
+
+    return () => {
+      controller.abort()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paletteKey, originalColor.string])
 
   return { fetchedData, isLoading, error }
 }

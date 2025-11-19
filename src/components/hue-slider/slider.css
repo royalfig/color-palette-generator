@@ -4,6 +4,9 @@
   grid-row: 3 / 6;
   grid-column: 1 / 7;
   gap: var(--base-gap);
+  /* Motion handles clipPath animations - ensure GPU acceleration */
+  will-change: clip-path;
+  transform: translateZ(0); /* Force hardware acceleration */
 }
 
 .slider {

@@ -12,5 +12,6 @@
   cursor: pointer;
   background-color: var(--color);
   border-radius: 1px;
-  transition: background-color 0.2s ease-in-out;
+  /* Transition is set inline for staggered animations - no default transition for better performance */
+  will-change: background-color; /* Hint to browser for GPU acceleration */
 }

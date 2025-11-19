@@ -1,4 +1,5 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { ColorContext } from './components/ColorContext'
 import { MessageContext, MessageType } from './components/MessageContext'
 import { AuxillaryDisplay } from './components/auxillary-display/AuxillaryDisplay'
@@ -173,51 +174,91 @@ export default function App() {
     }
   }, [])
 
-  // Update color history in state and localStorage when base color changes
-  useEffect(() => {
+  // Debounced localStorage update for color history
+  const debouncedColorHistoryUpdate = useDebouncedCallback((colorString: string) => {
     setColorHistory(prev => {
-      let updated = prev.filter(c => c !== colorContext.originalColor.string)
-      updated.push(colorContext.originalColor.string)
+      let updated = prev.filter(c => c !== colorString)
+      updated.push(colorString)
       // Limit to 240 colors, drop oldest if exceeded
       if (updated.length > 240) {
         updated = updated.slice(updated.length - 240)
       }
-      localStorage.setItem('color-history', JSON.stringify(updated))
+      // Use requestIdleCallback for non-critical localStorage write
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+          localStorage.setItem('color-history', JSON.stringify(updated))
+        })
+      } else {
+        setTimeout(() => {
+          localStorage.setItem('color-history', JSON.stringify(updated))
+        }, 0)
+      }
       return updated
     })
-  }, [colorContext.originalColor.string])
+  }, 500)
+
+  // Update color history in state and localStorage when base color changes
+  useEffect(() => {
+    debouncedColorHistoryUpdate(colorContext.originalColor.string)
+  }, [colorContext.originalColor.string, debouncedColorHistoryUpdate])
+
+  // Debounced URL update
+  const debouncedUrlUpdate = useDebouncedCallback(
+    (
+      colorString: string,
+      paletteType: PaletteKinds,
+      paletteStyle: 'square' | 'triangle' | 'circle' | 'diamond',
+      colorFormat: ColorFormat,
+      effectsString: string,
+    ) => {
+      const colorUrl = new URLSearchParams(document.location.search)
+      const currentColor = colorUrl.get('color')
+      const currentPaletteType = colorUrl.get('paletteType')
+      const currentPaletteStyle = colorUrl.get('paletteStyle')
+      const currentColorFormat = colorUrl.get('colorFormat')
+      const currentEffects = colorUrl.get('effects')
+
+      const needsUpdate =
+        currentColor !== colorString ||
+        currentPaletteType !== paletteType ||
+        currentPaletteStyle !== paletteStyle ||
+        currentColorFormat !== colorFormat ||
+        currentEffects !== effectsString
+
+      if (needsUpdate) {
+        colorUrl.set('color', colorString)
+        colorUrl.set('paletteType', paletteType)
+        colorUrl.set('paletteStyle', paletteStyle)
+        colorUrl.set('colorFormat', colorFormat)
+        colorUrl.set('effects', effectsString)
+        window.history.pushState({}, '', `${window.location.pathname}?${colorUrl.toString()}`)
+      }
+    },
+    300,
+  )
 
   // Update URL params whenever any relevant parameter changes
   useEffect(() => {
-    const colorUrl = new URLSearchParams(document.location.search)
-    const currentColor = colorUrl.get('color')
-    const currentPaletteType = colorUrl.get('paletteType')
-    const currentPaletteStyle = colorUrl.get('paletteStyle')
-    const currentColorFormat = colorUrl.get('colorFormat')
-    const currentEffects = colorUrl.get('effects')
-
     const effectsString = knobValues.join(',')
-    const needsUpdate =
-      currentColor !== colorContext.originalColor.string ||
-      currentPaletteType !== paletteType ||
-      currentPaletteStyle !== paletteStyle ||
-      currentColorFormat !== colorSpace.format ||
-      currentEffects !== effectsString
+    debouncedUrlUpdate(
+      colorContext.originalColor.string,
+      paletteType,
+      paletteStyle,
+      colorSpace.format,
+      effectsString,
+    )
+  }, [colorContext.originalColor.string, paletteType, paletteStyle, colorSpace.format, knobValues, debouncedUrlUpdate])
 
-    if (needsUpdate) {
-      colorUrl.set('color', colorContext.originalColor.string)
-      colorUrl.set('paletteType', paletteType)
-      colorUrl.set('paletteStyle', paletteStyle)
-      colorUrl.set('colorFormat', colorSpace.format)
-      colorUrl.set('effects', effectsString)
-      window.history.pushState({}, '', `${window.location.pathname}?${colorUrl.toString()}`)
-    }
-  }, [colorContext.originalColor.string, paletteType, paletteStyle, colorSpace.format, knobValues])
+  // Debounced favicon update
+  const debouncedFaviconUpdate = useDebouncedCallback((cssValue: string) => {
+    updateFavicon(cssValue)
+  }, 500)
 
+  // Update CSS variable immediately (needed for UI), but debounce favicon
   useEffect(() => {
-    updateFavicon(colorContext.originalColor.cssValue)
     document.documentElement.style.setProperty('--base-color', colorContext.originalColor.cssValue)
-  }, [colorContext.originalColor])
+    debouncedFaviconUpdate(colorContext.originalColor.cssValue)
+  }, [colorContext.originalColor.cssValue, debouncedFaviconUpdate])
 
   useEffect(() => {
     const handlePopState = () => {
