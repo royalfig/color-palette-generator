@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { BaseColorData } from '../util/factory'
 
@@ -21,7 +21,7 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
   const abortControllerRef = useRef<AbortController | null>(null)
 
   // Create a stable palette key for comparison
-  const paletteKey = palette.map(p => p.string).join('|')
+  const paletteKey = useMemo(() => palette.map(p => p.string).join('|'), [palette])
 
   const fetchColorName = useDebouncedCallback(
     async (palette: BaseColorData[], originalColor: BaseColorData, signal: AbortSignal) => {
