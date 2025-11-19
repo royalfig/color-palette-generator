@@ -12,6 +12,17 @@ function toPrecision(n: number, precision: number) {
   const multiplier = 10.0 ** (precision - digits)
   return Math.floor(n * multiplier + 0.5) / multiplier
 }
+
+type ConversionData = {
+  value: string
+  isInGamut: boolean
+  coords: number[]
+}
+
+type ConversionsCache = {
+  [key: string]: ConversionData | undefined
+}
+
 export type BaseColorData = {
   code: `${string}-${number}` | string
   isBase: boolean
@@ -22,13 +33,47 @@ export type BaseColorData = {
   contrast: string
   string: string
   conversions: {
-    [key: string]: {
-      value: string
-      isInGamut: boolean
-      coords: number[]
-    }
+    [key: string]: ConversionData
   }
   fallback: string
+}
+
+/**
+ * Creates a conversion getter that lazily computes and caches color space conversions.
+ * This significantly improves performance by only computing conversions when they're actually accessed.
+ */
+function createLazyConversion(
+  color: Color,
+  space: string,
+  format: ColorFormat,
+  cache: ConversionsCache,
+): ConversionData {
+  // Helper to ensure conversion is computed and cached
+  const ensureCached = () => {
+    if (!cache[space]) {
+      const convertedColor = color.to(space as any)
+      const inGamut = convertedColor.toGamut()
+      const coords = inGamut.coords.map(n => toPrecision(n, 3))
+      cache[space] = {
+        value: inGamut.toString({ precision: 3 }),
+        isInGamut: color.inGamut(space as any),
+        coords,
+      }
+    }
+    return cache[space]!
+  }
+
+  return {
+    get value() {
+      return ensureCached().value
+    },
+    get isInGamut() {
+      return ensureCached().isInGamut
+    },
+    get coords() {
+      return ensureCached().coords
+    },
+  } as ConversionData
 }
 
 export function colorFactory(
@@ -40,43 +85,39 @@ export function colorFactory(
   isUiMode = false,
 ): BaseColorData {
   const color = base instanceof Color ? base : new Color(base)
-  
-  // Optimize: Reuse converted color objects to avoid redundant conversions
+
+  // Conversion cache for lazy-loaded conversions
+  const conversionCache: ConversionsCache = {}
+
+  // Always compute hex and hsl upfront (most commonly used)
   // Convert to srgb once and reuse for hex/rgb
   const srgbColor = color.to('srgb')
   const srgbInGamut = srgbColor.toGamut()
   const srgbCoords = srgbInGamut.coords.map(n => toPrecision(n, 3))
-  
-  // Convert to hsl once
+  conversionCache.hex = {
+    value: srgbInGamut.toString({ format: 'hex' }),
+    isInGamut: color.inGamut('srgb'),
+    coords: srgbCoords,
+  }
+  conversionCache.rgb = {
+    value: srgbInGamut.toString({ precision: 3 }),
+    isInGamut: color.inGamut('srgb'),
+    coords: srgbCoords,
+  }
+
+  // Convert to hsl once (commonly used for UI components)
   const hslColor = color.to('hsl')
   const hslInGamut = hslColor.toGamut()
   const hslCoords = hslInGamut.coords.map(n => toPrecision(n, 3))
-  
-  // Convert to oklch once
-  const oklchColor = color.to('oklch')
-  const oklchInGamut = oklchColor.toGamut()
-  const oklchCoords = oklchInGamut.coords.map(n => toPrecision(n, 3))
-  
-  // Convert to lch once
-  const lchColor = color.to('lch')
-  const lchInGamut = lchColor.toGamut()
-  const lchCoords = lchInGamut.coords.map(n => toPrecision(n, 3))
-  
-  // Convert to lab once
-  const labColor = color.to('lab')
-  const labInGamut = labColor.toGamut()
-  const labCoords = labInGamut.coords.map(n => toPrecision(n, 3))
-  
-  // Convert to oklab once
-  const oklabColor = color.to('oklab')
-  const oklabInGamut = oklabColor.toGamut()
-  const oklabCoords = oklabInGamut.coords.map(n => toPrecision(n, 3))
-  
-  // Convert to p3 once
-  const p3Color = color.to('p3')
-  const p3InGamut = p3Color.toGamut()
-  const p3Coords = p3InGamut.coords.map(n => toPrecision(n, 3))
-  
+  conversionCache.hsl = {
+    value: hslInGamut.toString({ precision: 3 }),
+    isInGamut: color.inGamut('hsl'),
+    coords: hslCoords,
+  }
+
+  // Lazy-load other conversions (oklch, lch, lab, oklab, p3)
+  // These are only computed when accessed, saving significant computation time
+
   return {
     code: isUiMode ? paletteInformation : `${paletteInformation}-${idx + 1}`,
     isBase,
@@ -88,46 +129,15 @@ export function colorFactory(
     string: color.toString({ format, precision: 3 }),
     fallback: srgbInGamut.toString({ clip: true, format }),
     conversions: {
-      hex: {
-        value: srgbInGamut.toString({ format: 'hex' }),
-        isInGamut: color.inGamut('srgb'),
-        coords: srgbCoords,
-      },
-      rgb: {
-        value: srgbInGamut.toString({ precision: 3 }),
-        isInGamut: color.inGamut('srgb'),
-        coords: srgbCoords,
-      },
-      hsl: {
-        value: hslInGamut.toString({ precision: 3 }),
-        isInGamut: color.inGamut('hsl'),
-        coords: hslCoords,
-      },
-      lch: {
-        value: lchInGamut.toString({ precision: 3 }),
-        isInGamut: color.inGamut('lch'),
-        coords: lchCoords,
-      },
-      oklch: {
-        value: oklchInGamut.toString({ precision: 3 }),
-        isInGamut: color.inGamut('oklch'),
-        coords: oklchCoords,
-      },
-      lab: {
-        value: labInGamut.toString({ precision: 3 }),
-        isInGamut: color.inGamut('lab'),
-        coords: labCoords,
-      },
-      oklab: {
-        value: oklabInGamut.toString({ precision: 3 }),
-        isInGamut: color.inGamut('oklab'),
-        coords: oklabCoords,
-      },
-      p3: {
-        value: p3InGamut.toString({ precision: 3 }),
-        isInGamut: color.inGamut('p3'),
-        coords: p3Coords,
-      },
+      hex: conversionCache.hex,
+      rgb: conversionCache.rgb,
+      hsl: conversionCache.hsl,
+      // Lazy-loaded conversions - only computed when accessed
+      lch: createLazyConversion(color, 'lch', format, conversionCache),
+      oklch: createLazyConversion(color, 'oklch', format, conversionCache),
+      lab: createLazyConversion(color, 'lab', format, conversionCache),
+      oklab: createLazyConversion(color, 'oklab', format, conversionCache),
+      p3: createLazyConversion(color, 'p3', format, conversionCache),
     },
   }
 }
