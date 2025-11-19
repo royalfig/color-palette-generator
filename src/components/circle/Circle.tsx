@@ -78,9 +78,11 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
     [sortedPalette, type],
   )
 
-  // Create a stable key for palette to reduce unnecessary animations
-  const paletteKey = useMemo(() => sortedPalette.map(p => p.cssValue).join('|'), [sortedPalette])
-
+   const paletteKey = useMemo(
+    () => `${type}:${sortedPalette.map(p => p.cssValue).join('|')}`,
+    [sortedPalette, type],
+  )
+  
   // High-performance CSS transition approach for SVG circles
   // Modern browsers support CSS transitions on SVG attributes (cx, cy, fill)
   useEffect(() => {
