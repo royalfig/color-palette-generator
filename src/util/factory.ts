@@ -40,6 +40,43 @@ export function colorFactory(
   isUiMode = false,
 ): BaseColorData {
   const color = base instanceof Color ? base : new Color(base)
+  
+  // Optimize: Reuse converted color objects to avoid redundant conversions
+  // Convert to srgb once and reuse for hex/rgb
+  const srgbColor = color.to('srgb')
+  const srgbInGamut = srgbColor.toGamut()
+  const srgbCoords = srgbInGamut.coords.map(n => toPrecision(n, 3))
+  
+  // Convert to hsl once
+  const hslColor = color.to('hsl')
+  const hslInGamut = hslColor.toGamut()
+  const hslCoords = hslInGamut.coords.map(n => toPrecision(n, 3))
+  
+  // Convert to oklch once
+  const oklchColor = color.to('oklch')
+  const oklchInGamut = oklchColor.toGamut()
+  const oklchCoords = oklchInGamut.coords.map(n => toPrecision(n, 3))
+  
+  // Convert to lch once
+  const lchColor = color.to('lch')
+  const lchInGamut = lchColor.toGamut()
+  const lchCoords = lchInGamut.coords.map(n => toPrecision(n, 3))
+  
+  // Convert to lab once
+  const labColor = color.to('lab')
+  const labInGamut = labColor.toGamut()
+  const labCoords = labInGamut.coords.map(n => toPrecision(n, 3))
+  
+  // Convert to oklab once
+  const oklabColor = color.to('oklab')
+  const oklabInGamut = oklabColor.toGamut()
+  const oklabCoords = oklabInGamut.coords.map(n => toPrecision(n, 3))
+  
+  // Convert to p3 once
+  const p3Color = color.to('p3')
+  const p3InGamut = p3Color.toGamut()
+  const p3Coords = p3InGamut.coords.map(n => toPrecision(n, 3))
+  
   return {
     code: isUiMode ? paletteInformation : `${paletteInformation}-${idx + 1}`,
     isBase,
@@ -49,71 +86,47 @@ export function colorFactory(
     cssValue: color.display().toString(),
     contrast: color.contrastWCAG21('#fff') > color.contrastWCAG21('#000') ? '#fff' : '#000',
     string: color.toString({ format, precision: 3 }),
-    fallback: color.to('srgb').toString({ clip: true, format }),
+    fallback: srgbInGamut.toString({ clip: true, format }),
     conversions: {
       hex: {
-        value: color.to('srgb').toString({ format: 'hex' }),
+        value: srgbInGamut.toString({ format: 'hex' }),
         isInGamut: color.inGamut('srgb'),
-        coords: color
-          .to('srgb')
-          .toGamut()
-          .coords.map(n => toPrecision(n, 3)),
+        coords: srgbCoords,
       },
       rgb: {
-        value: color.to('srgb').toString({ precision: 3 }),
+        value: srgbInGamut.toString({ precision: 3 }),
         isInGamut: color.inGamut('srgb'),
-        coords: color
-          .to('srgb')
-          .toGamut()
-          .coords.map(n => toPrecision(n, 3)),
+        coords: srgbCoords,
       },
       hsl: {
-        value: color.to('hsl').toString({ precision: 3 }),
+        value: hslInGamut.toString({ precision: 3 }),
         isInGamut: color.inGamut('hsl'),
-        coords: color
-          .to('hsl')
-          .toGamut()
-          .coords.map(n => toPrecision(n, 3)),
+        coords: hslCoords,
       },
       lch: {
-        value: color.to('lch').toString({ precision: 3 }),
+        value: lchInGamut.toString({ precision: 3 }),
         isInGamut: color.inGamut('lch'),
-        coords: color
-          .to('lch')
-          .toGamut()
-          .coords.map(n => toPrecision(n, 3)),
+        coords: lchCoords,
       },
       oklch: {
-        value: color.to('oklch').toString({ precision: 3 }),
+        value: oklchInGamut.toString({ precision: 3 }),
         isInGamut: color.inGamut('oklch'),
-        coords: color
-          .to('oklch')
-          .toGamut()
-          .coords.map(n => toPrecision(n, 3)),
+        coords: oklchCoords,
       },
       lab: {
-        value: color.to('lab').toString({ precision: 3 }),
+        value: labInGamut.toString({ precision: 3 }),
         isInGamut: color.inGamut('lab'),
-        coords: color
-          .to('lab')
-          .toGamut()
-          .coords.map(n => toPrecision(n, 3)),
+        coords: labCoords,
       },
       oklab: {
-        value: color.to('oklab').toString({ precision: 3 }),
+        value: oklabInGamut.toString({ precision: 3 }),
         isInGamut: color.inGamut('oklab'),
-        coords: color
-          .to('oklab')
-          .toGamut()
-          .coords.map(n => toPrecision(n, 3)),
+        coords: oklabCoords,
       },
       p3: {
-        value: color.to('p3').toString({ precision: 3 }),
+        value: p3InGamut.toString({ precision: 3 }),
         isInGamut: color.inGamut('p3'),
-        coords: color
-          .to('p3')
-          .toGamut()
-          .coords.map(n => toPrecision(n, 3)),
+        coords: p3Coords,
       },
     },
   }
