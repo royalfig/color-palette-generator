@@ -17,7 +17,7 @@ export function Slider({
   type: SliderType
 }) {
   const context = useContext(ColorContext)
-  const strategy = getSliderStrategy(type, colorSpace.space)
+  const strategy = useMemo(() => getSliderStrategy(type, colorSpace.space), [type, colorSpace.space])
   const { min, max, step, label, getValue, updateColor, getTrackStyle, getThumbStyle } = strategy
 
   const base = context.originalColor
