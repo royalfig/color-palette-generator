@@ -71,7 +71,7 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
         const response = await fetch(apiUrl.toString(), {
           signal,
           headers: {
-            'X-Referrer': 'color-palette-generator',
+            'X-Referrer': 'color-palette-pro',
           },
         })
 
@@ -98,15 +98,14 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
 
         // Extract color names from the response
         const colorNames = data.colors.map(c => c.name)
-        
+
         // If we had to truncate the palette, pad with empty strings
         if (palette.length > colorsToFetch.length) {
           colorNames.push(...Array(palette.length - colorsToFetch.length).fill(''))
         }
 
-        const baseColorName = baseIndex !== -1 && baseIndex < colorNames.length 
-          ? colorNames[baseIndex] 
-          : colorNames[0] || 'Unknown'
+        const baseColorName =
+          baseIndex !== -1 && baseIndex < colorNames.length ? colorNames[baseIndex] : colorNames[0] || 'Unknown'
 
         if (!signal.aborted) {
           setFetchedData({
