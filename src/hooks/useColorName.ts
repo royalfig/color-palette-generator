@@ -2,7 +2,20 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { BaseColorData } from '../util/factory'
 
-// Your type definitions remain the same
+// Color Name API response types
+interface ColorNameApiColor {
+  name: string
+  hex: string
+  rgb: { r: number; g: number; b: number }
+  hsl: { h: number; s: number; l: number }
+  lab: { l: number; a: number; b: number }
+  distance: number
+}
+
+interface ColorNameApiResponse {
+  colors: ColorNameApiColor[]
+  paletteTitle: string
+}
 
 interface IUseFetchWithAbortResponse {
   fetchedData: { colorNames: string[]; paletteTitle: string; baseColorName: string } | null
@@ -26,41 +39,81 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
   const fetchColorName = useDebouncedCallback(
     async (palette: BaseColorData[], originalColor: BaseColorData, signal: AbortSignal) => {
       try {
-        const baseIndex = palette.findIndex(p => p.string === originalColor.string)
-        if (baseIndex !== -1) {
-          const paletteResponse = await fetch(
-            `https://api.colorpalette.pro/palette/${palette
-              .map(color => color.conversions.hex.value.replace('#', ''))
-              .join(',')}`,
-            { signal },
-          )
-          const { colors, palette_name } = (await paletteResponse.json()) as { colors: any; palette_name: string }
-          const colorNames = colors.map((c: any) => c.name)
-          const baseColorName = colorNames[baseIndex]
-
+        // Handle empty palette
+        if (palette.length === 0) {
           if (!signal.aborted) {
-            setFetchedData({ colorNames, paletteTitle: palette_name, baseColorName })
+            setFetchedData({
+              colorNames: [],
+              paletteTitle: 'Color Palette',
+              baseColorName: 'Unknown',
+            })
             setIsLoading(false)
           }
           return
         }
 
-        const paletteResponse = await fetch(
-          `https://api.colorpalette.pro/palette/${palette
-            .map(color => color.conversions.hex.value.replace('#', ''))
-            .join(',')}`,
-          { signal },
-        )
-        const colorResponse = await fetch(
-          `https://api.colorpalette.pro/color/${originalColor.conversions.hex.value.replace('#', '')}`,
-          { signal },
-        )
-        const { colors, palette_name } = (await paletteResponse.json()) as { colors: any; palette_name: string }
-        const colorName = (await colorResponse.json()) as { color: { name: string } }
-        const colorNames = colors.map((c: any) => c.name)
+        // API limit: max 100 colors per request
+        const colorsToFetch = palette.slice(0, 100)
+        const baseIndex = palette.findIndex(p => p.string === originalColor.string)
+
+        // Prepare hex values (without #) for the API
+        const hexValues = colorsToFetch.map(color => color.conversions.hex.value.replace('#', '')).join(',')
+
+        // Build API URL with optimizations:
+        // - list=bestOf: Uses a curated list of high-quality color names
+        // - noduplicates=true: Ensures each color gets a unique name
+        const apiUrl = new URL('https://api.color.pizza/v1/')
+        apiUrl.searchParams.set('values', hexValues)
+        apiUrl.searchParams.set('list', 'bestOf')
+        apiUrl.searchParams.set('noduplicates', 'true')
+
+        // Fetch color names from Color Name API
+        const response = await fetch(apiUrl.toString(), {
+          signal,
+          headers: {
+            'X-Referrer': 'color-palette-generator',
+          },
+        })
+
+        if (!response.ok) {
+          // Try to parse error response
+          let errorMessage = `API request failed: ${response.status} ${response.statusText}`
+          try {
+            const errorData = await response.json()
+            if (errorData?.error?.message) {
+              errorMessage = errorData.error.message
+            }
+          } catch {
+            // Ignore JSON parse errors, use default message
+          }
+          throw new Error(errorMessage)
+        }
+
+        const data = (await response.json()) as ColorNameApiResponse
+
+        // Validate response structure
+        if (!data || !Array.isArray(data.colors)) {
+          throw new Error('Invalid API response format')
+        }
+
+        // Extract color names from the response
+        const colorNames = data.colors.map(c => c.name)
+        
+        // If we had to truncate the palette, pad with empty strings
+        if (palette.length > colorsToFetch.length) {
+          colorNames.push(...Array(palette.length - colorsToFetch.length).fill(''))
+        }
+
+        const baseColorName = baseIndex !== -1 && baseIndex < colorNames.length 
+          ? colorNames[baseIndex] 
+          : colorNames[0] || 'Unknown'
 
         if (!signal.aborted) {
-          setFetchedData({ colorNames, paletteTitle: palette_name, baseColorName: colorName.color.name })
+          setFetchedData({
+            colorNames,
+            paletteTitle: data.paletteTitle || 'Color Palette',
+            baseColorName,
+          })
           setIsLoading(false)
         }
       } catch (e) {
