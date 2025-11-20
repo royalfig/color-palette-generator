@@ -14,7 +14,8 @@ For more information about the project, check out the [blog post](https://ryanfe
 
 ## Video Demo
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/2B8ZMgj0jDs" title="Color Palette Pro Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+[Check out a video demo on YouTube](https://www.youtube.com/embed/2B8ZMgj0jDs)
+
 
 ## Features
 
