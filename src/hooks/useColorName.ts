@@ -161,7 +161,7 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
     abortControllerRef.current = controller
 
     setIsLoading(true)
-    setFetchedData(null)
+    // setFetchedData(null) // Keep previous data while loading
     setError(null)
 
     // Trigger debounced fetch

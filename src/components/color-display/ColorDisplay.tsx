@@ -4,7 +4,7 @@ import { FadersHorizontalIcon } from '@phosphor-icons/react/dist/csr/FadersHoriz
 import { PaletteIcon } from '@phosphor-icons/react/dist/csr/Palette'
 import { ScissorsIcon } from '@phosphor-icons/react/dist/csr/Scissors'
 import { SwatchesIcon } from '@phosphor-icons/react/dist/csr/Swatches'
-import { motion } from 'motion/react'
+import { motion, AnimatePresence } from 'motion/react'
 import { useContext } from 'react'
 import { ColorFormat, ColorSpace, PaletteKinds, PaletteStyle } from '../../types'
 import { ColorContext } from '../ColorContext'
@@ -95,23 +95,28 @@ export function ColorDisplay({
         <div className="header flex justify-start gap-04">
           <div className="color-dot" style={{ '--color': color?.string || '#000' } as React.CSSProperties}></div>
           <div>
-            <motion.h1
-              initial={{ opacity: 0, x: -3 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 3 }}
-              key={colorName + '-name'}
-            >
-              {colorName}
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, x: 3 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -3 }}
-              transition={{ delay: 0.1 }}
-              key={colorName + '-palette'}
-            >
-              {fetchedData?.paletteTitle && `in ${fetchedData?.paletteTitle}`}
-            </motion.p>
+            <AnimatePresence mode="wait">
+              <motion.h1
+                key={colorName + '-name'}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {colorName}
+              </motion.h1>
+            </AnimatePresence>
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={colorName + '-palette'}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2, delay: 0.1 }}
+              >
+                {fetchedData?.paletteTitle && `in ${fetchedData?.paletteTitle}`}
+              </motion.p>
+            </AnimatePresence>
           </div>
         </div>
 
