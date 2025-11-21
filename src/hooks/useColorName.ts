@@ -23,6 +23,9 @@ interface IUseFetchWithAbortResponse {
   error: Error | null
 }
 
+// Module-level cache to store API responses
+const colorNameCache = new Map<string, ColorNameApiResponse>()
+
 export function useFetchColorNames(palette: BaseColorData[], originalColor: BaseColorData): IUseFetchWithAbortResponse {
   const [fetchedData, setFetchedData] = useState<{
     colorNames: string[]
@@ -67,8 +70,17 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
         apiUrl.searchParams.set('list', 'bestOf')
         apiUrl.searchParams.set('noduplicates', 'true')
 
+        const urlString = apiUrl.toString()
+
+        // Check cache first
+        if (colorNameCache.has(urlString)) {
+          const cachedData = colorNameCache.get(urlString)!
+          processResponse(cachedData, palette, colorsToFetch, baseIndex, signal)
+          return
+        }
+
         // Fetch color names from Color Name API
-        const response = await fetch(apiUrl.toString(), {
+        const response = await fetch(urlString, {
           signal,
           headers: {
             'X-Referrer': 'color-palette-pro',
@@ -96,25 +108,10 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
           throw new Error('Invalid API response format')
         }
 
-        // Extract color names from the response
-        const colorNames = data.colors.map(c => c.name)
+        // Cache the successful response
+        colorNameCache.set(urlString, data)
 
-        // If we had to truncate the palette, pad with empty strings
-        if (palette.length > colorsToFetch.length) {
-          colorNames.push(...Array(palette.length - colorsToFetch.length).fill(''))
-        }
-
-        const baseColorName =
-          baseIndex !== -1 && baseIndex < colorNames.length ? colorNames[baseIndex] : colorNames[0] || 'Unknown'
-
-        if (!signal.aborted) {
-          setFetchedData({
-            colorNames,
-            paletteTitle: data.paletteTitle || 'Color Palette',
-            baseColorName,
-          })
-          setIsLoading(false)
-        }
+        processResponse(data, palette, colorsToFetch, baseIndex, signal)
       } catch (e) {
         if (!signal.aborted) {
           setError(e instanceof Error ? e : new Error('An unexpected error occurred'))
@@ -124,6 +121,34 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
     },
     400, // 400ms debounce delay
   )
+
+  const processResponse = (
+    data: ColorNameApiResponse,
+    palette: BaseColorData[],
+    colorsToFetch: BaseColorData[],
+    baseIndex: number,
+    signal: AbortSignal,
+  ) => {
+    // Extract color names from the response
+    const colorNames = data.colors.map(c => c.name)
+
+    // If we had to truncate the palette, pad with empty strings
+    if (palette.length > colorsToFetch.length) {
+      colorNames.push(...Array(palette.length - colorsToFetch.length).fill(''))
+    }
+
+    const baseColorName =
+      baseIndex !== -1 && baseIndex < colorNames.length ? colorNames[baseIndex] : colorNames[0] || 'Unknown'
+
+    if (!signal.aborted) {
+      setFetchedData({
+        colorNames,
+        paletteTitle: data.paletteTitle || 'Color Palette',
+        baseColorName,
+      })
+      setIsLoading(false)
+    }
+  }
 
   useEffect(() => {
     // Abort previous request if it exists
