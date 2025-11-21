@@ -82,9 +82,6 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
         // Fetch color names from Color Name API
         const response = await fetch(urlString, {
           signal,
-          headers: {
-            'X-Referrer': 'color-palette-pro',
-          },
         })
 
         if (!response.ok) {
