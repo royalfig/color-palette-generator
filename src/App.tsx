@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef } from 'react'
-import { useDebounce, useDebouncedCallback } from 'use-debounce'
+import { useDebouncedCallback } from 'use-debounce'
 import { ColorContext } from './components/ColorContext'
 import { MessageContext, MessageType } from './components/MessageContext'
 import { AuxillaryDisplay } from './components/auxillary-display/AuxillaryDisplay'
@@ -153,10 +153,10 @@ export default function App() {
   // const css = generateCss(palettes)
   // const base = useBaseColor(palettes)
 
-  const [debouncedPalette] = useDebounce(palette, 400)
-  const [debouncedOriginalColor] = useDebounce(colorContext.originalColor, 400)
+  // const css = generateCss(palettes)
+  // const base = useBaseColor(palettes)
 
-  const { fetchedData, isLoading, error: colorNameError } = useFetchColorNames(debouncedPalette, debouncedOriginalColor)
+  const { fetchedData, isLoading, error: colorNameError } = useFetchColorNames(palette, colorContext.originalColor)
 
   // useEffect(() => {
   //   const styleEl = document.createElement('style')
