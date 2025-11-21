@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
+import { useDebounce, useDebouncedCallback } from 'use-debounce'
 import { ColorContext } from './components/ColorContext'
 import { MessageContext, MessageType } from './components/MessageContext'
 import { AuxillaryDisplay } from './components/auxillary-display/AuxillaryDisplay'
@@ -153,7 +153,10 @@ export default function App() {
   // const css = generateCss(palettes)
   // const base = useBaseColor(palettes)
 
-  const { fetchedData, isLoading, error: colorNameError } = useFetchColorNames(palette, colorContext.originalColor)
+  const [debouncedPalette] = useDebounce(palette, 400)
+  const [debouncedOriginalColor] = useDebounce(colorContext.originalColor, 400)
+
+  const { fetchedData, isLoading, error: colorNameError } = useFetchColorNames(debouncedPalette, debouncedOriginalColor)
 
   // useEffect(() => {
   //   const styleEl = document.createElement('style')
@@ -312,7 +315,7 @@ export default function App() {
             <main className="synth-container">
               <SectionHeader />
               <Display>
-                <ColorDisplay
+                  <ColorDisplay
                   fetchedData={fetchedData}
                   isLoading={isLoading}
                   error={colorNameError}
