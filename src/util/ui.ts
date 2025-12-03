@@ -264,9 +264,9 @@ function generateSurfaceColors(
   surface: Color
   onSurface: Color
   onSurfaceVariant: Color
-  surfaceElevated: Color
-  surfaceDim: Color
-  surfaceBright: Color
+  container: Color
+  containerDim: Color
+  containerBright: Color
 } {
   // Create surface colors with subtle tint from primary color (very subdued)
   // Uses primary's hue with minimal chroma for warmth/coolness without being obvious
@@ -274,16 +274,18 @@ function generateSurfaceColors(
 
   // Surface color - main background
   // Usage: Main app background, page body, base container
-  // Light mode: nearly white (L=0.992) with very subtle primary color tint (C=0.0015)
-  // Dark mode: dark gray (L=0.18) with very subtle primary color tint (C=0.0015)
+  // Light mode: nearly white (L=0.99) with subtle primary color tint (C=0.003)
+  // Dark mode: dark gray (L=0.12) with subtle primary color tint (C=0.005)
   const surface = primary.clone()
-  surface.oklch.c = 0.0015 // Very subtle tint, reduced from 0.003
-  surface.oklch.l = isDarkMode ? 0.18 : 0.992
+  surface.oklch.c = isDarkMode ? 0.005 : 0.003 // Reduced chroma for neutrality
+  surface.oklch.l = isDarkMode ? 0.12 : 0.99 // Light mode approaching white
 
   // On-surface - text on surface (must meet AAA 7:1)
   // Usage: Primary text color for headings, body text, high-emphasis content
   // Light mode: nearly black (L=0.1), Dark mode: light gray (L=0.9, not pure white)
-  const onSurface = new Color('oklch', [isDarkMode ? 0.9 : 0.1, 0, 0])
+  const onSurface = primary.clone() // Use primary clone to keep hue
+  onSurface.oklch.c = 0.01 // Slight chroma for harmony (was 0)
+  onSurface.oklch.l = isDarkMode ? 0.95 : 0.1 // Increased lightness for dark mode contrast
   // Ensure AAA contrast
   const onSurfaceAdjusted = ensureContrast(onSurface, surface, 7.0, !isDarkMode)
 
@@ -299,34 +301,37 @@ function generateSurfaceColors(
   // Light mode: subtle variations from base surface for clear hierarchy
   // Dark mode: subtle variations from base dark gray (creates depth)
 
-  // Surface-elevated: Elevated surfaces like cards, dialogs, modals, floating panels
+  // Container variants (formerly surface variants)
   // Usage: Cards, dialogs, sheets, floating action areas, tooltips
-  // Light mode: slightly lighter than base (L=0.995) with same subtle tint
-  const surfaceElevated = primary.clone()
-  surfaceElevated.oklch.c = 0.0015
-  surfaceElevated.oklch.l = isDarkMode ? 0.22 : 0.995
 
-  // Surface-dim: Dimmed/depressed surfaces
+  // Container: Elevated surfaces
+  // Light mode: slightly darker than surface (L=0.95) to differentiate from pure white background
+  // Dark mode: lighter than surface (L=0.18)
+  const container = primary.clone()
+  container.oklch.c = isDarkMode ? 0.008 : 0.004
+  container.oklch.l = isDarkMode ? 0.18 : 0.95
+
+  // Container-dim: Dimmed/depressed surfaces
   // Usage: Disabled states, inactive tabs, pressed buttons, scrim overlays
-  // Light mode: slightly darker than base (L=0.98) with same subtle tint
-  const surfaceDim = primary.clone()
-  surfaceDim.oklch.c = 0.0015
-  surfaceDim.oklch.l = isDarkMode ? 0.16 : 0.98
+  // Light mode: darker than container (L=0.92)
+  const containerDim = primary.clone()
+  containerDim.oklch.c = isDarkMode ? 0.006 : 0.006
+  containerDim.oklch.l = isDarkMode ? 0.08 : 0.92
 
-  // Surface-bright: Brightened surfaces
+  // Container-bright: Brightened surfaces
   // Usage: Hover states, active tabs, highlighted sections, selected items
-  // Light mode: slightly brighter than base (L=0.995) with same subtle tint
-  const surfaceBright = primary.clone()
-  surfaceBright.oklch.c = 0.0015
-  surfaceBright.oklch.l = isDarkMode ? 0.2 : 0.995
+  // Light mode: same as surface (L=0.99)
+  const containerBright = primary.clone()
+  containerBright.oklch.c = isDarkMode ? 0.01 : 0.003
+  containerBright.oklch.l = isDarkMode ? 0.24 : 0.99 // Same as surface in light mode
 
   return {
     surface,
     onSurface: onSurfaceAdjusted,
     onSurfaceVariant: onSurfaceVariantAdjusted,
-    surfaceElevated,
-    surfaceDim,
-    surfaceBright,
+    container,
+    containerDim,
+    containerBright,
   }
 }
 
@@ -346,18 +351,18 @@ function generateOutlineAndInverse(
 } {
   // Outline colors - slightly chromatic neutral variants
   const outlineBase = primary.clone()
-  outlineBase.oklch.c = 0.015
+  outlineBase.oklch.c = 0.01 // Reduced from 0.04 for better neutrality
 
   const outline = outlineBase.clone()
-  outline.oklch.l = isDarkMode ? 0.6 : 0.5
+  outline.oklch.l = isDarkMode ? 0.7 : 0.4 // Increased contrast
   // Ensure visible contrast against surface
   const surface = primary.clone()
-  surface.oklch.c = 0.005
-  surface.oklch.l = isDarkMode ? 0.1 : 0.99
+  surface.oklch.c = 0.008
+  surface.oklch.l = isDarkMode ? 0.12 : 0.98
   const outlineAdjusted = ensureContrast(outline, surface, 3.0, !isDarkMode)
 
   const outlineVariant = outlineBase.clone()
-  outlineVariant.oklch.l = isDarkMode ? 0.3 : 0.8
+  outlineVariant.oklch.l = isDarkMode ? 0.4 : 0.7 // Increased contrast spread
 
   // Inverse colors
   const inverseSurface = primary.clone()
@@ -560,10 +565,10 @@ export function generateUiColorPalette(
     colorFactory(surfaces.onSurface, 'on-surface', 0, colorFormat, false, true),
     colorFactory(surfaces.onSurfaceVariant, 'on-surface-variant', 0, colorFormat, false, true),
 
-    // Surface elevation (3)
-    colorFactory(surfaces.surfaceElevated, 'surface-elevated', 0, colorFormat, false, true),
-    colorFactory(surfaces.surfaceDim, 'surface-dim', 0, colorFormat, false, true),
-    colorFactory(surfaces.surfaceBright, 'surface-bright', 0, colorFormat, false, true),
+    // Container variants (3)
+    colorFactory(surfaces.container, 'container', 0, colorFormat, false, true),
+    colorFactory(surfaces.containerDim, 'container-dim', 0, colorFormat, false, true),
+    colorFactory(surfaces.containerBright, 'container-bright', 0, colorFormat, false, true),
 
     // Outline (2)
     colorFactory(outlineInverse.outline, 'outline', 0, colorFormat, false, true),
