@@ -14,24 +14,24 @@
     "@fontsource-variable/orbitron": "^5.2.8",
     "@phosphor-icons/react": "^2.1.10",
     "colorjs.io": "^0.5.2",
-    "motion": "^12.23.24",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "motion": "^12.23.25",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
     "use-debounce": "^10.0.6"
   },
   "devDependencies": {
-    "@types/react": "^19.2.6",
+    "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@typescript-eslint/eslint-plugin": "^8.47.0",
-    "@typescript-eslint/parser": "^8.47.0",
+    "@typescript-eslint/eslint-plugin": "^8.48.1",
+    "@typescript-eslint/parser": "^8.48.1",
     "@vitejs/plugin-react": "^5.1.1",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react": "^7.37.5",
-    "stylelint": "^16.25.0",
+    "stylelint": "^16.26.1",
     "stylelint-config-recess-order": "^7.4.0",
     "stylelint-config-standard": "^39.0.1",
     "typescript": "^5.9.3",
-    "vite": "^7.2.2"
+    "vite": "^7.2.6"
   }
 }
