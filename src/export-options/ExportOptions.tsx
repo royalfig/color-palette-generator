@@ -45,6 +45,7 @@ function downloadPaletteAsImage(
   baseColor: BaseColorData,
   palette: BaseColorData[],
   colorNames: ColorName,
+  colorFormat: ColorFormat,
   isUiMode: boolean = false,
 ) {
   const colorCount = palette.length
@@ -126,9 +127,8 @@ function downloadPaletteAsImage(
           )
         }
 
-        // Handle color value text sizing for UI mode
+       const colorValue = color.conversions[colorFormat].value
         if (isUiMode) {
-          const colorValue = color.string
           const maxWidth = squareSize * 0.9
           ctx.font = '12px system-ui'
 
@@ -145,7 +145,7 @@ function downloadPaletteAsImage(
           ctx.fillText(colorValue, x + squareSize * 0.05, y + (squareSize - squareSize * 0.05))
         } else {
           ctx.font = '16px system-ui'
-          ctx.fillText(color.string, x + squareSize * 0.05, y + (squareSize - squareSize * 0.05))
+          ctx.fillText(colorValue, x + squareSize * 0.05, y + (squareSize - squareSize * 0.05))
         }
       })
     }
@@ -192,7 +192,7 @@ export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: Ex
   }
 
   function handleImageDownload() {
-    downloadPaletteAsImage(originalColor, palette, colorNames, isUiMode)
+    downloadPaletteAsImage(originalColor, palette, colorNames, colorFormat, isUiMode)
     showMessage('Image created', 'success')
   }
 
