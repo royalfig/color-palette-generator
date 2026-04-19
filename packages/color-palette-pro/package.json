@@ -22,7 +22,7 @@
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch"
   },
   "dependencies": {
-    "colorjs.io": "^0.5.2"
+    "colorjs.io": "^0.6.0"
   },
   "devDependencies": {
     "tsup": "^8.3.0",

@@ -14,7 +14,7 @@
     "@fontsource-variable/orbitron": "^5.2.8",
     "@phosphor-icons/react": "^2.1.10",
     "@royalfig/color-palette-pro": "workspace:*",
-    "colorjs.io": "^0.5.2",
+    "colorjs.io": "^0.6.0",
     "motion": "^12.23.26",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
