@@ -8,8 +8,8 @@ import Button from '../components/button/Button'
 import { ColorContext } from '../components/ColorContext'
 import { LinearGradientSVG } from '../components/LinearGradientSVG'
 import { MessageContext } from '../components/MessageContext'
-import { ColorFormat } from 'color-palette-pro'
-import { BaseColorData } from 'color-palette-pro'
+import { ColorFormat } from '@royalfig/color-palette-pro'
+import { BaseColorData } from '@royalfig/color-palette-pro'
 import './export-options.css'
 
 function downloadAction(

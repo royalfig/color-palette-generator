@@ -1,4 +1,4 @@
-import { Palettes, BaseColorData } from 'color-palette-pro'
+import { Palettes, BaseColorData } from '@royalfig/color-palette-pro'
 
 export function useBaseColor(palettes: Palettes): BaseColorData {
   return palettes.com.og[0]

@@ -2,7 +2,7 @@ import { ShuffleIcon } from '@phosphor-icons/react/dist/csr/Shuffle'
 import { QuestionIcon } from '@phosphor-icons/react/dist/csr/Question'
 import Button from '../components/button/Button'
 import './options.css'
-import { pickRandomColor } from 'color-palette-pro'
+import { pickRandomColor } from '@royalfig/color-palette-pro'
 import { LinearGradientSVG } from '../components/LinearGradientSVG'
 
 export function Options({ setColor }: { setColor: React.Dispatch<React.SetStateAction<string>> }) {

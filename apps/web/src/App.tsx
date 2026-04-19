@@ -23,10 +23,10 @@ import { useFetchColorNames } from './hooks/useColorName'
 import { useDarkMode } from './hooks/useDarkMode'
 import { Options } from './options/Options'
 import { PaletteTypeSelector } from './palette-type-selector/PaletteTypeSelector'
-import type { ColorFormat, ColorSpaceAndFormat, PaletteKinds } from 'color-palette-pro'
-import { createPalettes } from 'color-palette-pro'
-import { colorFactory } from 'color-palette-pro'
-import { pickRandomColor } from 'color-palette-pro'
+import type { ColorFormat, ColorSpaceAndFormat, PaletteKinds } from '@royalfig/color-palette-pro'
+import { createPalettes } from '@royalfig/color-palette-pro'
+import { colorFactory } from '@royalfig/color-palette-pro'
+import { pickRandomColor } from '@royalfig/color-palette-pro'
 
 const Manual = lazy(() => import('./components/manual/Manual.js'))
 

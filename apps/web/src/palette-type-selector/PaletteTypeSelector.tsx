@@ -1,5 +1,5 @@
 import './palette-type-selector.css'
-import { PaletteKinds } from 'color-palette-pro'
+import { PaletteKinds } from '@royalfig/color-palette-pro'
 import Button from '../components/button/Button'
 
 const paletteTypeOptions = ['ana', 'com', 'spl', 'tri', 'tet', 'tas'] as const

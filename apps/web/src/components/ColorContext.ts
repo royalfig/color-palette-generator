@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { colorFactory, type BaseColorData } from 'color-palette-pro'
+import { colorFactory, type BaseColorData } from '@royalfig/color-palette-pro'
 
 export type ColorContextType = {
   originalColor: BaseColorData

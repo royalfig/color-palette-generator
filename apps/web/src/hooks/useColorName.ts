@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
-import { BaseColorData } from 'color-palette-pro'
+import { BaseColorData } from '@royalfig/color-palette-pro'
 
 // Color Name API response types
 interface ColorNameApiColor {
