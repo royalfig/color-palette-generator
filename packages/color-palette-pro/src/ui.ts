@@ -4,51 +4,31 @@ import { PaletteKinds, ColorFormat } from './types'
 
 // ===== PRIMARY COLOR MODE DETECTION =====
 
-/**
- * Determines if the primary color is naturally dark or light
- * Returns true if the color is dark (L < 0.5), false if light (L >= 0.5)
- */
 function isPrimaryColorDark(primary: Color): boolean {
   return primary.oklch.l < 0.5
-}
-
-/**
- * Determines which mode should preserve the primary color as-is
- * Dark colors work best in dark mode, light colors work best in light mode
- */
-function shouldPreserveInDarkMode(primary: Color): boolean {
-  return isPrimaryColorDark(primary)
 }
 
 // ===== CONTRAST-BASED COLOR GENERATION =====
 
 /**
- * Finds the optimal lightness value to achieve minimum contrast ratio
- * Uses binary search for efficiency
- * Determines search direction based on background lightness
+ * Binary search for the lightness value that minimally satisfies the contrast ratio.
+ * Dark background → finds minimum L that still meets ratio.
+ * Light background → finds maximum L that still meets ratio.
  */
 function findOptimalLightness(
   baseColor: Color,
   background: Color,
   minRatio: number,
-  isDarkMode: boolean,
   preserveHue: boolean = true,
   preserveChroma: boolean = true,
 ): Color {
-  // Determine if background is dark or light
   const backgroundL = background.oklch.l
-  const isBackgroundDark = backgroundL < 0.5
+  const needLightForeground = backgroundL < 0.5
 
-  // If background is dark, we need light foreground (high L)
-  // If background is light, we need dark foreground (low L)
-  const needLightForeground = isBackgroundDark
-
-  // Binary search for optimal lightness
   let minL = 0
   let maxL = 1
   let bestColor = baseColor.clone()
 
-  // Try to find a lightness that meets contrast requirements
   for (let i = 0; i < 50; i++) {
     const testL = (minL + maxL) / 2
     const testColor = baseColor.clone()
@@ -66,101 +46,72 @@ function findOptimalLightness(
     if (contrast >= minRatio) {
       bestColor = testColor.clone()
       if (needLightForeground) {
-        // We have enough contrast, can try going lighter for optimization
-        minL = testL
+        maxL = testL // found a working L; try darker to find minimum
       } else {
-        // We have enough contrast, can try going darker for optimization
-        maxL = testL
+        minL = testL // found a working L; try lighter to find maximum
       }
     } else {
       if (needLightForeground) {
-        // Need more contrast, current is too dark, search higher range
-        minL = testL
+        minL = testL // too dark; need to go lighter
       } else {
-        // Need more contrast, current is too light, search lower range
-        maxL = testL
+        maxL = testL // too light; need to go darker
       }
     }
 
-    // If we're very close, break
     if (Math.abs(maxL - minL) < 0.001) break
   }
 
   return bestColor
 }
 
-/**
- * Adjusts a color to meet minimum contrast ratio with a background
- */
-function adjustForContrast(color: Color, background: Color, minRatio: number, isDarkMode: boolean): Color {
-  const currentContrast = color.contrastWCAG21(background)
-
-  if (currentContrast >= minRatio) {
+function ensureContrast(color: Color, background: Color, minRatio: number): Color {
+  if (color.contrastWCAG21(background) >= minRatio) {
     return color.clone()
   }
-
-  return findOptimalLightness(color, background, minRatio, isDarkMode)
-}
-
-/**
- * Ensures a color meets contrast requirements against a background
- * Adjusts lightness while preserving hue and chroma as much as possible
- */
-function ensureContrast(color: Color, background: Color, minRatio: number, isDarkMode: boolean): Color {
-  return adjustForContrast(color, background, minRatio, isDarkMode)
+  return findOptimalLightness(color, background, minRatio)
 }
 
 // ===== PRIMARY COLOR ADAPTATION =====
 
 /**
- * Adapts the primary color for the specified mode
- * If the color naturally matches the mode, use it as-is
- * Otherwise, adjust it to work in the opposite mode
+ * Preserves the primary color unchanged in the mode where it naturally has best contrast,
+ * and adapts it for the other mode.
+ *
+ * Dark primary (L < 0.5) → best contrast on light surface → preserved in light mode.
+ * Light primary (L ≥ 0.5) → best contrast on dark surface → preserved in dark mode.
  */
 function adaptPrimaryForMode(primary: Color, isDarkMode: boolean): Color {
   const isNaturallyDark = isPrimaryColorDark(primary)
-  const shouldBeDark = isDarkMode
 
-  // If natural mode matches requested mode, use as-is
-  if (isNaturallyDark === shouldBeDark) {
-    return primary.clone()
-  }
+  // Preserve as-is in the mode where the primary already contrasts well
+  if (isNaturallyDark && !isDarkMode) return primary.clone()
+  if (!isNaturallyDark && isDarkMode) return primary.clone()
 
-  // Otherwise, adjust for opposite mode
-  // For a dark color in light mode, we need to darken it further
-  // For a light color in dark mode, we need to lighten it further
+  // Same polarity as surface (dark-on-dark or light-on-light) — needs significant shift
   const adjusted = primary.clone()
-
-  if (isNaturallyDark && !shouldBeDark) {
-    // Dark color in light mode - darken it
-    adjusted.oklch.l = Math.max(0.15, adjusted.oklch.l * 0.7)
+  if (isNaturallyDark) {
+    adjusted.oklch.l = Math.min(0.78, adjusted.oklch.l + 0.42)
   } else {
-    // Light color in dark mode - lighten it
-    adjusted.oklch.l = Math.min(0.85, adjusted.oklch.l * 1.3)
+    adjusted.oklch.l = Math.max(0.22, adjusted.oklch.l - 0.42)
   }
-
   return adjusted
 }
 
 // ===== ACCENT COLOR PREPARATION =====
 
 /**
- * Prepares an accent color (secondary or tertiary) for UI use
- * Desaturates and adjusts for better UI integration
+ * Prepares an accent color (secondary or tertiary) for UI use.
+ * Desaturates for better UI integration while retaining some vibrancy from the source.
  */
 function prepareAccentColor(baseColor: Color, role: 'secondary' | 'tertiary'): Color {
   const accent = baseColor.clone()
 
   if (role === 'secondary') {
-    // Secondary should be moderately desaturated but still visible
-    accent.oklch.c = Math.min(accent.oklch.c * 0.6, 0.12)
-    // Ensure reasonable lightness for UI
+    accent.oklch.c = Math.max(Math.min(accent.oklch.c * 0.6, 0.18), 0.05)
     if (accent.oklch.l > 0.9) accent.oklch.l = 0.7
     if (accent.oklch.l < 0.1) accent.oklch.l = 0.3
   } else {
-    // Tertiary should be more desaturated and subtle
-    accent.oklch.c = Math.min(accent.oklch.c * 0.4, 0.08)
-    // Lighter and softer for tertiary
+    accent.oklch.c = Math.max(Math.min(accent.oklch.c * 0.4, 0.12), 0.03)
     if (accent.oklch.l < 0.5) {
       accent.oklch.l = Math.min(accent.oklch.l + 0.15, 0.75)
     }
@@ -170,7 +121,7 @@ function prepareAccentColor(baseColor: Color, role: 'secondary' | 'tertiary'): C
 }
 
 /**
- * Selects secondary and tertiary colors from the palette
+ * Selects secondary and tertiary colors from the palette.
  */
 function selectAccentColors(
   paletteType: PaletteKinds,
@@ -181,7 +132,6 @@ function selectAccentColors(
     if (palette[index]?.color) {
       return palette[index].color.clone()
     }
-    // Generate fallback color with hue shift
     const fallback = primary.clone()
     fallback.oklch.h = (fallback.oklch.h + index * 60) % 360
     fallback.oklch.c = Math.min(fallback.oklch.c * 0.8, 0.12)
@@ -192,26 +142,39 @@ function selectAccentColors(
   let tertiaryIndex: number
 
   switch (paletteType) {
-    case 'com': // Complementary
+    case 'com':
       secondaryIndex = 1
       tertiaryIndex = 4
       break
-    case 'spl': // Split-complementary
+    case 'spl':
       secondaryIndex = 2
       tertiaryIndex = 4
       break
-    case 'tri': // Triadic
+    case 'tri':
       secondaryIndex = 2
       tertiaryIndex = 4
       break
-    case 'tet': // Tetradic
+    case 'tet':
       secondaryIndex = 1
       tertiaryIndex = 4
       break
-    case 'ana': // Analogous
+    case 'ana':
       secondaryIndex = 3
       tertiaryIndex = 1
       break
+    case 'ton': // Tonal - monochromatic with lightness variations; use hue-shifted fallbacks
+      const tonSecondary = primary.clone()
+      tonSecondary.oklch.h = (tonSecondary.oklch.h + 30) % 360
+      tonSecondary.oklch.c = Math.min(tonSecondary.oklch.c * 0.6, 0.05)
+
+      const tonTertiary = primary.clone()
+      tonTertiary.oklch.h = (tonTertiary.oklch.h + 60) % 360
+      tonTertiary.oklch.c = Math.min(tonTertiary.oklch.c * 0.4, 0.03)
+
+      return {
+        secondary: prepareAccentColor(tonSecondary, 'secondary'),
+        tertiary: prepareAccentColor(tonTertiary, 'tertiary'),
+      }
     case 'tas': // Tints and shades - monochrome
       const secondary = primary.clone()
       secondary.oklch.h = (secondary.oklch.h + 30) % 360
@@ -239,23 +202,14 @@ function selectAccentColors(
 // ===== SURFACE COLOR GENERATION =====
 
 /**
- * Generates surface colors with proper contrast
- * Surface and on-surface must meet AAA contrast (7:1)
- * Surfaces are truly neutral (nearly white in light mode, dark gray in dark mode)
+ * Surface slots (4 semantic roles):
+ * - surface:            Page/app canvas — <body>, page wrapper, sidebar shell
+ * - container:          Inline elevated content — cards, dialogs, sheets (Carbon-level ΔL)
+ * - container-sunken:   Recessed wells — text inputs, code blocks, data table rows
+ * - container-overlay:  Floating above the page — dropdowns, tooltips, popovers (relies on shadow/border)
  *
- * Design principles:
- * - Light mode: Nearly white (L=0.992) with very subtle primary color tint (C=0.0015)
- * - Dark mode: Dark gray (L=0.18) with very subtle primary color tint for cohesion
- * - On-surface: Not pure white in dark mode (L ~0.9) to reduce eye strain
- * - Surfaces use primary's hue with minimal chroma for subtle warmth/coolness
- *
- * Surface Color Usage:
- * - surface: Main app background (page body, main container)
- * - on-surface: Primary text color on surface (headings, body text, high-emphasis content)
- * - on-surface-variant: Secondary text color (captions, hints, labels, medium-emphasis content)
- * - surface-elevated: Elevated surfaces like cards, dialogs, sheets, floating action areas
- * - surface-dim: Dimmed/depressed surfaces (disabled states, inactive tabs, pressed buttons)
- * - surface-bright: Brightened surfaces (hover states, active tabs, highlighted sections)
+ * on-surface:         Primary text (AAA 7:1)
+ * on-surface-variant: Secondary text — lightest value that still meets AA 4.5:1 against surface
  */
 function generateSurfaceColors(
   primary: Color,
@@ -265,106 +219,72 @@ function generateSurfaceColors(
   onSurface: Color
   onSurfaceVariant: Color
   container: Color
-  containerDim: Color
-  containerBright: Color
+  containerSunken: Color
+  containerOverlay: Color
 } {
-  // Create surface colors with subtle tint from primary color (very subdued)
-  // Uses primary's hue with minimal chroma for warmth/coolness without being obvious
-  // Light mode: nearly white with very subtle tint, Dark mode: dark gray with subtle tint
-
-  // Surface color - main background
-  // Usage: Main app background, page body, base container
-  // Light mode: nearly white (L=0.99) with subtle primary color tint (C=0.003)
-  // Dark mode: dark gray (L=0.12) with subtle primary color tint (C=0.005)
   const surface = primary.clone()
-  surface.oklch.c = isDarkMode ? 0.005 : 0.003 // Reduced chroma for neutrality
-  surface.oklch.l = isDarkMode ? 0.12 : 0.99 // Light mode approaching white
+  surface.oklch.c = isDarkMode ? 0.005 : 0.010
+  surface.oklch.l = isDarkMode ? 0.12 : 0.99
 
-  // On-surface - text on surface (must meet AAA 7:1)
-  // Usage: Primary text color for headings, body text, high-emphasis content
-  // Light mode: nearly black (L=0.1), Dark mode: light gray (L=0.9, not pure white)
-  const onSurface = primary.clone() // Use primary clone to keep hue
-  onSurface.oklch.c = 0.01 // Slight chroma for harmony (was 0)
-  onSurface.oklch.l = isDarkMode ? 0.95 : 0.1 // Increased lightness for dark mode contrast
-  // Ensure AAA contrast
-  const onSurfaceAdjusted = ensureContrast(onSurface, surface, 7.0, !isDarkMode)
+  const onSurface = primary.clone()
+  onSurface.oklch.c = 0.01
+  onSurface.oklch.l = isDarkMode ? 0.95 : 0.1
+  const onSurfaceAdjusted = ensureContrast(onSurface, surface, 7.0)
 
-  // On-surface-variant - slightly more chromatic than on-surface but still very neutral
-  // Usage: Secondary text (captions, hints, labels, medium-emphasis content)
-  // Has a subtle color tint to differentiate from primary text
+  // Always search for the lightest (light mode) or darkest-usable (dark mode) value
+  // that meets AA 4.5:1 — never settle for an arbitrarily dark starting guess
   const onSurfaceVariant = primary.clone()
-  onSurfaceVariant.oklch.c = 0.01 // Very minimal chroma, just a hint
-  onSurfaceVariant.oklch.l = isDarkMode ? 0.75 : 0.3
-  const onSurfaceVariantAdjusted = ensureContrast(onSurfaceVariant, surface, 4.5, !isDarkMode)
+  onSurfaceVariant.oklch.c = 0.01
+  const onSurfaceVariantAdjusted = findOptimalLightness(onSurfaceVariant, surface, 4.5)
 
-  // Surface elevation variants - all use primary hue with subtle tint
-  // Light mode: subtle variations from base surface for clear hierarchy
-  // Dark mode: subtle variations from base dark gray (creates depth)
-
-  // Container variants (formerly surface variants)
-  // Usage: Cards, dialogs, sheets, floating action areas, tooltips
-
-  // Container: Elevated surfaces
-  // Light mode: slightly darker than surface (L=0.95) to differentiate from pure white background
-  // Dark mode: lighter than surface (L=0.18)
+  // container: cards, dialogs — Carbon-level ΔL ≈ 0.07–0.08 from surface
   const container = primary.clone()
-  container.oklch.c = isDarkMode ? 0.008 : 0.004
-  container.oklch.l = isDarkMode ? 0.18 : 0.95
+  container.oklch.c = isDarkMode ? 0.008 : 0.014
+  container.oklch.l = isDarkMode ? 0.20 : 0.92
 
-  // Container-dim: Dimmed/depressed surfaces
-  // Usage: Disabled states, inactive tabs, pressed buttons, scrim overlays
-  // Light mode: darker than container (L=0.92)
-  const containerDim = primary.clone()
-  containerDim.oklch.c = isDarkMode ? 0.006 : 0.006
-  containerDim.oklch.l = isDarkMode ? 0.08 : 0.92
+  // container-sunken: inset wells — slightly recessed from surface
+  const containerSunken = primary.clone()
+  containerSunken.oklch.c = isDarkMode ? 0.006 : 0.012
+  containerSunken.oklch.l = isDarkMode ? 0.08 : 0.96
 
-  // Container-bright: Brightened surfaces
-  // Usage: Hover states, active tabs, highlighted sections, selected items
-  // Light mode: same as surface (L=0.99)
-  const containerBright = primary.clone()
-  containerBright.oklch.c = isDarkMode ? 0.01 : 0.003
-  containerBright.oklch.l = isDarkMode ? 0.24 : 0.99 // Same as surface in light mode
+  // container-overlay: floating elements — same L as surface in light mode (shadow does the work),
+  // clearly lighter than surface in dark mode
+  const containerOverlay = primary.clone()
+  containerOverlay.oklch.c = isDarkMode ? 0.010 : 0.010
+  containerOverlay.oklch.l = isDarkMode ? 0.24 : 0.99
 
   return {
     surface,
     onSurface: onSurfaceAdjusted,
     onSurfaceVariant: onSurfaceVariantAdjusted,
     container,
-    containerDim,
-    containerBright,
+    containerSunken,
+    containerOverlay,
   }
 }
 
 // ===== OUTLINE AND INVERSE COLORS =====
 
-/**
- * Generates outline and inverse colors
- */
 function generateOutlineAndInverse(
   primary: Color,
   isDarkMode: boolean,
+  surface: Color,
 ): {
   outline: Color
   outlineVariant: Color
   inverseSurface: Color
   onInverseSurface: Color
 } {
-  // Outline colors - slightly chromatic neutral variants
   const outlineBase = primary.clone()
-  outlineBase.oklch.c = 0.01 // Reduced from 0.04 for better neutrality
+  outlineBase.oklch.c = 0.01
 
   const outline = outlineBase.clone()
-  outline.oklch.l = isDarkMode ? 0.7 : 0.4 // Increased contrast
-  // Ensure visible contrast against surface
-  const surface = primary.clone()
-  surface.oklch.c = 0.008
-  surface.oklch.l = isDarkMode ? 0.12 : 0.98
-  const outlineAdjusted = ensureContrast(outline, surface, 3.0, !isDarkMode)
+  outline.oklch.l = isDarkMode ? 0.7 : 0.4
+  const outlineAdjusted = ensureContrast(outline, surface, 3.0)
 
-  const outlineVariant = outlineBase.clone()
-  outlineVariant.oklch.l = isDarkMode ? 0.4 : 0.7 // Increased contrast spread
+  // Lightest value that still meets 3:1 against surface (same optimal-search as on-surface-variant)
+  const outlineVariant = findOptimalLightness(outlineBase, surface, 3.0)
 
-  // Inverse colors
   const inverseSurface = primary.clone()
   inverseSurface.oklch.c = 0.005
   inverseSurface.oklch.l = isDarkMode ? 0.9 : 0.2
@@ -372,7 +292,7 @@ function generateOutlineAndInverse(
   const onInverseSurface = primary.clone()
   onInverseSurface.oklch.c = 0.005
   onInverseSurface.oklch.l = isDarkMode ? 0.2 : 0.95
-  const onInverseSurfaceAdjusted = ensureContrast(onInverseSurface, inverseSurface, 7.0, isDarkMode)
+  const onInverseSurfaceAdjusted = ensureContrast(onInverseSurface, inverseSurface, 7.0)
 
   return {
     outline: outlineAdjusted,
@@ -385,34 +305,32 @@ function generateOutlineAndInverse(
 // ===== SEMANTIC COLOR GENERATION =====
 
 /**
- * Finds a color in the palette by hue range, or generates a fallback
+ * Returns the closest-hue palette color within tolerance, or null.
  */
-function findPaletteColorByHue(palette: BaseColorData[], targetHue: number, tolerance: number = 20): Color | null {
+function findPaletteColorByHue(palette: BaseColorData[], targetHue: number, tolerance: number = 30): Color | null {
+  let bestMatch: Color | null = null
+  let bestDistance = Infinity
+
   for (const item of palette) {
     if (item?.color?.oklch?.h !== undefined) {
       const hue = item.color.oklch.h
       const diff = Math.abs(hue - targetHue)
       const distance = Math.min(diff, 360 - diff)
-      if (distance <= tolerance) {
-        return item.color.clone()
+      if (distance <= tolerance && distance < bestDistance) {
+        bestDistance = distance
+        bestMatch = item.color.clone()
       }
     }
   }
-  return null
+  return bestMatch
 }
 
-/**
- * Gets average chroma from palette for harmony
- */
 function getAverageChroma(palette: BaseColorData[]): number {
   const chromas = palette.filter(item => item?.color?.oklch?.c !== undefined).map(item => item.color.oklch.c)
   if (chromas.length === 0) return 0.1
   return chromas.reduce((sum, c) => sum + c, 0) / chromas.length
 }
 
-/**
- * Generates semantic colors (error, success, warning) with proper contrast
- */
 function generateSemanticColors(
   primary: Color,
   palette: BaseColorData[],
@@ -427,17 +345,17 @@ function generateSemanticColors(
 } {
   const avgChroma = getAverageChroma(palette)
 
-  // Error color (red-ish)
+  // Error: red (hue 22 in OKLCH — distinct red, not orange)
   const errorBase =
-    findPaletteColorByHue(palette, 30) ||
+    findPaletteColorByHue(palette, 22) ||
     (() => {
       const fallback = primary.clone()
-      fallback.oklch.h = 30
+      fallback.oklch.h = 22
       fallback.oklch.c = Math.min(Math.max(avgChroma * 0.9, 0.1), 0.15)
       return fallback
     })()
 
-  // Success color (green-ish)
+  // Success: green (hue 140)
   const successBase =
     findPaletteColorByHue(palette, 140) ||
     (() => {
@@ -447,37 +365,36 @@ function generateSemanticColors(
       return fallback
     })()
 
-  // Warning color (yellow-ish)
+  // Warning: amber/yellow (hue 95 in OKLCH — warm yellow, not lime-green)
   const warningBase =
-    findPaletteColorByHue(palette, 80) ||
+    findPaletteColorByHue(palette, 95) ||
     (() => {
       const fallback = primary.clone()
-      fallback.oklch.h = 80
+      fallback.oklch.h = 95
       fallback.oklch.c = Math.min(Math.max(avgChroma * 0.9, 0.1), 0.15)
       return fallback
     })()
 
-  // Generate semantic colors with appropriate lightness
   const error = errorBase.clone()
   error.oklch.l = isDarkMode ? 0.8 : 0.4
 
   const onError = errorBase.clone()
   onError.oklch.l = isDarkMode ? 0.2 : 1.0
-  const onErrorAdjusted = ensureContrast(onError, error, 4.5, !isDarkMode)
+  const onErrorAdjusted = ensureContrast(onError, error, 4.5)
 
   const success = successBase.clone()
   success.oklch.l = isDarkMode ? 0.8 : 0.4
 
   const onSuccess = successBase.clone()
   onSuccess.oklch.l = isDarkMode ? 0.2 : 1.0
-  const onSuccessAdjusted = ensureContrast(onSuccess, success, 4.5, !isDarkMode)
+  const onSuccessAdjusted = ensureContrast(onSuccess, success, 4.5)
 
   const warning = warningBase.clone()
   warning.oklch.l = isDarkMode ? 0.7 : 0.5
 
   const onWarning = warningBase.clone()
   onWarning.oklch.l = isDarkMode ? 0.2 : 0.1
-  const onWarningAdjusted = ensureContrast(onWarning, warning, 4.5, !isDarkMode)
+  const onWarningAdjusted = ensureContrast(onWarning, warning, 4.5)
 
   return {
     error,
@@ -498,50 +415,41 @@ export function generateUiColorPalette(
   paletteType: PaletteKinds,
   colorFormat: ColorFormat,
 ): BaseColorData[] {
-  // Step 1: Adapt primary color for the current mode
+  // Step 1: Adapt primary — preserved as-is in the mode where it has greatest contrast
   const primary = adaptPrimaryForMode(color, isDarkMode)
 
-  // Step 2: Generate primary colors with proper contrast
-  // Primary container should have enough contrast with primary
+  // Step 2: Primary colors with proper contrast
   const primaryContainer = primary.clone()
   primaryContainer.oklch.l = isDarkMode ? 0.3 : 0.9
 
-  // On-primary must contrast with primary (AA 4.5:1)
   const onPrimary = primary.clone()
   onPrimary.oklch.l = isDarkMode ? 0.2 : 1.0
-  const onPrimaryAdjusted = ensureContrast(onPrimary, primary, 4.5, !isDarkMode)
+  const onPrimaryAdjusted = ensureContrast(onPrimary, primary, 4.5)
 
-  // On-primary-container must contrast with primary-container (AA 4.5:1)
   const onPrimaryContainer = primary.clone()
   onPrimaryContainer.oklch.l = isDarkMode ? 0.9 : 0.1
-  const onPrimaryContainerAdjusted = ensureContrast(onPrimaryContainer, primaryContainer, 4.5, isDarkMode)
+  const onPrimaryContainerAdjusted = ensureContrast(onPrimaryContainer, primaryContainer, 4.5)
 
-  // Step 3: Select and prepare accent colors
-  const { secondary, tertiary } = selectAccentColors(paletteType, palette, primary)
+  // Step 3: Surface colors (AAA contrast) — generated before accents so surface is available
+  const surfaces = generateSurfaceColors(primary, isDarkMode)
 
-  // Secondary colors
-  const secondaryContainer = secondary.clone()
-  secondaryContainer.oklch.l = isDarkMode ? 0.3 : 0.9
+  // Step 4: Accent colors — ensured to contrast with surface (3:1, WCAG non-text UI components)
+  const { secondary: secondaryRaw, tertiary: tertiaryRaw } = selectAccentColors(paletteType, palette, primary)
+  const secondary = ensureContrast(secondaryRaw, surfaces.surface, 3.0)
+  const tertiary = ensureContrast(tertiaryRaw, surfaces.surface, 3.0)
 
   const onSecondary = secondary.clone()
   onSecondary.oklch.l = isDarkMode ? 0.2 : 1.0
-  const onSecondaryAdjusted = ensureContrast(onSecondary, secondary, 4.5, !isDarkMode)
-
-  // Tertiary colors
-  const tertiaryContainer = tertiary.clone()
-  tertiaryContainer.oklch.l = isDarkMode ? 0.3 : 0.9
+  const onSecondaryAdjusted = ensureContrast(onSecondary, secondary, 4.5)
 
   const onTertiary = tertiary.clone()
   onTertiary.oklch.l = isDarkMode ? 0.2 : 1.0
-  const onTertiaryAdjusted = ensureContrast(onTertiary, tertiary, 4.5, !isDarkMode)
+  const onTertiaryAdjusted = ensureContrast(onTertiary, tertiary, 4.5)
 
-  // Step 4: Generate surface colors (AAA contrast)
-  const surfaces = generateSurfaceColors(primary, isDarkMode)
+  // Step 5: Outline and inverse colors
+  const outlineInverse = generateOutlineAndInverse(primary, isDarkMode, surfaces.surface)
 
-  // Step 5: Generate outline and inverse colors
-  const outlineInverse = generateOutlineAndInverse(primary, isDarkMode)
-
-  // Step 6: Generate semantic colors (AA contrast)
+  // Step 6: Semantic colors (AA contrast)
   const semantic = generateSemanticColors(primary, palette, isDarkMode)
 
   // Step 7: Return exactly 24 colors in consistent order
@@ -567,8 +475,8 @@ export function generateUiColorPalette(
 
     // Container variants (3)
     colorFactory(surfaces.container, 'container', 0, colorFormat, false, true),
-    colorFactory(surfaces.containerDim, 'container-dim', 0, colorFormat, false, true),
-    colorFactory(surfaces.containerBright, 'container-bright', 0, colorFormat, false, true),
+    colorFactory(surfaces.containerSunken, 'container-sunken', 0, colorFormat, false, true),
+    colorFactory(surfaces.containerOverlay, 'container-overlay', 0, colorFormat, false, true),
 
     // Outline (2)
     colorFactory(outlineInverse.outline, 'outline', 0, colorFormat, false, true),
