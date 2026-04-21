@@ -9,13 +9,7 @@ import { PaletteKinds, ColorFormat } from './types'
  * Dark background → finds minimum L that still meets ratio.
  * Light background → finds maximum L that still meets ratio.
  */
-function findOptimalLightness(
-  baseColor: Color,
-  background: Color,
-  minRatio: number,
-  preserveHue: boolean = true,
-  preserveChroma: boolean = true,
-): Color {
+function findOptimalLightness(baseColor: Color, background: Color, minRatio: number): Color {
   const backgroundL = background.oklch.l
   const needLightForeground = backgroundL < 0.5
 
@@ -26,13 +20,6 @@ function findOptimalLightness(
   for (let i = 0; i < 50; i++) {
     const testL = (minL + maxL) / 2
     const testColor = baseColor.clone()
-
-    if (preserveHue && baseColor.oklch.h !== undefined) {
-      testColor.oklch.h = baseColor.oklch.h
-    }
-    if (preserveChroma && baseColor.oklch.c !== undefined) {
-      testColor.oklch.c = baseColor.oklch.c
-    }
     testColor.oklch.l = testL
 
     const contrast = testColor.contrastWCAG21(background)
@@ -68,19 +55,26 @@ function ensureContrast(color: Color, background: Color, minRatio: number): Colo
 // ===== PRIMARY COLOR ADAPTATION =====
 
 /**
- * Preserves the primary color if it already meets 4.5:1 contrast against the surface,
- * otherwise finds the minimum lightness shift that satisfies that ratio.
+ * Preserves the primary color if the mode-appropriate on-primary candidate (near-white in
+ * light mode, near-black in dark mode) already achieves 4.5:1 against it; otherwise
+ * shifts primary's lightness minimally to reach that threshold.
  */
 function adaptPrimaryForMode(primary: Color, isDarkMode: boolean): Color {
-  const surface = primary.clone()
-  surface.oklch.c = isDarkMode ? 0.005 : 0.010
-  surface.oklch.l = isDarkMode ? 0.12 : 0.99
+  const onPrimary = primary.clone()
+  onPrimary.oklch.c = 0
+  onPrimary.oklch.l = isDarkMode ? 0.2 : 1.0
 
-  if (primary.contrastWCAG21(surface) >= 4.5) {
+  if (onPrimary.contrastWCAG21(primary) >= 4.5) {
     return primary.clone()
   }
 
-  return findOptimalLightness(primary, surface, 4.5)
+  return findOptimalLightness(primary, onPrimary, 4.5)
+}
+
+function surfaceChromaFor(primary: Color, isDarkMode: boolean): number {
+  return isDarkMode
+    ? Math.min(primary.oklch.c * 0.05, 0.007)
+    : Math.min(primary.oklch.c * 0.025, 0.004)
 }
 
 // ===== ACCENT COLOR PREPARATION =====
@@ -161,22 +155,20 @@ function selectAccentColors(
         secondary: prepareAccentColor(tonSecondary, 'secondary'),
         tertiary: prepareAccentColor(tonTertiary, 'tertiary'),
       }
-    case 'tas': // Tints and shades - monochrome
-      const secondary = primary.clone()
-      secondary.oklch.h = (secondary.oklch.h + 30) % 360
-      secondary.oklch.c = Math.min(secondary.oklch.c * 0.6, 0.05)
+    case 'tas': // Tints and shades — truly monochromatic; same hue as primary, chroma floored by prepareAccentColor
+      const tasSecondary = primary.clone()
+      tasSecondary.oklch.c = 0
 
-      const tertiary = primary.clone()
-      tertiary.oklch.h = (tertiary.oklch.h + 60) % 360
-      tertiary.oklch.c = Math.min(tertiary.oklch.c * 0.4, 0.03)
+      const tasTertiary = primary.clone()
+      tasTertiary.oklch.c = 0
 
       return {
-        secondary: prepareAccentColor(secondary, 'secondary'),
-        tertiary: prepareAccentColor(tertiary, 'tertiary'),
+        secondary: prepareAccentColor(tasSecondary, 'secondary'),
+        tertiary: prepareAccentColor(tasTertiary, 'tertiary'),
       }
     default:
       secondaryIndex = 1
-      tertiaryIndex = 2
+      tertiaryIndex = 4
   }
 
   return {
@@ -209,7 +201,7 @@ function generateSurfaceColors(
   containerOverlay: Color
 } {
   const surface = primary.clone()
-  surface.oklch.c = isDarkMode ? 0.005 : 0.010
+  surface.oklch.c = surfaceChromaFor(primary, isDarkMode)
   surface.oklch.l = isDarkMode ? 0.12 : 0.99
 
   const onSurface = primary.clone()
@@ -225,19 +217,23 @@ function generateSurfaceColors(
 
   // container: cards, dialogs — Carbon-level ΔL ≈ 0.07–0.08 from surface
   const container = primary.clone()
-  container.oklch.c = isDarkMode ? 0.008 : 0.014
+  container.oklch.c = isDarkMode
+    ? Math.min(primary.oklch.c * 0.07, 0.010)
+    : Math.min(primary.oklch.c * 0.04, 0.006)
   container.oklch.l = isDarkMode ? 0.20 : 0.92
 
   // container-sunken: inset wells — slightly recessed from surface
   const containerSunken = primary.clone()
-  containerSunken.oklch.c = isDarkMode ? 0.006 : 0.012
+  containerSunken.oklch.c = isDarkMode
+    ? Math.min(primary.oklch.c * 0.04, 0.005)
+    : Math.min(primary.oklch.c * 0.02, 0.003)
   containerSunken.oklch.l = isDarkMode ? 0.08 : 0.96
 
-  // container-overlay: floating elements — same L as surface in light mode (shadow does the work),
-  // clearly lighter than surface in dark mode
+  // container-overlay: floating elements — pure white in light mode (shadow provides separation),
+  // visibly elevated above container in dark mode
   const containerOverlay = primary.clone()
-  containerOverlay.oklch.c = isDarkMode ? 0.010 : 0.010
-  containerOverlay.oklch.l = isDarkMode ? 0.24 : 0.99
+  containerOverlay.oklch.c = isDarkMode ? Math.min(primary.oklch.c * 0.09, 0.012) : 0
+  containerOverlay.oklch.l = isDarkMode ? 0.24 : 1.0
 
   return {
     surface,
@@ -311,10 +307,14 @@ function findPaletteColorByHue(palette: BaseColorData[], targetHue: number, tole
   return bestMatch
 }
 
-function getAverageChroma(palette: BaseColorData[]): number {
-  const chromas = palette.filter(item => item?.color?.oklch?.c !== undefined).map(item => item.color.oklch.c)
+function getMedianChroma(palette: BaseColorData[]): number {
+  const chromas = palette
+    .filter(item => item?.color?.oklch?.c !== undefined)
+    .map(item => item.color.oklch.c)
+    .sort((a, b) => a - b)
   if (chromas.length === 0) return 0.1
-  return chromas.reduce((sum, c) => sum + c, 0) / chromas.length
+  const mid = Math.floor(chromas.length / 2)
+  return chromas.length % 2 === 0 ? (chromas[mid - 1] + chromas[mid]) / 2 : chromas[mid]
 }
 
 function generateSemanticColors(
@@ -329,15 +329,15 @@ function generateSemanticColors(
   warning: Color
   onWarning: Color
 } {
-  const avgChroma = getAverageChroma(palette)
+  const medianChroma = getMedianChroma(palette)
 
-  // Error: red (hue 22 in OKLCH — distinct red, not orange)
+  // Error: red (hue 27 in OKLCH)
   const errorBase =
-    findPaletteColorByHue(palette, 22) ||
+    findPaletteColorByHue(palette, 27) ||
     (() => {
       const fallback = primary.clone()
-      fallback.oklch.h = 22
-      fallback.oklch.c = Math.min(Math.max(avgChroma * 0.9, 0.1), 0.15)
+      fallback.oklch.h = 27
+      fallback.oklch.c = Math.min(Math.max(medianChroma * 0.9, 0.1), 0.15)
       return fallback
     })()
 
@@ -347,17 +347,17 @@ function generateSemanticColors(
     (() => {
       const fallback = primary.clone()
       fallback.oklch.h = 140
-      fallback.oklch.c = Math.min(Math.max(avgChroma * 0.9, 0.1), 0.15)
+      fallback.oklch.c = Math.min(Math.max(medianChroma * 0.9, 0.1), 0.15)
       return fallback
     })()
 
-  // Warning: amber/yellow (hue 95 in OKLCH — warm yellow, not lime-green)
+  // Warning: amber (hue 83 in OKLCH)
   const warningBase =
-    findPaletteColorByHue(palette, 95) ||
+    findPaletteColorByHue(palette, 83) ||
     (() => {
       const fallback = primary.clone()
-      fallback.oklch.h = 95
-      fallback.oklch.c = Math.min(Math.max(avgChroma * 0.9, 0.1), 0.15)
+      fallback.oklch.h = 83
+      fallback.oklch.c = Math.min(Math.max(medianChroma * 0.9, 0.1), 0.15)
       return fallback
     })()
 
