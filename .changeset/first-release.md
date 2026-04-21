@@ -1,5 +1,5 @@
 ---
-"color-palette-pro": major
+"@royalfig/color-palette-pro": major
 ---
 
 Initial extracted release of the color palette orchestration logic! 🎨 
