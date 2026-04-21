@@ -2,12 +2,6 @@ import Color from 'colorjs.io'
 import { BaseColorData, colorFactory } from './factory'
 import { PaletteKinds, ColorFormat } from './types'
 
-// ===== PRIMARY COLOR MODE DETECTION =====
-
-function isPrimaryColorDark(primary: Color): boolean {
-  return primary.oklch.l < 0.5
-}
-
 // ===== CONTRAST-BASED COLOR GENERATION =====
 
 /**
@@ -74,27 +68,19 @@ function ensureContrast(color: Color, background: Color, minRatio: number): Colo
 // ===== PRIMARY COLOR ADAPTATION =====
 
 /**
- * Preserves the primary color unchanged in the mode where it naturally has best contrast,
- * and adapts it for the other mode.
- *
- * Dark primary (L < 0.5) → best contrast on light surface → preserved in light mode.
- * Light primary (L ≥ 0.5) → best contrast on dark surface → preserved in dark mode.
+ * Preserves the primary color if it already meets 4.5:1 contrast against the surface,
+ * otherwise finds the minimum lightness shift that satisfies that ratio.
  */
 function adaptPrimaryForMode(primary: Color, isDarkMode: boolean): Color {
-  const isNaturallyDark = isPrimaryColorDark(primary)
+  const surface = primary.clone()
+  surface.oklch.c = isDarkMode ? 0.005 : 0.010
+  surface.oklch.l = isDarkMode ? 0.12 : 0.99
 
-  // Preserve as-is in the mode where the primary already contrasts well
-  if (isNaturallyDark && !isDarkMode) return primary.clone()
-  if (!isNaturallyDark && isDarkMode) return primary.clone()
-
-  // Same polarity as surface (dark-on-dark or light-on-light) — needs significant shift
-  const adjusted = primary.clone()
-  if (isNaturallyDark) {
-    adjusted.oklch.l = Math.min(0.78, adjusted.oklch.l + 0.42)
-  } else {
-    adjusted.oklch.l = Math.max(0.22, adjusted.oklch.l - 0.42)
+  if (primary.contrastWCAG21(surface) >= 4.5) {
+    return primary.clone()
   }
-  return adjusted
+
+  return findOptimalLightness(primary, surface, 4.5)
 }
 
 // ===== ACCENT COLOR PREPARATION =====
