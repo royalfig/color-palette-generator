@@ -213,7 +213,7 @@ function generateSurfaceColors(
 } {
   const surface = primary.clone();
   surface.oklch.c = surfaceChromaFor(primary, isDarkMode);
-  surface.oklch.l = isDarkMode ? 0.06 : 0.99;
+  surface.oklch.l = isDarkMode ? 0.12 : 0.99;
 
   const onSurface = primary.clone();
   onSurface.oklch.c = 0.01;
@@ -229,19 +229,19 @@ function generateSurfaceColors(
     4.5,
   );
 
-  // container: cards, dialogs — Subtle ΔL ≈ 0.04–0.06 from surface
+  // container: cards, dialogs — ΔL ≈ 0.08 from surface
   const container = primary.clone();
   container.oklch.c = isDarkMode
     ? Math.min(primary.oklch.c * 0.07, 0.01)
     : Math.min(primary.oklch.c * 0.04, 0.006);
-  container.oklch.l = isDarkMode ? 0.12 : 0.95;
+  container.oklch.l = isDarkMode ? 0.20 : 0.95;
 
   // container-sunken: inset wells — slightly recessed from surface
   const containerSunken = primary.clone();
   containerSunken.oklch.c = isDarkMode
     ? Math.min(primary.oklch.c * 0.04, 0.005)
     : Math.min(primary.oklch.c * 0.02, 0.003);
-  containerSunken.oklch.l = isDarkMode ? 0.04 : 0.97;
+  containerSunken.oklch.l = isDarkMode ? 0.08 : 0.97;
 
   // container-overlay: floating elements — white in light mode (shadows provide separation),
   // visibly elevated in dark mode (M3 Tone 22 ≈ 0.22)
@@ -249,7 +249,7 @@ function generateSurfaceColors(
   containerOverlay.oklch.c = isDarkMode
     ? Math.min(primary.oklch.c * 0.09, 0.012)
     : 0;
-  containerOverlay.oklch.l = isDarkMode ? 0.22 : 1.0;
+  containerOverlay.oklch.l = isDarkMode ? 0.24 : 1.0;
 
   return {
     surface,
