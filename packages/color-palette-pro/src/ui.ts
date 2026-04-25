@@ -213,15 +213,14 @@ function generateSurfaceColors(
 } {
   const surface = primary.clone();
   surface.oklch.c = surfaceChromaFor(primary, isDarkMode);
-  surface.oklch.l = isDarkMode ? 0.12 : 0.99;
+  surface.oklch.l = isDarkMode ? 0.06 : 0.99;
 
   const onSurface = primary.clone();
   onSurface.oklch.c = 0.01;
   onSurface.oklch.l = isDarkMode ? 0.95 : 0.1;
   const onSurfaceAdjusted = ensureContrast(onSurface, surface, 7.0);
 
-  // Always search for the lightest (light mode) or darkest-usable (dark mode) value
-  // that meets AA 4.5:1 — never settle for an arbitrarily dark starting guess
+  // on-surface-variant: Secondary text — AA 4.5:1 against surface
   const onSurfaceVariant = primary.clone();
   onSurfaceVariant.oklch.c = 0.01;
   const onSurfaceVariantAdjusted = findOptimalLightness(
@@ -230,27 +229,27 @@ function generateSurfaceColors(
     4.5,
   );
 
-  // container: cards, dialogs — Carbon-level ΔL ≈ 0.07–0.08 from surface
+  // container: cards, dialogs — Subtle ΔL ≈ 0.04–0.06 from surface
   const container = primary.clone();
   container.oklch.c = isDarkMode
     ? Math.min(primary.oklch.c * 0.07, 0.01)
     : Math.min(primary.oklch.c * 0.04, 0.006);
-  container.oklch.l = isDarkMode ? 0.2 : 0.92;
+  container.oklch.l = isDarkMode ? 0.12 : 0.95;
 
   // container-sunken: inset wells — slightly recessed from surface
   const containerSunken = primary.clone();
   containerSunken.oklch.c = isDarkMode
     ? Math.min(primary.oklch.c * 0.04, 0.005)
     : Math.min(primary.oklch.c * 0.02, 0.003);
-  containerSunken.oklch.l = isDarkMode ? 0.08 : 0.96;
+  containerSunken.oklch.l = isDarkMode ? 0.04 : 0.97;
 
-  // container-overlay: floating elements — pure white in light mode (shadow provides separation),
-  // visibly elevated above container in dark mode
+  // container-overlay: floating elements — white in light mode (shadows provide separation),
+  // visibly elevated in dark mode (M3 Tone 22 ≈ 0.22)
   const containerOverlay = primary.clone();
   containerOverlay.oklch.c = isDarkMode
     ? Math.min(primary.oklch.c * 0.09, 0.012)
     : 0;
-  containerOverlay.oklch.l = isDarkMode ? 0.24 : 1.0;
+  containerOverlay.oklch.l = isDarkMode ? 0.22 : 1.0;
 
   return {
     surface,
@@ -278,11 +277,12 @@ function generateOutlineAndInverse(
   outlineBase.oklch.c = 0.01;
 
   const outline = outlineBase.clone();
-  outline.oklch.l = isDarkMode ? 0.7 : 0.4;
+  outline.oklch.l = isDarkMode ? 0.6 : 0.5;
   const outlineAdjusted = ensureContrast(outline, surface, 3.0);
 
-  // Lightest value that still meets 3:1 against surface (same optimal-search as on-surface-variant)
-  const outlineVariant = findOptimalLightness(outlineBase, surface, 2.0);
+  // outline-variant: Decorative dividers — subtle contrast (~1.5:1 to 2:1)
+  const outlineVariant = outlineBase.clone();
+  outlineVariant.oklch.l = isDarkMode ? 0.3 : 0.82;
 
   const inverseSurface = primary.clone();
   inverseSurface.oklch.c = 0.005;
