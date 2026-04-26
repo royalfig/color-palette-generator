@@ -1,18 +1,27 @@
-import { PaletteKinds, Palettes, VariationKinds } from './types'
+import { PaletteKinds } from './types'
 
-export function generateCss(palettes: Palettes) {
+type PaletteColor = {
+  code: string
+  oklch: { contrast: string; raw: number[] }
+}
+
+export function generateCss(palettes: Record<string, Record<string, PaletteColor[]>>) {
   let css = ''
 
   // Generate CSS for each palette
-  Object.keys(palettes).map((paletteName: string) => {
+  Object.keys(palettes).forEach((paletteName: string) => {
+    const palette = palettes[paletteName]
+    if (!palette) return
     css += `/* ${paletteName} */\n`
-    Object.keys(palettes[paletteName as PaletteKinds]).map((variationName: string) => {
+    Object.keys(palette).forEach((variationName: string) => {
+      const variation = palette[variationName]
+      if (!variation) return
       css += `/* ${variationName} */\n`
-      Object.keys(palettes[paletteName as PaletteKinds][variationName as VariationKinds]).map(colorIndex => {
+      variation.forEach((color) => {
         const {
           code,
           oklch: { contrast, raw },
-        } = palettes[paletteName as PaletteKinds][variationName as VariationKinds][colorIndex]
+        } = color
         css += `--${code}: ${raw.join(' ')}; --${code}-contrast: ${contrast};\n`
       })
     })

@@ -14,6 +14,7 @@ export * from './types'
 export * from './factory'
 export * from './pickRandomColor'
 export * from './utils'
+export { generateCssVariables } from './css'
 
 export function createPalettes(
   color: string,

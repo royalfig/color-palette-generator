@@ -9,7 +9,7 @@ export function generateTones(
   },
 ) {
   const { style } = options
-  const format = detectFormat(baseColor)
+  const format = detectFormat(baseColor) ?? 'hex'
 
   try {
     const baseColorObj = new Color(baseColor)
@@ -195,7 +195,7 @@ function getLightnessHueAdjustmentsForTones(
 
 function generateGrayscaleTones(
   baseColor: Color,
-  format: 'hex' | 'rgb' | 'hsl' | 'oklch' | 'oklab' | 'lch' | 'lab' | 'p3' | undefined,
+  format: 'hex' | 'rgb' | 'hsl' | 'oklch' | 'oklab' | 'lch' | 'lab' | 'p3' | undefined = 'hex',
 ): BaseColorData[] {
   // For grays, create lightness variations since there's no chroma to adjust
   const baseLightness = baseColor.oklch.l

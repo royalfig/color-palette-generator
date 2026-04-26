@@ -8,8 +8,7 @@ import Button from '../components/button/Button'
 import { ColorContext } from '../components/ColorContext'
 import { LinearGradientSVG } from '../components/LinearGradientSVG'
 import { MessageContext } from '../components/MessageContext'
-import { ColorFormat } from '@royalfig/color-palette-pro'
-import { BaseColorData } from '@royalfig/color-palette-pro'
+import { ColorFormat, BaseColorData, generateCssVariables } from '@royalfig/color-palette-pro'
 import './export-options.css'
 
 function downloadAction(
@@ -19,15 +18,7 @@ function downloadAction(
   isUiMode: boolean,
   cb: (msg: string, type: 'success' | 'error') => void,
 ) {
-  const paletteString = palette.map((color, idx) => {
-    if (isUiMode) {
-      return `  --color-${color.code}: ${color.conversions[colorFormat].value};
-  --color-${color.code}-contrast: ${color.contrast};`
-    }
-    return `  --color-${color.code.substring(0, 3)}-${idx + 1}: ${color.conversions[colorFormat].value};
-  --color-${color.code.substring(0, 3)}-${idx + 1}-contrast: ${color.contrast};`
-  })
-  const paletteAsCss = ':root {\n' + paletteString.join('\n') + '\n}'
+  const paletteAsCss = generateCssVariables(palette, { format: colorFormat, isUiMode, wrapper: 'root' })
   const filename = `${paletteTitle?.toLowerCase().replace(/\W/g, '-') || 'color-palette-pro'}.css`
   const type = 'text'
 
@@ -178,15 +169,7 @@ export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: Ex
   const colorNames = { fetchedData, isLoading, error }
 
   function handleCopyToClipboard() {
-    const paletteString = palette.map((color, idx) => {
-      if (isUiMode) {
-        return `--color-${color.code}: ${color.conversions[colorFormat].value};
---color-${color.code}-contrast: ${color.contrast};`
-      }
-      return `--color-${color.code.substring(0, 3)}-${idx + 1}: ${color.conversions[colorFormat].value};
---color-${color.code.substring(0, 3)}-${idx + 1}-contrast: ${color.contrast};`
-    })
-    const paletteAsCss = paletteString.join('\n')
+    const paletteAsCss = generateCssVariables(palette, { format: colorFormat, isUiMode })
     navigator.clipboard.writeText(paletteAsCss)
     showMessage('Palette copied', 'success')
   }

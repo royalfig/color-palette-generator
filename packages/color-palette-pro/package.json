@@ -4,12 +4,21 @@
   "description": "Powerful, mathematical color palette generation logic using OKLCH and colorjs.io",
   "author": "",
   "license": "MIT",
-  "keywords": ["color", "palette", "generator", "oklch", "colors", "design-system"],
+  "keywords": [
+    "color",
+    "palette",
+    "generator",
+    "oklch",
+    "colors",
+    "design-system"
+  ],
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -22,11 +31,11 @@
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch"
   },
   "dependencies": {
-    "colorjs.io": "^0.5.2"
+    "colorjs.io": "^0.6.1"
   },
   "devDependencies": {
-    "tsup": "^8.3.0",
-    "typescript": "^5.9.3"
+    "tsup": "^8.5.1",
+    "typescript": "~5.9.3"
   },
   "publishConfig": {
     "access": "public"

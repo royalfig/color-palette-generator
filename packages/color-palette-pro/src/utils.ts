@@ -51,9 +51,9 @@ export function y(num: Color) {
   // g /= 255;
   // b / 255;
 
-  const rL = linearRGB(r)
-  const gL = linearRGB(g)
-  const bL = linearRGB(b)
+  const rL = linearRGB(r ?? 0)
+  const gL = linearRGB(g ?? 0)
+  const bL = linearRGB(b ?? 0)
 
   return 0.2126 * rL + 0.7152 * gL + 0.0722 * bL
 }
@@ -65,7 +65,7 @@ export function createSlug(str: string) {
 export function isLight(color: Color) {
   const l = color.oklch.l
 
-  if (l >= 0.5) {
+  if (l !== null && l >= 0.5) {
     return true
   }
 

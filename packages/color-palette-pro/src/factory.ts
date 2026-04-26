@@ -1,7 +1,7 @@
 import Color, { Coords } from 'colorjs.io'
 import { ColorFormat } from './types'
-function toPrecision(n: number, precision: number) {
-  if (n === 0) {
+function toPrecision(n: number | null, precision: number) {
+  if (n === null || n === 0) {
     return 0
   }
   let integer = ~~n
