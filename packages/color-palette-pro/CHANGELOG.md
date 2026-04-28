@@ -1,5 +1,11 @@
 # @royalfig/color-palette-pro
 
+## 2.1.0
+
+### Minor Changes
+
+- d01bd9d: Updated UI generation logic
+
 ## 2.0.0
 
 ### Major Changes
