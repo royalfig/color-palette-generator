@@ -105,7 +105,7 @@ function ensureContrast(
  * Light mode: Ensure primary is dark enough to sit on light surface.
  * Dark mode: Ensure primary is light enough to sit on dark surface.
  */
-function adaptPrimaryForMode(primary: Color, isDarkMode: boolean): Color {
+export function adaptPrimaryForMode(primary: Color, isDarkMode: boolean): Color {
   const surfaceL = isDarkMode ? 0.14 : 0.98;
   const surface = primary.clone();
   surface.oklch.l = surfaceL;
@@ -222,7 +222,7 @@ function selectAccentColors(
  * on-surface:         Primary text (AAA 7:1)
  * on-surface-variant: Secondary text — lightest value that still meets AA 4.5:1 against surface
  */
-function generateSurfaceColors(
+export function generateSurfaceColors(
   primary: Color,
   isDarkMode: boolean,
 ): {
@@ -366,7 +366,7 @@ function getMedianChroma(palette: BaseColorData[]): number {
     : chromas[mid];
 }
 
-function generateSemanticColors(
+export function generateSemanticColors(
   primary: Color,
   palette: BaseColorData[],
   isDarkMode: boolean,

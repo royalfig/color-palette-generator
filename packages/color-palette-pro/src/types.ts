@@ -8,6 +8,8 @@ export type ColorSpaceAndFormat = { space: ColorSpace; format: ColorFormat }
 
 export type PaletteStyle = 'square' | 'triangle' | 'circle' | 'diamond'
 
+export type PaletteMode = 'palette' | 'ui' | 'code'
+
 export type SliderType =
   | 'hue'
   | 'saturation'
