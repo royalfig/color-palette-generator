@@ -4,7 +4,7 @@ A synthesizer for color palettes. Generate customizable color palettes in advanc
 
 **🌐 [Try it live at colorpalette.pro](https://colorpalette.pro)**
 
-![Color Palette Pro](public/colorpalettepro.png)
+![Color Palette Pro](apps/web/public/colorpalettepro.png)
 
 ## About
 

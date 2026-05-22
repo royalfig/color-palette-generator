@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e3e0dc" />
+      <stop offset="100%" stop-color="#afaeac" />
+    </linearGradient>
+
+    <linearGradient id="knobGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ececec" />
+      <stop offset="100%" stop-color="#bcbcbc" />
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bodyGrad)" />
+  <rect
+    x="1"
+    y="1"
+    width="510"
+    height="510"
+    rx="112"
+    fill="none"
+    stroke="#9f9cb0"
+    stroke-width="2"
+    stroke-opacity="0.75"
+  />
+  <rect
+    x="4"
+    y="4"
+    width="504"
+    height="504"
+    rx="108"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="6"
+    stroke-opacity="0.6"
+  />
+
+  <rect x="64" y="64" width="384" height="192" rx="24" fill="#030304" />
+
+  <rect x="80" y="80" width="106" height="160" rx="12" fill="#FF65A8" />
+  <rect x="203" y="80" width="106" height="160" rx="12" fill="#7A8A00" />
+  <rect x="326" y="80" width="106" height="160" rx="12" fill="#008BCA" />
+
+  <rect
+    x="80"
+    y="80"
+    width="106"
+    height="160"
+    rx="12"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="2"
+    stroke-opacity="0.2"
+  />
+  <rect
+    x="203"
+    y="80"
+    width="106"
+    height="160"
+    rx="12"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="2"
+    stroke-opacity="0.2"
+  />
+  <rect
+    x="326"
+    y="80"
+    width="106"
+    height="160"
+    rx="12"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="2"
+    stroke-opacity="0.2"
+  />
+
+  <circle cx="256" cy="380" r="76" fill="#000000" opacity="0.2" />
+  <circle cx="256" cy="376" r="76" fill="#c8c6d2" />
+
+  <circle cx="256" cy="376" r="64" fill="url(#knobGrad)" />
+  <circle cx="256" cy="376" r="64" fill="none" stroke="#ffffff" stroke-width="3" stroke-opacity="0.8" />
+  <circle cx="256" cy="376" r="64" fill="none" stroke="#9f9cb0" stroke-width="1" />
+
+  <circle cx="256" cy="336" r="8" fill="#17171c" />
+</svg>
