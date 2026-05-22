@@ -1,6 +1,12 @@
 import Color from 'colorjs.io'
-import type { PlainColorObject } from 'colorjs.io/types/src/color';
 import { ColorSpace, ColorFormat } from './types'
+
+interface PlainColorObject {
+  space: ColorSpace
+  coords: number[]
+  alpha?: number
+}
+
 
 type CreatedColorObj = {
   base: Color
@@ -28,14 +34,16 @@ function roundNumber(num: number, precision: number) {
 export function createColorObj(color: string | Color | PlainColorObject, colorSpace: ColorSpace | 'hex', precision: number = 3): CreatedColorObj {
   const space: string = colorSpace === 'hex' ? 'srgb' : colorSpace
   const format: ColorFormat | undefined = colorSpace === 'hex' ? 'hex' : undefined
-  const colorObj = new Color(color);
+  const colorObj = new Color(color as any);
   const isInGamut = colorObj.inGamut(space);
-  const converted = colorObj.to(space)
+  const converted = colorObj.to(space) ?? colorObj
+  const coords: number[] | [number | null, number | null, number | null] = converted.coords ?? [0, 0, 0]
   const str = format ? converted.toString({ precision, format }) : converted.toString({ precision })
   const css = converted.display().toString()
-  const raw = converted.coords.map(c => roundNumber(c, precision))
-  const outOfGamut = converted.to('srgb').toString({format: 'hex', inGamut: false})
-  const fallback = isInGamut ? css : converted.to('srgb').toString({format: 'hex'})
+  const raw = (coords as number[]).map(c => roundNumber(c, precision))
+  const srgbOG = converted.to('srgb') ?? converted
+  const outOfGamut = srgbOG.toString({format: 'hex', inGamut: false})
+  const fallback = isInGamut ? css : (() => { const s = converted.to('srgb'); return s?.toString({format: 'hex'}) ?? ''; })()
   const contrast = converted.contrastWCAG21('#fff') > converted.contrastWCAG21('#000') ? '#fff' : '#000'
 
   return {

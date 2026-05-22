@@ -21,7 +21,7 @@ function getMathematicalComplement(hue: number): number {
 
 function getOpticalComplement(baseColor: Color): number {
   // Perceptual Harmony: Based on how the human visual system processes opponent colors
-  const hue = baseColor.oklch.h
+  const hue = baseColor.oklch.h ?? 0
 
   // Red-green and blue-yellow opponent channels work differently
   if (hue >= 0 && hue < 30) {
@@ -57,9 +57,9 @@ function getOpticalComplement(baseColor: Color): number {
 function getAdaptiveComplement(baseColor: Color): number {
   // Emotional Resonance: Creates complements that enhance the emotional story
   const oklch = baseColor.to('oklch')
-  const hue = oklch.h
-  const chroma = oklch.c
-  const lightness = oklch.l
+  const hue = oklch.h ?? 0
+  const chroma = oklch.c ?? 0
+  const lightness = oklch.l ?? 0.5
 
   // Determine emotional profile and create meaningful opposition
   if (hue >= 345 || hue < 30) {
@@ -95,9 +95,9 @@ function getAdaptiveComplement(baseColor: Color): number {
 function getLuminosityComplement(baseColor: Color): number {
   // Luminosity Dance: Based on how light and shadow create natural complements
   const oklch = baseColor.to('oklch')
-  const hue = oklch.h
-  const chroma = oklch.c
-  const lightness = oklch.l
+  const hue = oklch.h ?? 0
+  const chroma = oklch.c ?? 0
+  const lightness = oklch.l ?? 0.5
 
   // Determine the lighting scenario and create realistic complements
 
@@ -161,7 +161,7 @@ export function generateComplementary(
 
     switch (options.style) {
       case 'square':
-        complementHue = getMathematicalComplement(baseColorObj.oklch.h)
+        complementHue = getMathematicalComplement(baseColorObj.oklch.h ?? 0)
         break
       case 'triangle':
         complementHue = getOpticalComplement(baseColorObj)
@@ -175,8 +175,8 @@ export function generateComplementary(
     }
 
     // Get base color properties for adaptive lightness
-    const baseLightness = baseColorObj.oklch.l
-    const baseChroma = baseColorObj.oklch.c
+    const baseLightness = baseColorObj.oklch.l ?? 0.5
+    const baseChroma = baseColorObj.oklch.c ?? 0
 
     // Create adaptive lightness adjustments based on input color
     function getAdaptiveLightnessAdjustments() {
@@ -241,7 +241,7 @@ export function generateComplementary(
       }
     } else if (options.style === 'circle') {
       // Emotional resonance: varies by emotional type, adapted for base lightness
-      const hue = baseColorObj.oklch.h
+      const hue = baseColorObj.oklch.h ?? 0
       const lightnessAdaptation = baseLightness < 0.4 ? 0.15 : baseLightness > 0.6 ? -0.15 : 0
 
       if (hue >= 345 || hue < 30) {
@@ -269,8 +269,8 @@ export function generateComplementary(
       }
     } else if (options.style === 'diamond') {
       // Luminosity dance: based on lighting scenario
-      const lightness = baseColorObj.oklch.l
-      const chroma = baseColorObj.oklch.c
+      const lightness = baseColorObj.oklch.l ?? 0.5
+      const chroma = baseColorObj.oklch.c ?? 0
 
       if (lightness > 0.8 && chroma < 0.3) {
         // daylight - strong contrast but prevent over-darkening
@@ -302,17 +302,17 @@ export function generateComplementary(
     if (enhanced) {
       const cleaned = avoidMuddyZones(
         complementHue,
-        baseColorObj.oklch.l + complementVariations.main.l,
-        baseColorObj.oklch.c * complementVariations.main.c,
+        (baseColorObj.oklch.l ?? 0.5) + complementVariations.main.l,
+        (baseColorObj.oklch.c ?? 0) * complementVariations.main.c,
       )
       finalComplementHue = cleaned.h
     }
 
     // Dark base
     const darkBaseValues = clampOKLCH(
-      baseColorObj.oklch.l + baseVariations.dark.l,
-      baseColorObj.oklch.c * baseVariations.dark.c,
-      baseColorObj.oklch.h,
+      (baseColorObj.oklch.l ?? 0.5) + baseVariations.dark.l,
+      (baseColorObj.oklch.c ?? 0) * baseVariations.dark.c,
+      baseColorObj.oklch.h ?? 0,
     )
     darkBase.oklch.l = darkBaseValues.l
     darkBase.oklch.c = darkBaseValues.c
@@ -320,9 +320,9 @@ export function generateComplementary(
 
     // Light base (replaces muted base for better distribution)
     const lightBaseValues = clampOKLCH(
-      baseColorObj.oklch.l + baseVariations.light.l,
-      baseColorObj.oklch.c * baseVariations.light.c,
-      baseColorObj.oklch.h,
+      (baseColorObj.oklch.l ?? 0.5) + baseVariations.light.l,
+      (baseColorObj.oklch.c ?? 0) * baseVariations.light.c,
+      baseColorObj.oklch.h ?? 0,
     )
     mutedBase.oklch.l = lightBaseValues.l
     mutedBase.oklch.c = lightBaseValues.c
@@ -330,8 +330,8 @@ export function generateComplementary(
 
     // Main complement
     const mainCompValues = clampOKLCH(
-      baseColorObj.oklch.l + complementVariations.main.l,
-      baseColorObj.oklch.c * chromaAdjust * complementVariations.main.c,
+      (baseColorObj.oklch.l ?? 0.5) + complementVariations.main.l,
+      (baseColorObj.oklch.c ?? 0) * chromaAdjust * complementVariations.main.c,
       finalComplementHue,
     )
     mainComplement.oklch.l = mainCompValues.l
@@ -340,8 +340,8 @@ export function generateComplementary(
 
     // Light complement
     const lightCompValues = clampOKLCH(
-      baseColorObj.oklch.l + complementVariations.light.l,
-      baseColorObj.oklch.c * complementVariations.light.c,
+      (baseColorObj.oklch.l ?? 0.5) + complementVariations.light.l,
+      (baseColorObj.oklch.c ?? 0) * complementVariations.light.c,
       finalComplementHue,
     )
     lightComplement.oklch.l = lightCompValues.l
@@ -350,8 +350,8 @@ export function generateComplementary(
 
     // Muted complement
     const mutedCompValues = clampOKLCH(
-      baseColorObj.oklch.l + complementVariations.muted.l,
-      baseColorObj.oklch.c * complementVariations.muted.c,
+      (baseColorObj.oklch.l ?? 0.5) + complementVariations.muted.l,
+      (baseColorObj.oklch.c ?? 0) * complementVariations.muted.c,
       finalComplementHue,
     )
     mutedComplement.oklch.l = mutedCompValues.l

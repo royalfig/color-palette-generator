@@ -1,4 +1,4 @@
-import Color from 'colorjs.io/types/src/color'
+import Color from 'colorjs.io'
 import { createScales } from './scales'
 
 export function createColorData(baseColor: string | Color) {

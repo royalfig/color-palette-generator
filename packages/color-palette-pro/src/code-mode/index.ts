@@ -140,9 +140,10 @@ function enforceDistinction(syntax: SyntaxColors, isDarkMode: boolean, minDeltaE
 function compositeOver(fgHex: string, bgHex: string, alpha: number): Color {
   const fg = new Color(fgHex).to('srgb')
   const bg = new Color(bgHex).to('srgb')
-  const r = fg.coords[0] * alpha + bg.coords[0] * (1 - alpha)
-  const g = fg.coords[1] * alpha + bg.coords[1] * (1 - alpha)
-  const b = fg.coords[2] * alpha + bg.coords[2] * (1 - alpha)
+  if (!fg || !bg) return new Color(fgHex)
+  const r = (fg.coords[0] ?? 0) * alpha + (bg.coords[0] ?? 0) * (1 - alpha)
+  const g = (fg.coords[1] ?? 0) * alpha + (bg.coords[1] ?? 0) * (1 - alpha)
+  const b = (fg.coords[2] ?? 0) * alpha + (bg.coords[2] ?? 0) * (1 - alpha)
   return new Color('srgb', [r, g, b])
 }
 
@@ -264,7 +265,7 @@ export function generateCodeTheme(
     let bestDist = Infinity
     for (const item of palette) {
       if (item?.color?.oklch?.h !== undefined) {
-        const h = item.color.oklch.h
+        const h = item.color.oklch.h ?? 0
         const dist = Math.min(Math.abs(h - 220), 360 - Math.abs(h - 220))
         if (dist < bestDist) {
           bestDist = dist

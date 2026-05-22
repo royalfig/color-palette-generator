@@ -13,7 +13,7 @@ function getMathematicalSplitComplementary(hue: number): number[] {
 
 function getOpticalSplitComplementary(baseColor: Color): number[] {
   // Perceptual Harmony: Based on how our visual system processes split complements
-  const hue = baseColor.oklch.h
+  const hue = baseColor.oklch.h ?? 0
 
   // Human vision processes split complements differently based on hue region
   if (hue >= 0 && hue < 45) {
@@ -61,9 +61,9 @@ function getOpticalSplitComplementary(baseColor: Color): number[] {
 function getAdaptiveSplitComplementary(baseColor: Color): number[] {
   // Emotional Resonance: Creates split complements that tell emotional stories
   const oklch = baseColor.to('oklch')
-  const hue = oklch.h
-  const chroma = oklch.c
-  const lightness = oklch.l
+  const hue = oklch.h ?? 0
+  const chroma = oklch.c ?? 0
+  const lightness = oklch.l ?? 0.5
 
   // Determine emotional profile and create meaningful splits
   if (hue >= 345 || hue < 30) {
@@ -123,9 +123,9 @@ function getAdaptiveSplitComplementary(baseColor: Color): number[] {
 function getLuminositySplitComplementary(baseColor: Color): number[] {
   // Luminosity Dance: Based on how light creates natural split complement relationships
   const oklch = baseColor.to('oklch')
-  const hue = oklch.h
-  const chroma = oklch.c
-  const lightness = oklch.l
+  const hue = oklch.h ?? 0
+  const chroma = oklch.c ?? 0
+  const lightness = oklch.l ?? 0.5
 
   // Determine lighting scenario and create realistic split complements
 
@@ -209,7 +209,7 @@ export function generateSplitComplementary(
 
     switch (style) {
       case 'square':
-        splitHues = getMathematicalSplitComplementary(baseColorObj.oklch.h)
+        splitHues = getMathematicalSplitComplementary(baseColorObj.oklch.h ?? 0)
         break
       case 'triangle':
         splitHues = getOpticalSplitComplementary(baseColorObj)
@@ -223,8 +223,8 @@ export function generateSplitComplementary(
     }
 
     // Get base color properties for adaptive lightness
-    const baseLightness = baseColorObj.oklch.l
-    const baseChroma = baseColorObj.oklch.c
+    const baseLightness = baseColorObj.oklch.l ?? 0.5
+    const baseChroma = baseColorObj.oklch.c ?? 0
 
     // Create adaptive lightness adjustments based on input color
     function getAdaptiveLightnessAdjustments() {
@@ -286,7 +286,7 @@ export function generateSplitComplementary(
       }
     } else if (style === 'circle') {
       // Emotional resonance: varies by emotional type
-      const hue = baseColorObj.oklch.h
+      const hue = baseColorObj.oklch.h ?? 0
       // Emotional resonance: varies by emotional type, adapted for base lightness
       const lightnessAdaptation = baseLightness < 0.4 ? 0.15 : baseLightness > 0.6 ? -0.15 : 0
 
@@ -323,8 +323,8 @@ export function generateSplitComplementary(
       }
     } else if (style === 'diamond') {
       // Luminosity dance: based on lighting scenario
-      const lightness = baseColorObj.oklch.l
-      const chroma = baseColorObj.oklch.c
+      const lightness = baseColorObj.oklch.l ?? 0.5
+      const chroma = baseColorObj.oklch.c ?? 0
 
       if (lightness > 0.8 && chroma < 0.3) {
         // daylight - strong contrast but prevent over-darkening
@@ -367,8 +367,8 @@ export function generateSplitComplementary(
         initialColors.push(new Color(baseColor)) // Preserve base
 
         const darkBaseValues = clampOKLCH(
-          baseColorObj.oklch.l + baseVariations.dark.l,
-          baseColorObj.oklch.c * baseVariations.dark.c,
+          baseColorObj.oklch.l ?? 0.5 + baseVariations.dark.l,
+          (baseColorObj.oklch.c ?? 0) * baseVariations.dark.c,
           hue,
         )
         const darkBase = baseColorObj.clone()
@@ -386,15 +386,15 @@ export function generateSplitComplementary(
         if (enhanced) {
           const cleaned = avoidMuddyZones(
             hue,
-            baseColorObj.oklch.l + variations.pure.l,
-            baseColorObj.oklch.c * variations.pure.c,
+            (baseColorObj.oklch.l ?? 0.5) + variations.pure.l,
+            (baseColorObj.oklch.c ?? 0) * variations.pure.c,
           )
           finalHue = cleaned.h
         }
 
         const pureValues = clampOKLCH(
-          baseColorObj.oklch.l + variations.pure.l,
-          baseColorObj.oklch.c * variations.pure.c,
+          (baseColorObj.oklch.l ?? 0.5) + variations.pure.l,
+          (baseColorObj.oklch.c ?? 0) * variations.pure.c,
           finalHue,
         )
         const pureColor = baseColorObj.clone()
@@ -403,8 +403,8 @@ export function generateSplitComplementary(
         pureColor.oklch.h = pureValues.h
 
         const mutedValues = clampOKLCH(
-          baseColorObj.oklch.l + variations.muted.l,
-          baseColorObj.oklch.c * variations.muted.c,
+          (baseColorObj.oklch.l ?? 0.5) + variations.muted.l,
+          (baseColorObj.oklch.c ?? 0) * variations.muted.c,
           finalHue,
         )
         const mutedColor = baseColorObj.clone()

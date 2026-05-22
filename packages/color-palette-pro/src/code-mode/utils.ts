@@ -9,7 +9,7 @@ export function findOptimalLightness(
   background: Color,
   minRatio: number,
 ): Color {
-  const backgroundL = background.oklch.l
+  const backgroundL = background.oklch.l ?? 0.5
   const needLightForeground = backgroundL < 0.5
 
   let minL = 0
@@ -53,9 +53,9 @@ export function getAccessibleVariant(
   minRatio: number = 4.5,
 ): string {
   const target = color.clone()
-  target.oklch.c = Math.max(target.oklch.c, 0.06)
+  target.oklch.c = Math.max(target.oklch.c ?? 0, 0.06)
   
-  const isDarkBg = background.oklch.l < 0.5
+  const isDarkBg = (background.oklch.l ?? 0.5) < 0.5
   target.oklch.l = isDarkBg ? 0.9 : 0.12
 
   if (target.contrastWCAG21(background) >= minRatio) {
@@ -90,7 +90,7 @@ export function ensureContrast(
  */
 export function desaturate(color: Color, factor: number): Color {
   const c = color.clone()
-  c.oklch.c = Math.max(c.oklch.c * (1 - factor), 0)
+  c.oklch.c = Math.max((c.oklch.c ?? 0) * (1 - factor), 0)
   return c
 }
 
@@ -99,7 +99,7 @@ export function desaturate(color: Color, factor: number): Color {
  */
 export function shiftHue(color: Color, degrees: number): Color {
   const c = color.clone()
-  c.oklch.h = (c.oklch.h + degrees + 360) % 360
+  c.oklch.h = ((c.oklch.h ?? 0) + degrees + 360) % 360
   return c
 }
 
@@ -108,7 +108,7 @@ export function shiftHue(color: Color, degrees: number): Color {
  */
 export function boostChroma(color: Color, factor: number): Color {
   const c = color.clone()
-  c.oklch.c = Math.min(c.oklch.c * factor, 0.25)
+  c.oklch.c = Math.min((c.oklch.c ?? 0) * factor, 0.25)
   return c
 }
 
@@ -116,10 +116,12 @@ export function boostChroma(color: Color, factor: number): Color {
  * Convert a Color to hex string, including alpha channel if present.
  */
 export function toHex(color: Color): string {
-  const srgb = color.to('srgb').toGamut()
-  const r = Math.round(srgb.coords[0] * 255)
-  const g = Math.round(srgb.coords[1] * 255)
-  const b = Math.round(srgb.coords[2] * 255)
+  const srgb = color.to('srgb')
+  if (!srgb) return '#000000'
+  const gamut = srgb.toGamut()
+  const r = Math.round((gamut.coords[0] ?? 0) * 255)
+  const g = Math.round((gamut.coords[1] ?? 0) * 255)
+  const b = Math.round((gamut.coords[2] ?? 0) * 255)
   const a = color.alpha !== undefined ? Math.round(color.alpha * 255) : 255
 
   const hex = `#${clamp(r).toString(16).padStart(2, '0')}${clamp(g).toString(16).padStart(2, '0')}${clamp(b).toString(16).padStart(2, '0')}`
@@ -156,7 +158,7 @@ export function findColorByHue(
 
   for (const item of palette) {
     if (item?.color?.oklch?.h !== undefined) {
-      const hue = item.color.oklch.h
+      const hue = item.color.oklch.h ?? 0
       const diff = Math.abs(hue - targetHue)
       const distance = Math.min(diff, 360 - diff)
       if (distance <= tolerance && distance < bestDistance) {
@@ -174,7 +176,7 @@ export function findColorByHue(
 export function getMedianChroma(palette: BaseColorData[]): number {
   const chromas = palette
     .filter((item) => item?.color?.oklch?.c !== undefined)
-    .map((item) => item.color.oklch.c)
+    .map((item) => item.color.oklch.c ?? 0)
     .sort((a, b) => a - b)
   if (chromas.length === 0) return 0.1
   const mid = Math.floor(chromas.length / 2)
@@ -190,9 +192,9 @@ export function getMedianChroma(palette: BaseColorData[]): number {
 export function adaptLightnessForText(color: Color, isDarkMode: boolean): Color {
   const c = color.clone()
   if (isDarkMode) {
-    c.oklch.l = Math.max(0.75, Math.min(0.90, c.oklch.l))
+    c.oklch.l = Math.max(0.75, Math.min(0.90, c.oklch.l ?? 0.5))
   } else {
-    c.oklch.l = Math.max(0.20, Math.min(0.45, c.oklch.l))
+    c.oklch.l = Math.max(0.20, Math.min(0.45, c.oklch.l ?? 0.5))
   }
   return c
 }
@@ -205,9 +207,9 @@ export function adaptLightnessForText(color: Color, isDarkMode: boolean): Color 
 export function adaptLightnessForQuiet(color: Color, isDarkMode: boolean): Color {
   const c = color.clone()
   if (isDarkMode) {
-    c.oklch.l = Math.max(0.62, Math.min(0.82, c.oklch.l))
+    c.oklch.l = Math.max(0.62, Math.min(0.82, c.oklch.l ?? 0.5))
   } else {
-    c.oklch.l = Math.max(0.30, Math.min(0.55, c.oklch.l))
+    c.oklch.l = Math.max(0.30, Math.min(0.55, c.oklch.l ?? 0.5))
   }
   return c
 }
@@ -292,11 +294,13 @@ export function ensureAPCAAgainst(color: Color, bg: Color, minLc: number): Color
  * so we catch cases where two distinct OKLCH colors collapse to the same hex.
  */
 export function deltaE(a: Color, b: Color): number {
-  const ca = a.clone().to('srgb').toGamut().to('oklab')
-  const cb = b.clone().to('srgb').toGamut().to('oklab')
-  const dL = (ca.coords[0] - cb.coords[0]) * 100
-  const da = (ca.coords[1] - cb.coords[1]) * 100
-  const db = (ca.coords[2] - cb.coords[2]) * 100
+  const ca = (() => { const c = a.clone().to('srgb'); return c?.toGamut()?.to('oklab') ?? a.clone(); })()
+  const cb = (() => { const c = b.clone().to('srgb'); return c?.toGamut()?.to('oklab') ?? b.clone(); })()
+  const caCoords = ca.coords ?? [0, 0, 0]
+  const cbCoords = cb.coords ?? [0, 0, 0]
+  const dL = ((caCoords[0] ?? 0) - (cbCoords[0] ?? 0)) * 100
+  const da = ((caCoords[1] ?? 0) - (cbCoords[1] ?? 0)) * 100
+  const db = ((caCoords[2] ?? 0) - (cbCoords[2] ?? 0)) * 100
   return Math.sqrt(dL * dL + da * da + db * db)
 }
 
@@ -323,8 +327,8 @@ export function mixColors(colorA: Color, colorB: Color, ratio: number): Color {
   const cA = colorA.clone()
   const cB = colorB.clone()
   
-  const l = cA.oklch.l * (1 - ratio) + cB.oklch.l * ratio
-  const c = cA.oklch.c * (1 - ratio) + cB.oklch.c * ratio
+  const l = (cA.oklch.l ?? 0.5) * (1 - ratio) + (cB.oklch.l ?? 0.5) * ratio
+  const c = (cA.oklch.c ?? 0) * (1 - ratio) + (cB.oklch.c ?? 0) * ratio
   
   // Interpolating hue requires taking the shortest path around the 360-degree circle
   let hA = cA.oklch.h ?? 0

@@ -11,7 +11,7 @@ function getMathematicalTriadic(hue: number): number[] {
 
 function getOpticalTriadic(baseColor: Color): number[] {
   // Perceptual Harmony: Based on how human vision processes triadic relationships
-  const hue = baseColor.oklch.h
+  const hue = baseColor.oklch.h ?? 0
 
   // Human vision processes triadic relationships differently based on hue regions
   if (hue >= 0 && hue < 60) {
@@ -70,9 +70,9 @@ function getOpticalTriadic(baseColor: Color): number[] {
 function getAdaptiveTriadic(baseColor: Color): number[] {
   // Emotional Resonance: Creates triads that tell complete emotional stories
   const oklch = baseColor.to('oklch')
-  const hue = oklch.h
-  const chroma = oklch.c
-  const lightness = oklch.l
+  const hue = oklch.h ?? 0
+  const chroma = oklch.c ?? 0
+  const lightness = oklch.l ?? 0.5
 
   // Determine emotional profile and create three-part narrative
   if (hue >= 345 || hue < 30) {
@@ -132,9 +132,9 @@ function getAdaptiveTriadic(baseColor: Color): number[] {
 function getWarmCoolTriadic(baseColor: Color): number[] {
   // Luminosity Dance: Based on how three light sources create balanced illumination
   const oklch = baseColor.to('oklch')
-  const hue = oklch.h
-  const chroma = oklch.c
-  const lightness = oklch.l
+  const hue = oklch.h ?? 0
+  const chroma = oklch.c ?? 0
+  const lightness = oklch.l ?? 0.5
 
   // Determine lighting scenario and create three-point illumination
 
@@ -219,7 +219,7 @@ export function generateTriadic(
 
     switch (style) {
       case 'square':
-        triadicHues = getMathematicalTriadic(baseColorObj.oklch.h)
+        triadicHues = getMathematicalTriadic(baseColorObj.oklch.h ?? 0)
         break
       case 'triangle':
         triadicHues = getOpticalTriadic(baseColorObj)
@@ -233,8 +233,8 @@ export function generateTriadic(
     }
 
     // Get base color properties for adaptive lightness
-    const baseLightness = baseColorObj.oklch.l
-    const baseChroma = baseColorObj.oklch.c
+    const baseLightness = baseColorObj.oklch.l ?? 0.5
+    const baseChroma = baseColorObj.oklch.c ?? 0
 
     // Create adaptive lightness adjustments based on input color
     function getAdaptiveLightnessAdjustments() {
@@ -296,7 +296,7 @@ export function generateTriadic(
       }
     } else if (style === 'circle') {
       // Emotional resonance: varies by emotional type
-      const hue = baseColorObj.oklch.h
+      const hue = baseColorObj.oklch.h ?? 0
       // Emotional resonance: adapt for base lightness
       const lightnessAdaptation = baseLightness < 0.4 ? 0.15 : baseLightness > 0.6 ? -0.15 : 0
 
@@ -333,8 +333,8 @@ export function generateTriadic(
       }
     } else if (style === 'diamond') {
       // Luminosity dance: based on lighting scenario
-      const lightness = baseColorObj.oklch.l
-      const chroma = baseColorObj.oklch.c
+      const lightness = baseColorObj.oklch.l ?? 0.5
+      const chroma = baseColorObj.oklch.c ?? 0
 
       if (lightness > 0.8 && chroma < 0.3) {
         // daylight - prevent over-darkening
@@ -377,8 +377,8 @@ export function generateTriadic(
         initialColors.push(new Color(baseColor)) // Preserve base
 
         const darkBaseValues = clampOKLCH(
-          baseColorObj.oklch.l + baseVariations.dark.l,
-          baseColorObj.oklch.c * baseVariations.dark.c,
+          (baseColorObj.oklch.l ?? 0.5) + baseVariations.dark.l,
+          (baseColorObj.oklch.c ?? 0) * baseVariations.dark.c,
           hue,
         )
         const darkBase = baseColorObj.clone()
@@ -396,15 +396,15 @@ export function generateTriadic(
         if (enhanced) {
           const cleaned = avoidMuddyZones(
             hue,
-            baseColorObj.oklch.l + variations.pure.l,
-            baseColorObj.oklch.c * variations.pure.c,
+            (baseColorObj.oklch.l ?? 0.5) + variations.pure.l,
+            (baseColorObj.oklch.c ?? 0) * variations.pure.c,
           )
           finalHue = cleaned.h
         }
 
         const pureValues = clampOKLCH(
-          baseColorObj.oklch.l + variations.pure.l,
-          baseColorObj.oklch.c * variations.pure.c,
+          (baseColorObj.oklch.l ?? 0.5) + variations.pure.l,
+          (baseColorObj.oklch.c ?? 0) * variations.pure.c,
           finalHue,
         )
         const pureColor = baseColorObj.clone()
@@ -413,8 +413,8 @@ export function generateTriadic(
         pureColor.oklch.h = pureValues.h
 
         const mutedValues = clampOKLCH(
-          baseColorObj.oklch.l + variations.muted.l,
-          baseColorObj.oklch.c * variations.muted.c,
+          (baseColorObj.oklch.l ?? 0.5) + variations.muted.l,
+          (baseColorObj.oklch.c ?? 0) * variations.muted.c,
           finalHue,
         )
         const mutedColor = baseColorObj.clone()

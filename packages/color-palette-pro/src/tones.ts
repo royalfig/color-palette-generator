@@ -15,7 +15,7 @@ export function generateTones(
     const baseColorObj = new Color(baseColor)
 
     // Handle achromatic colors - create lightness variations instead
-    if (isNaN(baseColorObj.oklch.h) || baseColorObj.oklch.c < 0.01) {
+    if ((baseColorObj.oklch.h == null || isNaN(baseColorObj.oklch.h)) || (baseColorObj.oklch.c ?? 0) < 0.01) {
       return generateGrayscaleTones(baseColorObj, format)
     }
 
@@ -26,10 +26,10 @@ export function generateTones(
 
     switch (style) {
       case 'square':
-        chromaSteps = getMathematicalTones(baseColorObj.oklch.c)
+        chromaSteps = getMathematicalTones(baseColorObj.oklch.c ?? 0)
         break
       case 'triangle':
-        chromaSteps = getVisuallyPleasingTones(baseColorObj.oklch.c)
+        chromaSteps = getVisuallyPleasingTones(baseColorObj.oklch.c ?? 0)
         break
       case 'circle':
         chromaSteps = getAdaptiveTones(baseColorObj)
@@ -42,22 +42,22 @@ export function generateTones(
     chromaSteps.forEach((chroma, index) => {
       if (index === 0) {
         // Most saturated version (might be more than base)
-        if (chroma === baseColorObj.oklch.c) {
+        if (chroma === (baseColorObj.oklch.c ?? 0)) {
           colors.push(colorFactory(baseColor, 'tones', index, format))
           return
         }
       }
 
       // Apply style-specific adjustments
-      let adjustedLightness = baseColorObj.oklch.l
-      let adjustedHue = baseColorObj.oklch.h || 0
+      let adjustedLightness = baseColorObj.oklch.l ?? 0.5
+      let adjustedHue = baseColorObj.oklch.h ?? 0
 
       if (style === 'triangle' || style === 'circle' || style === 'diamond') {
         const adjustments = getLightnessHueAdjustmentsForTones(
           chroma,
-          baseColorObj.oklch.c,
-          baseColorObj.oklch.l,
-          baseColorObj.oklch.h || 0,
+          baseColorObj.oklch.c ?? 0,
+          baseColorObj.oklch.l ?? 0.5,
+          baseColorObj.oklch.h ?? 0,
           style,
         )
         adjustedLightness = adjustments.lightness
@@ -121,13 +121,13 @@ function getVisuallyPleasingTones(baseChroma: number): number[] {
 
 function getAdaptiveTones(baseColor: Color): number[] {
   const oklch = baseColor.to('oklch')
-  const baseChroma = oklch.c
+  const baseChroma = oklch.c ?? 0
 
   // Adapt based on color properties
   let maxChroma = Math.min(0.37, baseChroma * 1.1)
 
   // High lightness colors can handle more saturation variation
-  if (oklch.l > 0.7) {
+  if ((oklch.l ?? 0.5) > 0.7) {
     maxChroma = Math.min(0.37, baseChroma * 1.3)
   }
 
@@ -155,7 +155,7 @@ function getAdaptiveTones(baseColor: Color): number[] {
 
 function getWarmCoolTones(baseColor: Color): number[] {
   // Same chroma progression as visually pleasing
-  return getVisuallyPleasingTones(baseColor.oklch.c)
+  return getVisuallyPleasingTones(baseColor.oklch.c ?? 0)
 }
 
 function getLightnessHueAdjustmentsForTones(
@@ -198,7 +198,7 @@ function generateGrayscaleTones(
   format: 'hex' | 'rgb' | 'hsl' | 'oklch' | 'oklab' | 'lch' | 'lab' | 'p3' | undefined = 'hex',
 ): BaseColorData[] {
   // For grays, create lightness variations since there's no chroma to adjust
-  const baseLightness = baseColor.oklch.l
+  const baseLightness = baseColor.oklch.l ?? 0.5
   const variations = [0, 0.05, 0.1, 0.15, 0.08, 0.03, -0.03, -0.08, -0.15, -0.2, -0.25, -0.3]
 
   return variations.map((lightAdj, index) => {
