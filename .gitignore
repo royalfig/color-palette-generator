@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# generate-all-themes.mts output
+packages/color-palette-pro/generated-themes/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

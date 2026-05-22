@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
-import type { PersonalityFontStyleProfile, SemanticColors, TokenRule } from '../types'
-import { toHex, desaturate, boostChroma, ensureContrast, getAccessibleVariant, withAlpha } from '../utils'
+import type { PersonalityFontStyleProfile, SemanticColors, SurfaceProfile, TokenRule } from '../types'
+import { toHex, desaturate, boostChroma, ensureContrast, getAccessibleVariant, withAlpha, shiftHue } from '../utils'
 
 /**
  * Common scope sets used across all templates.
@@ -211,11 +211,42 @@ function stepL(hex: string, delta: number): string {
 }
 
 /**
- * Optional knobs surfaced from the caller (index.ts), e.g. selection-overlay
- * alpha computed by the legibility check.
+ * Optional knobs surfaced from the caller (index.ts). Peak alpha drives the unified
+ * chromatic highlight ramp (selection / find / word-highlight family). Inactive
+ * selection style routes to one of three branches.
  */
 export interface UiColorOptions {
-  selectionAlpha?: number
+  /** Peak alpha for the chromatic highlight family — character-driven, mode-adjusted. */
+  peakAlpha?: number
+  /** Inactive selection treatment — character-driven. */
+  inactiveSelectionStyle?: SurfaceProfile['inactiveSelectionStyle']
+}
+
+/**
+ * Unified chromatic-highlight ramp. One primary tint, seven roles, alpha-baked.
+ * Mirrors the 2026 pattern (selection/findMatch/wordHighlight all sourced from one
+ * hex prefix) but lets each character bias the peak. The ratios stay constant so
+ * the relative ordering — selection > findMatch > wordHighlight — is preserved.
+ */
+function attentionRamp(primaryHex: string, peak: number): {
+  selection: string
+  findMatch: string
+  wordHighlightStrong: string
+  findMatchHighlight: string
+  inactiveSelection: string
+  selectionHighlight: string
+  wordHighlight: string
+} {
+  const a = (mult: number): string => toHex(withAlpha(primaryHex, Math.min(0.95, peak * mult)))
+  return {
+    selection:           a(1.00),
+    findMatch:           a(0.65),
+    wordHighlightStrong: a(0.55),
+    findMatchHighlight:  a(0.55),
+    inactiveSelection:   a(0.42),
+    selectionHighlight:  a(0.42),
+    wordHighlight:       a(0.35),
+  }
 }
 
 /**
@@ -228,13 +259,29 @@ export function deriveUiColors(
 ): Record<string, string> {
   const {
     editorBackground, editorForeground, sidebarBackground, panelBackground, overlayBackground,
-    statusBarBackground, outline, divider, bracketPairColors,
+    statusBarBackground, outline, outlineVariant, divider, neutralBand, cursorColor, inputSunken,
+    bracketPairColors,
   } = semantic
 
-  // Selection alpha — caller (index.ts) may have lifted it to keep the overlay
-  // legible against syntax foreground.
-  const selectionAlpha = options.selectionAlpha ?? (isDarkMode ? 0.25 : 0.20)
-  const inactiveSelectionAlpha = selectionAlpha * 0.75
+  // Peak alpha for the chromatic highlight family — character-driven, mode-adjusted
+  // (set by index.ts via personality.surfaceProfile). Falls back to a sensible default
+  // if a caller invokes deriveUiColors directly.
+  const peakAlpha = options.peakAlpha ?? (isDarkMode ? 0.70 : 0.30)
+  const ramp = attentionRamp(semantic.focusBorder.hex, peakAlpha)
+
+  // Inactive selection style — chromatic (current ramp), complementary (Night Owl
+  // move, hue-shifted primary), or neutral (mono — uses the chrome surface itself).
+  const inactiveStyle = options.inactiveSelectionStyle ?? 'chromatic'
+  const inactiveSelectionHex = (() => {
+    if (inactiveStyle === 'chromatic') return ramp.inactiveSelection
+    if (inactiveStyle === 'complementary') {
+      const complement = shiftHue(new Color(semantic.focusBorder.hex), 180)
+      return toHex(withAlpha(complement, Math.min(0.95, peakAlpha * 0.42)))
+    }
+    // neutral — solid chrome tone (no alpha). In dark we want the highest chrome
+    // surface; in light we want the lifted chrome (container, not white).
+    return isDarkMode ? overlayBackground.hex : panelBackground.hex
+  })()
 
   // Bracket pairs come from the template as a 6-color harmonic spread.
   // Apply alpha so they don't collide with text underneath.
@@ -250,21 +297,64 @@ export function deriveUiColors(
     return toHex(c)
   }
 
+  // focusBorder applied at alpha — softens the focus glow at curved chrome corners.
+  // 2026 uses ~0.70 alpha; we match.
+  const focusBorderAlpha = toHex(withAlpha(semantic.focusBorder.hex, 0.70))
+
+  // chat.inputWorkingBorder gradient — three lightness steps of primary. The sweep
+  // direction inverts by mode so the "working" animation reads as motion both ways.
+  const primaryColor = new Color(semantic.focusBorder.hex)
+  const chatGradient = (delta: number): string => {
+    const c = primaryColor.clone()
+    c.oklch.l = Math.max(0.05, Math.min(0.95, (c.oklch.l ?? 0.5) + delta))
+    return toHex(c)
+  }
+  const chatGradient1 = chatGradient(isDarkMode ? -0.10 : +0.10)
+  const chatGradient2 = semantic.focusBorder.hex
+  const chatGradient3 = chatGradient(isDarkMode ? +0.10 : -0.10)
+
+  // Three-step alpha ramp on a neutral foreground tone — used for minimap slider.
+  const sliderAlpha = (a: number): string => toHex(withAlpha(editorForeground.hex, a))
+
+  // Purple for charts — derived by snapping the primary hue to ~305° (canonical
+  // purple). Charts need categorically distinct colors, and the palette doesn't
+  // always include a purple — so we generate one at a fixed perceptual position.
+  const chartsPurpleHex = (() => {
+    const c = new Color(semantic.focusBorder.hex).clone()
+    c.oklch.h = 305
+    c.oklch.l = isDarkMode ? 0.72 : 0.50
+    c.oklch.c = Math.min((c.oklch.c ?? 0.10), 0.15)
+    return toHex(c)
+  })()
+
+  // Status-bar foreground — `statusBar.foreground` must hit at least 4.5:1 against
+  // the bar background.
+  const statusBarFg = ensureContrast(new Color(editorForeground.hex), new Color(statusBarBackground.hex), 4.5)
+
   return {
     // Editor
     'editor.background': editorBackground.hex,
     'editor.foreground': editorForeground.hex,
-    'editor.lineHighlightBackground': toHex(withAlpha(editorForeground.hex, isDarkMode ? 0.05 : 0.03)),
-    'editor.lineHighlightBorder': toHex(withAlpha(editorForeground.hex, isDarkMode ? 0.1 : 0.05)),
-    'editor.selectionBackground': toHex(withAlpha(semantic.focusBorder.hex, selectionAlpha)),
-    'editor.selectionHighlightBackground': toHex(withAlpha(semantic.focusBorder.hex, selectionAlpha * 0.6)),
-    'editor.findMatchBackground': toHex(withAlpha(semantic.accentColor.hex, 0.5)),
-    'editor.findMatchHighlightBackground': toHex(withAlpha(semantic.accentColor.hex, 0.3)),
-    'editor.inactiveSelectionBackground': toHex(withAlpha(semantic.focusBorder.hex, inactiveSelectionAlpha)),
-    'editor.rangeHighlightBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.10)),
-    'editor.hoverHighlightBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.10)),
-    'editor.wordHighlightBackground': toHex(withAlpha(semantic.infoForeground.hex, 0.30)),
-    'editor.wordHighlightStrongBackground': toHex(withAlpha(semantic.definitionColor.hex, 0.40)),
+
+    // Neutral attention layer — solid surface (no alpha) for the "user is pointing at
+    // this" feedback (line / range / hover). Sits one step from editor toward the
+    // chrome end of the L stack. The chromatic ramp below is reserved for "the editor
+    // found something" feedback.
+    'editor.lineHighlightBackground': neutralBand.hex,
+    'editor.lineHighlightBorder': outlineVariant.hex,
+    'editor.rangeHighlightBackground': neutralBand.hex,
+    'editor.hoverHighlightBackground': neutralBand.hex,
+    'editor.findRangeHighlightBackground': neutralBand.hex,
+
+    // Chromatic attention layer — unified family, all sourced from focusBorder via
+    // attentionRamp(). 2026-style coherent "the editor is attending to this" language.
+    'editor.selectionBackground': ramp.selection,
+    'editor.selectionHighlightBackground': ramp.selectionHighlight,
+    'editor.findMatchBackground': ramp.findMatch,
+    'editor.findMatchHighlightBackground': ramp.findMatchHighlight,
+    'editor.inactiveSelectionBackground': inactiveSelectionHex,
+    'editor.wordHighlightBackground': ramp.wordHighlight,
+    'editor.wordHighlightStrongBackground': ramp.wordHighlightStrong,
 
     // Bracket pair colorization (harmonic spread, alpha-baked)
     'editorBracketHighlight.foreground1': bp(0),
@@ -278,8 +368,20 @@ export function deriveUiColors(
     'editorBracketPairGuide.activeBackground2': bp(1),
     'editorBracketPairGuide.activeBackground3': bp(2),
 
+    // editorBracketMatch — when the cursor sits next to a `{`, the matching `}` gets
+    // a visible chromatic background (~30% primary) and a near-invisible border.
+    'editorBracketMatch.background': toHex(withAlpha(semantic.focusBorder.hex, 0.30)),
+    'editorBracketMatch.border': outlineVariant.hex,
+
+    // Sticky scroll — header bands floating above the editor. Background continuous
+    // with editor; hover lifts to the panel tone; border is the chrome whisper.
+    'editorStickyScroll.background': editorBackground.hex,
+    'editorStickyScrollHover.background': panelBackground.hex,
+    'editorStickyScroll.border': outlineVariant.hex,
+    'editorStickyScroll.shadow': '#00000000',
+
     'editorCodeLens.foreground': toHex(desaturate(new Color(editorForeground.hex), 0.7)),
-    'editorCursor.foreground': semantic.accentColor.hex,
+    'editorCursor.foreground': cursorColor.hex,
     'editorInlayHint.foreground': toHex(withAlpha(semantic.propertyColor.hex, 0.7)),
     'editorInlayHint.background': toHex(withAlpha(panelBackground.hex, 0.5)),
     'editorInlayHint.typeForeground': toHex(withAlpha(semantic.typeColor.hex, 0.75)),
@@ -288,11 +390,14 @@ export function deriveUiColors(
     'editorGroup.dropBackground': toHex(withAlpha(sidebarBackground.hex, 0.7)),
     'editorGroupHeader.tabsBackground': sidebarBackground.hex,
     'editorGroupHeader.tabsBorder': sidebarBackground.hex,
+    // Gutter shares editor.background — emit explicitly so it doesn't inherit a
+    // contrasting default in older VS Code builds.
+    'editorGutter.background': editorBackground.hex,
     'editorGutter.addedBackground': toHex(withAlpha(semantic.successForeground.hex, 0.7)),
     'editorGutter.deletedBackground': toHex(withAlpha(semantic.errorForeground.hex, 0.7)),
     'editorGutter.modifiedBackground': toHex(withAlpha(semantic.infoForeground.hex, 0.7)),
     'editorHoverWidget.background': overlayBackground.hex,
-    'editorHoverWidget.border': outline.hex,
+    'editorHoverWidget.border': outlineVariant.hex,
     'editorIndentGuide.activeBackground': toHex(withAlpha(editorForeground.hex, 0.25)),
     'editorIndentGuide.background': toHex(withAlpha(editorForeground.hex, 0.08)),
     'editorLineNumber.foreground': toHex(withAlpha(editorForeground.hex, isDarkMode ? 0.35 : 0.45)),
@@ -300,7 +405,7 @@ export function deriveUiColors(
     'editorLink.activeForeground': semantic.infoForeground.hex,
     'editorMarkerNavigation.background': overlayBackground.hex,
     'editorOverviewRuler.addedForeground': toHex(withAlpha(semantic.successForeground.hex, 0.5)),
-    'editorOverviewRuler.border': sidebarBackground.hex,
+    'editorOverviewRuler.border': outlineVariant.hex,
     'editorOverviewRuler.deletedForeground': toHex(withAlpha(semantic.errorForeground.hex, 0.5)),
     'editorOverviewRuler.errorForeground': toHex(withAlpha(semantic.errorForeground.hex, 0.5)),
     'editorOverviewRuler.infoForeground': toHex(withAlpha(semantic.infoForeground.hex, 0.5)),
@@ -310,11 +415,11 @@ export function deriveUiColors(
     'editorRuler.foreground': toHex(withAlpha(editorForeground.hex, 0.1)),
     'editorSuggestWidget.background': overlayBackground.hex,
     'editorSuggestWidget.foreground': editorForeground.hex,
-    'editorSuggestWidget.border': outline.hex,
+    'editorSuggestWidget.border': outlineVariant.hex,
     'editorSuggestWidget.selectedBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.3)),
     'editorWhitespace.foreground': toHex(withAlpha(editorForeground.hex, 0.08)),
     'editorWidget.background': overlayBackground.hex,
-    'editorWidget.border': outline.hex,
+    'editorWidget.border': outlineVariant.hex,
 
     // Error/warning
     'editorError.foreground': semantic.errorForeground.hex,
@@ -322,8 +427,8 @@ export function deriveUiColors(
     'editorInfo.foreground': semantic.infoForeground.hex,
     'errorForeground': semantic.errorForeground.hex,
 
-    // Focus and selection
-    'focusBorder': semantic.focusBorder.hex,
+    // Focus and selection — focusBorder applied at 70% alpha to soften corner glow.
+    'focusBorder': focusBorderAlpha,
     'foreground': editorForeground.hex,
     'selection.background': toHex(withAlpha(semantic.focusBorder.hex, 0.3)),
 
@@ -335,14 +440,12 @@ export function deriveUiColors(
     'sideBarSectionHeader.foreground': editorForeground.hex,
     'sideBarTitle.foreground': editorForeground.hex,
 
-    // Status bar
+    // Status bar — lens-driven (match-sidebar / tinted / primary / primary-deep).
+    // The chromatic seam (only for diamond) is added via statusBarBorderTop when
+    // the personality opts in.
     'statusBar.background': statusBarBackground.hex,
-    'statusBar.foreground': ensureContrast(
-      new Color(editorForeground.hex),
-      new Color(statusBarBackground.hex),
-      4.5,
-    ),
-    'statusBar.border': divider.hex,
+    'statusBar.foreground': statusBarFg,
+    'statusBar.border': semantic.statusBarBorderTop?.hex ?? divider.hex,
     'statusBar.noFolderBackground': statusBarBackground.hex,
     'statusBar.noFolderForeground': editorForeground.hex,
     'statusBar.debuggingBackground': semantic.warningForeground.hex,
@@ -352,16 +455,19 @@ export function deriveUiColors(
     'statusBarItem.remoteBackground': semantic.accentColor.hex,
     'statusBarItem.remoteForeground': getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5),
 
-    // Tabs
+    // Tabs — active tab merges visually with the editor (continuous surface).
     'tab.activeBackground': editorBackground.hex,
     'tab.activeBorderTop': semantic.accentColor.hex,
-    'tab.activeBorder': semantic.focusBorder.hex,
+    'tab.activeBorder': editorBackground.hex,
     'tab.activeForeground': editorForeground.hex,
-    'tab.border': sidebarBackground.hex,
+    'tab.border': outlineVariant.hex,
     'tab.inactiveBackground': sidebarBackground.hex,
     'tab.inactiveForeground': toHex(withAlpha(editorForeground.hex, 0.55)),
-    'tab.hoverBackground': panelBackground.hex,
+    'tab.hoverBackground': editorBackground.hex,
+    'tab.unfocusedActiveBackground': editorBackground.hex,
+    'tab.unfocusedActiveForeground': toHex(withAlpha(editorForeground.hex, 0.7)),
     'tab.unfocusedActiveBorderTop': toHex(withAlpha(semantic.accentColor.hex, 0.5)),
+    'tab.lastPinnedBorder': outlineVariant.hex,
 
     // Title bar
     'titleBar.activeBackground': sidebarBackground.hex,
@@ -373,7 +479,7 @@ export function deriveUiColors(
     // Input
     'input.background': panelBackground.hex,
     'input.foreground': editorForeground.hex,
-    'input.border': outline.hex,
+    'input.border': outlineVariant.hex,
     'input.placeholderForeground': toHex(withAlpha(editorForeground.hex, 0.5)),
     'inputOption.activeBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.2)),
     'inputOption.activeBorder': semantic.focusBorder.hex,
@@ -382,7 +488,7 @@ export function deriveUiColors(
     // Dropdown
     'dropdown.background': overlayBackground.hex,
     'dropdown.foreground': editorForeground.hex,
-    'dropdown.border': outline.hex,
+    'dropdown.border': outlineVariant.hex,
 
     // Button
     'button.background': semantic.focusBorder.hex,
@@ -459,7 +565,7 @@ export function deriveUiColors(
 
     // Debug
     'debugToolBar.background': overlayBackground.hex,
-    'debugToolBar.border': outline.hex,
+    'debugToolBar.border': outlineVariant.hex,
     'debugConsole.errorForeground': semantic.errorForeground.hex,
     'debugConsole.warningForeground': semantic.warningForeground.hex,
     'debugConsole.infoForeground': semantic.infoForeground.hex,
@@ -487,12 +593,12 @@ export function deriveUiColors(
     'notebookStatusSuccessIcon.foreground': semantic.successForeground.hex,
 
     // Notification
-    'notificationCenter.border': outline.hex,
+    'notificationCenter.border': outlineVariant.hex,
     'notificationCenterHeader.background': sidebarBackground.hex,
-    'notificationToast.border': outline.hex,
+    'notificationToast.border': outlineVariant.hex,
     'notifications.background': overlayBackground.hex,
     'notifications.foreground': editorForeground.hex,
-    'notifications.border': outline.hex,
+    'notifications.border': outlineVariant.hex,
     'notificationLink.foreground': semantic.infoForeground.hex,
 
     // Scrollbar
@@ -504,9 +610,9 @@ export function deriveUiColors(
     // Settings
     'settings.modifiedItemIndicator': semantic.warningForeground.hex,
     'settings.dropdownBackground': overlayBackground.hex,
-    'settings.dropdownBorder': outline.hex,
+    'settings.dropdownBorder': outlineVariant.hex,
     'settings.checkboxBackground': overlayBackground.hex,
-    'settings.checkboxBorder': outline.hex,
+    'settings.checkboxBorder': outlineVariant.hex,
 
     // Diff editor
     'diffEditor.insertedTextBackground': toHex(withAlpha(semantic.successForeground.hex, 0.15)),
@@ -532,7 +638,7 @@ export function deriveUiColors(
     'activityBar.background': sidebarBackground.hex,
     'activityBar.foreground': editorForeground.hex,
     'activityBar.inactiveForeground': toHex(withAlpha(editorForeground.hex, 0.4)),
-    'activityBar.border': divider.hex,
+    'activityBar.border': outlineVariant.hex,
     'activityBar.activeBorder': semantic.accentColor.hex,
     'activityBar.activeBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.15)),
     'activityBarBadge.background': semantic.accentColor.hex,
@@ -557,9 +663,9 @@ export function deriveUiColors(
     // Terminal UI
     'terminal.background': editorBackground.hex,
     'terminal.foreground': editorForeground.hex,
-    'terminal.selectionBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.30)),
-    'terminal.border': divider.hex,
-    'terminalCursor.foreground': semantic.accentColor.hex,
+    'terminal.selectionBackground': ramp.findMatchHighlight,
+    'terminal.border': outlineVariant.hex,
+    'terminalCursor.foreground': cursorColor.hex,
     'terminalCursor.background': editorBackground.hex,
 
     // Terminal ANSI colors (16 standard)
@@ -580,6 +686,64 @@ export function deriveUiColors(
     'terminal.ansiBrightMagenta': brightAnsi(semantic.terminalAnsiMagenta.hex),
     'terminal.ansiBrightCyan': brightAnsi(semantic.terminalAnsiCyan.hex),
     'terminal.ansiBrightWhite': editorForeground.hex,
+
+    // Minimap slider — three alpha tiers on a neutral fg tone, matches 2026.
+    'minimapSlider.background': sliderAlpha(0.20),
+    'minimapSlider.hoverBackground': sliderAlpha(0.35),
+    'minimapSlider.activeBackground': sliderAlpha(0.50),
+
+    // Sticky-scroll for non-editor surfaces (no shadow — flatten the chrome stack).
+    'sideBarStickyScroll.shadow': '#00000000',
+    'panelStickyScroll.shadow': '#00000000',
+    'listFilterWidget.shadow': '#00000000',
+    'widget.shadow': '#00000000',
+
+    // Inline chat — transparent border, relies on bg contrast (2026 move).
+    'inlineChat.border': '#00000000',
+
+    // Agents / chat panel keys (newer VS Code chat experience). Map straight onto
+    // existing surface roles so the chat panel inherits the same chrome behavior as
+    // the rest of the IDE.
+    'agents.background': editorBackground.hex,
+    'agentsPanel.background': panelBackground.hex,
+    'agentsPanel.foreground': editorForeground.hex,
+    'agentsPanel.border': outlineVariant.hex,
+    'agentsGradient.tintColor': semantic.focusBorder.hex,
+    'agentsChatInput.background': inputSunken.hex,
+    'agentsChatInput.foreground': editorForeground.hex,
+    'agentsChatInput.border': outlineVariant.hex,
+    'agentsChatInput.focusBorder': focusBorderAlpha,
+    'agentsChatInput.placeholderForeground': toHex(withAlpha(editorForeground.hex, 0.5)),
+    'agentsNewSessionButton.background': '#00000000',
+    'agentsNewSessionButton.foreground': editorForeground.hex,
+    'agentsNewSessionButton.border': outlineVariant.hex,
+    'agentsNewSessionButton.hoverBackground': toHex(withAlpha(editorForeground.hex, 0.08)),
+    'agentsBadge.background': semantic.accentColor.hex,
+    'agentsBadge.foreground': getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5),
+    'agentsUnreadBadge.background': semantic.accentColor.hex,
+    'agentsUnreadBadge.foreground': getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5),
+
+    // chat.* (request bubbles + working-input gradient sweep)
+    'chat.requestBubbleBackground': toHex(withAlpha(editorForeground.hex, isDarkMode ? 0.06 : 0.04)),
+    'chat.requestBubbleHoverBackground': toHex(withAlpha(editorForeground.hex, isDarkMode ? 0.10 : 0.07)),
+    'chat.inputWorkingBorderColor1': chatGradient1,
+    'chat.inputWorkingBorderColor2': chatGradient2,
+    'chat.inputWorkingBorderColor3': chatGradient3,
+
+    // editorCommentsWidget — chat-like comment threads in PR review.
+    'editorCommentsWidget.rangeBackground': toHex(withAlpha(semantic.infoForeground.hex, 0.15)),
+    'editorCommentsWidget.rangeActiveBackground': toHex(withAlpha(semantic.infoForeground.hex, 0.25)),
+
+    // Charts (notebook charts, debug visualizations). Mode-agnostic — the semantic
+    // colors are already mode-adapted upstream.
+    'charts.foreground': editorForeground.hex,
+    'charts.lines': toHex(withAlpha(editorForeground.hex, 0.4)),
+    'charts.blue': semantic.infoForeground.hex,
+    'charts.red': semantic.errorForeground.hex,
+    'charts.green': semantic.successForeground.hex,
+    'charts.yellow': semantic.warningForeground.hex,
+    'charts.orange': semantic.accentColor.hex,
+    'charts.purple': chartsPurpleHex,
   }
 }
 

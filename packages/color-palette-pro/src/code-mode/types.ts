@@ -15,10 +15,19 @@ export interface SemanticColors {
   panelBackground: SemanticColor
   overlayBackground: SemanticColor
   statusBarBackground: SemanticColor
+  /** Optional top-border accent for the status bar (diamond lens only). */
+  statusBarBorderTop?: SemanticColor
   focusBorder: SemanticColor
   inputBackground: SemanticColor
+  /** Surface used for chat / agents input fields — sunken in dark, lifted in light. */
+  inputSunken: SemanticColor
   divider: SemanticColor
   outline: SemanticColor
+  outlineVariant: SemanticColor
+  /** Solid neutral one step from editor, used for line/range/hover highlights. */
+  neutralBand: SemanticColor
+  /** Cursor color — character-driven (foreground for calm characters, accent for loud). */
+  cursorColor: SemanticColor
 
   // Primary syntax roles (chromatic)
   definitionColor: SemanticColor
@@ -168,10 +177,37 @@ export interface PersonalityFontStyleProfile {
   scopeOverrides?: Record<string, string>
 }
 
+/**
+ * Surface profile — controls how chrome relates to the editor, how loud highlights
+ * are, and where each character's signature moves land. Derived from (lens × character)
+ * in personality.ts and consumed in index.ts + base.ts.
+ */
+export interface SurfaceProfile {
+  /** Editor L override in dark mode. Modern themes anchor editor as the deepest point. */
+  editorLDark: number
+  /** Editor L in light mode — character driven (vivid → 1.0, serene/mono → 0.98). */
+  editorLLight: number
+  /** Peak alpha for the chromatic highlight ramp, per mode. */
+  peakAlpha: { dark: number; light: number }
+  /** Which surface plays "sidebar". Light mode often differs from dark. */
+  sidebarSurface: { dark: 'container' | 'containerSunken'; light: 'container' | 'containerSunken' }
+  /** Whether sidebar/chrome surfaces get a primary-hue tint. */
+  chromeTint: boolean
+  /** How the status bar is styled. */
+  statusBarStyle: 'match-sidebar' | 'tinted' | 'primary' | 'primary-deep'
+  /** Cursor color source. */
+  cursorSource: 'foreground' | 'accent'
+  /** Inactive selection style. */
+  inactiveSelectionStyle: 'chromatic' | 'complementary' | 'neutral'
+  /** Amount of primary-hue tint applied to the neutral band (0 = pure neutral). */
+  neutralBandTint: number
+}
+
 export interface PersonalityConfig {
   bgTint: PersonalityBgTint | null
   contrastProfile: PersonalityContrastProfile | null
   fontStyleProfile: PersonalityFontStyleProfile | null
+  surfaceProfile: SurfaceProfile
   /** Human-readable label for the style lens (e.g. "Engineered", "Cinematic"). */
   lensName: string
   /** Palette's inherent character. */

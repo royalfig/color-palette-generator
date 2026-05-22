@@ -5,6 +5,7 @@ import type {
   PersonalityConfig,
   PersonalityContrastProfile,
   PersonalityFontStyleProfile,
+  SurfaceProfile,
 } from './types'
 
 /**
@@ -130,6 +131,107 @@ const FONT_STYLES: Record<PaletteStyle, Record<PaletteCharacter, PersonalityFont
   },
 }
 
+// ----- surface profile: (lens × character) → chrome behavior -----
+//
+// Lens controls: structural depth (editor L in dark), status bar style, chrome tint
+// Character controls: editor whiteness in light mode, peak highlight alpha, cursor
+//   source, inactive-selection style, neutral-band warmth.
+//
+// 2026 is one of several references — diamond runs theatrically deeper, square sits
+// closest to a modern Microsoft/2026 baseline, circle/triangle interpolate.
+
+// Editor L in dark mode by lens. Editor is the deepest point; chrome lifts above it.
+// Values target the perceptual L range where 2026 / Catppuccin / Dark Modern sit
+// (OKLCH L ≈ 0.17–0.21 for the editor surface). Container is L 0.19, so anything
+// below that creates the inversion.
+const EDITOR_L_DARK_BY_LENS: Record<PaletteStyle, number> = {
+  square:   0.170,  // engineered baseline (2026-tight gap to chrome)
+  triangle: 0.185,  // natural — closest to original L=0.14 surface
+  circle:   0.170,  // expressive — chrome tint compensates for tight gap
+  diamond:  0.140,  // cinematic — theatrical depth, wider gap below chrome
+}
+
+// Editor L in light mode by character. Vivid pushes to pure white for max contrast;
+// serene/mono stay slightly off-white for long-session comfort.
+const EDITOR_L_LIGHT_BY_CHARACTER: Record<PaletteCharacter, number> = {
+  serene: 0.98,
+  mono:   0.98,
+  crisp:  0.99,
+  vivid:  1.00,
+}
+
+// Peak alpha for the unified chromatic highlight ramp. Light is roughly half of dark —
+// primary on white reads much harder than primary on near-black.
+const PEAK_ALPHA_BY_CHARACTER: Record<PaletteCharacter, { dark: number; light: number }> = {
+  serene: { dark: 0.55, light: 0.25 },
+  crisp:  { dark: 0.70, light: 0.30 },
+  mono:   { dark: 0.75, light: 0.32 },
+  vivid:  { dark: 0.85, light: 0.40 },
+}
+
+// Sidebar surface routing. Square keeps the tightest gap; diamond opens it up for drama.
+const SIDEBAR_SURFACE_BY_LENS: Record<PaletteStyle, SurfaceProfile['sidebarSurface']> = {
+  square:   { dark: 'container', light: 'container' },
+  triangle: { dark: 'container', light: 'container' },
+  circle:   { dark: 'container', light: 'container' },
+  diamond:  { dark: 'container', light: 'containerSunken' },
+}
+
+const CHROME_TINT_BY_LENS: Record<PaletteStyle, boolean> = {
+  square:   false,
+  triangle: false,
+  circle:   true,
+  diamond:  true,
+}
+
+const STATUS_BAR_STYLE_BY_LENS: Record<PaletteStyle, SurfaceProfile['statusBarStyle']> = {
+  square:   'match-sidebar',
+  triangle: 'tinted',
+  circle:   'primary',
+  diamond:  'primary-deep',
+}
+
+// Cursor source: loud characters keep accent; calm characters use foreground (2026-style).
+const CURSOR_SOURCE_BY_CHARACTER: Record<PaletteCharacter, SurfaceProfile['cursorSource']> = {
+  serene: 'foreground',
+  mono:   'foreground',
+  crisp:  'accent',
+  vivid:  'accent',
+}
+
+// Inactive selection — when focus leaves, where does identity go?
+// Vivid pulls a complementary hue (Night Owl move). Mono falls back to a neutral solid
+// since there's no complement to spend. Serene/crisp keep chromatic continuity.
+const INACTIVE_SELECTION_BY_CHARACTER: Record<PaletteCharacter, SurfaceProfile['inactiveSelectionStyle']> = {
+  serene: 'chromatic',
+  crisp:  'chromatic',
+  vivid:  'complementary',
+  mono:   'neutral',
+}
+
+// Diamond warms the neutral band with a whisper of primary; everyone else stays neutral.
+const NEUTRAL_BAND_TINT_BY_LENS: Record<PaletteStyle, number> = {
+  square:   0,
+  triangle: 0,
+  circle:   0,
+  diamond:  0.15,
+}
+
+function buildSurfaceProfile(kind: PaletteKinds, style: PaletteStyle): SurfaceProfile {
+  const character = PALETTE_CHARACTER[kind]
+  return {
+    editorLDark:            EDITOR_L_DARK_BY_LENS[style],
+    editorLLight:           EDITOR_L_LIGHT_BY_CHARACTER[character],
+    peakAlpha:              PEAK_ALPHA_BY_CHARACTER[character],
+    sidebarSurface:         SIDEBAR_SURFACE_BY_LENS[style],
+    chromeTint:             CHROME_TINT_BY_LENS[style],
+    statusBarStyle:         STATUS_BAR_STYLE_BY_LENS[style],
+    cursorSource:           CURSOR_SOURCE_BY_CHARACTER[character],
+    inactiveSelectionStyle: INACTIVE_SELECTION_BY_CHARACTER[character],
+    neutralBandTint:        NEUTRAL_BAND_TINT_BY_LENS[style],
+  }
+}
+
 // ----- resolution -----
 
 function lerp(from: number, to: number, t: number): number {
@@ -165,6 +267,7 @@ export function getPersonalityConfig(kind: PaletteKinds, style: PaletteStyle): P
     bgTint: scaledBgTint(bgTintBase, lens.bgChromaIntensity),
     contrastProfile: scaledContrastProfile(profileBase, lens.characterIntensity, lens.bgOffsetIntensity),
     fontStyleProfile: FONT_STYLES[style][character],
+    surfaceProfile: buildSurfaceProfile(kind, style),
     lensName: lens.name,
     paletteCharacter: character,
   }

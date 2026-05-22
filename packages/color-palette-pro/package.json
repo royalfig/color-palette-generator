@@ -29,13 +29,15 @@
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "generate-themes": "tsx generate-all-themes.mts"
   },
   "dependencies": {
     "colorjs.io": "^0.6.1"
   },
   "devDependencies": {
     "tsup": "^8.5.1",
+    "tsx": "^4.20.6",
     "typescript": "~5.9.3"
   },
   "publishConfig": {

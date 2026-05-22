@@ -21,7 +21,7 @@ import { deriveUiColors, generateBaseTokenRules, generateSemanticTokenRules } fr
 import { generateSurfaceColors, generateSemanticColors, adaptPrimaryForMode } from '../ui'
 import {
   findColorByHue, toHex, shiftHue, desaturate, withAlpha,
-  ensureAPCAAgainst, deltaE, nudgeForDistinction,
+  ensureAPCAAgainst, deltaE, nudgeForDistinction, mixColors, tintTowardHue,
 } from './utils'
 import { getPersonalityConfig } from './personality'
 
@@ -172,15 +172,19 @@ function legibleOverlayAlpha(
 
 function deriveOutline(primary: Color, isDarkMode: boolean): { outline: Color; outlineVariant: Color } {
   const baseHue = primary.oklch.h ?? 0
+  // `outline` stays visible — reserved for peekView / panel seams where we want
+  // a real line. Chrome borders should use `outlineVariant` (see deriveUiColors).
   const outline = primary.clone()
   outline.oklch.h = baseHue
   outline.oklch.c = 0.005
-  outline.oklch.l = 0.55
+  outline.oklch.l = isDarkMode ? 0.32 : 0.78
 
+  // outlineVariant is the "barely there" tone used for almost every widget border
+  // in modern themes — sits just above editor L in dark, just below white in light.
   const outlineVariant = primary.clone()
   outlineVariant.oklch.h = baseHue
   outlineVariant.oklch.c = 0.005
-  outlineVariant.oklch.l = isDarkMode ? 0.22 : 0.90
+  outlineVariant.oklch.l = isDarkMode ? 0.20 : 0.92
 
   return { outline, outlineVariant }
 }
@@ -222,38 +226,89 @@ export function generateCodeTheme(
     outlineVariant,
   }
 
-  // Editor background: start from UI surface, apply personality bg tint + mode-aware offset.
-  // Dark-mode chroma is hard-capped because at low L any chroma reads strongly.
+  // Editor background — surface profile drives the anchor L. Dark mode: editor is the
+  // *deepest* point (lens-driven); chrome lifts above it. Light mode: editor is the
+  // *brightest* point (character-driven); chrome sinks below it. This inverts the
+  // older sidebar-darkest convention and reads as a frame around the document.
+  const sp = personality.surfaceProfile
   const editorBgBase = surfaces.surface.clone()
+  editorBgBase.oklch.l = isDarkMode ? sp.editorLDark : sp.editorLLight
   if (personality.bgTint) {
     editorBgBase.oklch.h = primary.oklch.h
     if (isDarkMode) {
-      editorBgBase.oklch.l = Math.min(0.16, (editorBgBase.oklch.l ?? 0.10) + 0.02)
       editorBgBase.oklch.c = Math.min((editorBgBase.oklch.c ?? 0) + personality.bgTint.chromaBoost * 0.5, 0.025)
     } else {
       editorBgBase.oklch.c = Math.min((editorBgBase.oklch.c ?? 0) + personality.bgTint.chromaBoost * 0.5, 0.012)
     }
   }
   if (personality.contrastProfile) {
-    const [lMin, lMax] = isDarkMode ? [0.05, 0.35] : [0.80, 1.00]
     const modeOffset = isDarkMode
       ? personality.contrastProfile.bgLightnessOffsetDark
       : personality.contrastProfile.bgLightnessOffsetLight
-    editorBgBase.oklch.l = Math.max(lMin, Math.min(lMax, (editorBgBase.oklch.l ?? (isDarkMode ? 0.14 : 0.98)) + modeOffset))
+    const [lMin, lMax] = isDarkMode ? [0.12, 0.22] : [0.95, 1.00]
+    editorBgBase.oklch.l = Math.max(lMin, Math.min(lMax, (editorBgBase.oklch.l ?? 0.17) + modeOffset))
   }
 
-  // Three-tier surface stack drawn from the UI gen.
-  const sidebarBg = surfaces.containerSunken
-  const panelBg = surfaces.container
+  // Sidebar routing — lens decides which container plays the chrome role.
+  const sidebarRouteKey = isDarkMode ? sp.sidebarSurface.dark : sp.sidebarSurface.light
+  const sidebarBg = (sidebarRouteKey === 'container' ? surfaces.container : surfaces.containerSunken).clone()
+  if (sp.chromeTint) {
+    sidebarBg.oklch.h = primary.oklch.h
+    sidebarBg.oklch.c = Math.min((sidebarBg.oklch.c ?? 0) + 0.006, isDarkMode ? 0.020 : 0.010)
+  }
+  const panelBg = sidebarBg.clone()
   const overlayBg = surfaces.containerOverlay
 
-  // Status bar: primary-tinted, distinctly more prominent than the sidebar.
+  // Chat / agents input. In dark, 2026 lifts the input to the *widget* level
+  // (#202122 — same as popovers) so it pops forward from the panel beneath. In
+  // light, the input sinks ~2% L below editor white — readable as a field, not as a
+  // separate card. Both directions mirror what 2026 actually does.
+  const inputSunken = isDarkMode
+    ? surfaces.containerOverlay.clone()
+    : mixColors(surfaces.surface, surfaces.containerSunken, 0.3)
+
+  // Status bar — lens dial.
   const statusBarBg = primary.clone()
-  statusBarBg.oklch.l = isDarkMode ? 0.22 : 0.88
-  statusBarBg.oklch.c = Math.min((primary.oklch.c ?? 0) * 0.3, 0.05)
+  let statusBarBorderTop: Color | undefined
+  switch (sp.statusBarStyle) {
+    case 'match-sidebar':
+      statusBarBg.oklch.l = sidebarBg.oklch.l ?? (isDarkMode ? 0.18 : 0.96)
+      statusBarBg.oklch.c = sidebarBg.oklch.c ?? 0
+      statusBarBg.oklch.h = sidebarBg.oklch.h ?? primary.oklch.h
+      break
+    case 'tinted':
+      statusBarBg.oklch.l = sidebarBg.oklch.l ?? (isDarkMode ? 0.18 : 0.96)
+      statusBarBg.oklch.c = Math.min((primary.oklch.c ?? 0) * 0.15, isDarkMode ? 0.020 : 0.010)
+      break
+    case 'primary':
+      statusBarBg.oklch.l = isDarkMode ? 0.22 : 0.88
+      statusBarBg.oklch.c = Math.min((primary.oklch.c ?? 0) * 0.3, 0.05)
+      break
+    case 'primary-deep':
+      statusBarBg.oklch.l = isDarkMode ? 0.22 : 0.85
+      statusBarBg.oklch.c = Math.min((primary.oklch.c ?? 0) * 0.45, 0.07)
+      // Accent top border — small chromatic seam (set after syntax is built).
+      statusBarBorderTop = primary.clone()
+      break
+  }
 
   // Divider — barely-tinted outline-variant.
   const divider = outlineVariant.clone()
+
+  // Neutral attention band — solid surface used for lineHighlight / rangeHighlight /
+  // hoverHighlight. Should sit noticeably above the editor surface (toward chrome)
+  // so the active line reads as "lifted in front." 2026 puts its line band even
+  // above widget level. We mix existing chrome tokens: in dark, between panel and
+  // overlay; in light, between containerSunken and editor surface.
+  const neutralBandBase = isDarkMode
+    ? mixColors(surfaces.container, surfaces.containerOverlay, 0.5)
+    : mixColors(surfaces.surface, surfaces.containerSunken, 0.4)
+  const neutralBand = sp.neutralBandTint > 0
+    ? tintTowardHue(neutralBandBase, primary.oklch.h ?? 0, sp.neutralBandTint, 0.008)
+    : neutralBandBase
+
+  // Cursor color is computed after the syntax pipeline runs (it may depend on
+  // accentColor for loud characters).
 
   // Semantic status colors from the UI palette gen.
   const semantics = generateSemanticColors(primary, palette, isDarkMode)
@@ -302,6 +357,12 @@ export function generateCodeTheme(
     : toHex(syntax.commentColor)
   const punctuationHex = toHex(syntax.punctuationColor)
 
+  // Cursor — character-driven. Loud characters use accent (the syntax pop); calm
+  // characters use the foreground (2026-style, restful).
+  const cursorColor = sp.cursorSource === 'foreground'
+    ? surfaces.onSurface.clone()
+    : syntax.accentColor.clone()
+
   const semanticColors: SemanticColors = {
     editorBackground: { hex: toHex(editorBgBase) },
     editorForeground: { hex: toHex(surfaces.onSurface) },
@@ -309,10 +370,15 @@ export function generateCodeTheme(
     panelBackground: { hex: toHex(panelBg) },
     overlayBackground: { hex: toHex(overlayBg) },
     statusBarBackground: { hex: toHex(statusBarBg) },
+    ...(statusBarBorderTop ? { statusBarBorderTop: { hex: toHex(statusBarBorderTop) } } : {}),
     focusBorder: { hex: toHex(primary) },
     inputBackground: { hex: toHex(panelBg) },
+    inputSunken: { hex: toHex(inputSunken) },
     divider: { hex: toHex(divider) },
     outline: { hex: toHex(surfaces.outline) },
+    outlineVariant: { hex: toHex(surfaces.outlineVariant) },
+    neutralBand: { hex: toHex(neutralBand) },
+    cursorColor: { hex: toHex(cursorColor) },
 
     defaultForeground: { hex: toHex(surfaces.onSurface) },
     definitionColor: { hex: toHex(syntax.definitionColor) },
@@ -351,19 +417,24 @@ export function generateCodeTheme(
   }
 
   // Selection overlay legibility check — composite the selection bg over editor bg,
-  // confirm it stays distinguishable from foreground text. If not, ramp alpha up.
-  const selectionStartAlpha = isDarkMode ? 0.25 : 0.20
-  const selectionAlpha = legibleOverlayAlpha(
+  // confirm it stays distinguishable from foreground text. Peak comes from the
+  // character's chromatic-highlight envelope (~half in light vs dark — primary on
+  // white reads much harder than primary on near-black).
+  const peakStartAlpha = isDarkMode ? sp.peakAlpha.dark : sp.peakAlpha.light
+  const peakAlpha = legibleOverlayAlpha(
     semanticColors.focusBorder.hex,
     semanticColors.editorBackground.hex,
     semanticColors.editorForeground.hex,
-    selectionStartAlpha,
+    peakStartAlpha,
     APCA_TARGET_SELECTION_OVERLAY,
   )
 
   const nameInfo = nameSuggestions[paletteKind]
   const type: 'dark' | 'light' = isDarkMode ? 'dark' : 'light'
-  const uiColors = deriveUiColors(semanticColors, isDarkMode, { selectionAlpha })
+  const uiColors = deriveUiColors(semanticColors, isDarkMode, {
+    peakAlpha,
+    inactiveSelectionStyle: sp.inactiveSelectionStyle,
+  })
   const baseTokenRules = generateBaseTokenRules(semanticColors, personality.fontStyleProfile ?? undefined)
   const semanticTokenRules = generateSemanticTokenRules(semanticColors, personality.fontStyleProfile ?? undefined)
 
