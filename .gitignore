@@ -25,3 +25,5 @@ packages/color-palette-pro/generated-themes/
 *.njsproj
 *.sln
 *.sw?
+
+generated-themes
