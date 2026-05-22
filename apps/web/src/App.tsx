@@ -23,10 +23,9 @@ import { useFetchColorNames } from './hooks/useColorName'
 import { useDarkMode } from './hooks/useDarkMode'
 import { Options } from './options/Options'
 import { PaletteTypeSelector } from './palette-type-selector/PaletteTypeSelector'
-import type { ColorFormat, ColorSpaceAndFormat, PaletteKinds } from '@royalfig/color-palette-pro'
-import { createPalettes } from '@royalfig/color-palette-pro'
-import { colorFactory } from '@royalfig/color-palette-pro'
-import { pickRandomColor } from '@royalfig/color-palette-pro'
+import type { ColorFormat, ColorSpaceAndFormat, PaletteKinds, CodeThemeOutput } from '@royalfig/color-palette-pro'
+import { createPalettes, colorFactory, pickRandomColor, generateCodeTheme } from '@royalfig/color-palette-pro'
+import Color from 'colorjs.io'
 
 const Manual = lazy(() => import('./components/manual/Manual.js'))
 
@@ -104,6 +103,7 @@ export default function App() {
         .split(',')
         .map(v => parseFloat(v) || 0)
     : [0, 0, 0, 0]
+  const initialMode = (params.get('mode') as 'palette' | 'ui' | 'code') || 'palette'
   // If you want to support colorSpace as a param, otherwise default to 'oklch'
 
   // State initialization using URL params or defaults
@@ -115,7 +115,7 @@ export default function App() {
   const [paletteStyle, setPaletteStyle] = useState<'square' | 'triangle' | 'circle' | 'diamond'>(initialPaletteStyle)
   const [colorSpace, setColorSpace] = useState<ColorSpaceAndFormat>(parsedInitialColorSpace(initialColorFormat))
   const [knobValues, setKnobValues] = useState(initialKnobValues)
-  const [isUiMode, setUiMode] = useState(false)
+  const [mode, setMode] = useState<'palette' | 'ui' | 'code'>(initialMode)
 
   const { isDarkMode, toggleDarkMode } = useDarkMode()
   const [message, setMessage] = useState<string | null>(null)
@@ -140,14 +140,17 @@ export default function App() {
     [message, messageType, showMessage],
   )
 
-  const palette = useMemo(
-    () => createPalettes(color, paletteType, paletteStyle, colorSpace, knobValues, isUiMode, isDarkMode),
-    [color, paletteType, paletteStyle, colorSpace, knobValues, isUiMode, isDarkMode],
-  )
+  const palette = useMemo(() => createPalettes(color, paletteType, paletteStyle, colorSpace, knobValues, mode === 'ui', isDarkMode), [color, paletteType, paletteStyle, colorSpace, knobValues, mode, isDarkMode])
+
+  const codeTheme = useMemo(() => {
+    if (mode !== 'code') return undefined
+    const rawPalette = createPalettes(color, paletteType, paletteStyle, colorSpace, knobValues, false, isDarkMode)
+    return generateCodeTheme(new Color(color), rawPalette, isDarkMode, paletteType, paletteStyle)
+  }, [color, paletteType, paletteStyle, colorSpace, knobValues, mode, isDarkMode])
 
   const colorContext = useMemo(
-    () => ({ originalColor: colorFactory(color, 'base', 0, colorSpace.format), palette, isUiMode }),
-    [color, palette, colorSpace.format, isUiMode],
+    () => ({ originalColor: colorFactory(color, 'base', 0, colorSpace.format), palette, mode, codeTheme, isDarkMode }),
+    [color, palette, colorSpace.format, mode, codeTheme, isDarkMode],
   )
 
   // const css = generateCss(palettes)
@@ -213,6 +216,7 @@ export default function App() {
       paletteStyle: 'square' | 'triangle' | 'circle' | 'diamond',
       colorFormat: ColorFormat,
       effectsString: string,
+      currentMode: 'palette' | 'ui' | 'code',
     ) => {
       const colorUrl = new URLSearchParams(document.location.search)
       const currentColor = colorUrl.get('color')
@@ -220,13 +224,15 @@ export default function App() {
       const currentPaletteStyle = colorUrl.get('paletteStyle')
       const currentColorFormat = colorUrl.get('colorFormat')
       const currentEffects = colorUrl.get('effects')
+      const currentModeParam = colorUrl.get('mode')
 
       const needsUpdate =
         currentColor !== colorString ||
         currentPaletteType !== paletteType ||
         currentPaletteStyle !== paletteStyle ||
         currentColorFormat !== colorFormat ||
-        currentEffects !== effectsString
+        currentEffects !== effectsString ||
+        currentModeParam !== currentMode
 
       if (needsUpdate) {
         colorUrl.set('color', colorString)
@@ -234,6 +240,7 @@ export default function App() {
         colorUrl.set('paletteStyle', paletteStyle)
         colorUrl.set('colorFormat', colorFormat)
         colorUrl.set('effects', effectsString)
+        colorUrl.set('mode', currentMode)
         window.history.pushState({}, '', `${window.location.pathname}?${colorUrl.toString()}`)
       }
     },
@@ -249,8 +256,9 @@ export default function App() {
       paletteStyle,
       colorSpace.format,
       effectsString,
+      mode,
     )
-  }, [colorContext.originalColor.string, paletteType, paletteStyle, colorSpace.format, knobValues, debouncedUrlUpdate])
+  }, [colorContext.originalColor.string, paletteType, paletteStyle, colorSpace.format, knobValues, debouncedUrlUpdate, mode])
 
   // Debounced favicon update
   const debouncedFaviconUpdate = useDebouncedCallback((cssValue: string) => {
@@ -271,6 +279,7 @@ export default function App() {
       const paletteStyleParam = params.get('paletteStyle')
       const colorFormatParam = params.get('colorFormat')
       const effectsParam = params.get('effects')
+      const modeParam = params.get('mode')
 
       if (colorParam) {
         setColor(colorParam)
@@ -286,6 +295,9 @@ export default function App() {
       }
       if (effectsParam) {
         setKnobValues(effectsParam.split(',').map(v => parseFloat(v) || 0))
+      }
+      if (modeParam) {
+        setMode(modeParam as 'palette' | 'ui' | 'code')
       }
     }
 
@@ -350,8 +362,8 @@ export default function App() {
                   toggleDarkMode={toggleDarkMode}
                   showColorHistory={showColorHistory}
                   setShowColorHistory={setShowColorHistory}
-                  isUiMode={isUiMode}
-                  setIsUiMode={setUiMode}
+                  mode={mode}
+                  setMode={setMode}
                 />
                 <ExportOptions
                   fetchedData={fetchedData}

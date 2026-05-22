@@ -12,7 +12,7 @@ function getMathematicalTetradic(hue: number): number[] {
 
 function getOpticalTetradic(baseColor: Color): number[] {
   // Perceptual Harmony: Based on how our visual system processes four-color relationships
-  const hue = baseColor.oklch.h
+  const hue = baseColor.oklch.h ?? 0
 
   // Human vision processes tetrad relationships differently based on opponent channels
   if (hue >= 0 && hue < 45) {
@@ -97,9 +97,9 @@ function getOpticalTetradic(baseColor: Color): number[] {
 function getAdaptiveTetradic(baseColor: Color): number[] {
   // Emotional Resonance: Creates tetrads that tell complete emotional stories
   const oklch = baseColor.to('oklch')
-  const hue = oklch.h
-  const chroma = oklch.c
-  const lightness = oklch.l
+  const hue = oklch.h ?? 0
+  const chroma = oklch.c ?? 0
+  const lightness = oklch.l ?? 0.5
 
   // Determine emotional profile and create four-part narrative
   if (hue >= 345 || hue < 30) {
@@ -165,9 +165,9 @@ function getAdaptiveTetradic(baseColor: Color): number[] {
 function getLuminosityTetradic(baseColor: Color): number[] {
   // Luminosity Dance: Based on how four light sources interact in space
   const oklch = baseColor.to('oklch')
-  const hue = oklch.h
-  const chroma = oklch.c
-  const lightness = oklch.l
+  const hue = oklch.h ?? 0
+  const chroma = oklch.c ?? 0
+  const lightness = oklch.l ?? 0.5
 
   // Determine lighting scenario and create four-point illumination
 
@@ -250,7 +250,7 @@ export function generateTetradic(
 
     switch (style) {
       case 'square':
-        tetradicHues = getMathematicalTetradic(baseColorObj.oklch.h)
+        tetradicHues = getMathematicalTetradic(baseColorObj.oklch.h ?? 0)
         break
       case 'triangle':
         tetradicHues = getOpticalTetradic(baseColorObj)
@@ -264,8 +264,8 @@ export function generateTetradic(
     }
 
     // Get base color properties for adaptive lightness
-    const baseLightness = baseColorObj.oklch.l
-    const baseChroma = baseColorObj.oklch.c
+    const baseLightness = baseColorObj.oklch.l ?? 0.5
+    const baseChroma = baseColorObj.oklch.c ?? 0
 
     // Create adaptive lightness adjustments based on input color
     function getAdaptiveLightnessAdjustments() {
@@ -313,7 +313,7 @@ export function generateTetradic(
       }
     } else if (style === 'circle') {
       // Emotional resonance: varies by emotional type
-      const hue = baseColorObj.oklch.h
+      const hue = baseColorObj.oklch.h ?? 0
       // Emotional resonance: adapt for base lightness
       const lightnessAdaptation = baseLightness < 0.4 ? 0.15 : baseLightness > 0.6 ? -0.15 : 0
 
@@ -334,8 +334,8 @@ export function generateTetradic(
       }
     } else if (style === 'diamond') {
       // Luminosity dance: based on lighting scenario
-      const lightness = baseColorObj.oklch.l
-      const chroma = baseColorObj.oklch.c
+      const lightness = baseColorObj.oklch.l ?? 0.5
+      const chroma = baseColorObj.oklch.c ?? 0
 
       if (lightness > 0.8 && chroma < 0.3) {
         // studio lighting - prevent over-darkening
@@ -369,15 +369,15 @@ export function generateTetradic(
         if (enhanced) {
           const cleaned = avoidMuddyZones(
             hue,
-            baseColorObj.oklch.l + variations.first.pure.l,
-            baseColorObj.oklch.c * variations.first.pure.c,
+            (baseColorObj.oklch.l ?? 0.5) + variations.first.pure.l,
+            (baseColorObj.oklch.c ?? 0) * variations.first.pure.c,
           )
           finalHue = cleaned.h
         }
 
         const pureValues = clampOKLCH(
-          baseColorObj.oklch.l + variations.first.pure.l,
-          baseColorObj.oklch.c * variations.first.pure.c,
+          (baseColorObj.oklch.l ?? 0.5) + variations.first.pure.l,
+          (baseColorObj.oklch.c ?? 0) * variations.first.pure.c,
           finalHue,
         )
         const pureColor = baseColorObj.clone()
@@ -387,8 +387,8 @@ export function generateTetradic(
         initialColors.push(pureColor)
 
         const mutedValues = clampOKLCH(
-          baseColorObj.oklch.l + variations.first.muted.l,
-          baseColorObj.oklch.c * variations.first.muted.c,
+          (baseColorObj.oklch.l ?? 0.5) + variations.first.muted.l,
+          (baseColorObj.oklch.c ?? 0) * variations.first.muted.c,
           finalHue,
         )
         const mutedColor = baseColorObj.clone()
@@ -404,15 +404,15 @@ export function generateTetradic(
         if (enhanced) {
           const cleaned = avoidMuddyZones(
             hue,
-            baseColorObj.oklch.l + variations.complement.l,
-            baseColorObj.oklch.c * variations.complement.c,
+            (baseColorObj.oklch.l ?? 0.5) + variations.complement.l,
+            (baseColorObj.oklch.c ?? 0) * variations.complement.c,
           )
           finalHue = cleaned.h
         }
 
         const compValues = clampOKLCH(
-          baseColorObj.oklch.l + variations.complement.l,
-          baseColorObj.oklch.c * variations.complement.c,
+          (baseColorObj.oklch.l ?? 0.5) + variations.complement.l,
+          (baseColorObj.oklch.c ?? 0) * variations.complement.c,
           finalHue,
         )
         const compColor = baseColorObj.clone()
@@ -428,15 +428,15 @@ export function generateTetradic(
         if (enhanced) {
           const cleaned = avoidMuddyZones(
             hue,
-            baseColorObj.oklch.l + variations.fourth.light.l,
-            baseColorObj.oklch.c * variations.fourth.light.c,
+            (baseColorObj.oklch.l ?? 0.5) + variations.fourth.light.l,
+            (baseColorObj.oklch.c ?? 0) * variations.fourth.light.c,
           )
           finalHue = cleaned.h
         }
 
         const lightValues = clampOKLCH(
-          baseColorObj.oklch.l + variations.fourth.light.l,
-          baseColorObj.oklch.c * variations.fourth.light.c,
+          (baseColorObj.oklch.l ?? 0.5) + variations.fourth.light.l,
+          (baseColorObj.oklch.c ?? 0) * variations.fourth.light.c,
           finalHue,
         )
         const lightColor = baseColorObj.clone()
@@ -446,8 +446,8 @@ export function generateTetradic(
         initialColors.push(lightColor)
 
         const darkValues = clampOKLCH(
-          baseColorObj.oklch.l + variations.fourth.dark.l,
-          baseColorObj.oklch.c * variations.fourth.dark.c,
+          (baseColorObj.oklch.l ?? 0.5) + variations.fourth.dark.l,
+          (baseColorObj.oklch.c ?? 0) * variations.fourth.dark.c,
           finalHue,
         )
         const darkColor = baseColorObj.clone()

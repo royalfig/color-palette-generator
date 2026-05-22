@@ -26,11 +26,11 @@ export function createScales(baseColor: Color | string) {
   const tonesStartCinematic = new Color(baseColor).mix('#808080', 0.75, { space: 'lch', outputSpace: 'lch' })
   const tSc = new Color(tonesStartCinematic)
   tSc.lch.l = 99
-  tSc.lch.c *= 0.5
+  tSc.lch.c = (tSc.lch.c ?? 0) * 0.5
   const tonesEndCinematic = new Color(baseColor).mix('#808080', 0.75, { space: 'lch', outputSpace: 'lch' })
   const tEc = new Color(tonesEndCinematic)
   tEc.lch.l = 1
-  tEc.lch.c *= 1.5
+  tEc.lch.c = (tEc.lch.c ?? 0) * 1.5
 
   const tonesCinematic = Color.steps(tSc, tEc, {
     space: 'oklab',
@@ -41,12 +41,12 @@ export function createScales(baseColor: Color | string) {
   const tonesStartLanguid = new Color(baseColor).mix('#808080', 0.98, { space: 'hsl', outputSpace: 'hsl' })
   const tSl = new Color(tonesStartLanguid)
   tSl.hsl.l = 99
-  tSl.hsl.s *= 0.5
+  tSl.hsl.s = (tSl.hsl.s ?? 0) * 0.5
 
   const tonesEndLanguid = new Color(baseColor).mix('#808080', 0.98, { space: 'hsl', outputSpace: 'hsl' })
   const tEl = new Color(tonesEndLanguid)
   tEl.hsl.l = 1
-  tEl.hsl.s *= 0.5
+  tEl.hsl.s = (tEl.hsl.s ?? 0) * 0.5
 
   const tonesLanguid = Color.steps(tSl, tEl, {
     space: 'lch',
@@ -58,12 +58,12 @@ export function createScales(baseColor: Color | string) {
   const sbStartLanguid = new Color(baseColor).mix('#808080', 0.98, { space: 'lch', outputSpace: 'lch' })
   const tSbs = new Color(sbStartLanguid)
   tSbs.lch.l = 99
-  tSbs.lch.c *= 1.5
+  tSbs.lch.c = (tSbs.lch.c ?? 0) * 1.5
 
   const sbEndLanguid = new Color(baseColor).mix('#808080', 0.98, { space: 'lch', outputSpace: 'lch' })
   const tSbe = new Color(sbEndLanguid)
   tSbe.lch.l = 1
-  tSbe.lch.c *= 1.5
+  tSbe.lch.c = (tSbe.lch.c ?? 0) * 1.5
 
   const tonesSharkbite = Color.steps(tSbs, tSbe, {
     space: 'lch',
@@ -81,8 +81,8 @@ export function createScales(baseColor: Color | string) {
 
   const polyStartOriginal = new Color(baseColor)
   const polyEndOriginal = new Color(baseColor)
-  polyEndOriginal.hsl.h += 349
-  polyEndOriginal.hsl.h = polyEndOriginal.hsl.h % 360
+  const polyH = (polyEndOriginal.hsl.h ?? 0) + 349
+  polyEndOriginal.hsl.h = polyH % 360
   console.log(polyStartOriginal.hsl.h, polyEndOriginal.hsl.h)
   const polyOriginal = Color.steps(polyStartOriginal, polyEndOriginal, {
     space: 'hsl',

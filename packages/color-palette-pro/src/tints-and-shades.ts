@@ -15,7 +15,7 @@ export function generateTintsAndShades(
 
   try {
     const baseColorObj = new Color(baseColor)
-    const baseLightness = baseColorObj.oklch.l
+    const baseLightness = baseColorObj.oklch.l ?? 0.5
 
     // Generate 12 lightness values from darkest to lightest
     const lightnessProgression = getLightnessProgression(baseLightness, style)
@@ -59,8 +59,8 @@ export function generateTintsAndShades(
 // Square Style: Pure numerical consistency
 function generateSquareStyle(baseColor: Color, lightnesses: number[], baseIndex: number): Color[] {
   const colors: Color[] = []
-  const baseChroma = baseColor.oklch.c
-  const baseHue = baseColor.oklch.h || 0
+  const baseChroma = baseColor.oklch.c ?? 0
+  const baseHue = baseColor.oklch.h ?? 0
 
   lightnesses.forEach((lightness, index) => {
     if (index === baseIndex) {
@@ -80,9 +80,9 @@ function generateSquareStyle(baseColor: Color, lightnesses: number[], baseIndex:
 // Triangle Style: Perceptual compensation
 function generateTriangleStyle(baseColor: Color, lightnesses: number[], baseIndex: number): Color[] {
   const colors: Color[] = []
-  const baseChroma = baseColor.oklch.c
-  const baseHue = baseColor.oklch.h || 0
-  const baseLightness = baseColor.oklch.l
+  const baseChroma = baseColor.oklch.c ?? 0
+  const baseHue = baseColor.oklch.h ?? 0
+  const baseLightness = baseColor.oklch.l ?? 0.5
 
   lightnesses.forEach((targetLightness, index) => {
     const color = baseColor.clone()
@@ -120,8 +120,8 @@ function generateTriangleStyle(baseColor: Color, lightnesses: number[], baseInde
 // Circle Style: Chroma storytelling
 function generateCircleStyle2(baseColor: Color, lightnesses: number[], baseIndex: number): Color[] {
   const colors: Color[] = []
-  const baseChroma = baseColor.oklch.c
-  const baseHue = baseColor.oklch.h || 0
+  const baseChroma = baseColor.oklch.c ?? 0
+  const baseHue = baseColor.oklch.h ?? 0
 
   // Create a chroma curve that peaks in shadows and valleys in highlights
   const chromaCurve = (lightness: number) => {

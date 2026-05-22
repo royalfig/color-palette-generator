@@ -19,7 +19,7 @@ function getMathematicalAnalogous(hue: number): number[] {
 function getOpticalAnalogous(baseColor: Color): number[] {
   // Perceptual Harmony: Based on opponent process theory and how human vision actually processes color
   const oklch = baseColor.to('oklch')
-  const hue = oklch.h
+  const hue = oklch.h ?? 0
 
   if (hue >= 0 && hue < 30) {
     // Deep reds: tight progression avoiding muddy browns
@@ -108,9 +108,9 @@ function getOpticalAnalogous(baseColor: Color): number[] {
 function getAdaptiveAnalogous(baseColor: Color): number[] {
   // Emotional Resonance: Creates palettes that tell emotional stories
   const oklch = baseColor.to('oklch')
-  const hue = oklch.h
-  const saturation = oklch.c
-  const lightness = oklch.l
+  const hue = oklch.h ?? 0
+  const saturation = oklch.c ?? 0
+  const lightness = oklch.l ?? 0.5
 
   // Determine emotional profile
   let emotionalType: string
@@ -200,9 +200,9 @@ function getAdaptiveAnalogous(baseColor: Color): number[] {
 function getWarmCoolAnalogous(baseColor: Color): number[] {
   // Luminosity Dance: Based on physics of light and illumination
   const oklch = baseColor.to('oklch')
-  const hue = oklch.h
-  const chroma = oklch.c
-  const lightness = oklch.l
+  const hue = oklch.h ?? 0
+  const chroma = oklch.c ?? 0
+  const lightness = oklch.l ?? 0.5
 
   // Determine light source character
   let lightType: string
@@ -297,7 +297,7 @@ export function generateAnalogous(
 
     switch (style) {
       case 'square':
-        analogousHues = getMathematicalAnalogous(baseColorObj.oklch.h)
+        analogousHues = getMathematicalAnalogous(baseColorObj.oklch.h ?? 0)
         break
       case 'triangle':
         analogousHues = getOpticalAnalogous(baseColorObj)
@@ -311,8 +311,8 @@ export function generateAnalogous(
     }
 
     // Get base color properties for adaptive lightness
-    const baseLightness = baseColorObj.oklch.l
-    const baseChroma = baseColorObj.oklch.c
+    const baseLightness = baseColorObj.oklch.l ?? 0.5
+    const baseChroma = baseColorObj.oklch.c ?? 0
 
     // Create adaptive lightness adjustments
     function getAdaptiveVariations() {
@@ -367,7 +367,7 @@ export function generateAnalogous(
       ]
     } else if (style === 'circle') {
       // Emotional resonance: varies by emotional type
-      const hue = baseColorObj.oklch.h
+      const hue = baseColorObj.oklch.h ?? 0
       // Emotional resonance: adapt for base lightness
       const lightnessAdaptation = baseLightness < 0.4 ? 0.2 : baseLightness > 0.6 ? -0.2 : 0
 
@@ -394,9 +394,9 @@ export function generateAnalogous(
       }
     } else if (style === 'diamond') {
       // Luminosity dance: varies by light type
-      const hue = baseColorObj.oklch.h
-      const chroma = baseColorObj.oklch.c
-      const lightness = baseColorObj.oklch.l
+      const hue = baseColorObj.oklch.h ?? 0
+      const chroma = baseColorObj.oklch.c ?? 0
+      const lightness = baseColorObj.oklch.l ?? 0.5
 
       if (hue >= 30 && hue < 90 && lightness > 0.6) {
         // golden - prevent over-lightening
@@ -434,8 +434,8 @@ export function generateAnalogous(
 
       // Apply muddy zone avoidance if enhanced mode
       let finalHue = hue
-      let finalLightness = baseColorObj.oklch.l + variation.l
-      let finalChroma = baseColorObj.oklch.c * variation.c * chromaAdjust
+      let finalLightness = (baseColorObj.oklch.l ?? 0.5) + variation.l
+      let finalChroma = (baseColorObj.oklch.c ?? 0) * variation.c * chromaAdjust
 
       if (enhanced) {
         const cleaned = avoidMuddyZones(finalHue, finalLightness, finalChroma)

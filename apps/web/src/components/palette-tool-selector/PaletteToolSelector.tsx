@@ -3,9 +3,15 @@ import { InfoIcon } from '@phosphor-icons/react/dist/csr/Info'
 import { AppWindowIcon } from '@phosphor-icons/react/dist/csr/AppWindow'
 import { MoonStarsIcon } from '@phosphor-icons/react/dist/csr/MoonStars'
 import { SunIcon } from '@phosphor-icons/react/dist/csr/Sun'
+import { PaletteIcon } from '@phosphor-icons/react/dist/csr/Palette'
+import { CodeSimpleIcon } from '@phosphor-icons/react/dist/csr/CodeSimple'
 import Button from '../button/Button'
 import './palette-tool-selector.css'
 import { LinearGradientSVG } from '../LinearGradientSVG'
+
+const MODES = ['palette', 'ui', 'code'] as const
+type Mode = typeof MODES[number]
+
 export function PaletteToolSelector({
   showPaletteColors,
   setShowPaletteColors,
@@ -13,8 +19,8 @@ export function PaletteToolSelector({
   toggleDarkMode,
   showColorHistory,
   setShowColorHistory,
-  isUiMode,
-  setIsUiMode,
+  mode,
+  setMode,
 }: {
   showPaletteColors: boolean
   setShowPaletteColors: React.Dispatch<React.SetStateAction<boolean>>
@@ -22,9 +28,14 @@ export function PaletteToolSelector({
   toggleDarkMode: () => void
   showColorHistory: boolean
   setShowColorHistory: React.Dispatch<React.SetStateAction<boolean>>
-  isUiMode: boolean
-  setIsUiMode: React.Dispatch<React.SetStateAction<boolean>>
+  mode: Mode
+  setMode: React.Dispatch<React.SetStateAction<Mode>>
 }) {
+  const cycleMode = () => {
+    const idx = MODES.indexOf(mode)
+    setMode(MODES[(idx + 1) % MODES.length])
+  }
+
   return (
     <div className="palette-tool-container">
       <Button
@@ -49,15 +60,20 @@ export function PaletteToolSelector({
           <LinearGradientSVG id="rewind-gradient" />
         </RewindIcon>
       </Button>
-      <Button
-        handler={() => {
-          setIsUiMode(!isUiMode)
-        }}
-        active={isUiMode}
-      >
-        <AppWindowIcon size={20} color="url(#app-window-gradient)" weight="fill">
-          <LinearGradientSVG id="app-window-gradient" />
-        </AppWindowIcon>
+      <Button handler={cycleMode} active={false}>
+        {mode === 'ui' ? (
+          <AppWindowIcon size={20} color="url(#app-window-gradient)" weight="fill">
+            <LinearGradientSVG id="app-window-gradient" />
+          </AppWindowIcon>
+        ) : mode === 'code' ? (
+          <CodeSimpleIcon size={20} color="url(#app-window-gradient)" weight="fill">
+            <LinearGradientSVG id="app-window-gradient" />
+          </CodeSimpleIcon>
+        ) : (
+          <PaletteIcon size={20} color="url(#app-window-gradient)" weight="fill">
+            <LinearGradientSVG id="app-window-gradient" />
+          </PaletteIcon>
+        )}
       </Button>
       <Button handler={toggleDarkMode} active={isDarkMode}>
         {isDarkMode ? (

@@ -3,12 +3,14 @@ import { FileArrowDownIcon } from '@phosphor-icons/react/dist/csr/FileArrowDown'
 import { ImageIcon } from '@phosphor-icons/react/dist/csr/Image'
 import { LinkIcon } from '@phosphor-icons/react/dist/csr/Link'
 import { useContext } from 'react'
+import Color from 'colorjs.io'
 import { ColorName } from '../App'
 import Button from '../components/button/Button'
 import { ColorContext } from '../components/ColorContext'
 import { LinearGradientSVG } from '../components/LinearGradientSVG'
 import { MessageContext } from '../components/MessageContext'
 import { ColorFormat, BaseColorData, generateCssVariables } from '@royalfig/color-palette-pro'
+import type { CodeThemeOutput } from '@royalfig/color-palette-pro'
 import './export-options.css'
 
 function downloadAction(
@@ -155,6 +157,107 @@ function downloadPaletteAsImage(
   document.body.removeChild(dlLink)
 }
 
+function hexContrastColor(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16) / 255
+  const g = parseInt(hex.slice(3, 5), 16) / 255
+  const b = parseInt(hex.slice(5, 7), 16) / 255
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+  return luminance > 0.5 ? 'black' : 'white'
+}
+
+function downloadCodeThemeAsImage(
+  theme: CodeThemeOutput,
+  keyColors: Array<[string, string]>,
+  baseColorString: string,
+  colorFormat: ColorFormat,
+  cb: (msg: string, type: 'success' | 'error') => void,
+) {
+  const colorCount = keyColors.length
+  const columns = Math.min(colorCount, 8)
+  const rows = Math.ceil(colorCount / columns)
+  const outerPadding = 60
+  const width = 1920
+  const largeFontSize = 64
+  const totalSpaces = columns + 1
+  const totalPadding = totalSpaces * outerPadding
+  const squareSize = (width - totalPadding) / columns
+  const headerHeight = largeFontSize + 60 + 36 + outerPadding
+  const height = headerHeight + rows * squareSize + (rows + 1) * outerPadding
+
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+
+  ctx.fillStyle = 'white'
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+  ctx.fillStyle = 'black'
+  ctx.font = `bold ${largeFontSize}px system-ui`
+  ctx.fillText(theme.displayName, outerPadding, outerPadding + largeFontSize)
+  ctx.font = '18px system-ui'
+  ctx.fillText(
+    `Based on ${baseColorString} from ${document.location.href} on ${new Date().toLocaleString()}.`,
+    outerPadding,
+    outerPadding + largeFontSize + 36,
+  )
+
+  keyColors.forEach(([label, hex], idx) => {
+    const row = Math.floor(idx / columns)
+    const col = idx % columns
+    const x = outerPadding + col * (squareSize + outerPadding)
+    const y = headerHeight + outerPadding + row * (squareSize + outerPadding)
+
+    ctx.fillStyle = hex
+    ctx.fillRect(x, y, squareSize, squareSize)
+
+    const contrastColor = hexContrastColor(hex)
+    ctx.fillStyle = contrastColor
+
+    const maxWidth = squareSize * 0.9
+    ctx.font = 'bold 12px system-ui'
+    if (ctx.measureText(label).width > maxWidth) ctx.font = 'bold 10px system-ui'
+    ctx.fillText(label, x + squareSize * 0.05, y + (squareSize - squareSize * 0.05 - 27))
+
+    let colorValue = hex
+    if (colorFormat !== 'hex') {
+      try { colorValue = new Color(hex).toString({ format: colorFormat as any, precision: 3 }) } catch { /* keep hex */ }
+    }
+    ctx.font = '12px system-ui'
+    if (ctx.measureText(colorValue).width > maxWidth) ctx.font = '10px system-ui'
+    ctx.fillText(colorValue, x + squareSize * 0.05, y + (squareSize - squareSize * 0.05))
+  })
+
+  const dataUrl = canvas.toDataURL('image/png')
+  const dlLink = document.createElement('a')
+  dlLink.href = dataUrl
+  dlLink.download = `${theme.name || 'theme'}.png`
+  document.body.appendChild(dlLink)
+  dlLink.click()
+  document.body.removeChild(dlLink)
+  cb('Preview created', 'success')
+}
+
+function downloadCodeTheme(theme: CodeThemeOutput, paletteTitle: string, cb: (msg: string, type: 'success' | 'error') => void) {
+  const json = JSON.stringify(theme, null, 2)
+  const filename = `${paletteTitle?.toLowerCase().replace(/\W/g, '-') || 'color-palette-pro'}.json`
+  const blob = new Blob([json], { type: 'application/json' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  cb('Theme downloaded', 'success')
+}
+
+function copyCodeTheme(theme: CodeThemeOutput, cb: (msg: string, type: 'success' | 'error') => void) {
+  const json = JSON.stringify(theme, null, 2)
+  navigator.clipboard.writeText(json)
+  cb('Theme copied', 'success')
+}
+
 interface ExportOptionsProps {
   fetchedData: { colorNames: string[]; paletteTitle: string; baseColorName: string } | null
   isLoading: boolean
@@ -163,23 +266,62 @@ interface ExportOptionsProps {
 }
 
 export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: ExportOptionsProps) {
-  const { palette, originalColor, isUiMode } = useContext(ColorContext)
+  const { palette, originalColor, mode, codeTheme } = useContext(ColorContext)
   const { showMessage } = useContext(MessageContext)
 
   const colorNames = { fetchedData, isLoading, error }
 
   function handleCopyToClipboard() {
-    const paletteAsCss = generateCssVariables(palette, { format: colorFormat, isUiMode })
+    if (mode === 'code') {
+      if (codeTheme) copyCodeTheme(codeTheme, showMessage)
+      return
+    }
+    const paletteAsCss = generateCssVariables(palette, { format: colorFormat, isUiMode: mode === 'ui' })
     navigator.clipboard.writeText(paletteAsCss)
     showMessage('Palette copied', 'success')
   }
 
   function handleImageDownload() {
-    downloadPaletteAsImage(originalColor, palette, colorNames, colorFormat, isUiMode)
+    if (mode === 'code') {
+      if (!codeTheme) return
+
+      const scopes: Record<string, string> = {}
+      for (const rule of codeTheme.tokenColors) {
+        const fg = rule.settings.foreground
+        if (!fg) continue
+        const scopeList = Array.isArray(rule.scope) ? rule.scope : [rule.scope || '']
+        for (const s of scopeList) {
+          if (s && !scopes[s]) scopes[s] = fg
+        }
+      }
+
+      const keyColors: Array<[string, string]> = [
+        ['Editor BG', codeTheme.colors['editor.background'] || '#1e1e1e'],
+        ['Editor FG', codeTheme.colors['editor.foreground'] || '#d4d4d4'],
+        ['Sidebar', codeTheme.colors['sideBar.background'] || '#181818'],
+        ['Status Bar', codeTheme.colors['statusBar.background'] || '#007acc'],
+        ['Focus Border', codeTheme.colors['focusBorder'] || '#007acc'],
+        ['Input BG', codeTheme.colors['input.background'] || '#1e1e1e'],
+        ['Comment', scopes['comment'] || '#6a9955'],
+        ['Definition', scopes['entity.name.function'] || '#569cd6'],
+        ['String', scopes['string'] || '#ce9178'],
+        ['Number', scopes['constant.numeric'] || '#b5cea8'],
+      ]
+
+      downloadCodeThemeAsImage(codeTheme, keyColors, originalColor?.string || 'unknown', colorFormat, showMessage)
+      return
+    }
+    downloadPaletteAsImage(originalColor, palette, colorNames, colorFormat, mode === 'ui')
     showMessage('Image created', 'success')
   }
 
-  // Image export logic
+  function handleFileDownload() {
+    if (mode === 'code') {
+      if (codeTheme) downloadCodeTheme(codeTheme, colorNames.fetchedData?.paletteTitle || 'color-palette-pro', showMessage)
+      return
+    }
+    downloadAction(palette, colorNames.fetchedData?.paletteTitle || 'Palette', colorFormat, mode === 'ui', showMessage)
+  }
 
   return (
     <div className="export-options-container">
@@ -188,12 +330,7 @@ export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: Ex
           <LinearGradientSVG id="image-gradient" />
         </ImageIcon>
       </Button>
-      <Button
-        handler={() => {
-          downloadAction(palette, colorNames.fetchedData?.paletteTitle || 'Palette', colorFormat, isUiMode, showMessage)
-        }}
-        active={false}
-      >
+      <Button handler={handleFileDownload} active={false}>
         <FileArrowDownIcon size={22} color="url(#file-arrow-down-gradient)" weight="fill">
           <LinearGradientSVG id="file-arrow-down-gradient" />
         </FileArrowDownIcon>

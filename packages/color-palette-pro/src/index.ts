@@ -15,6 +15,8 @@ export * from './factory'
 export * from './pickRandomColor'
 export * from './utils'
 export { generateCssVariables } from './css'
+export { generateCodeTheme, generateCodeThemePair, serializeTheme, serializeThemePair } from './code-mode'
+export type { CodeThemeOutput } from './code-mode/types'
 
 export function createPalettes(
   color: string,

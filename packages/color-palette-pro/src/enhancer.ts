@@ -273,7 +273,7 @@ export function enhancePalette(
   baseColorIndex: number = 0,
 ): Color[] {
   const baseColor = colors[baseColorIndex]
-  const baseChroma = baseColor.oklch.c
+  const baseChroma = baseColor.oklch.c ?? 0
 
   // Get enhancement patterns
   const chromaNarrative = getChromaNarrative(paletteType, style, baseChroma)
@@ -297,7 +297,7 @@ export function enhancePalette(
     newChroma *= role.chromaMultiplier
 
     // Apply lightness hierarchy
-    let newLightness = enhancedColor.oklch.l + role.lightnessShift
+    let newLightness = (enhancedColor.oklch.l ?? 0.5) + role.lightnessShift
 
     // Clamp values
     newChroma = Math.max(0, Math.min(0.37, newChroma))
@@ -379,56 +379,59 @@ export function polishPalette(colors: Color[], baseColorIndex: number = 0): Colo
     const polished = color.clone()
     const oklch = polished.oklch
 
+    const c = oklch.c ?? 0
+    const l = oklch.l ?? 0.5
+    const h = oklch.h ?? 0
+
     // 1. Prevent "dead" grays in mid-tones
-    if (oklch.c < 0.05 && oklch.l > 0.2 && oklch.l < 0.8) {
-      oklch.c = Math.max(0.08, oklch.c * 2) // Minimum life
+    if (c < 0.05 && l > 0.2 && l < 0.8) {
+      polished.oklch.c = Math.max(0.08, c * 2) // Minimum life
     }
 
     // 2. Make very light colors more interesting
-    if (oklch.l > 0.85) {
+    if (l > 0.85) {
       // Add subtle tint based on the hue
-      if (oklch.c < 0.04) {
-        oklch.c = 0.04 // Minimum tint
+      if (c < 0.04) {
+        polished.oklch.c = 0.04 // Minimum tint
       }
       // Slight warm shift for most hues (except already warm ones)
-      if (oklch.h < 30 || oklch.h > 200) {
-        oklch.h = (oklch.h + 3) % 360
+      if (h < 30 || h > 200) {
+        polished.oklch.h = (h + 3) % 360
       }
     }
 
     // 3. Enrich dark colors
-    if (oklch.l < 0.25) {
+    if (l < 0.25) {
       // Darks should be rich, not muddy
-      oklch.c = Math.min(oklch.c * 1.3, 0.15) // Boost but keep in gamut
+      polished.oklch.c = Math.min(c * 1.3, 0.15) // Boost but keep in gamut
 
       // Very dark colors benefit from slight hue shifts toward "noble" darks
-      if (oklch.l < 0.15) {
+      if (l < 0.15) {
         // Push toward blue-blacks, purple-blacks, or green-blacks
-        const nobleDarkShift = Math.sin((oklch.h * Math.PI) / 180) * 5
-        oklch.h = (oklch.h + nobleDarkShift + 360) % 360
+        const nobleDarkShift = Math.sin((h * Math.PI) / 180) * 5
+        polished.oklch.h = (h + nobleDarkShift + 360) % 360
       }
     }
 
     // 4. Jewel tone enhancement for saturated mid-tones
-    if (oklch.c > 0.15 && oklch.l > 0.35 && oklch.l < 0.65) {
+    if (c > 0.15 && l > 0.35 && l < 0.65) {
       // The "jewel zone" - make these colors sing
-      oklch.l *= 0.97 // Slightly darker
-      oklch.c = Math.min(oklch.c * 1.08, 0.37) // More saturated
+      polished.oklch.l = l * 0.97 // Slightly darker
+      polished.oklch.c = Math.min(c * 1.08, 0.37) // More saturated
     }
 
     // 5. Fix "almost neutral" colors that look accidentally desaturated
-    if (oklch.c > 0.03 && oklch.c < 0.08) {
+    if (c > 0.03 && c < 0.08) {
       // Either make it clearly neutral or clearly colored
-      if (index % 2 === 0 || oklch.l < 0.3 || oklch.l > 0.7) {
+      if (index % 2 === 0 || l < 0.3 || l > 0.7) {
         // Make it neutral
-        oklch.c *= 0.6
+        polished.oklch.c = c * 0.6
       } else {
         // Make it clearly colored
-        oklch.c *= 1.5
+        polished.oklch.c = c * 1.5
       }
     }
 
-    polished.oklch = oklch
     return polished
   })
 }
@@ -439,15 +442,18 @@ export function addMicroVariations(color: Color, index: number, strength: number
   const oklch = varied.oklch
 
   // Organic micro-variations in hue (like how natural colors are never perfectly uniform)
-  const hueMicroShift = Math.sin(index * 0.7 + oklch.h * 0.01) * 2 * strength
+  const h = oklch.h ?? 0
+  const l = oklch.l ?? 0.5
+  const c = oklch.c ?? 0
+  const hueMicroShift = Math.sin(index * 0.7 + h * 0.01) * 2 * strength
 
   // Subtle chroma breathing (more variation in mid-tones)
   const chromaBreathing = Math.sin(index * 1.3) * 0.015 * strength
-  const chromaMultiplier = 1 + chromaBreathing * (1 - Math.abs(oklch.l - 0.5) * 2)
+  const chromaMultiplier = 1 + chromaBreathing * (1 - Math.abs(l - 0.5) * 2)
 
   // Apply variations
-  oklch.h = (oklch.h + hueMicroShift + 360) % 360
-  oklch.c = Math.max(0, Math.min(0.37, oklch.c * chromaMultiplier))
+  varied.oklch.h = (h + hueMicroShift + 360) % 360
+  varied.oklch.c = Math.max(0, Math.min(0.37, c * chromaMultiplier))
 
   varied.oklch = oklch
   return varied

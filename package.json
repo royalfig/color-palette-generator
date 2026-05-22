@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "pnpm -r --parallel run dev",
     "build": "pnpm -r run build",
-    "lint": "pnpm -r run lint"
+    "lint": "pnpm -r run lint",
+    "type-check": "pnpm -r run type-check"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",

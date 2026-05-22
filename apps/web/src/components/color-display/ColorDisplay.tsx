@@ -4,6 +4,7 @@ import { FadersHorizontalIcon } from '@phosphor-icons/react/dist/csr/FadersHoriz
 import { PaletteIcon } from '@phosphor-icons/react/dist/csr/Palette'
 import { ScissorsIcon } from '@phosphor-icons/react/dist/csr/Scissors'
 import { SwatchesIcon } from '@phosphor-icons/react/dist/csr/Swatches'
+import { CodeSimpleIcon } from '@phosphor-icons/react/dist/csr/CodeSimple'
 import { motion, AnimatePresence } from 'motion/react'
 import { useContext } from 'react'
 import { ColorFormat, ColorSpace, PaletteKinds, PaletteStyle } from '../../types'
@@ -177,28 +178,34 @@ export function ColorDisplay({
           </div>
         </div>
         <div className="color-detail">
-          {context.isUiMode ? (
+          {context.mode === 'ui' ? (
             <AppWindowIcon
               weight="fill"
               size={14}
-              color={context.palette[0].color.clone().to('lch').set({ l: 80 }).display()}
+              color={context.palette[0]?.color?.clone()?.to('lch')?.set({ l: 80 })?.display() || 'var(--dimmed)'}
+            />
+          ) : context.mode === 'code' ? (
+            <CodeSimpleIcon
+              weight="fill"
+              size={14}
+              color="var(--base-color)"
             />
           ) : (
             <PaletteIcon
               weight="fill"
               size={14}
-              color={context.palette[0].color.clone().to('lch').set({ l: 80 }).display()}
+              color={context.palette[0]?.color?.clone()?.to('lch')?.set({ l: 80 })?.display() || 'var(--dimmed)'}
             />
           )}
           <div className="color-text">
-            <p>{context.isUiMode ? 'UI Mode' : 'Palette Mode'}</p>
+            <p>{context.mode === 'ui' ? 'UI Mode' : context.mode === 'code' ? 'Code Mode' : 'Palette Mode'}</p>
           </div>
         </div>
         <div className="color-detail">
           <SwatchesIcon
             weight="fill"
             size={14}
-            color={context.palette[1].color.clone().to('lch').set({ l: 80 }).display()}
+            color={context.palette[1]?.color?.clone()?.to('lch')?.set({ l: 80 })?.display() || 'var(--dimmed)'}
           />
           <div className="color-text">
             <p>{paletteTypeFull}</p>
@@ -207,7 +214,7 @@ export function ColorDisplay({
         <div className="color-detail">
           <CirclesFourIcon
             weight="fill"
-            color={context.palette[2].color.clone().to('lch').set({ l: 80 }).display()}
+            color={context.palette[2]?.color?.clone()?.to('lch')?.set({ l: 80 })?.display() || 'var(--dimmed)'}
             size={14}
           />
           <div className="color-text">
@@ -218,7 +225,7 @@ export function ColorDisplay({
           <FadersHorizontalIcon
             weight="fill"
             color={
-              effectsEnabled ? context.palette[3].color.clone().to('lch').set({ l: 80 }).display() : 'var(--dimmed)'
+              effectsEnabled && context.palette[3] ? context.palette[3].color.clone().to('lch').set({ l: 80 }).display() : 'var(--dimmed)'
             }
             size={14}
           />
