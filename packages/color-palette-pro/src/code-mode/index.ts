@@ -18,7 +18,7 @@ import { triadicTemplate } from './templates/triadic'
 import { tintsAndShadesTemplate } from './templates/tints-and-shades'
 import { tonesTemplate } from './templates/tones'
 import { deriveUiColors, generateBaseTokenRules, generateSemanticTokenRules } from './templates/base'
-import { generateSurfaceColors, generateSemanticColors, adaptPrimaryForMode } from '../ui'
+import { generateSurfaceColors, generateSemanticColors, adaptPrimaryForMode, makeContainerForAccent } from '../ui'
 import {
   findColorByHue, toHex, shiftHue, desaturate, withAlpha,
   ensureAPCAAgainst, deltaE, nudgeForDistinction, mixColors, tintTowardHue,
@@ -310,8 +310,32 @@ export function generateCodeTheme(
   // Cursor color is computed after the syntax pipeline runs (it may depend on
   // accentColor for loud characters).
 
-  // Semantic status colors from the UI palette gen.
-  const semantics = generateSemanticColors(primary, palette, isDarkMode)
+  // Semantic status colors from the UI palette gen — clamped against the editor bg
+  // so the status colors are legible when used inline (debugConsole, gutter, etc.).
+  const semantics = generateSemanticColors(primary, palette, isDarkMode, editorBgBase)
+
+  // Soft containers — paired backgrounds for input validation, badges, prominent
+  // buttons. These replace the alpha-over-foreground compositing trick.
+  const primaryContainerPair = makeContainerForAccent(primary, isDarkMode)
+  const errorContainerPair = makeContainerForAccent(semantics.error, isDarkMode)
+  const warningContainerPair = makeContainerForAccent(semantics.warning, isDarkMode)
+  const successContainerPair = makeContainerForAccent(semantics.success, isDarkMode)
+
+  // Secondary brand role — taken from palette[1] when available, else a primary
+  // hue-shift (60°), then pushed to the standard Tone 40 / Tone 80 brand levels.
+  const secondaryRaw = (palette[1]?.color ?? (() => {
+    const c = primary.clone()
+    c.oklch.h = ((c.oklch.h ?? 0) + 60) % 360
+    return c
+  })()).clone()
+  secondaryRaw.oklch.l = isDarkMode ? 0.8 : 0.4
+  secondaryRaw.oklch.c = Math.min(secondaryRaw.oklch.c ?? 0, 0.08)
+  const secondaryContainerPair = makeContainerForAccent(secondaryRaw, isDarkMode)
+  const onSecondary = (() => {
+    const t = secondaryRaw.clone()
+    t.oklch.l = isDarkMode ? 0.12 : 0.95
+    return t
+  })()
 
   // Info: blue (hue 220) if the palette has one, otherwise the coolest in-palette swatch.
   const infoFromPalette = findColorByHue(palette, 220, 30)
@@ -335,6 +359,7 @@ export function generateCodeTheme(
     return fb
   })()
   infoColor.oklch.l = isDarkMode ? 0.75 : 0.45
+  const infoContainerPair = makeContainerForAccent(infoColor, isDarkMode)
 
   // Syntax pipeline: template → personality → distinction → APCA contrast guarantee.
   const rawSyntax = template.deriveColors(baseColor, palette, isDarkMode, surfaces)
@@ -396,9 +421,24 @@ export function generateCodeTheme(
     commentColor: { hex: commentHex },
 
     errorForeground: { hex: toHex(semantics.error) },
+    errorContainer: { hex: toHex(errorContainerPair.container) },
+    onErrorContainer: { hex: toHex(errorContainerPair.onContainer) },
     warningForeground: { hex: toHex(semantics.warning) },
+    warningContainer: { hex: toHex(warningContainerPair.container) },
+    onWarningContainer: { hex: toHex(warningContainerPair.onContainer) },
     infoForeground: { hex: toHex(infoColor) },
+    infoContainer: { hex: toHex(infoContainerPair.container) },
+    onInfoContainer: { hex: toHex(infoContainerPair.onContainer) },
     successForeground: { hex: toHex(semantics.success) },
+    successContainer: { hex: toHex(successContainerPair.container) },
+    onSuccessContainer: { hex: toHex(successContainerPair.onContainer) },
+
+    primaryContainer: { hex: toHex(primaryContainerPair.container) },
+    onPrimaryContainer: { hex: toHex(primaryContainerPair.onContainer) },
+    secondaryColor: { hex: toHex(secondaryRaw) },
+    onSecondaryColor: { hex: toHex(onSecondary) },
+    secondaryContainer: { hex: toHex(secondaryContainerPair.container) },
+    onSecondaryContainer: { hex: toHex(secondaryContainerPair.onContainer) },
 
     terminalAnsiBlack: { hex: toHex(desaturate(surfaces.onSurface.clone(), 0.7)) },
     terminalAnsiRed: { hex: toHex(semantics.error) },

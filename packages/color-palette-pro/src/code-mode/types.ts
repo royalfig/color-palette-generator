@@ -46,11 +46,27 @@ export interface SemanticColors {
   punctuationColor: SemanticColor
   commentColor: SemanticColor
 
-  // Status
+  // Status (foregrounds + paired soft containers for backgrounds)
   errorForeground: SemanticColor
+  errorContainer: SemanticColor
+  onErrorContainer: SemanticColor
   warningForeground: SemanticColor
+  warningContainer: SemanticColor
+  onWarningContainer: SemanticColor
   infoForeground: SemanticColor
+  infoContainer: SemanticColor
+  onInfoContainer: SemanticColor
   successForeground: SemanticColor
+  successContainer: SemanticColor
+  onSuccessContainer: SemanticColor
+
+  // Accent containers (soft backgrounds for badges, secondary buttons, regions)
+  primaryContainer: SemanticColor
+  onPrimaryContainer: SemanticColor
+  secondaryColor: SemanticColor
+  onSecondaryColor: SemanticColor
+  secondaryContainer: SemanticColor
+  onSecondaryContainer: SemanticColor
 
   // Terminal ANSI
   terminalAnsiBlack: SemanticColor

@@ -490,12 +490,14 @@ export function deriveUiColors(
     'dropdown.foreground': editorForeground.hex,
     'dropdown.border': outlineVariant.hex,
 
-    // Button
+    // Button — secondary now uses the real secondary role (not a fake foreground@10%),
+    // giving the theme a proper two-tier button system.
     'button.background': semantic.focusBorder.hex,
     'button.foreground': getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.focusBorder.hex), 4.5),
-    'button.secondaryBackground': toHex(withAlpha(editorForeground.hex, 0.1)),
-    'button.secondaryForeground': editorForeground.hex,
     'button.hoverBackground': toHex(boostChroma(new Color(semantic.focusBorder.hex), 1.1)),
+    'button.secondaryBackground': semantic.secondaryContainer.hex,
+    'button.secondaryForeground': semantic.onSecondaryContainer.hex,
+    'button.secondaryHoverBackground': toHex(boostChroma(new Color(semantic.secondaryContainer.hex), 1.05)),
 
     // Lists
     'list.activeSelectionBackground': toHex(withAlpha(semantic.focusBorder.hex, isDarkMode ? 0.3 : 0.2)),
@@ -577,10 +579,11 @@ export function deriveUiColors(
     'debugTokenExpression.number': semantic.numberColor.hex,
     'debugTokenExpression.error': semantic.errorForeground.hex,
 
-    // Extension button
-    'extensionButton.prominentBackground': semantic.successForeground.hex,
-    'extensionButton.prominentForeground': getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.successForeground.hex), 4.5),
-    'extensionButton.prominentHoverBackground': toHex(boostChroma(new Color(semantic.successForeground.hex), 1.1)),
+    // Extension button — soft success container instead of a saturated fill so the
+    // CTA reads as actionable, not alarming. Hover boosts chroma on the container.
+    'extensionButton.prominentBackground': semantic.successContainer.hex,
+    'extensionButton.prominentForeground': semantic.onSuccessContainer.hex,
+    'extensionButton.prominentHoverBackground': toHex(boostChroma(new Color(semantic.successContainer.hex), 1.08)),
 
     // Inline chat / notebook
     'inlineChat.regionHighlight': toHex(withAlpha(semantic.focusBorder.hex, 0.08)),
@@ -626,13 +629,18 @@ export function deriveUiColors(
     // Walkthrough
     'walkThrough.embeddedEditorBackground': sidebarBackground.hex,
 
-    // Input validation
-    'inputValidation.errorBackground': toHex(withAlpha(semantic.errorForeground.hex, 0.15)),
+    // Input validation — soft semantic containers (solid, brand-tinted) replace the
+    // older alpha-over-editor trick. Foregrounds explicitly set so message text
+    // stays legible against the container.
+    'inputValidation.errorBackground': semantic.errorContainer.hex,
     'inputValidation.errorBorder': semantic.errorForeground.hex,
-    'inputValidation.infoBackground': toHex(withAlpha(semantic.infoForeground.hex, 0.15)),
+    'inputValidation.errorForeground': semantic.onErrorContainer.hex,
+    'inputValidation.infoBackground': semantic.infoContainer.hex,
     'inputValidation.infoBorder': semantic.infoForeground.hex,
-    'inputValidation.warningBackground': toHex(withAlpha(semantic.warningForeground.hex, 0.15)),
+    'inputValidation.infoForeground': semantic.onInfoContainer.hex,
+    'inputValidation.warningBackground': semantic.warningContainer.hex,
     'inputValidation.warningBorder': semantic.warningForeground.hex,
+    'inputValidation.warningForeground': semantic.onWarningContainer.hex,
 
     // Activity bar
     'activityBar.background': sidebarBackground.hex,
@@ -641,16 +649,17 @@ export function deriveUiColors(
     'activityBar.border': outlineVariant.hex,
     'activityBar.activeBorder': semantic.accentColor.hex,
     'activityBar.activeBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.15)),
-    'activityBarBadge.background': semantic.accentColor.hex,
-    'activityBarBadge.foreground': getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5),
+    'activityBarBadge.background': semantic.primaryContainer.hex,
+    'activityBarBadge.foreground': semantic.onPrimaryContainer.hex,
     'activityBarTop.foreground': editorForeground.hex,
     'activityBarTop.inactiveForeground': toHex(withAlpha(editorForeground.hex, 0.4)),
     'activityBarTop.activeBorder': semantic.accentColor.hex,
     'activityBarTop.dropBorder': semantic.focusBorder.hex,
 
-    // Badge
-    'badge.background': semantic.accentColor.hex,
-    'badge.foreground': getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5),
+    // Badge — soft primary container reads as informational, not as a code-collision
+    // chromatic chip (which is what raw accent would create).
+    'badge.background': semantic.primaryContainer.hex,
+    'badge.foreground': semantic.onPrimaryContainer.hex,
 
     // Quick input / command palette
     'quickInput.background': overlayBackground.hex,

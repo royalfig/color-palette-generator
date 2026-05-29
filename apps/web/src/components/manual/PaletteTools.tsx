@@ -40,8 +40,10 @@ export function PaletteTools() {
         </li>
         <li>
           <strong>UI Mode:</strong> Generates palettes for use in UIs, loosely following Google's Material Design
-          strategy for dynamic color palettes. Colors are semantically named: primary, on-primary, surface, on-surface,
-          outline, and so forth.
+          strategy for dynamic color palettes. Colors are semantically named across families (primary, secondary,
+          tertiary, error, success, warning) with paired on-colors and soft containers (e.g. primary-container,
+          on-primary-container), plus surfaces (surface, container, container-sunken, container-overlay), outlines,
+          and inverse surfaces.
         </li>
       </ul>
 

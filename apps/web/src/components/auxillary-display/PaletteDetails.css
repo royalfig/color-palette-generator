@@ -30,10 +30,38 @@
   }
 }
 
-.palette-details:has(.palette-detail:nth-child(24)) .palette-detail {
-  padding: 0.5em;
+/* Compact layout for code mode (12 named tokens). */
+.palette-details:has(.palette-detail:nth-child(n + 13)) .palette-detail {
+  padding: 0.4em;
 
   p {
-    font-size: var(--x-small);
+    font-size: 0.65rem;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* UI mode — 24 × 10 semantically-grouped grid that fills the panel exactly.
+   Each .palette-detail sets its own grid-column span (4/6/8/12) inline. */
+.palette-details.palette-details-ui {
+  grid-template-columns: repeat(24, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  grid-auto-flow: row;
+}
+
+.palette-details.palette-details-ui .palette-detail {
+  height: auto;
+  padding: 0.25em 0.35em;
+  overflow: hidden;
+
+  p {
+    font-size: 0.6rem;
+    line-height: 1.1;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

@@ -36,7 +36,13 @@ export function ExportOptions() {
         <li>Generates a .css file with CSS custom properties</li>
         <li>Includes both color values and contrast colors</li>
         <li>In Palette mode: Uses sequential naming (--ana-1, --ana-2)</li>
-        <li>In UI mode: Uses semantic naming (--primary, --on-primary)</li>
+        <li>
+          In UI mode: Uses semantic naming for the full role system — accent families (--primary, --on-primary,
+          --primary-container, --on-primary-container) for primary/secondary/tertiary, status families (--error,
+          --on-error, --error-container, --on-error-container) for error/success/warning, surface roles (--surface,
+          --on-surface, --container, --container-sunken, --container-overlay), and structural roles (--outline,
+          --inverse-surface)
+        </li>
       </ul>
 
       <h3>3. Clipboard Copy</h3>
