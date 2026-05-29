@@ -435,26 +435,3 @@ export function polishPalette(colors: Color[], baseColorIndex: number = 0): Colo
     return polished
   })
 }
-// Add to enhancer.ts
-
-export function addMicroVariations(color: Color, index: number, strength: number = 1.0): Color {
-  const varied = color.clone()
-  const oklch = varied.oklch
-
-  // Organic micro-variations in hue (like how natural colors are never perfectly uniform)
-  const h = oklch.h ?? 0
-  const l = oklch.l ?? 0.5
-  const c = oklch.c ?? 0
-  const hueMicroShift = Math.sin(index * 0.7 + h * 0.01) * 2 * strength
-
-  // Subtle chroma breathing (more variation in mid-tones)
-  const chromaBreathing = Math.sin(index * 1.3) * 0.015 * strength
-  const chromaMultiplier = 1 + chromaBreathing * (1 - Math.abs(l - 0.5) * 2)
-
-  // Apply variations
-  varied.oklch.h = (h + hueMicroShift + 360) % 360
-  varied.oklch.c = Math.max(0, Math.min(0.37, c * chromaMultiplier))
-
-  varied.oklch = oklch
-  return varied
-}

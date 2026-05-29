@@ -4,7 +4,7 @@ import { CaretUpIcon } from '@phosphor-icons/react/dist/csr/CaretUp'
 import { CaretDownIcon } from '@phosphor-icons/react/dist/csr/CaretDown'
 import { ColorContext } from '../ColorContext'
 import { useDebouncedCallback } from 'use-debounce'
-import { ColorSpace } from '../../types'
+import { ColorSpace } from '@royalfig/color-palette-pro'
 import Color from 'colorjs.io'
 
 function getColorSpace(colorSpace: string) {
@@ -61,7 +61,7 @@ export function HueSlider({
 
   const base = context.originalColor
 
-  const initialHue = Math.round(base.color[space].h)
+  const initialHue = Math.round(base.color[space].h ?? 0)
   const initialSaturation = getSaturation(space, base.color)
   const initialLightness = base?.color[space].l ?? 0
   const [hue, setHue] = useState(initialHue)

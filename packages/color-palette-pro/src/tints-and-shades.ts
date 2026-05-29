@@ -117,37 +117,6 @@ function generateTriangleStyle(baseColor: Color, lightnesses: number[], baseInde
   return colors
 }
 
-// Circle Style: Chroma storytelling
-function generateCircleStyle2(baseColor: Color, lightnesses: number[], baseIndex: number): Color[] {
-  const colors: Color[] = []
-  const baseChroma = baseColor.oklch.c ?? 0
-  const baseHue = baseColor.oklch.h ?? 0
-
-  // Create a chroma curve that peaks in shadows and valleys in highlights
-  const chromaCurve = (lightness: number) => {
-    // Exponential curve that favors darker values
-    const darkness = 1 - lightness
-    const chromaBoost = Math.pow(darkness, 1.5) * 0.8 + 0.2
-    return baseChroma * chromaBoost * 1.2 // Allow up to 20% over base chroma in darks
-  }
-
-  lightnesses.forEach((lightness, index) => {
-    const color = baseColor.clone()
-    color.oklch.l = lightness
-
-    // Apply the chroma curve
-    const targetChroma = chromaCurve(lightness)
-    color.oklch.c = Math.max(0, Math.min(0.37, targetChroma))
-
-    // Minimal hue adjustment for cohesion
-    const hueShift = (lightness - 0.5) * 2 // -1 to 1 degree
-    color.oklch.h = (baseHue + hueShift + 360) % 360
-
-    colors.push(color)
-  })
-
-  return colors
-}
 
 function generateCircleStyle(baseColor: Color, lightnesses: number[], baseIndex: number): Color[] {
   const whiteSteps = baseColor.steps('white', {

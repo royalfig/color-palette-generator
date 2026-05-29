@@ -1,7 +1,6 @@
 import Color from 'colorjs.io'
-import { ColorSpace, SliderType } from '../../types'
-import { BaseColorData } from '../../util/factory'
-import space from 'colorjs.io/types/src/space'
+import { ColorSpace, SliderType } from '@royalfig/color-palette-pro'
+import { BaseColorData } from '@royalfig/color-palette-pro'
 
 export interface SliderStrategy {
   label: string

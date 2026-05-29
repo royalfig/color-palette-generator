@@ -3,9 +3,9 @@ import { CaretUpIcon } from '@phosphor-icons/react/dist/csr/CaretUp'
 import { CaretDownIcon } from '@phosphor-icons/react/dist/csr/CaretDown'
 import { ColorContext } from '../ColorContext'
 import { useDebouncedCallback } from 'use-debounce'
-import { ColorSpace, SliderType } from '../../types'
+import { ColorSpace, SliderType } from '@royalfig/color-palette-pro'
 import { getSliderStrategy } from './slider-strategies'
-import { BaseColorData } from '../../util/factory'
+import { BaseColorData } from '@royalfig/color-palette-pro'
 
 // Move helper functions outside component to avoid recreation
 function getLightness(base: BaseColorData, space: ColorSpace) {
@@ -102,7 +102,7 @@ export const Slider = memo(function Slider({
   // Memoize placeholders object to avoid recreation
   const placeholders = useMemo(
     () => ({
-      hue: workingColor.h,
+      hue: workingColor.h ?? 0,
       saturation: getSaturation(base, colorSpace.space),
       lightness: getLightness(base, colorSpace.space),
       value: value,

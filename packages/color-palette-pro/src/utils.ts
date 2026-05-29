@@ -36,28 +36,6 @@ export function hex3to6(color: Color) {
   return hex
 }
 
-export function linearRGB(num: number) {
-  if (num > 0.03928) {
-    return num + 0.055
-  }
-
-  return num / 12.92
-}
-
-export function y(num: Color) {
-  let { r, g, b } = num.srgb
-
-  // r /= 255;
-  // g /= 255;
-  // b / 255;
-
-  const rL = linearRGB(r ?? 0)
-  const gL = linearRGB(g ?? 0)
-  const bL = linearRGB(b ?? 0)
-
-  return 0.2126 * rL + 0.7152 * gL + 0.0722 * bL
-}
-
 export function createSlug(str: string) {
   return str.split(' ')[0].toLowerCase().replace(/\W/, '-')
 }

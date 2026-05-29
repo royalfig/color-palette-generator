@@ -1,5 +1,5 @@
 import { use, useMemo, useRef, useEffect } from 'react'
-import { BaseColorData } from '../../util/factory'
+import { BaseColorData } from '@royalfig/color-palette-pro'
 import { ColorContext } from '../ColorContext'
 import { useReducedMotion } from 'motion/react'
 import './circle.css'

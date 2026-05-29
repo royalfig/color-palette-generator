@@ -144,9 +144,8 @@ export default function App() {
 
   const codeTheme = useMemo(() => {
     if (mode !== 'code') return undefined
-    const rawPalette = createPalettes(color, paletteType, paletteStyle, colorSpace, knobValues, false, isDarkMode)
-    return generateCodeTheme(new Color(color), rawPalette, isDarkMode, paletteType, paletteStyle)
-  }, [color, paletteType, paletteStyle, colorSpace, knobValues, mode, isDarkMode])
+    return generateCodeTheme(new Color(color), palette, isDarkMode, paletteType, paletteStyle)
+  }, [color, palette, paletteType, paletteStyle, mode, isDarkMode])
 
   const colorContext = useMemo(
     () => ({ originalColor: colorFactory(color, 'base', 0, colorSpace.format), palette, mode, codeTheme, isDarkMode }),

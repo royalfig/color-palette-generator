@@ -2,7 +2,7 @@ import { EyedropperSampleIcon } from '@phosphor-icons/react/dist/csr/EyedropperS
 import { PlayIcon } from '@phosphor-icons/react/dist/csr/Play'
 import Color from 'colorjs.io'
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
-import { ColorSpaceAndFormat } from '../../types'
+import { ColorSpaceAndFormat } from '@royalfig/color-palette-pro'
 import Button from '../button/Button'
 import { ColorContext } from '../ColorContext'
 import { LinearGradientSVG } from '../LinearGradientSVG'
@@ -42,8 +42,7 @@ export function InputColorContainer({
         showMessage(`Color set`, 'success')
         setActive(false)
       })
-      .catch((e: Error) => {
-        console.log(e)
+      .catch(() => {
         showMessage('Cancelled', 'info')
       })
   }

@@ -1,4 +1,4 @@
-import { PaletteKinds } from '../../types'
+import { PaletteKinds } from '@royalfig/color-palette-pro'
 import { Circle } from '../circle/Circle'
 import './palette-display.css'
 

@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useMemo } from 'react'
-import { ColorSpaceAndFormat } from '../../types'
+import { ColorSpaceAndFormat } from '@royalfig/color-palette-pro'
 import { Slider } from './Slider'
 import './slider.css'
 
@@ -104,7 +104,7 @@ export function SliderGroup({
         key={colorSpace.space}
         initial={shouldReduceMotion ? false : { clipPath: 'inset(0 100% 0 0)' }}
         animate={{ clipPath: 'inset(0 0 0 0)' }}
-        exit={shouldReduceMotion ? false : { clipPath: 'inset(0 0 0 100%)' }}
+        exit={shouldReduceMotion ? undefined : { clipPath: 'inset(0 0 0 100%)' }}
         transition={transition}
         className="slider-group"
       >
