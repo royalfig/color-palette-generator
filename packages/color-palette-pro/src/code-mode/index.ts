@@ -207,7 +207,7 @@ function buildDescription(displayName: string, lensName: string, character: Pale
   return `${displayName} in the ${lensName} lens — a ${CHARACTER_PROSE[character]} ${mode} theme generated from a ${displayName.toLowerCase()} palette.`
 }
 
-function buildThemeData(
+export function buildThemeData(
   baseColor: Color,
   palette: BaseColorData[],
   isDarkMode: boolean,
