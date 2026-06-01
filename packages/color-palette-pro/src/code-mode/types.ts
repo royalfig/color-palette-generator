@@ -230,6 +230,50 @@ export interface PersonalityConfig {
   paletteCharacter: PaletteCharacter
 }
 
+// ===== FORMAT SELECTION =====
+
+export type ThemeFormat = 'vscode' | 'zed' | 'iterm2' | 'ghostty'
+
+// ===== FORMAT-AGNOSTIC THEME DATA =====
+
+/**
+ * Everything a format serializer needs — produced by buildThemeData() in index.ts
+ * and consumed by serializeAsVSCode / serializeAsZed / serializeAsIterm2 / etc.
+ */
+export interface ThemeData {
+  semanticColors: SemanticColors
+  isDarkMode: boolean
+  type: 'dark' | 'light'
+  name: string
+  displayName: string
+  description: string
+  author: string
+  peakAlpha: number
+  inactiveSelectionStyle: SurfaceProfile['inactiveSelectionStyle']
+  fontStyleProfile: PersonalityFontStyleProfile | null
+}
+
+// ===== ZED OUTPUT =====
+
+export interface ZedSyntaxToken {
+  color?: string
+  font_style?: 'italic' | 'normal' | 'oblique'
+  font_weight?: 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900
+}
+
+export interface ZedTheme {
+  name: string
+  appearance: 'dark' | 'light'
+  style: Record<string, unknown>
+}
+
+export interface ZedThemeOutput {
+  $schema: string
+  name: string
+  author: string
+  themes: ZedTheme[]
+}
+
 // ===== COLOR DATA (from factory.ts) =====
 
 export interface BaseColorData {

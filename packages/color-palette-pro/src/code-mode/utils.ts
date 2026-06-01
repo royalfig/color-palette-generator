@@ -321,6 +321,16 @@ export function nudgeForDistinction(color: Color, awayFrom: Color, isDarkMode: b
 }
 
 /**
+ * Brighten (dark mode) or dim (light mode) an ANSI color for its bright variant.
+ * Mirrors the formula used in deriveUiColors so terminal outputs stay consistent.
+ */
+export function brightAnsiHex(hex: string, isDarkMode: boolean, isBlack = false): string {
+  const c = new Color(hex)
+  c.oklch.l = Math.min(0.95, (c.oklch.l ?? 0.5) + (isDarkMode ? (isBlack ? 0.20 : 0.10) : -0.05))
+  return toHex(c)
+}
+
+/**
  * Mathematical OKLCH interpolation between two colors with a ratio.
  */
 export function mixColors(colorA: Color, colorB: Color, ratio: number): Color {

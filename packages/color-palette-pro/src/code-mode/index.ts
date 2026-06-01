@@ -9,7 +9,13 @@ import type {
   SemanticColors,
   SurfaceBundle,
   SyntaxColors,
+  ThemeData,
+  ThemeFormat,
+  ZedThemeOutput,
 } from './types'
+import { serializeAsZed } from './formats/zed'
+import { serializeAsIterm2 } from './formats/iterm2'
+import { serializeAsGhostty } from './formats/ghostty'
 import { analogousTemplate } from './templates/analogous'
 import { complementaryTemplate } from './templates/complementary'
 import { splitComplementaryTemplate } from './templates/split-complementary'
@@ -201,35 +207,25 @@ function buildDescription(displayName: string, lensName: string, character: Pale
   return `${displayName} in the ${lensName} lens — a ${CHARACTER_PROSE[character]} ${mode} theme generated from a ${displayName.toLowerCase()} palette.`
 }
 
-export function generateCodeTheme(
+function buildThemeData(
   baseColor: Color,
   palette: BaseColorData[],
   isDarkMode: boolean,
   paletteKind: PaletteKinds,
   paletteStyle: PaletteStyle = 'square',
-): CodeThemeOutput {
+): ThemeData {
   const template = templateRegistry[paletteKind]
   if (!template) throw new Error(`Unknown palette kind: ${paletteKind}`)
 
   const personality = getPersonalityConfig(paletteKind, paletteStyle)
 
-  // Primary, adapted for mode (from the UI palette gen).
   const rawPrimary = (palette[0]?.color ?? baseColor).clone()
   const primary = adaptPrimaryForMode(rawPrimary, isDarkMode)
 
-  // Surfaces from the UI palette gen.
   const surfaceTones = generateSurfaceColors(primary, isDarkMode)
   const { outline, outlineVariant } = deriveOutline(primary, isDarkMode)
-  const surfaces: SurfaceBundle = {
-    ...surfaceTones,
-    outline,
-    outlineVariant,
-  }
+  const surfaces: SurfaceBundle = { ...surfaceTones, outline, outlineVariant }
 
-  // Editor background — surface profile drives the anchor L. Dark mode: editor is the
-  // *deepest* point (lens-driven); chrome lifts above it. Light mode: editor is the
-  // *brightest* point (character-driven); chrome sinks below it. This inverts the
-  // older sidebar-darkest convention and reads as a frame around the document.
   const sp = personality.surfaceProfile
   const editorBgBase = surfaces.surface.clone()
   editorBgBase.oklch.l = isDarkMode ? sp.editorLDark : sp.editorLLight
@@ -249,7 +245,6 @@ export function generateCodeTheme(
     editorBgBase.oklch.l = Math.max(lMin, Math.min(lMax, (editorBgBase.oklch.l ?? 0.17) + modeOffset))
   }
 
-  // Sidebar routing — lens decides which container plays the chrome role.
   const sidebarRouteKey = isDarkMode ? sp.sidebarSurface.dark : sp.sidebarSurface.light
   const sidebarBg = (sidebarRouteKey === 'container' ? surfaces.container : surfaces.containerSunken).clone()
   if (sp.chromeTint) {
@@ -259,15 +254,10 @@ export function generateCodeTheme(
   const panelBg = sidebarBg.clone()
   const overlayBg = surfaces.containerOverlay
 
-  // Chat / agents input. In dark, 2026 lifts the input to the *widget* level
-  // (#202122 — same as popovers) so it pops forward from the panel beneath. In
-  // light, the input sinks ~2% L below editor white — readable as a field, not as a
-  // separate card. Both directions mirror what 2026 actually does.
   const inputSunken = isDarkMode
     ? surfaces.containerOverlay.clone()
     : mixColors(surfaces.surface, surfaces.containerSunken, 0.3)
 
-  // Status bar — lens dial.
   const statusBarBg = primary.clone()
   let statusBarBorderTop: Color | undefined
   switch (sp.statusBarStyle) {
@@ -287,19 +277,12 @@ export function generateCodeTheme(
     case 'primary-deep':
       statusBarBg.oklch.l = isDarkMode ? 0.22 : 0.85
       statusBarBg.oklch.c = Math.min((primary.oklch.c ?? 0) * 0.45, 0.07)
-      // Accent top border — small chromatic seam (set after syntax is built).
       statusBarBorderTop = primary.clone()
       break
   }
 
-  // Divider — barely-tinted outline-variant.
   const divider = outlineVariant.clone()
 
-  // Neutral attention band — solid surface used for lineHighlight / rangeHighlight /
-  // hoverHighlight. Should sit noticeably above the editor surface (toward chrome)
-  // so the active line reads as "lifted in front." 2026 puts its line band even
-  // above widget level. We mix existing chrome tokens: in dark, between panel and
-  // overlay; in light, between containerSunken and editor surface.
   const neutralBandBase = isDarkMode
     ? mixColors(surfaces.container, surfaces.containerOverlay, 0.5)
     : mixColors(surfaces.surface, surfaces.containerSunken, 0.4)
@@ -307,22 +290,13 @@ export function generateCodeTheme(
     ? tintTowardHue(neutralBandBase, primary.oklch.h ?? 0, sp.neutralBandTint, 0.008)
     : neutralBandBase
 
-  // Cursor color is computed after the syntax pipeline runs (it may depend on
-  // accentColor for loud characters).
-
-  // Semantic status colors from the UI palette gen — clamped against the editor bg
-  // so the status colors are legible when used inline (debugConsole, gutter, etc.).
   const semantics = generateSemanticColors(primary, palette, isDarkMode, editorBgBase)
 
-  // Soft containers — paired backgrounds for input validation, badges, prominent
-  // buttons. These replace the alpha-over-foreground compositing trick.
   const primaryContainerPair = makeContainerForAccent(primary, isDarkMode)
   const errorContainerPair = makeContainerForAccent(semantics.error, isDarkMode)
   const warningContainerPair = makeContainerForAccent(semantics.warning, isDarkMode)
   const successContainerPair = makeContainerForAccent(semantics.success, isDarkMode)
 
-  // Secondary brand role — taken from palette[1] when available, else a primary
-  // hue-shift (60°), then pushed to the standard Tone 40 / Tone 80 brand levels.
   const secondaryRaw = (palette[1]?.color ?? (() => {
     const c = primary.clone()
     c.oklch.h = ((c.oklch.h ?? 0) + 60) % 360
@@ -337,7 +311,6 @@ export function generateCodeTheme(
     return t
   })()
 
-  // Info: blue (hue 220) if the palette has one, otherwise the coolest in-palette swatch.
   const infoFromPalette = findColorByHue(palette, 220, 30)
   const infoColor = infoFromPalette ?? (() => {
     let best: Color | null = null
@@ -361,7 +334,6 @@ export function generateCodeTheme(
   infoColor.oklch.l = isDarkMode ? 0.75 : 0.45
   const infoContainerPair = makeContainerForAccent(infoColor, isDarkMode)
 
-  // Syntax pipeline: template → personality → distinction → APCA contrast guarantee.
   const rawSyntax = template.deriveColors(baseColor, palette, isDarkMode, surfaces)
   const styledSyntax = personality.contrastProfile
     ? applyContrastProfile(rawSyntax, personality.contrastProfile, isDarkMode)
@@ -369,21 +341,16 @@ export function generateCodeTheme(
   const distinctSyntax = enforceDistinction(styledSyntax, isDarkMode)
   const syntax = ensureRoleContrast(distinctSyntax, editorBgBase)
 
-  // Bracket pair spread from the template (kept as hex; alpha applied in deriveUiColors).
   const rawBracketPairs = template.deriveBracketPairs(baseColor, palette, isDarkMode)
   const bracketPairColors = rawBracketPairs.map(toHex)
 
-  // Markdown quote: muted desaturated version of string.
   const markdownQuote = desaturate(syntax.stringColor.clone(), 0.4)
 
-  // Alpha-baked comment hex (dark mode only — see COMMENT_ALPHA_DARK rationale above).
   const commentHex = isDarkMode
     ? toHex(withAlpha(syntax.commentColor, COMMENT_ALPHA_DARK))
     : toHex(syntax.commentColor)
   const punctuationHex = toHex(syntax.punctuationColor)
 
-  // Cursor — character-driven. Loud characters use accent (the syntax pop); calm
-  // characters use the foreground (2026-style, restful).
   const cursorColor = sp.cursorSource === 'foreground'
     ? surfaces.onSurface.clone()
     : syntax.accentColor.clone()
@@ -456,10 +423,6 @@ export function generateCodeTheme(
     bracketPairColors,
   }
 
-  // Selection overlay legibility check — composite the selection bg over editor bg,
-  // confirm it stays distinguishable from foreground text. Peak comes from the
-  // character's chromatic-highlight envelope (~half in light vs dark — primary on
-  // white reads much harder than primary on near-black).
   const peakStartAlpha = isDarkMode ? sp.peakAlpha.dark : sp.peakAlpha.light
   const peakAlpha = legibleOverlayAlpha(
     semanticColors.focusBorder.hex,
@@ -470,25 +433,191 @@ export function generateCodeTheme(
   )
 
   const nameInfo = nameSuggestions[paletteKind]
-  const type: 'dark' | 'light' = isDarkMode ? 'dark' : 'light'
-  const uiColors = deriveUiColors(semanticColors, isDarkMode, {
-    peakAlpha,
-    inactiveSelectionStyle: sp.inactiveSelectionStyle,
-  })
-  const baseTokenRules = generateBaseTokenRules(semanticColors, personality.fontStyleProfile ?? undefined)
-  const semanticTokenRules = generateSemanticTokenRules(semanticColors, personality.fontStyleProfile ?? undefined)
 
   return {
-    $schema: 'vscode://schemas/color-theme',
+    semanticColors,
+    isDarkMode,
+    type: isDarkMode ? 'dark' : 'light',
     name: isDarkMode ? nameInfo.dark : nameInfo.light,
     displayName: `${nameInfo.displayName} ${isDarkMode ? 'Dark' : 'Light'}`,
     description: buildDescription(nameInfo.displayName, personality.lensName, personality.paletteCharacter, isDarkMode),
     author: 'color-palette-pro / code-mode',
+    peakAlpha,
+    inactiveSelectionStyle: sp.inactiveSelectionStyle,
+    fontStyleProfile: personality.fontStyleProfile,
+  }
+}
+
+export function generateCodeTheme(
+  baseColor: Color,
+  palette: BaseColorData[],
+  isDarkMode: boolean,
+  paletteKind: PaletteKinds,
+  paletteStyle: PaletteStyle = 'square',
+): CodeThemeOutput {
+  const data = buildThemeData(baseColor, palette, isDarkMode, paletteKind, paletteStyle)
+  const { semanticColors, type, name, displayName, description, author, peakAlpha, inactiveSelectionStyle, fontStyleProfile } = data
+  const uiColors = deriveUiColors(semanticColors, isDarkMode, { peakAlpha, inactiveSelectionStyle })
+  const baseTokenRules = generateBaseTokenRules(semanticColors, fontStyleProfile ?? undefined)
+  const semanticTokenRules = generateSemanticTokenRules(semanticColors, fontStyleProfile ?? undefined)
+  return {
+    $schema: 'vscode://schemas/color-theme',
+    name,
+    displayName,
+    description,
+    author,
     type,
     semanticHighlighting: true,
     colors: uiColors,
     tokenColors: baseTokenRules,
     semanticTokenColors: semanticTokenRules,
+  }
+}
+
+// ===== UNIFIED FORMAT API =====
+
+/**
+ * Generate a theme in the specified format, serialized to a string ready to write to disk.
+ * - vscode: JSON (.json) — load via Extensions > Install from VSIX or drop in themes dir
+ * - zed: JSON (.json) — place in ~/.config/zed/themes/
+ * - iterm2: XML plist (.itermcolors) — import via iTerm2 > Preferences > Colors
+ * - ghostty: config snippet — paste into ~/.config/ghostty/config
+ */
+export function generateTheme(
+  baseColor: Color,
+  palette: BaseColorData[],
+  isDarkMode: boolean,
+  paletteKind: PaletteKinds,
+  paletteStyle: PaletteStyle = 'square',
+  format: ThemeFormat = 'vscode',
+): string {
+  const data = buildThemeData(baseColor, palette, isDarkMode, paletteKind, paletteStyle)
+  switch (format) {
+    case 'vscode': {
+      const { semanticColors, type, name, displayName, description, author, peakAlpha, inactiveSelectionStyle, fontStyleProfile } = data
+      const uiColors = deriveUiColors(semanticColors, isDarkMode, { peakAlpha, inactiveSelectionStyle })
+      const baseTokenRules = generateBaseTokenRules(semanticColors, fontStyleProfile ?? undefined)
+      const semanticTokenRules = generateSemanticTokenRules(semanticColors, fontStyleProfile ?? undefined)
+      const output: CodeThemeOutput = {
+        $schema: 'vscode://schemas/color-theme',
+        name, displayName, description, author, type,
+        semanticHighlighting: true,
+        colors: uiColors,
+        tokenColors: baseTokenRules,
+        semanticTokenColors: semanticTokenRules,
+      }
+      return JSON.stringify(output, null, 2)
+    }
+    case 'zed': {
+      const nameInfo = nameSuggestions[paletteKind]
+      const zedOutput: ZedThemeOutput = {
+        $schema: 'https://zed.dev/schema/themes/v0.2.0.json',
+        name: nameInfo.displayName,
+        author: 'color-palette-pro / code-mode',
+        themes: [serializeAsZed(data)],
+      }
+      return JSON.stringify(zedOutput, null, 2)
+    }
+    case 'iterm2': return serializeAsIterm2(data)
+    case 'ghostty': return serializeAsGhostty(data)
+  }
+}
+
+/** Generate dark and light variants for the given format. */
+export function generateThemePair(
+  baseColor: Color,
+  palette: BaseColorData[],
+  paletteKind: PaletteKinds,
+  paletteStyle: PaletteStyle = 'square',
+  format: ThemeFormat = 'vscode',
+): { dark: string; light: string } {
+  return {
+    dark: generateTheme(baseColor, palette, true, paletteKind, paletteStyle, format),
+    light: generateTheme(baseColor, palette, false, paletteKind, paletteStyle, format),
+  }
+}
+
+// ===== ZED =====
+
+export function generateZedTheme(
+  baseColor: Color,
+  palette: BaseColorData[],
+  isDarkMode: boolean,
+  paletteKind: PaletteKinds,
+  paletteStyle: PaletteStyle = 'square',
+): ZedThemeOutput {
+  const data = buildThemeData(baseColor, palette, isDarkMode, paletteKind, paletteStyle)
+  const nameInfo = nameSuggestions[paletteKind]
+  return {
+    $schema: 'https://zed.dev/schema/themes/v0.2.0.json',
+    name: nameInfo.displayName,
+    author: 'color-palette-pro / code-mode',
+    themes: [serializeAsZed(data)],
+  }
+}
+
+export function generateZedThemePair(
+  baseColor: Color,
+  palette: BaseColorData[],
+  paletteKind: PaletteKinds,
+  paletteStyle: PaletteStyle = 'square',
+): ZedThemeOutput {
+  const dark = buildThemeData(baseColor, palette, true, paletteKind, paletteStyle)
+  const light = buildThemeData(baseColor, palette, false, paletteKind, paletteStyle)
+  const nameInfo = nameSuggestions[paletteKind]
+  return {
+    $schema: 'https://zed.dev/schema/themes/v0.2.0.json',
+    name: nameInfo.displayName,
+    author: 'color-palette-pro / code-mode',
+    themes: [serializeAsZed(dark), serializeAsZed(light)],
+  }
+}
+
+// ===== ITERM2 =====
+
+export function generateIterm2Theme(
+  baseColor: Color,
+  palette: BaseColorData[],
+  isDarkMode: boolean,
+  paletteKind: PaletteKinds,
+  paletteStyle: PaletteStyle = 'square',
+): string {
+  return serializeAsIterm2(buildThemeData(baseColor, palette, isDarkMode, paletteKind, paletteStyle))
+}
+
+export function generateIterm2ThemePair(
+  baseColor: Color,
+  palette: BaseColorData[],
+  paletteKind: PaletteKinds,
+  paletteStyle: PaletteStyle = 'square',
+): { dark: string; light: string } {
+  return {
+    dark: serializeAsIterm2(buildThemeData(baseColor, palette, true, paletteKind, paletteStyle)),
+    light: serializeAsIterm2(buildThemeData(baseColor, palette, false, paletteKind, paletteStyle)),
+  }
+}
+
+// ===== GHOSTTY =====
+
+export function generateGhosttyTheme(
+  baseColor: Color,
+  palette: BaseColorData[],
+  isDarkMode: boolean,
+  paletteKind: PaletteKinds,
+  paletteStyle: PaletteStyle = 'square',
+): string {
+  return serializeAsGhostty(buildThemeData(baseColor, palette, isDarkMode, paletteKind, paletteStyle))
+}
+
+export function generateGhosttyThemePair(
+  baseColor: Color,
+  palette: BaseColorData[],
+  paletteKind: PaletteKinds,
+  paletteStyle: PaletteStyle = 'square',
+): { dark: string; light: string } {
+  return {
+    dark: serializeAsGhostty(buildThemeData(baseColor, palette, true, paletteKind, paletteStyle)),
+    light: serializeAsGhostty(buildThemeData(baseColor, palette, false, paletteKind, paletteStyle)),
   }
 }
 
