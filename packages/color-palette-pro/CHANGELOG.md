@@ -1,5 +1,11 @@
 # @royalfig/color-palette-pro
 
+## 2.4.0
+
+### Minor Changes
+
+- 3f19b9e: Updated color logic
+
 ## 2.2.0
 
 ### Minor Changes
