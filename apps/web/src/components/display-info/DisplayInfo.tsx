@@ -10,7 +10,7 @@ import { MonitorIcon } from '@phosphor-icons/react/dist/csr/Monitor'
 import { EyeIcon } from '@phosphor-icons/react/dist/csr/Eye'
 import { CircleHalfIcon } from '@phosphor-icons/react/dist/csr/CircleHalf'
 
-export function useDisplayCapabilities() {
+function useDisplayCapabilities() {
   const capabilities = useMemo(() => {
     // Test color gamut
     let gamut = 'srgb' // default

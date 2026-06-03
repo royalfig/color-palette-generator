@@ -19,7 +19,7 @@ import './css/Reset.css'
 import './css/Variables.css'
 import './css/utils.css'
 import { ExportOptions } from './export-options/ExportOptions'
-import { useFetchColorNames } from './hooks/useColorName'
+import { useFetchColorNames, ColorName } from './hooks/useColorName'
 import { useDarkMode } from './hooks/useDarkMode'
 import { Options } from './options/Options'
 import { PaletteTypeSelector } from './palette-type-selector/PaletteTypeSelector'
@@ -50,15 +50,6 @@ function parsedInitialColorSpace(initialColorFormat: ColorFormat): ColorSpaceAnd
     default:
       return { space: 'oklch', format: 'oklch' }
   }
-}
-
-export type ColorName = {
-  fetchedData: {
-    colorNames: string[]
-    paletteTitle: string
-  } | null
-  isLoading: boolean
-  error: Error | null
 }
 
 function updateFavicon(color: string) {

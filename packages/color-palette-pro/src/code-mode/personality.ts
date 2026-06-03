@@ -145,10 +145,10 @@ const FONT_STYLES: Record<PaletteStyle, Record<PaletteCharacter, PersonalityFont
 // (OKLCH L ≈ 0.17–0.21 for the editor surface). Container is L 0.19, so anything
 // below that creates the inversion.
 const EDITOR_L_DARK_BY_LENS: Record<PaletteStyle, number> = {
-  square:   0.170,  // engineered baseline (2026-tight gap to chrome)
-  triangle: 0.185,  // natural — closest to original L=0.14 surface
-  circle:   0.170,  // expressive — chrome tint compensates for tight gap
-  diamond:  0.140,  // cinematic — theatrical depth, wider gap below chrome
+  square:   0.230,  // engineered baseline (~VS Code Dark+)
+  triangle: 0.245,  // natural — slightly lighter
+  circle:   0.230,  // expressive — chrome tint compensates for tight gap
+  diamond:  0.195,  // cinematic — theatrical depth, still the darkest lens
 }
 
 // Editor L in light mode by character. Vivid pushes to pure white for max contrast;
@@ -273,10 +273,3 @@ export function getPersonalityConfig(kind: PaletteKinds, style: PaletteStyle): P
   }
 }
 
-export function getPaletteCharacter(kind: PaletteKinds): PaletteCharacter {
-  return PALETTE_CHARACTER[kind]
-}
-
-export function getLensName(style: PaletteStyle): string {
-  return STYLE_LENSES[style].name
-}

@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
-import { BaseColorData, colorFactory } from './factory'
-import { clampOKLCH, detectFormat } from './utils'
+import { BaseColorData } from './factory'
+import { clampOKLCH, detectFormat, applyVariation, buildPaletteColors } from './utils'
 import { ColorFormat } from './types'
 import { ColorSpace } from './types'
 import { enhancePalette, avoidMuddyZones, polishPalette, applyEnhancementsToTetradic } from './enhancer'
@@ -375,27 +375,10 @@ export function generateTetradic(
           finalHue = cleaned.h
         }
 
-        const pureValues = clampOKLCH(
-          (baseColorObj.oklch.l ?? 0.5) + variations.first.pure.l,
-          (baseColorObj.oklch.c ?? 0) * variations.first.pure.c,
-          finalHue,
+        initialColors.push(
+          applyVariation(baseColorObj, variations.first.pure, finalHue),
+          applyVariation(baseColorObj, variations.first.muted, finalHue),
         )
-        const pureColor = baseColorObj.clone()
-        pureColor.oklch.l = pureValues.l
-        pureColor.oklch.c = pureValues.c
-        pureColor.oklch.h = pureValues.h
-        initialColors.push(pureColor)
-
-        const mutedValues = clampOKLCH(
-          (baseColorObj.oklch.l ?? 0.5) + variations.first.muted.l,
-          (baseColorObj.oklch.c ?? 0) * variations.first.muted.c,
-          finalHue,
-        )
-        const mutedColor = baseColorObj.clone()
-        mutedColor.oklch.l = mutedValues.l
-        mutedColor.oklch.c = mutedValues.c
-        mutedColor.oklch.h = mutedValues.h
-        initialColors.push(mutedColor)
       } else if (tetradIndex === 2) {
         // Complement color
 
@@ -410,16 +393,7 @@ export function generateTetradic(
           finalHue = cleaned.h
         }
 
-        const compValues = clampOKLCH(
-          (baseColorObj.oklch.l ?? 0.5) + variations.complement.l,
-          (baseColorObj.oklch.c ?? 0) * variations.complement.c,
-          finalHue,
-        )
-        const compColor = baseColorObj.clone()
-        compColor.oklch.l = compValues.l
-        compColor.oklch.c = compValues.c
-        compColor.oklch.h = compValues.h
-        initialColors.push(compColor)
+        initialColors.push(applyVariation(baseColorObj, variations.complement, finalHue))
       } else if (tetradIndex === 3) {
         // Fourth tetradic color + dark variant
 
@@ -434,27 +408,10 @@ export function generateTetradic(
           finalHue = cleaned.h
         }
 
-        const lightValues = clampOKLCH(
-          (baseColorObj.oklch.l ?? 0.5) + variations.fourth.light.l,
-          (baseColorObj.oklch.c ?? 0) * variations.fourth.light.c,
-          finalHue,
+        initialColors.push(
+          applyVariation(baseColorObj, variations.fourth.light, finalHue),
+          applyVariation(baseColorObj, variations.fourth.dark, finalHue),
         )
-        const lightColor = baseColorObj.clone()
-        lightColor.oklch.l = lightValues.l
-        lightColor.oklch.c = lightValues.c
-        lightColor.oklch.h = lightValues.h
-        initialColors.push(lightColor)
-
-        const darkValues = clampOKLCH(
-          (baseColorObj.oklch.l ?? 0.5) + variations.fourth.dark.l,
-          (baseColorObj.oklch.c ?? 0) * variations.fourth.dark.c,
-          finalHue,
-        )
-        const darkColor = baseColorObj.clone()
-        darkColor.oklch.l = darkValues.l
-        darkColor.oklch.c = darkValues.c
-        darkColor.oklch.h = darkValues.h
-        initialColors.push(darkColor)
       }
     })
 
@@ -463,17 +420,7 @@ export function generateTetradic(
       ? polishPalette(applyEnhancementsToTetradic(initialColors, style, 0), 0) // Base is at index 0
       : initialColors
 
-    // Convert to your color factory format
-    const colors: BaseColorData[] = []
-    finalColors.forEach((color, index) => {
-      if (index === 0) {
-        colors.push(colorFactory(baseColor, 'tetradic', index, format, true))
-      } else {
-        colors.push(colorFactory(color, 'tetradic', index, format))
-      }
-    })
-
-    return colors
+    return buildPaletteColors(baseColor, finalColors, 'tetradic', format)
   } catch (e) {
     throw new Error(`Failed to generate tetradic colors for ${baseColor}: ${e}`)
   }

@@ -1,4 +1,6 @@
 import Color from 'colorjs.io'
+import { colorFactory, BaseColorData } from './factory'
+import { ColorFormat } from './types'
 
 export function detectFormat(str: string): 'hex' | undefined {
   if (str.startsWith('#')) return 'hex'
@@ -19,6 +21,23 @@ export function clampOKLCH(l: number, c: number, h: number) {
     c: Math.max(OKLCH_LIMITS.c.min, Math.min(OKLCH_LIMITS.c.max, c)),
     h: ((h % 360) + 360) % 360, // Wrap hue properly
   }
+}
+
+export function applyVariation(
+  baseColor: Color,
+  variation: { l: number; c: number },
+  hue: number,
+): Color {
+  const values = clampOKLCH(
+    (baseColor.oklch.l ?? 0.5) + variation.l,
+    (baseColor.oklch.c ?? 0) * variation.c,
+    hue,
+  )
+  const result = baseColor.clone()
+  result.oklch.l = values.l
+  result.oklch.c = values.c
+  result.oklch.h = values.h
+  return result
 }
 
 export function getRandBetween() {
@@ -48,4 +67,17 @@ export function isLight(color: Color) {
   }
 
   return false
+}
+
+export function buildPaletteColors(
+  baseColor: string,
+  finalColors: Color[],
+  paletteType: string,
+  format: ColorFormat,
+): BaseColorData[] {
+  return finalColors.map((color, index) =>
+    index === 0
+      ? colorFactory(baseColor, paletteType, index, format, true)
+      : colorFactory(color, paletteType, index, format),
+  )
 }

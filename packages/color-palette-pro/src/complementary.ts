@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
 import { colorFactory } from './factory'
-import { clampOKLCH, detectFormat } from './utils'
+import { clampOKLCH, detectFormat, applyVariation } from './utils'
 import { ColorFormat, ColorSpace } from './types'
 import { enhancePalette, avoidMuddyZones, polishPalette, applyEnhancementsToComplementary } from './enhancer'
 
@@ -151,8 +151,6 @@ export function generateComplementary(
 
   try {
     const baseColorObj = new Color(baseColor)
-    const darkBase = baseColorObj.clone()
-    const mutedBase = baseColorObj.clone()
     const mainComplement = baseColorObj.clone()
     const lightComplement = baseColorObj.clone()
     const mutedComplement = baseColorObj.clone()
@@ -308,25 +306,8 @@ export function generateComplementary(
       finalComplementHue = cleaned.h
     }
 
-    // Dark base
-    const darkBaseValues = clampOKLCH(
-      (baseColorObj.oklch.l ?? 0.5) + baseVariations.dark.l,
-      (baseColorObj.oklch.c ?? 0) * baseVariations.dark.c,
-      baseColorObj.oklch.h ?? 0,
-    )
-    darkBase.oklch.l = darkBaseValues.l
-    darkBase.oklch.c = darkBaseValues.c
-    darkBase.oklch.h = darkBaseValues.h
-
-    // Light base (replaces muted base for better distribution)
-    const lightBaseValues = clampOKLCH(
-      (baseColorObj.oklch.l ?? 0.5) + baseVariations.light.l,
-      (baseColorObj.oklch.c ?? 0) * baseVariations.light.c,
-      baseColorObj.oklch.h ?? 0,
-    )
-    mutedBase.oklch.l = lightBaseValues.l
-    mutedBase.oklch.c = lightBaseValues.c
-    mutedBase.oklch.h = lightBaseValues.h
+    const darkBase = applyVariation(baseColorObj, baseVariations.dark, baseColorObj.oklch.h ?? 0)
+    const mutedBase = applyVariation(baseColorObj, baseVariations.light, baseColorObj.oklch.h ?? 0)
 
     // Main complement
     const mainCompValues = clampOKLCH(

@@ -5,7 +5,7 @@ import { toHex, desaturate, boostChroma, ensureContrast, getAccessibleVariant, w
 /**
  * Common scope sets used across all templates.
  */
-export const scopeSets = {
+const scopeSets = {
   default: ['text'],
 
   keywords: [

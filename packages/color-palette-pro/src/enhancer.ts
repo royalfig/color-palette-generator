@@ -330,10 +330,6 @@ export function applyEnhancementsToTetradic(colors: Color[], style: string, base
   return enhancePalette(colors, 'tetradic', style as any, baseIndex)
 }
 
-export function applyEnhancementsToTintsShades(colors: Color[], style: string, baseIndex: number): Color[] {
-  return enhancePalette(colors, 'tints-shades', style as any, baseIndex)
-}
-
 export function applyEnhancementsToTriadic(colors: Color[], style: string, baseIndex: number = 0): Color[] {
   return enhancePalette(colors, 'triadic', style as any, baseIndex)
 }

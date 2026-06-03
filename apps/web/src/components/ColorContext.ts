@@ -2,7 +2,7 @@ import { createContext } from 'react'
 import { colorFactory, type BaseColorData } from '@royalfig/color-palette-pro'
 import type { CodeThemeOutput } from '@royalfig/color-palette-pro'
 
-export type ColorContextType = {
+type ColorContextType = {
   originalColor: BaseColorData
   palette: BaseColorData[]
   mode: 'palette' | 'ui' | 'code'

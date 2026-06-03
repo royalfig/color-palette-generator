@@ -207,7 +207,7 @@ function buildDescription(displayName: string, lensName: string, character: Pale
   return `${displayName} in the ${lensName} lens — a ${CHARACTER_PROSE[character]} ${mode} theme generated from a ${displayName.toLowerCase()} palette.`
 }
 
-export function buildThemeData(
+function buildThemeData(
   baseColor: Color,
   palette: BaseColorData[],
   isDarkMode: boolean,
@@ -297,7 +297,11 @@ export function buildThemeData(
   const warningContainerPair = makeContainerForAccent(semantics.warning, isDarkMode)
   const successContainerPair = makeContainerForAccent(semantics.success, isDarkMode)
 
-  const secondaryRaw = (palette[1]?.color ?? (() => {
+  const SECONDARY_INDEX: Record<PaletteKinds, number> = {
+    com: 5, spl: 3, tri: 3, tet: 3, ana: 2, tas: 3, ton: 1,
+  }
+  const secondaryPaletteIdx = SECONDARY_INDEX[paletteKind] ?? 1
+  const secondaryRaw = (palette[secondaryPaletteIdx]?.color ?? (() => {
     const c = primary.clone()
     c.oklch.h = ((c.oklch.h ?? 0) + 60) % 360
     return c

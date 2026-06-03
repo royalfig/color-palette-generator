@@ -1,48 +1,8 @@
 import Color from 'colorjs.io'
 import { BaseColorData } from './types'
+import { findOptimalLightness, findColorByHue, getMedianChroma } from '../color-math'
 
-/**
- * Binary search for the lightness value that minimally satisfies the contrast ratio.
- */
-export function findOptimalLightness(
-  baseColor: Color,
-  background: Color,
-  minRatio: number,
-): Color {
-  const backgroundL = background.oklch.l ?? 0.5
-  const needLightForeground = backgroundL < 0.5
-
-  let minL = 0
-  let maxL = 1
-  let bestColor = baseColor.clone()
-
-  for (let i = 0; i < 20; i++) {
-    const testL = (minL + maxL) / 2
-    const testColor = baseColor.clone()
-    testColor.oklch.l = testL
-
-    const contrast = testColor.contrastWCAG21(background)
-
-    if (contrast >= minRatio) {
-      bestColor = testColor.clone()
-      if (needLightForeground) {
-        maxL = testL
-      } else {
-        minL = testL
-      }
-    } else {
-      if (needLightForeground) {
-        minL = testL
-      } else {
-        maxL = testL
-      }
-    }
-
-    if (Math.abs(maxL - minL) < 0.0001) break
-  }
-
-  return bestColor
-}
+export { findColorByHue }
 
 /**
  * Generates an accessible (4.5:1) version of a color on a given background.
@@ -146,46 +106,6 @@ function clamp(v: number): number {
 }
 
 /**
- * Get a color from the palette by hue proximity, or create a fallback.
- */
-export function findColorByHue(
-  palette: BaseColorData[],
-  targetHue: number,
-  tolerance: number = 30,
-): Color | null {
-  let bestMatch: Color | null = null
-  let bestDistance = Infinity
-
-  for (const item of palette) {
-    if (item?.color?.oklch?.h !== undefined) {
-      const hue = item.color.oklch.h ?? 0
-      const diff = Math.abs(hue - targetHue)
-      const distance = Math.min(diff, 360 - diff)
-      if (distance <= tolerance && distance < bestDistance) {
-        bestDistance = distance
-        bestMatch = item.color.clone()
-      }
-    }
-  }
-  return bestMatch
-}
-
-/**
- * Get median chroma from a palette.
- */
-export function getMedianChroma(palette: BaseColorData[]): number {
-  const chromas = palette
-    .filter((item) => item?.color?.oklch?.c !== undefined)
-    .map((item) => item.color.oklch.c ?? 0)
-    .sort((a, b) => a - b)
-  if (chromas.length === 0) return 0.1
-  const mid = Math.floor(chromas.length / 2)
-  return chromas.length % 2 === 0
-    ? (chromas[mid - 1] + chromas[mid]) / 2
-    : chromas[mid]
-}
-
-/**
  * Clamp/adapt OKLCH lightness (L) for AAA text legibility while preserving hue and chroma.
  * Legibility ranges: 0.75-0.90 for dark mode, 0.20-0.45 for light mode.
  */
@@ -226,15 +146,6 @@ export function tintTowardHue(neutral: Color, towardHue: number, hueAmount = 1.0
 }
 
 /**
- * Guarantee a color meets a contrast ratio against a specific background by
- * shifting only L. Returns the original color if already passing.
- */
-export function ensureContrastAgainst(color: Color, bg: Color, minRatio: number): Color {
-  if (color.contrastWCAG21(bg) >= minRatio) return color.clone()
-  return findOptimalLightness(color, bg, minRatio)
-}
-
-/**
  * Binary-search for the L value that minimally satisfies an APCA contrast target.
  * APCA returns Lc (positive = light fg on dark bg, negative = dark fg on light bg).
  * We compare |Lc| against minLc.
@@ -245,7 +156,7 @@ export function ensureContrastAgainst(color: Color, bg: Color, minRatio: number)
  *  - 45: incidental UI text
  *  - 30: spot text / decorative
  */
-export function findOptimalLightnessAPCA(color: Color, background: Color, minLc: number): Color {
+function findOptimalLightnessAPCA(color: Color, background: Color, minLc: number): Color {
   const bgL = background.oklch.l ?? 0.5
   const needLightForeground = bgL < 0.5
 

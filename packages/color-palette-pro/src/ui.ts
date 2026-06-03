@@ -1,53 +1,9 @@
 import Color from "colorjs.io";
 import { BaseColorData, colorFactory } from "./factory";
 import { PaletteKinds, ColorFormat } from "./types";
+import { findOptimalLightness, getMedianChroma, findColorByHue } from "./color-math";
 
 // ===== CONTRAST-BASED COLOR GENERATION =====
-
-/**
- * Binary search for the lightness value that minimally satisfies the contrast ratio.
- * Dark background → finds lowest L that still meets ratio.
- * Light background → finds highest L that still meets ratio.
- */
-function findOptimalLightness(
-  baseColor: Color,
-  background: Color,
-  minRatio: number,
-): Color {
-  const backgroundL = background.oklch.l ?? 0.5;
-  const needLightForeground = backgroundL < 0.5;
-
-  let minL = 0;
-  let maxL = 1;
-  let bestColor = baseColor.clone();
-
-  for (let i = 0; i < 20; i++) {
-    const testL = (minL + maxL) / 2;
-    const testColor = baseColor.clone();
-    testColor.oklch.l = testL;
-
-    const contrast = testColor.contrastWCAG21(background);
-
-    if (contrast >= minRatio) {
-      bestColor = testColor.clone();
-      if (needLightForeground) {
-        maxL = testL; // found a working L; try to go lower (closer to background)
-      } else {
-        minL = testL; // found a working L; try to go higher (closer to background)
-      }
-    } else {
-      if (needLightForeground) {
-        minL = testL; // too dark; need to go lighter
-      } else {
-        maxL = testL; // too light; need to go darker
-      }
-    }
-
-    if (Math.abs(maxL - minL) < 0.0001) break;
-  }
-
-  return bestColor;
-}
 
 /**
  * Searches outward from a preferred lightness until the contrast ratio is met.
@@ -275,21 +231,21 @@ export function generateSurfaceColors(
 
   const surface = primary.clone();
   surface.oklch.c = surfaceChromaFor(primary, isDarkMode);
-  surface.oklch.l = isDarkMode ? 0.12 : 0.98;
+  surface.oklch.l = isDarkMode ? 0.23 : 0.99;
 
-  // container: Standard cards — ΔL ≈ 0.04 (light) / 0.07 (dark) from surface
+  // container: Standard cards — ΔL ≈ 0.04 (light) / 0.04 (dark) from surface
   const container = primary.clone();
   container.oklch.c = isDarkMode
     ? Math.min(primaryC * 0.08, 0.012)
     : Math.min(primaryC * 0.04, 0.006);
-  container.oklch.l = isDarkMode ? 0.19 : 0.94;
+  container.oklch.l = isDarkMode ? 0.27 : 0.965;
 
   // container-sunken: Inset wells — recessed below surface or container
   const containerSunken = primary.clone();
   containerSunken.oklch.c = isDarkMode
     ? Math.min(primaryC * 0.04, 0.006)
     : Math.min(primaryC * 0.02, 0.003);
-  containerSunken.oklch.l = isDarkMode ? 0.08 : 0.90;
+  containerSunken.oklch.l = isDarkMode ? 0.18 : 0.935;
 
   // container-overlay: Floating elements — near-white in light mode with a whisper
   // of brand tint so it feels family-related; visibly elevated above container in dark.
@@ -297,7 +253,7 @@ export function generateSurfaceColors(
   containerOverlay.oklch.c = isDarkMode
     ? Math.min(primaryC * 0.06, 0.008)
     : Math.min(primaryC * 0.02, 0.003);
-  containerOverlay.oklch.l = isDarkMode ? 0.22 : 0.995;
+  containerOverlay.oklch.l = isDarkMode ? 0.31 : 0.995;
 
   // Worst-case background for contrast checking:
   // Light Mode (Dark Text): Lowest contrast occurs on the darkest background (sunken)
@@ -370,43 +326,6 @@ function generateOutlineAndInverse(
 
 // ===== SEMANTIC COLOR GENERATION =====
 
-/**
- * Returns the closest-hue palette color within tolerance, or null.
- */
-function findPaletteColorByHue(
-  palette: BaseColorData[],
-  targetHue: number,
-  tolerance: number = 30,
-): Color | null {
-  let bestMatch: Color | null = null;
-  let bestDistance = Infinity;
-
-  for (const item of palette) {
-    if (item?.color?.oklch?.h !== undefined) {
-      const hue = item.color.oklch.h ?? 0;
-      const diff = Math.abs(hue - targetHue);
-      const distance = Math.min(diff, 360 - diff);
-      if (distance <= tolerance && distance < bestDistance) {
-        bestDistance = distance;
-        bestMatch = item.color.clone();
-      }
-    }
-  }
-  return bestMatch;
-}
-
-function getMedianChroma(palette: BaseColorData[]): number {
-  const chromas = palette
-    .filter((item) => item?.color?.oklch?.c !== undefined)
-    .map((item) => item.color.oklch.c ?? 0)
-    .sort((a, b) => a - b);
-  if (chromas.length === 0) return 0.1;
-  const mid = Math.floor(chromas.length / 2);
-  return chromas.length % 2 === 0
-    ? (chromas[mid - 1] + chromas[mid]) / 2
-    : chromas[mid];
-}
-
 export function generateSemanticColors(
   primary: Color,
   palette: BaseColorData[],
@@ -424,7 +343,7 @@ export function generateSemanticColors(
 
   // Error: red (hue 27 in OKLCH)
   const errorBase =
-    findPaletteColorByHue(palette, 27) ||
+    findColorByHue(palette, 27) ||
     (() => {
       const fallback = primary.clone();
       fallback.oklch.h = 27;
@@ -434,7 +353,7 @@ export function generateSemanticColors(
 
   // Success: green (hue 140)
   const successBase =
-    findPaletteColorByHue(palette, 140) ||
+    findColorByHue(palette, 140) ||
     (() => {
       const fallback = primary.clone();
       fallback.oklch.h = 140;
@@ -444,7 +363,7 @@ export function generateSemanticColors(
 
   // Warning: amber (hue 83 in OKLCH)
   const warningBase =
-    findPaletteColorByHue(palette, 83) ||
+    findColorByHue(palette, 83) ||
     (() => {
       const fallback = primary.clone();
       fallback.oklch.h = 83;

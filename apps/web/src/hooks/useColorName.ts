@@ -17,11 +17,13 @@ interface ColorNameApiResponse {
   paletteTitle: string
 }
 
-interface IUseFetchWithAbortResponse {
+export interface ColorName {
   fetchedData: { colorNames: string[]; paletteTitle: string; baseColorName: string } | null
   isLoading: boolean
   error: Error | null
 }
+
+type IUseFetchWithAbortResponse = ColorName
 
 // Module-level cache to store API responses
 const colorNameCache = new Map<string, ColorNameApiResponse>()
