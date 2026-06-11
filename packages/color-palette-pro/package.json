@@ -38,7 +38,7 @@
   "devDependencies": {
     "tsup": "^8.5.1",
     "tsx": "^4.20.6",
-    "typescript": "~5.9.3"
+    "typescript": "~6.0.0"
   },
   "publishConfig": {
     "access": "public"
