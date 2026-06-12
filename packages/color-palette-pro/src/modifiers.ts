@@ -1,5 +1,11 @@
 import { ColorSpace } from './types'
 import { BaseColorData, colorFactory } from './factory'
+import { safeHue } from './utils'
+
+/** Normalize a hue (incl. NaN-safe) into [0, 360). */
+function wrapHue(h: number): number {
+  return Number.isFinite(h) ? ((h % 360) + 360) % 360 : h
+}
 
 function mapRange(value: number, inMin: number, inMax: number, outMin: number, outMax: number): number {
   return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin
@@ -21,10 +27,10 @@ function sineModifier(palette: BaseColorData[], modifier: number): BaseColorData
     const lightnessShift = Math.sin(wavePosition * 1.5 + modifier * 0.008) * lightnessIntensity
 
     const newColor = color.color.clone()
-    const currentHue = newColor.oklch.h || 0
+    const currentHue = safeHue(newColor, 0)
     const currentLightness = newColor.oklch.l || 0.5
     
-    newColor.oklch.h = (currentHue + hueShift) % 360
+    newColor.oklch.h = wrapHue(currentHue + hueShift)
     newColor.oklch.l = Math.max(0.05, Math.min(0.95, currentLightness + lightnessShift))
 
     return colorFactory(newColor, color.code.split('-')[0], idx, color.colorSpace as ColorSpace, false)
@@ -54,11 +60,11 @@ function waveModifier(palette: BaseColorData[], modifier: number): BaseColorData
     const chromaMultiplier = 0.4 + smoothedX * 1.2 // More dramatic chroma changes
 
     const newColor = color.color.clone()
-    const currentHue = newColor.oklch.h || 0
+    const currentHue = safeHue(newColor, 0)
     const currentLightness = newColor.oklch.l || 0.5
     const currentChroma = newColor.oklch.c || 0
 
-    newColor.oklch.h = (currentHue + hueShift) % 360
+    newColor.oklch.h = wrapHue(currentHue + hueShift)
     newColor.oklch.l = Math.max(0.05, Math.min(0.95, currentLightness + lightnessShift))
     newColor.oklch.c = Math.max(0, Math.min(0.4, currentChroma * chromaMultiplier))
 
@@ -86,11 +92,11 @@ function zapModifier(palette: BaseColorData[], modifier: number): BaseColorData[
     const chromaShift = Math.sin(angle * 1.5) * 0.08 // Smoother chroma variation
 
     const newColor = color.color.clone()
-    const currentHue = newColor.oklch.h || 0
+    const currentHue = safeHue(newColor, 0)
     const currentLightness = newColor.oklch.l || 0.5
     const currentChroma = newColor.oklch.c || 0
 
-    newColor.oklch.h = (currentHue + hueShift + 360) % 360
+    newColor.oklch.h = wrapHue(currentHue + hueShift)
     newColor.oklch.l = Math.max(0.05, Math.min(0.95, currentLightness + lightnessShift))
     newColor.oklch.c = Math.max(0, Math.min(0.4, currentChroma + chromaShift))
 
@@ -118,11 +124,11 @@ function blockModifier(palette: BaseColorData[], modifier: number): BaseColorDat
     const chromaShift = Math.cos(wavePosition + Math.PI * 0.5) * rawTriangle * chromaAmplitude
 
     const newColor = color.color.clone()
-    const currentHue = newColor.oklch.h || 0
+    const currentHue = safeHue(newColor, 0)
     const currentLightness = newColor.oklch.l || 0.5
     const currentChroma = newColor.oklch.c || 0
 
-    newColor.oklch.h = (currentHue + hueShift + 360) % 360
+    newColor.oklch.h = wrapHue(currentHue + hueShift)
     newColor.oklch.l = Math.max(0.05, Math.min(0.95, currentLightness + lightnessShift))
     newColor.oklch.c = Math.max(0, Math.min(0.4, currentChroma + chromaShift))
 

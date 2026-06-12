@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
 import { BaseColorData } from './factory'
-import { detectFormat, clampOKLCH, applyVariation, buildPaletteColors } from './utils'
+import { detectFormat, clampOKLCH, applyVariation, buildPaletteColors, isAchromatic, generateNeutralPalette } from './utils'
 import { ColorFormat, ColorSpace } from './types'
 import { avoidMuddyZones, polishPalette, applyEnhancementsToTriadic } from './enhancer'
 
@@ -86,11 +86,12 @@ function getAdaptiveTriadic(baseColor: Color): number[] {
 
   if (hue >= 30 && hue < 90) {
     // Energetic oranges/yellows → Sun, sea, and night
-    const intensity = chroma * lightness
+    // Vividness fraction (chroma / typical max), not chroma×lightness — an aesthetic nudge.
+    const intensity = Math.min(chroma / 0.3, 1)
     return [
       hue, // Sun energy
-      (hue + 120 + intensity * 15) % 360, // Sea depth (varies with intensity)
-      (hue + 240 - intensity * 10) % 360, // Night mystery
+      (hue + 120 + intensity * 12) % 360, // Sea depth (varies with vividness)
+      (hue + 240 - intensity * 8) % 360, // Night mystery
     ]
   }
 
@@ -138,7 +139,7 @@ function getWarmCoolTriadic(baseColor: Color): number[] {
 
   // Determine lighting scenario and create three-point illumination
 
-  if (lightness > 0.8 && chroma < 0.3) {
+  if (lightness > 0.8 && chroma < 0.06) {
     // Bright daylight scenario: three balanced natural light sources
     return [
       hue, // Primary daylight
@@ -165,7 +166,7 @@ function getWarmCoolTriadic(baseColor: Color): number[] {
     ]
   }
 
-  if (chroma > 0.8 && lightness < 0.4) {
+  if (chroma > 0.15 && lightness < 0.4) {
     // Dramatic three-point lighting: strong contrast triangle
     const isWarm = hue < 180
     if (isWarm) {
@@ -214,6 +215,7 @@ export function generateTriadic(
 
   try {
     const baseColorObj = new Color(baseColor)
+    if (isAchromatic(baseColorObj)) return generateNeutralPalette(baseColor, 6, 'triadic', format)
 
     let triadicHues: number[]
 
@@ -336,7 +338,7 @@ export function generateTriadic(
       const lightness = baseColorObj.oklch.l ?? 0.5
       const chroma = baseColorObj.oklch.c ?? 0
 
-      if (lightness > 0.8 && chroma < 0.3) {
+      if (lightness > 0.8 && chroma < 0.06) {
         // daylight - prevent over-darkening
         baseVariations = {
           dark: { l: Math.max(-0.25, 0.15 - lightness), c: 1.0 },
@@ -351,7 +353,7 @@ export function generateTriadic(
             muted: { l: -0.25, c: 0.5 },
           },
         }
-      } else if (chroma > 0.8 && lightness < 0.4) {
+      } else if (chroma > 0.15 && lightness < 0.4) {
         // dramatic - ensure visibility
         baseVariations = {
           dark: { l: Math.max(-0.2, 0.15 - lightness), c: 1.3 },

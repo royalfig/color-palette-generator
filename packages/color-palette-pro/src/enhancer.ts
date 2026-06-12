@@ -1,7 +1,14 @@
 import Color from 'colorjs.io'
 
 // ===== CHROMA NARRATIVE SYSTEM =====
-// Creates intentional saturation stories instead of uniform chroma
+// Creates intentional per-position chroma patterns instead of uniform saturation.
+//
+// Honesty note (Audit 3D): the `description` strings below ("emotional crescendo", "four-act
+// epic", …) are non-functional flavor — only `pattern` is read by enhancePalette. What the
+// patterns verifiably do is modulate *visual energy / focal emphasis* (chroma is the strongest
+// driver of perceived color "energy"). They do not encode a universal emotional meaning: color
+// affect is context-dependent, individual, and culturally variable (e.g. red = luck in much of
+// East Asia vs. danger elsewhere). Treat the narrative names as mnemonics, not claims.
 
 interface ChromaNarrative {
   pattern: number[] // Multipliers for base chroma
@@ -335,30 +342,25 @@ export function applyEnhancementsToTriadic(colors: Color[], style: string, baseI
 }
 
 // ===== MUDDY ZONE AVOIDANCE =====
-// Bonus: Fix muddy colors
+// "Muddiness" is a chroma×lightness phenomenon, NOT a property of particular hue bands. The
+// previous implementation treated whole hue ranges (browns/olives, sage greens, teals) as
+// "corpse/sick/dead" and *teleported* the hue ±10° out of them — which destroyed the palette
+// geometry the generators had just computed and silently relocated the user's own brand hue
+// (an earthy brown or a teal would get shoved elsewhere). Browns, olives, sages and teals are
+// perfectly good, culturally-loaded colors.
+//
+// A color reads muddy when it carries *just enough* chroma to look like a failed attempt at a
+// hue, sitting at a mid lightness where the eye expects either a clean neutral or a clean
+// color. We fix that by committing the chroma to one side of that dead band — never by moving
+// the hue. (Audit 3A.)
 export function avoidMuddyZones(hue: number, lightness: number, chroma: number): { h: number; l: number; c: number } {
-  // Expanded zones for maximum beauty
-  const mudZones = [
-    { range: [25, 65], name: 'brown-olive' },
-    { range: [100, 140], name: 'sick-green' },
-    { range: [45, 55], name: 'dead-orange' }, // NEW
-    { range: [180, 200], name: 'corpse-cyan' }, // NEW
-  ]
+  if (!Number.isFinite(hue)) return { h: hue, l: lightness, c: chroma } // achromatic: leave neutral
 
-  // More aggressive pushing out of ugly zones
-  for (const zone of mudZones) {
-    if (hue >= zone.range[0] && hue <= zone.range[1]) {
-      // Push harder toward beautiful alternatives
-      if (chroma < 0.15) {
-        // Very muted: make it a sophisticated neutral
-        return { h: hue, l: lightness, c: chroma * 0.5 }
-      } else {
-        // Push to nearest beautiful hue
-        const pushDirection = hue < (zone.range[0] + zone.range[1]) / 2 ? -1 : 1
-        const newHue = pushDirection > 0 ? zone.range[1] + 10 : zone.range[0] - 10
-        return { h: newHue, l: lightness, c: chroma * 1.1 }
-      }
-    }
+  const inMidLightness = lightness > 0.3 && lightness < 0.72
+  const inDeadChromaBand = chroma > 0.03 && chroma < 0.09
+  if (inMidLightness && inDeadChromaBand) {
+    // Commit to a clean color rather than a half-hearted wash — hue preserved.
+    return { h: hue, l: lightness, c: Math.min(chroma * 1.7, 0.13) }
   }
 
   return { h: hue, l: lightness, c: chroma }
@@ -377,55 +379,45 @@ export function polishPalette(colors: Color[], baseColorIndex: number = 0): Colo
 
     const c = oklch.c ?? 0
     const l = oklch.l ?? 0.5
-    const h = oklch.h ?? 0
+    const h = oklch.h ?? NaN
+    const isNeutral = !Number.isFinite(h) || c < 0.01
 
-    // 1. Prevent "dead" grays in mid-tones
+    // Leave genuinely neutral colors neutral — don't inject a hue into them.
+    if (isNeutral) return polished
+
+    // 1. Prevent "dead" grays in mid-tones — give a near-neutral mid color a little life.
     if (c < 0.05 && l > 0.2 && l < 0.8) {
-      polished.oklch.c = Math.max(0.08, c * 2) // Minimum life
+      polished.oklch.c = Math.max(0.08, c * 2)
     }
 
-    // 2. Make very light colors more interesting
-    if (l > 0.85) {
-      // Add subtle tint based on the hue
-      if (c < 0.04) {
-        polished.oklch.c = 0.04 // Minimum tint
-      }
-      // Slight warm shift for most hues (except already warm ones)
-      if (h < 30 || h > 200) {
-        polished.oklch.h = (h + 3) % 360
-      }
+    // 2. Give very light colors a minimum tint so they don't wash out to flat white.
+    if (l > 0.85 && c < 0.04) {
+      polished.oklch.c = 0.04
     }
 
-    // 3. Enrich dark colors
+    // 3. Enrich dark colors so they read rich, not muddy. Optionally lean them slightly cool
+    //    (toward blue ~264°) — a common "rich black" treatment. Unlike the old `sin(h)*5`
+    //    (which rotated the wrong way for warm hues), this is a true small lerp toward blue.
     if (l < 0.25) {
-      // Darks should be rich, not muddy
-      polished.oklch.c = Math.min(c * 1.3, 0.15) // Boost but keep in gamut
-
-      // Very dark colors benefit from slight hue shifts toward "noble" darks
+      polished.oklch.c = Math.min(c * 1.3, 0.15)
       if (l < 0.15) {
-        // Push toward blue-blacks, purple-blacks, or green-blacks
-        const nobleDarkShift = Math.sin((h * Math.PI) / 180) * 5
-        polished.oklch.h = (h + nobleDarkShift + 360) % 360
+        const COOL_DARK_HUE = 264
+        let diff = ((COOL_DARK_HUE - h + 540) % 360) - 180 // shortest signed path
+        polished.oklch.h = ((h + diff * 0.08) % 360 + 360) % 360 // 8% toward blue
       }
     }
 
-    // 4. Jewel tone enhancement for saturated mid-tones
+    // 4. Jewel-tone enhancement for saturated mid-tones — make these colors sing.
     if (c > 0.15 && l > 0.35 && l < 0.65) {
-      // The "jewel zone" - make these colors sing
-      polished.oklch.l = l * 0.97 // Slightly darker
-      polished.oklch.c = Math.min(c * 1.08, 0.37) // More saturated
+      polished.oklch.l = l * 0.97
+      polished.oklch.c = c * 1.08 // gamut-clamped downstream in colorFactory
     }
 
-    // 5. Fix "almost neutral" colors that look accidentally desaturated
+    // 5. Resolve "almost neutral" colors deterministically: a color carrying a real hue should
+    //    commit to it rather than hover in the indeterminate 0.03–0.08 chroma band. (No more
+    //    array-index parity deciding saturation — that made output depend on slot order.)
     if (c > 0.03 && c < 0.08) {
-      // Either make it clearly neutral or clearly colored
-      if (index % 2 === 0 || l < 0.3 || l > 0.7) {
-        // Make it neutral
-        polished.oklch.c = c * 0.6
-      } else {
-        // Make it clearly colored
-        polished.oklch.c = c * 1.5
-      }
+      polished.oklch.c = c * 1.5
     }
 
     return polished

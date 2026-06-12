@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
 import { BaseColorData } from './factory'
-import { clampOKLCH, detectFormat, applyVariation, buildPaletteColors } from './utils'
+import { clampOKLCH, detectFormat, applyVariation, buildPaletteColors, isAchromatic, generateNeutralPalette } from './utils'
 import { getWarmCoolComplement } from './complementary'
 import { ColorFormat, ColorSpace } from './types'
 import { applyEnhancementsToSplitComplementary, avoidMuddyZones, polishPalette } from './enhancer'
@@ -77,11 +77,12 @@ function getAdaptiveSplitComplementary(baseColor: Color): number[] {
 
   if (hue >= 30 && hue < 90) {
     // Energetic oranges/yellows → Mysterious and dreamy split
-    const intensity = chroma * lightness
+    // Vividness fraction (chroma / typical max), not chroma×lightness — an aesthetic nudge.
+    const intensity = Math.min(chroma / 0.3, 1)
     return [
       hue,
-      (hue + 160 + intensity * 15) % 360, // Deeper blues for more intense oranges
-      (hue + 200 + intensity * 10) % 360, // Dream purples
+      (hue + 160 + intensity * 12) % 360, // Deeper blues for more vivid oranges
+      (hue + 200 + intensity * 8) % 360, // Dream purples
     ]
   }
 
@@ -129,7 +130,7 @@ function getLuminositySplitComplementary(baseColor: Color): number[] {
 
   // Determine lighting scenario and create realistic split complements
 
-  if (lightness > 0.8 && chroma < 0.3) {
+  if (lightness > 0.8 && chroma < 0.06) {
     // Bright daylight scenario: creates gentle split shadows
     return [
       hue,
@@ -157,7 +158,7 @@ function getLuminositySplitComplementary(baseColor: Color): number[] {
     ]
   }
 
-  if (chroma > 0.8 && lightness < 0.4) {
+  if (chroma > 0.15 && lightness < 0.4) {
     // Dramatic lighting scenario: creates strong temperature splits
     const isWarm = hue < 180
     if (isWarm) {
@@ -204,6 +205,7 @@ export function generateSplitComplementary(
 
   try {
     const baseColorObj = new Color(baseColor)
+    if (isAchromatic(baseColorObj)) return generateNeutralPalette(baseColor, 6, 'split-complementary', format)
 
     let splitHues: number[]
 
@@ -326,7 +328,7 @@ export function generateSplitComplementary(
       const lightness = baseColorObj.oklch.l ?? 0.5
       const chroma = baseColorObj.oklch.c ?? 0
 
-      if (lightness > 0.8 && chroma < 0.3) {
+      if (lightness > 0.8 && chroma < 0.06) {
         // daylight - strong contrast but prevent over-darkening
         baseVariations = {
           dark: { l: Math.max(-0.25, 0.15 - lightness), c: 1.0 },
@@ -341,7 +343,7 @@ export function generateSplitComplementary(
             muted: { l: 0.05, c: 0.55 },
           },
         }
-      } else if (chroma > 0.8 && lightness < 0.4) {
+      } else if (chroma > 0.15 && lightness < 0.4) {
         // dramatic - enhance contrast while ensuring visibility
         baseVariations = {
           dark: { l: Math.max(-0.2, 0.15 - lightness), c: 1.3 },

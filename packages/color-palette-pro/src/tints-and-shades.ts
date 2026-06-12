@@ -118,6 +118,9 @@ function generateTriangleStyle(baseColor: Color, lightnesses: number[], baseInde
 }
 
 
+// Circle style intentionally ignores the shared `lightnesses`/`baseIndex` progression: it uses
+// colorjs `steps()` toward white and black to build its own perceptually-even ramp with natural
+// chroma falloff at the extremes. The params are kept only for a uniform dispatch signature. (5.2)
 function generateCircleStyle(baseColor: Color, lightnesses: number[], baseIndex: number): Color[] {
   const whiteSteps = baseColor.steps('white', {
     space: 'oklch',
@@ -157,51 +160,28 @@ function generateDiamondStyle(baseColor: Color, lightnesses: number[], baseIndex
   return colors
 }
 
-// Perceptual compensation functions
+// Approximate perceptual hue-drift functions.
+//
+// These *mimic* the Bezold–Brücke (hue shifts with luminance) and Abney (hue shifts with
+// desaturation) effects. Real B–B/Abney are non-linear and defined for near-spectral stimuli,
+// not broadband sRGB tints — so we don't claim precision. Compared to the previous version
+// (hard per-hue-band steps with arbitrary gains, covering only part of the wheel and producing
+// discontinuities at the band edges) these are smooth, bounded, and defined for *every* hue,
+// so a tint ramp drifts consistently no matter the base hue. (Audit 3B.)
+
+/** Subtle luminance-driven hue drift (≤~4°), continuous across the wheel. */
 function getBezoldBruckeCompensation(hue: number, lightnessDelta: number): number {
-  // Bezold-Brücke shift compensation
-  let shift = 0
-
-  if (hue >= 220 && hue <= 280) {
-    // Blues
-    // Blues shift toward red when darker
-    shift = lightnessDelta * -8
-  } else if (hue >= 60 && hue <= 90) {
-    // Yellows
-    // Yellows shift toward green when darker
-    shift = lightnessDelta * -5
-  } else if ((hue >= 0 && hue <= 30) || hue >= 330) {
-    // Reds
-    // Reds shift toward yellow when lighter
-    shift = lightnessDelta * 3
-  } else if (hue >= 150 && hue <= 200) {
-    // Cyans
-    // Cyans shift toward blue when darker
-    shift = lightnessDelta * -4
-  }
-
-  return shift
+  if (!Number.isFinite(hue)) return 0
+  // Smoothly varies sign with hue: ~max near yellow (90°), opposite near blue (270°).
+  const phase = Math.cos(((hue - 90) * Math.PI) / 180)
+  return lightnessDelta * phase * 4
 }
 
+/** Subtle desaturation-driven hue drift (≤~2°), continuous across the wheel. */
 function getAbneyCompensation(hue: number, chromaReduction: number): number {
-  // Abney effect compensation (for desaturation)
-  let shift = 0
-
-  if (hue >= 280 && hue <= 320) {
-    // Purples
-    // Purples shift toward red when desaturated
-    shift = chromaReduction * -40
-  } else if (hue >= 180 && hue <= 210) {
-    // Cyans
-    // Cyans shift toward blue when desaturated
-    shift = chromaReduction * -30
-  } else if (hue >= 90 && hue <= 120) {
-    // Yellow-greens
-    // Yellow-greens shift toward yellow when desaturated
-    shift = chromaReduction * -20
-  }
-
-  return shift
+  if (!Number.isFinite(hue)) return 0
+  const phase = Math.sin(((hue - 30) * Math.PI) / 180)
+  return chromaReduction * phase * 15
 }
 
 // Lightness progression
@@ -260,6 +240,11 @@ function findBaseColorPosition(baseLightness: number, progression: number[]): nu
     }
   }
 
-  progression[closestIndex] = baseLightness
+  // Snap the nearest slot to the base lightness so the base appears exactly in the ramp — but
+  // clamp it between its neighbors so the progression stays strictly increasing. Writing the
+  // raw base L unconditionally could put the slot out of order (a non-monotone ramp). (Audit 5.1.)
+  const lower = closestIndex > 0 ? progression[closestIndex - 1] + 0.005 : 0
+  const upper = closestIndex < progression.length - 1 ? progression[closestIndex + 1] - 0.005 : 1
+  progression[closestIndex] = Math.max(lower, Math.min(upper, baseLightness))
   return closestIndex
 }

@@ -1,5 +1,6 @@
+import Color from 'colorjs.io'
 import type { ThemeData } from '../types'
-import { brightAnsiHex } from '../utils'
+import { brightAnsiHex, toHex } from '../utils'
 
 export function serializeAsGhostty(data: ThemeData): string {
   const { semanticColors: c, isDarkMode, displayName } = data
@@ -8,6 +9,17 @@ export function serializeAsGhostty(data: ThemeData): string {
 
   // Strip any alpha suffix — Ghostty uses plain #RRGGBB
   const hex = (h: string) => h.slice(0, 7).toUpperCase()
+
+  // Ghostty can't render a translucent selection, so a full-opacity focus color would erase
+  // the selected text. Composite the focus color over the editor bg at the same legible alpha
+  // the alpha-aware formats use, baking a solid hex that keeps selection-foreground readable.
+  // (Audit 4G.)
+  const selectionBg = toHex(
+    new Color(c.editorBackground.hex).mix(new Color(c.focusBorder.hex), data.peakAlpha, {
+      space: 'srgb',
+      outputSpace: 'srgb',
+    }) as Color,
+  )
 
   const palette: [number, string][] = [
     [0, c.terminalAnsiBlack.hex],
@@ -35,7 +47,7 @@ export function serializeAsGhostty(data: ThemeData): string {
     `background = ${hex(c.editorBackground.hex)}`,
     `foreground = ${hex(c.editorForeground.hex)}`,
     `cursor-color = ${hex(c.cursorColor.hex)}`,
-    `selection-background = ${hex(c.focusBorder.hex)}`,
+    `selection-background = ${hex(selectionBg)}`,
     `selection-foreground = ${hex(c.editorForeground.hex)}`,
     '',
     ...palette.map(([i, v]) => `palette = ${i}=${hex(v)}`),

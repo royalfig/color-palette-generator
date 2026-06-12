@@ -1,5 +1,6 @@
 import Color, { Coords } from 'colorjs.io'
 import { ColorFormat } from './types'
+import { clampChromaToGamut } from './color-math'
 function toPrecision(n: number | null, precision: number) {
   if (n === null || n === 0) {
     return 0
@@ -84,7 +85,11 @@ export function colorFactory(
   isBase = false,
   isUiMode = false,
 ): BaseColorData {
-  const color = base instanceof Color ? base : new Color(base)
+  // Reduce chroma to the sRGB gamut up front (holding L and H), so the stored color and
+  // every downstream consumer (ui.ts reads `.oklch` off this) reason about a realizable
+  // color rather than one that gets hue-shifted by a naive clip at serialization time.
+  const rawColor = base instanceof Color ? base : new Color(base)
+  const color = clampChromaToGamut(rawColor)
 
   // Conversion cache for lazy-loaded conversions
   const conversionCache: ConversionsCache = {}
@@ -127,7 +132,9 @@ export function colorFactory(
     cssValue: color.display().toString(),
     contrast: color.contrastWCAG21('#fff') > color.contrastWCAG21('#000') ? '#fff' : '#000',
     string: color.toString({ format, precision: 3 }),
-    fallback: srgbInGamut.toString({ clip: true, format }),
+    // `color` is already chroma-reduced into sRGB above, so this serializes a hue-stable
+    // in-gamut value rather than a per-channel clip (which shifts hue at the extremes).
+    fallback: srgbInGamut.toString({ format }),
     conversions: {
       hex: conversionCache.hex,
       rgb: conversionCache.rgb,
