@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
 import { colorFactory } from './factory'
-import { clampOKLCH, detectFormat } from './utils'
+import { clampOKLCH, detectFormat, isAchromatic, generateNeutralPalette } from './utils'
 import { ColorFormat, ColorSpace } from './types'
 import { enhancePalette, avoidMuddyZones, applyEnhancementsToAnalogous, polishPalette } from './enhancer'
 
@@ -206,13 +206,13 @@ function getWarmCoolAnalogous(baseColor: Color): number[] {
 
   // Determine light source character
   let lightType: string
-  if (lightness > 0.8 && chroma < 0.3) {
+  if (lightness > 0.8 && chroma < 0.06) {
     lightType = 'neutral'
   } else if (hue >= 30 && hue < 90 && lightness > 0.6) {
     lightType = 'golden'
   } else if (hue >= 180 && hue < 240 && lightness < 0.5) {
     lightType = 'cool'
-  } else if (chroma > 0.8 && lightness < 0.4) {
+  } else if (chroma > 0.15 && lightness < 0.4) {
     lightType = 'dramatic'
   } else if (hue >= 270 && hue < 330) {
     lightType = 'magical'
@@ -292,6 +292,8 @@ export function generateAnalogous(
   try {
     const baseColorObj = new Color(baseColor)
     const format = options.colorSpace.format
+
+    if (isAchromatic(baseColorObj)) return generateNeutralPalette(baseColor, 6, 'analogous', format)
 
     let analogousHues: number[]
 

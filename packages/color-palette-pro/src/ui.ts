@@ -2,8 +2,16 @@ import Color from "colorjs.io";
 import { BaseColorData, colorFactory } from "./factory";
 import { PaletteKinds, ColorFormat } from "./types";
 import { findOptimalLightness, getMedianChroma, findColorByHue } from "./color-math";
+import { cvdDistance } from "./cvd";
 
 // ===== CONTRAST-BASED COLOR GENERATION =====
+//
+// NOTE on the contrast metric: this module targets WCAG 2.1 ratios (contrastWCAG21). WCAG 2 is
+// known to be perceptually inaccurate — it overstates contrast for light-on-dark (dark mode)
+// and ignores hue/chroma. APCA (Lc) models this better and is used in code-mode for syntax.
+// We keep WCAG 2.1 here because consumers validate against it, but dark-mode "on-*" colors
+// chosen to *just* clear 4.5:1 may be perceptually light; prefer the higher AAA tokens for body
+// text in dark mode. (Audit 2D.2.)
 
 /**
  * Searches outward from a preferred lightness until the contrast ratio is met.
@@ -33,11 +41,13 @@ function findLightnessFromTarget(
 
 /**
  * Generates an accessible (4.5:1 or 7:1) version of a color to sit on a background.
- * It targets Tone 90 or Tone 10 for a clean "on-color" look.
+ * It targets OKLCH L 0.90 (on dark) / 0.12 (on light) for a clean "on-color" look.
  *
- * `chromaFloor` is the minimum chroma the result will carry. Default 0.06 keeps
- * accent on-colors (on-primary, on-error, …) visibly tinted. Pass 0 when the
- * caller is neutral body text (on-surface) and should not be forced chromatic.
+ * `chromaFloor` is the minimum chroma the result carries — but it's scaled down as the target
+ * lightness approaches the poles, because chroma is barely perceptible at L≈0.12/0.90 (and the
+ * gamut ceiling there is tiny). The old code forced a flat 0.06 floor and claimed it kept
+ * on-colors "visibly tinted"; at the poles it did almost nothing. Scaling keeps the promise
+ * honest: a real tint where L allows it, near-neutral where it doesn't. (Audit 4E.)
  */
 function getAccessibleVariant(
   color: Color,
@@ -49,10 +59,12 @@ function getAccessibleVariant(
   const isDarkBg = backgroundL < 0.5;
   const target = color.clone();
 
-  target.oklch.c = Math.max(target.oklch.c ?? 0, chromaFloor);
-
-  // Target high-contrast levels (Tone 90 for dark backgrounds, Tone 10 for light)
+  // Target high-contrast levels (OKLCH L 0.90 on dark backgrounds, 0.12 on light)
   target.oklch.l = isDarkBg ? 0.9 : 0.12;
+
+  // Scale the floor by proximity to mid-lightness (≈0 at the poles, full near L 0.5).
+  const effectiveFloor = chromaFloor * Math.max(0, 1 - Math.abs((target.oklch.l ?? 0.5) - 0.5) * 2);
+  target.oklch.c = Math.max(target.oklch.c ?? 0, effectiveFloor);
 
   if (target.contrastWCAG21(background) >= minRatio) {
     return target;
@@ -102,8 +114,10 @@ export function adaptPrimaryForMode(
   surface.oklch.l = surfaceL;
   surface.oklch.c = 0;
 
-  // M3 uses Tone 40 (L=0.4) for Light and Tone 80 (L=0.8) for Dark by default.
-  // Callers may override (e.g. naturally-light + light mode prefers L=0.35).
+  // We use OKLCH L 0.40 (light) / 0.80 (dark) for the primary — M3-INSPIRED, but note these
+  // are OKLCH lightness values, NOT M3 HCT "tones". HCT tone ≈ CIE L*, a different scale, so
+  // OKLCH L 0.40 ≠ HCT tone 40. Don't cross-reference these against M3 reference palettes.
+  // (Audit 4A.) Callers may override (naturally-light + light mode prefers L=0.35).
   const desiredL = targetL ?? (isDarkMode ? 0.8 : 0.4);
   const target = primary.clone();
   target.oklch.l = desiredL;
@@ -117,11 +131,149 @@ export function adaptPrimaryForMode(
   return findLightnessFromTarget(target, surface, 4.5, desiredL);
 }
 
+/**
+ * Chroma for a tinted-neutral surface, damped toward 0 as the surface approaches the mode's
+ * "paper" extreme (white in light mode, black in dark). Near those extremes even a tiny OKLCH
+ * chroma reads as heavily saturated (HSL saturation blows up as L→1, and a faint wash on a
+ * near-white page is conspicuous), so the page canvas and floating overlays trend neutral while
+ * mid-elevation containers — further from the extreme — may carry a whisper of brand tint.
+ *
+ * `intended` is the chroma we'd use mid-range; `proximityRange` is how far from the extreme the
+ * tint ramps back to full. (Audit 4B.)
+ */
+function dampedSurfaceChroma(
+  primaryC: number,
+  l: number,
+  isDarkMode: boolean,
+  intended: number,
+  minProximity = 0,
+): number {
+  // HSL saturation (and perceived "colored-ness" of a near-neutral fill) blows up as L
+  // approaches EITHER extreme — its denominator 1−|2L−1| → 0 at both black and white. So damp
+  // by distance from the nearer extreme: ~0 chroma near black/white, full at mid lightness.
+  //
+  // `minProximity` sets a floor on that damping per role: the page surface and floating overlay
+  // use 0 (they trend fully neutral near white), but containers use a positive floor so they
+  // keep a visible brand tint even when their lightness sits close to white. (Audit 4B.)
+  const distanceFromExtreme = Math.min(l, 1 - l); // 0 at the poles, 0.5 at mid
+  const proximity = Math.max(minProximity, Math.min(1, distanceFromExtreme / 0.5));
+  return Math.min(primaryC, intended) * proximity;
+}
+
 function surfaceChromaFor(primary: Color, isDarkMode: boolean): number {
   const c = primary.oklch.c ?? 0;
-  return isDarkMode
-    ? Math.min(c * 0.03, 0.004)
-    : Math.min(c * 0.015, 0.002);
+  // Page canvas: the most restrained tint of the whole stack. At its lightness (L≈0.99 light /
+  // 0.23 dark) the damping drives light mode essentially neutral and keeps dark subtle.
+  const surfaceL = isDarkMode ? 0.23 : 0.99;
+  return dampedSurfaceChroma(c, surfaceL, isDarkMode, isDarkMode ? 0.012 : 0.012);
+}
+
+// ===== ELEVATION SHADOWS =====
+
+// Relative-color wrapper per output space. Each emits `<fn>(from var(--<token>) <channels> / a)`,
+// which passes the source color's channels through unchanged and only overrides alpha — so
+// `--shadow-color` / `--highlight-color` stay *real, reusable colors* (in the palette's own
+// space) and every layer derives its translucency from them.
+const REL_WRAP: Record<ColorFormat, { fn: string; channels: string }> = {
+  oklch: { fn: "oklch", channels: "l c h" },
+  oklab: { fn: "oklab", channels: "l a b" },
+  lab: { fn: "lab", channels: "l a b" },
+  lch: { fn: "lch", channels: "l c h" },
+  hsl: { fn: "hsl", channels: "h s l" },
+  p3: { fn: "color", channels: "display-p3 r g b" },
+  srgb: { fn: "rgb", channels: "r g b" },
+  rgb: { fn: "rgb", channels: "r g b" },
+  hex: { fn: "rgb", channels: "r g b" },
+};
+
+function colorToCss(color: Color, format: ColorFormat): string {
+  if (format === "hex") return color.to("srgb").toString({ format: "hex" });
+  if (format === "rgb" || format === "srgb") return color.to("srgb").toString({ precision: 4 });
+  return color.to(format).toString({ precision: 4 });
+}
+
+/**
+ * A near-neutral, brand-tinted, mode-adapted elevation shadow system, using the layered
+ * "smooth shadow" technique: each tier stacks box-shadows with growing offset/blur and negative
+ * spread so the penumbra falls off realistically. Design choices baked in here:
+ *
+ *  - Almost neutral ink (a whisper of the brand hue), darker in light mode so shadows read crisp
+ *    rather than hazy; near-black in dark mode.
+ *  - DARK MODE leans on a top "key-light" highlight + a couple of shallow layers rather than big
+ *    drop shadows (black-on-near-black barely registers; lighter surfaces do the elevation work).
+ *  - A top inset HIGHLIGHT (`--highlight-color`) lifts the upper edge of the element.
+ *  - All offsets are derived from one `--light-angle` via CSS `sin()`/`cos()`, so the whole set
+ *    rotates from a single knob (0deg = straight down). `--shadow-strength` scales every alpha.
+ *  - `xs` is a single hairline layer for buttons/hovers.
+ *
+ * Returns CSS custom properties ready to drop into `:root`.
+ */
+export function generateElevationShadowVars(
+  primary: Color,
+  isDarkMode: boolean,
+  format: ColorFormat = "oklch",
+): Record<string, string> {
+  const hsl = primary.to("hsl");
+  const isAchromatic = (primary.oklch.c ?? 0) < 0.01;
+  const hue = Number.isFinite(hsl.coords[0] ?? NaN) ? (hsl.coords[0] as number) : 0;
+
+  // Near-neutral ink: faint hue, low saturation. Darker in light mode (crisp, not hazy).
+  const shadowCol = new Color("hsl", [hue, isAchromatic ? 0 : isDarkMode ? 6 : 4, isDarkMode ? 5 : 30]);
+  // Key-light edge: lighter than the surface (white-ish in light, a lifted brand tone in dark).
+  const highlightCol = new Color("hsl", [hue, isAchromatic ? 0 : isDarkMode ? 14 : 12, isDarkMode ? 62 : 100]);
+
+  const rel = REL_WRAP[format] ?? REL_WRAP.oklch;
+  const ink = (alpha: number) =>
+    `${rel.fn}(from var(--shadow-color) ${rel.channels} / calc(${alpha} * var(--shadow-strength)))`;
+  const lit = (alpha: number) =>
+    `${rel.fn}(from var(--highlight-color) ${rel.channels} / calc(${alpha} * var(--shadow-strength)))`;
+
+  // One drop-shadow layer, its offset rotated from --light-angle (0deg ⇒ straight down).
+  const layer = (d: number, blur: number, spread: number, alpha: number) =>
+    `calc(sin(var(--light-angle)) * ${(-d).toFixed(2)}px) calc(cos(var(--light-angle)) * ${d.toFixed(2)}px) ${blur}px ${spread}px ${ink(alpha)}`;
+  const topHighlight = (alpha: number) => `inset 0 1px 0 ${lit(alpha)}`;
+  const join = (layers: string[]) => layers.join(",\n    ");
+
+  // [offset-distance, blur, spread, alpha] per layer. Dark tiers are deliberately shallow and
+  // lean on the highlight; light tiers layer more, with darker low-alpha ink for a crisp edge.
+  const tiers = isDarkMode
+    ? {
+        xs: [layer(0.5, 1, 0, 0.4)],
+        low: [topHighlight(0.35), layer(1, 2, -0.5, 0.5)],
+        medium: [topHighlight(0.4), layer(2, 4, -1, 0.5), layer(6, 9, -2, 0.5)],
+        high: [topHighlight(0.45), layer(4, 7, -1, 0.45), layer(12, 18, -2, 0.45), layer(26, 34, -3, 0.45)],
+      }
+    : {
+        xs: [layer(0.5, 0.8, 0, 0.1)],
+        low: [topHighlight(0.5), layer(0.5, 0.6, 0, 0.12), layer(1, 1.3, -0.6, 0.12), layer(2.3, 2.7, -1.3, 0.12)],
+        medium: [
+          topHighlight(0.5),
+          layer(0.5, 0.6, 0, 0.12),
+          layer(1.8, 2.1, -0.5, 0.12),
+          layer(4.5, 5.2, -1, 0.12),
+          layer(9, 10.5, -1.6, 0.12),
+        ],
+        high: [
+          topHighlight(0.5),
+          layer(0.5, 0.6, 0, 0.11),
+          layer(3, 3.5, -0.3, 0.11),
+          layer(6, 6.8, -0.6, 0.11),
+          layer(10.5, 12, -1, 0.11),
+          layer(17, 19, -1.4, 0.11),
+          layer(26, 29, -1.9, 0.11),
+        ],
+      };
+
+  return {
+    "--light-angle": "0deg",
+    "--shadow-strength": "1",
+    "--shadow-color": colorToCss(shadowCol, format),
+    "--highlight-color": colorToCss(highlightCol, format),
+    "--shadow-elevation-xs": join(tiers.xs),
+    "--shadow-elevation-low": join(tiers.low),
+    "--shadow-elevation-medium": join(tiers.medium),
+    "--shadow-elevation-high": join(tiers.high),
+  };
 }
 
 // ===== ACCENT COLOR PREPARATION =====
@@ -233,31 +385,36 @@ export function generateSurfaceColors(
   surface.oklch.c = surfaceChromaFor(primary, isDarkMode);
   surface.oklch.l = isDarkMode ? 0.23 : 0.99;
 
-  // container: Standard cards — ΔL ≈ 0.04 (light) / 0.04 (dark) from surface
+  // container: Standard cards — the most tinted of the stack (furthest from paper in light mode,
+  // so the damping lets the brand tint actually show here). (Audit 4B.)
   const container = primary.clone();
-  container.oklch.c = isDarkMode
-    ? Math.min(primaryC * 0.08, 0.012)
-    : Math.min(primaryC * 0.04, 0.006);
-  container.oklch.l = isDarkMode ? 0.27 : 0.965;
+  const containerL = isDarkMode ? 0.27 : 0.96;
+  container.oklch.l = containerL;
+  // Dark containers sit at a lower (more mid) lightness, so they tolerate more chroma before
+  // reading as oversaturated — give dark a higher intended so its tint matches the light card.
+  container.oklch.c = dampedSurfaceChroma(primaryC, containerL, isDarkMode, isDarkMode ? 0.032 : 0.018, 0.34);
 
   // container-sunken: Inset wells — recessed below surface or container
   const containerSunken = primary.clone();
-  containerSunken.oklch.c = isDarkMode
-    ? Math.min(primaryC * 0.04, 0.006)
-    : Math.min(primaryC * 0.02, 0.003);
-  containerSunken.oklch.l = isDarkMode ? 0.18 : 0.935;
+  const sunkenL = isDarkMode ? 0.18 : 0.935;
+  containerSunken.oklch.l = sunkenL;
+  containerSunken.oklch.c = dampedSurfaceChroma(primaryC, sunkenL, isDarkMode, isDarkMode ? 0.024 : 0.014, 0.26);
 
-  // container-overlay: Floating elements — near-white in light mode with a whisper
-  // of brand tint so it feels family-related; visibly elevated above container in dark.
+  // container-overlay: Floating elements. Near-white in light mode → the damping makes it
+  // essentially neutral, so it relies on the `shadow` token to read as elevated (see
+  // generateUiColorPalette); visibly lifted (and faintly tinted) in dark.
   const containerOverlay = primary.clone();
-  containerOverlay.oklch.c = isDarkMode
-    ? Math.min(primaryC * 0.06, 0.008)
-    : Math.min(primaryC * 0.02, 0.003);
-  containerOverlay.oklch.l = isDarkMode ? 0.31 : 0.995;
+  const overlayL = isDarkMode ? 0.31 : 0.995;
+  containerOverlay.oklch.l = overlayL;
+  containerOverlay.oklch.c = dampedSurfaceChroma(primaryC, overlayL, isDarkMode, 0.014);
 
-  // Worst-case background for contrast checking:
+  // Worst-case background for contrast checking, WITHIN THE NEUTRAL SURFACE STACK:
   // Light Mode (Dark Text): Lowest contrast occurs on the darkest background (sunken)
   // Dark Mode (Light Text): Lowest contrast occurs on the lightest background (overlay)
+  // Scope caveat: on-surface / on-surface-variant are guaranteed only against these neutral
+  // surfaces. They are NOT verified against the tinted accent containers (primary-container,
+  // error-container, …) — text on those should use the matching on-*-container token, which
+  // makeContainerForAccent verifies separately. (Audit 2D.3.)
   const worstCaseBackground = isDarkMode ? containerOverlay : containerSunken;
 
   const onSurface = primary.clone();
@@ -309,12 +466,16 @@ function generateOutlineAndInverse(
   const outlineVariant = outlineBase.clone();
   outlineVariant.oklch.l = isDarkMode ? 0.2 : 0.92;
 
-  // Inverse colors: strictly neutral flips of the surface/on-surface
+  // Inverse colors (snackbars, etc.): a whisper of the brand tint so they stay in the same
+  // family as the rest of the (tinted-neutral) surfaces rather than reading as a foreign pure
+  // grey. The chroma is tiny, so the inverse contrast is unaffected. (Audit 4H.)
   const inverseSurface = onSurface.clone();
-  inverseSurface.oklch.c = 0; // Truly neutral
+  inverseSurface.oklch.h = primary.oklch.h ?? inverseSurface.oklch.h;
+  inverseSurface.oklch.c = isDarkMode ? 0.006 : 0.008;
 
   const onInverseSurface = surface.clone();
-  onInverseSurface.oklch.c = 0; // Truly neutral
+  onInverseSurface.oklch.h = primary.oklch.h ?? onInverseSurface.oklch.h;
+  onInverseSurface.oklch.c = isDarkMode ? 0.008 : 0.006;
 
   return {
     outline: outlineAdjusted,
@@ -341,57 +502,60 @@ export function generateSemanticColors(
 } {
   const medianChroma = getMedianChroma(palette);
 
-  // Error: red (hue 27 in OKLCH)
-  const errorBase =
-    findColorByHue(palette, 27) ||
-    (() => {
-      const fallback = primary.clone();
-      fallback.oklch.h = 27;
-      fallback.oklch.c = Math.min(Math.max(medianChroma * 0.9, 0.1), 0.15);
-      return fallback;
-    })();
+  // Canonical semantic HUES are pinned (not borrowed from the palette): an "error" must read
+  // as red, not as whatever palette swatch happened to fall within 30° of red. We only borrow
+  // *chroma* from a nearby palette member so the semantics feel related to the brand, with a
+  // floor so they stay saturated enough to signal. (Audit 2A.)
+  const borrowChroma = (hue: number): number => {
+    const match = findColorByHue(palette, hue, 25);
+    const c = match?.oklch.c ?? medianChroma;
+    // Floor keeps semantics saturated enough to read AND to stay separable under CVD
+    // (perceptual distance grows with chroma); ceiling keeps them from screaming.
+    return Math.min(Math.max(c, 0.13), 0.18);
+  };
 
-  // Success: green (hue 140)
-  const successBase =
-    findColorByHue(palette, 140) ||
-    (() => {
-      const fallback = primary.clone();
-      fallback.oklch.h = 140;
-      fallback.oklch.c = Math.min(Math.max(medianChroma * 0.9, 0.1), 0.15);
-      return fallback;
-    })();
+  // Distinct lightness targets per role. Separating error/success/warning in LIGHTNESS — not
+  // just hue — keeps them distinguishable for red-green color-vision deficiency, where the
+  // hue channel that normally separates red from green collapses. (Audit 2B.1.) Amber sits
+  // lighter because high-chroma yellow is only realizable at higher L.
+  const targetL = isDarkMode
+    ? { error: 0.66, warning: 0.90, success: 0.74 }
+    : { error: 0.42, warning: 0.62, success: 0.50 };
 
-  // Warning: amber (hue 83 in OKLCH)
-  const warningBase =
-    findColorByHue(palette, 83) ||
-    (() => {
-      const fallback = primary.clone();
-      fallback.oklch.h = 83;
-      fallback.oklch.c = Math.min(Math.max(medianChroma * 0.9, 0.1), 0.15);
-      return fallback;
-    })();
+  // Construct fresh from explicit OKLCH coords. Building via `primary.clone()` breaks for
+  // achromatic seeds (NaN hue): assigning `.oklch.h` onto a chroma-0 color doesn't reliably
+  // take, leaving the semantics neutral (and thus indistinguishable under CVD).
+  const make = (hue: number, l: number): Color =>
+    new Color("oklch", [l, borrowChroma(hue), hue]);
 
-  // Step the semantic L back toward the surface only as far as needed to keep 4.5:1
-  // — preserves the perceived hue while making inline use (text/icons on surface) safe.
+  // Success uses a teal-leaning green (162°) rather than a pure green (~145°). The blue-yellow
+  // axis it gains is preserved under red-green CVD, so success stays distinct from both amber
+  // (warning) and red (error) for deuteranopes/protanopes — pure green collapses onto amber.
+  let error = make(27, targetL.error);
+  let warning = make(83, targetL.warning);
+  let success = make(162, targetL.success);
+
+  // Step the semantic L back toward the surface only as far as needed to keep 4.5:1 — preserves
+  // the perceived hue while making inline use (text/icons on surface) safe. Done FIRST so the
+  // CVD pass (below) can then separate them without re-colliding.
   const clampAgainstSurface = (c: Color): Color => {
     if (!surface) return c;
     if (c.contrastWCAG21(surface) >= 4.5) return c;
     return findLightnessFromTarget(c, surface, 4.5, c.oklch.l ?? 0.5);
   };
 
-  let error = errorBase.clone();
-  error.oklch.l = isDarkMode ? 0.8 : 0.4;
   error = clampAgainstSurface(error);
-  const onError = getAccessibleVariant(error, error, 4.5);
-
-  let success = successBase.clone();
-  success.oklch.l = isDarkMode ? 0.8 : 0.4;
-  success = clampAgainstSurface(success);
-  const onSuccess = getAccessibleVariant(success, success, 4.5);
-
-  let warning = warningBase.clone();
-  warning.oklch.l = isDarkMode ? 0.7 : 0.5;
   warning = clampAgainstSurface(warning);
+  success = clampAgainstSurface(success);
+
+  // Separate the three in OKLCH lightness so they stay mutually distinct *as a red-green
+  // dichromat sees them*. Each color is re-placed at the lightness — within its contrast-safe
+  // band against the surface — that maximizes CVD distance from the colors already placed.
+  // Green is placed last (it's the one most confusable with both red and amber).
+  ({ error, warning, success } = enforceCvdDistinctSemantics(error, warning, success, surface));
+
+  const onError = getAccessibleVariant(error, error, 4.5);
+  const onSuccess = getAccessibleVariant(success, success, 4.5);
   const onWarning = getAccessibleVariant(warning, warning, 4.5);
 
   return {
@@ -402,6 +566,57 @@ export function generateSemanticColors(
     warning,
     onWarning,
   };
+}
+
+/**
+ * Push error/warning/success apart in lightness until each pair clears a minimum perceptual
+ * distance *under deuteranopia + protanopia simulation*. Without this, red error and green
+ * success — the single most confusable CVD pair — can render near-identical. We only move
+ * lightness (cheap, monotonic, doesn't break the canonical hue identity).
+ */
+function enforceCvdDistinctSemantics(
+  error: Color,
+  warning: Color,
+  success: Color,
+  surface: Color | undefined,
+  minDist = 14,
+): { error: Color; warning: Color; success: Color } {
+  // Lightness range we may explore (kept inside legible bounds). The contrast filter below
+  // further restricts this per-color so every result still clears 4.5:1 against the surface.
+  const candidateLs: number[] = [];
+  for (let l = 0.18; l <= 0.96; l += 0.02) candidateLs.push(l);
+
+  const contrastOk = (c: Color): boolean =>
+    !surface || c.contrastWCAG21(surface) >= 4.5;
+
+  // Place error first (anchor), then amber, then green — green is confusable with BOTH, so it
+  // gets last pick of the remaining lightness space.
+  const placed: Color[] = [error];
+  const place = (c: Color) => {
+    const targetL = c.oklch.l ?? 0.5;
+    let best = targetL;
+    let bestScore = -Infinity;
+    for (const l of candidateLs) {
+      const probe = c.clone();
+      probe.oklch.l = l;
+      if (!contrastOk(probe)) continue;
+      let minD = Infinity;
+      for (const p of placed) minD = Math.min(minD, cvdDistance(probe, p));
+      // Reward distinctness; gently prefer staying near the role's natural lightness so amber
+      // stays light, error stays deep, etc. The bonus is dwarfed once a pair is below minDist.
+      const score = Math.min(minD, minDist) * 10 - Math.abs(l - targetL);
+      if (score > bestScore) {
+        bestScore = score;
+        best = l;
+      }
+    }
+    c.oklch.l = best;
+    placed.push(c);
+  };
+  place(warning);
+  place(success);
+
+  return { error, warning, success };
 }
 
 // ===== CONTAINER GENERATION =====
@@ -461,14 +676,20 @@ export function generateUiColorPalette(
     primary,
   );
 
-  // Secondary and Tertiary follow the same Tone targets as Primary:
-  // Light mode → Tone 40 (dark, so on-color is light), Dark mode → Tone 80 (light, so on-color is dark).
-  // Directly assigning L avoids adaptPrimaryForMode leaving them above 0.5 in light mode,
-  // which would cause getAccessibleVariant to generate a dark (wrong) on-color.
-  const secondary = secondaryRaw.clone();
-  secondary.oklch.l = isDarkMode ? 0.8 : 0.4;
-  const tertiary = tertiaryRaw.clone();
-  tertiary.oklch.l = isDarkMode ? 0.8 : 0.4;
+  // Secondary and Tertiary follow the same lightness targets as Primary (OKLCH L 0.4 light /
+  // 0.8 dark, picked so the on-color lands on the opposite pole). We assign the target L and
+  // then VERIFY it against the surface, searching outward only if needed — previously the L
+  // was hard-assigned with no contrast check, so these were accessible only by luck of the
+  // accent's chroma. (Audit 2C.1.)
+  const verifyAgainstSurface = (c: Color, targetL: number): Color => {
+    const out = c.clone();
+    out.oklch.l = targetL;
+    if (out.contrastWCAG21(surfaces.surface) >= 4.5) return out;
+    return findLightnessFromTarget(out, surfaces.surface, 4.5, targetL);
+  };
+  const accentTargetL = isDarkMode ? 0.8 : 0.4;
+  const secondary = verifyAgainstSurface(secondaryRaw, accentTargetL);
+  const tertiary = verifyAgainstSurface(tertiaryRaw, accentTargetL);
 
   const onSecondary = getAccessibleVariant(secondary, secondary, 4.5);
   const onTertiary = getAccessibleVariant(tertiary, tertiary, 4.5);
@@ -496,7 +717,29 @@ export function generateUiColorPalette(
   const { container: warningContainer, onContainer: onWarningContainer } =
     makeContainerForAccent(semantic.warning, isDarkMode);
 
-  // Step 7: Return 34 tokens in consistent order
+  // Interaction-state & utility tokens (Audit 4C/4D — the set was previously missing every
+  // hover/pressed/disabled state plus scrim/shadow, so a real UI couldn't be built from it).
+  // M3 state layers = the on-color composited over the base at a fixed opacity; we bake those
+  // to solid tokens (hover 8%, pressed 12%). scrim/shadow are pure black for consumers to apply
+  // at their own alpha (modal backdrops, elevation shadows — the latter is what lets near-white
+  // light-mode overlays read as elevated).
+  const stateLayer = (base: Color, on: Color, opacity: number): Color =>
+    base.clone().mix(on, opacity, { space: "srgb", outputSpace: "srgb" }) as Color;
+  const primaryHover = stateLayer(primary, onPrimary, 0.08);
+  const primaryPressed = stateLayer(primary, onPrimary, 0.12);
+
+  const scrim = new Color("oklch", [0, 0, 0]);
+  const shadow = new Color("oklch", [0, 0, 0]);
+
+  // Disabled: neutral, low-emphasis (hue-stripped so it reads as inactive).
+  const onDisabled = surfaces.onSurfaceVariant.clone();
+  onDisabled.oklch.c = 0;
+  onDisabled.oklch.l = isDarkMode ? 0.45 : 0.62;
+  const disabledContainer = surfaces.surface.clone();
+  disabledContainer.oklch.c = 0;
+  disabledContainer.oklch.l = isDarkMode ? 0.26 : 0.93;
+
+  // Step 7: Return tokens in consistent order (count derived from the roles below, not fixed).
   return [
     // Primary colors (4)
     colorFactory(primary, "primary", 0, colorFormat, false, true),
@@ -603,5 +846,13 @@ export function generateUiColorPalette(
     colorFactory(semantic.onWarning, "on-warning", 0, colorFormat, false, true),
     colorFactory(warningContainer, "warning-container", 0, colorFormat, false, true),
     colorFactory(onWarningContainer, "on-warning-container", 0, colorFormat, false, true),
+
+    // Interaction states + disabled + utility (Audit 4C/4D)
+    colorFactory(primaryHover, "primary-hover", 0, colorFormat, false, true),
+    colorFactory(primaryPressed, "primary-pressed", 0, colorFormat, false, true),
+    colorFactory(onDisabled, "on-disabled", 0, colorFormat, false, true),
+    colorFactory(disabledContainer, "disabled-container", 0, colorFormat, false, true),
+    colorFactory(scrim, "scrim", 0, colorFormat, false, true),
+    colorFactory(shadow, "shadow", 0, colorFormat, false, true),
   ];
 }

@@ -301,6 +301,12 @@ export function deriveUiColors(
   // 2026 uses ~0.70 alpha; we match.
   const focusBorderAlpha = toHex(withAlpha(semantic.focusBorder.hex, 0.70))
 
+  // controlBorder: a border that conveys the *boundary of an interactive control* (text
+  // inputs, dropdowns, checkboxes) must meet WCAG 1.4.11 non-text contrast (3:1) against the
+  // surface behind it. `outlineVariant` is intentionally ~1.2:1 (decorative dividers/seams),
+  // so functional control borders use this verified token instead. (Audit 2C.2.)
+  const controlBorder = ensureContrast(new Color(outline.hex), new Color(panelBackground.hex), 3.0)
+
   // chat.inputWorkingBorder gradient — three lightness steps of primary. The sweep
   // direction inverts by mode so the "working" animation reads as motion both ways.
   const primaryColor = new Color(semantic.focusBorder.hex)
@@ -479,7 +485,7 @@ export function deriveUiColors(
     // Input
     'input.background': panelBackground.hex,
     'input.foreground': editorForeground.hex,
-    'input.border': outlineVariant.hex,
+    'input.border': controlBorder,
     'input.placeholderForeground': toHex(withAlpha(editorForeground.hex, 0.5)),
     'inputOption.activeBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.2)),
     'inputOption.activeBorder': semantic.focusBorder.hex,
@@ -488,7 +494,7 @@ export function deriveUiColors(
     // Dropdown
     'dropdown.background': overlayBackground.hex,
     'dropdown.foreground': editorForeground.hex,
-    'dropdown.border': outlineVariant.hex,
+    'dropdown.border': controlBorder,
 
     // Button — secondary now uses the real secondary role (not a fake foreground@10%),
     // giving the theme a proper two-tier button system.
@@ -613,9 +619,9 @@ export function deriveUiColors(
     // Settings
     'settings.modifiedItemIndicator': semantic.warningForeground.hex,
     'settings.dropdownBackground': overlayBackground.hex,
-    'settings.dropdownBorder': outlineVariant.hex,
+    'settings.dropdownBorder': controlBorder,
     'settings.checkboxBackground': overlayBackground.hex,
-    'settings.checkboxBorder': outlineVariant.hex,
+    'settings.checkboxBorder': controlBorder,
 
     // Diff editor
     'diffEditor.insertedTextBackground': toHex(withAlpha(semantic.successForeground.hex, 0.15)),

@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
 import { BaseColorData } from './factory'
-import { clampOKLCH, detectFormat, applyVariation, buildPaletteColors } from './utils'
+import { clampOKLCH, detectFormat, applyVariation, buildPaletteColors, isAchromatic, generateNeutralPalette } from './utils'
 import { ColorFormat } from './types'
 import { ColorSpace } from './types'
 import { enhancePalette, avoidMuddyZones, polishPalette, applyEnhancementsToTetradic } from './enhancer'
@@ -114,7 +114,8 @@ function getAdaptiveTetradic(baseColor: Color): number[] {
 
   if (hue >= 30 && hue < 90) {
     // Energetic oranges/yellows → Day cycle energy (dawn, noon, dusk, night)
-    const intensity = chroma * lightness
+    // Vividness fraction (chroma / typical max), not chroma×lightness — an aesthetic nudge.
+    const intensity = Math.min(chroma / 0.3, 1)
     return [
       hue, // Dawn energy
       (hue + 90 + intensity * 10) % 360, // Noon intensity
@@ -171,7 +172,7 @@ function getLuminosityTetradic(baseColor: Color): number[] {
 
   // Determine lighting scenario and create four-point illumination
 
-  if (lightness > 0.8 && chroma < 0.3) {
+  if (lightness > 0.8 && chroma < 0.06) {
     // Studio lighting scenario: four balanced light sources
     return [
       hue, // Key light
@@ -201,7 +202,7 @@ function getLuminosityTetradic(baseColor: Color): number[] {
     ]
   }
 
-  if (chroma > 0.8 && lightness < 0.4) {
+  if (chroma > 0.15 && lightness < 0.4) {
     // Dramatic stage lighting: strong contrast four-point
     const warmCool = hue < 180 ? 1 : -1
     return [
@@ -245,6 +246,7 @@ export function generateTetradic(
 
   try {
     const baseColorObj = new Color(baseColor)
+    if (isAchromatic(baseColorObj)) return generateNeutralPalette(baseColor, 6, 'tetradic', format)
 
     let tetradicHues: number[]
 
@@ -337,14 +339,14 @@ export function generateTetradic(
       const lightness = baseColorObj.oklch.l ?? 0.5
       const chroma = baseColorObj.oklch.c ?? 0
 
-      if (lightness > 0.8 && chroma < 0.3) {
+      if (lightness > 0.8 && chroma < 0.06) {
         // studio lighting - prevent over-darkening
         variations = {
           first: { pure: { l: -0.05, c: 0.8 }, muted: { l: -0.2, c: 0.5 } },
           complement: { l: -0.15, c: 0.85 },
           fourth: { light: { l: 0.05, c: 0.7 }, dark: { l: Math.max(-0.3, 0.15 - lightness), c: 0.9 } },
         }
-      } else if (chroma > 0.8 && lightness < 0.4) {
+      } else if (chroma > 0.15 && lightness < 0.4) {
         // dramatic - ensure visibility with lighter variants
         variations = {
           first: { pure: { l: 0.25, c: 1.1 }, muted: { l: 0.1, c: 0.8 } },

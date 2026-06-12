@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
 import { colorFactory } from './factory'
-import { clampOKLCH, detectFormat, applyVariation } from './utils'
+import { clampOKLCH, detectFormat, applyVariation, isAchromatic, generateNeutralPalette, safeHue } from './utils'
 import { ColorFormat, ColorSpace } from './types'
 import { enhancePalette, avoidMuddyZones, polishPalette, applyEnhancementsToComplementary } from './enhancer'
 
@@ -20,38 +20,16 @@ function getMathematicalComplement(hue: number): number {
 }
 
 function getOpticalComplement(baseColor: Color): number {
-  // Perceptual Harmony: Based on how the human visual system processes opponent colors
-  const hue = baseColor.oklch.h ?? 0
-
-  // Red-green and blue-yellow opponent channels work differently
-  if (hue >= 0 && hue < 30) {
-    // Pure reds: eyes expect blue-greens around 160-180°, not yellow-greens
-    return 170 + hue * 0.3 // Creates rich teals/cyans
-  }
-
-  if (hue >= 30 && hue < 90) {
-    // Orange-yellows: eyes expect deep blues/purples
-    // Avoid muddy complements by going to rich blues
-    return 240 + (hue - 30) * 0.5 // Blues to blue-purples
-  }
-
-  if (hue >= 90 && hue < 150) {
-    // Greens: eyes expect magentas/reds, but shifted for visual harmony
-    return 320 + (hue - 90) * 0.6 // Rich magentas to warm reds
-  }
-
-  if (hue >= 150 && hue < 210) {
-    // Blue-greens to cyans: eyes expect warm reds/oranges
-    return 20 + (hue - 150) * 0.4 // Warm reds to red-oranges
-  }
-
-  if (hue >= 210 && hue < 270) {
-    // Blues: eyes expect oranges, but warmer than mathematical
-    return 40 + (hue - 210) * 0.3 // Rich oranges
-  }
-
-  // Purples/magentas: expect yellow-greens
-  return 90 + (hue - 270) * 0.4 // Yellow-greens to greens
+  // Approximate "perceptual" complement, CONTINUOUS in hue. The previous version was a
+  // piecewise table whose branches overlapped and disagreed at the boundaries (e.g. hue 30
+  // mapped to both ~179° and ~240°), so two visually-identical seeds 1° apart could produce
+  // complements 60° apart. This starts from the mathematical 180° opposite and applies a
+  // smooth ±18° skew that biases the complement warmer/cooler the way afterimage complements
+  // skew vs the naive opposite — no band cliffs. (Audit 3C.)
+  const hue = safeHue(baseColor, 0)
+  const base = (hue + 180) % 360
+  const skew = Math.sin((hue * Math.PI) / 180) * 18
+  return (((base + skew) % 360) + 360) % 360
 }
 
 function getAdaptiveComplement(baseColor: Color): number {
@@ -69,8 +47,11 @@ function getAdaptiveComplement(baseColor: Color): number {
 
   if (hue >= 30 && hue < 90) {
     // Energetic oranges/yellows → Mysterious deep blues (energy vs. depth)
-    const intensity = chroma * lightness
-    return 240 + intensity * 30 // Deeper blues for more intense oranges
+    // Vividness = chroma as a fraction of a typical OKLCH max (~0.3), clamped 0–1. More vivid
+    // inputs nudge the complement a little further. This is a deliberate aesthetic nudge, not a
+    // perceptual law — chroma (not chroma×lightness) is the better proxy for saturation/arousal.
+    const intensity = Math.min(chroma / 0.3, 1)
+    return 240 + intensity * 12
   }
 
   if (hue >= 90 && hue < 150) {
@@ -101,7 +82,7 @@ function getLuminosityComplement(baseColor: Color): number {
 
   // Determine the lighting scenario and create realistic complements
 
-  if (lightness > 0.8 && chroma < 0.3) {
+  if (lightness > 0.8 && chroma < 0.06) {
     // Bright, desaturated = daylight scenario
     // Shadows go cool, highlights stay neutral
     return (hue + 200) % 360 // Slightly cool complement
@@ -117,7 +98,7 @@ function getLuminosityComplement(baseColor: Color): number {
     return 40 + (hue - 180) * 0.4 // Warm candlelight colors
   }
 
-  if (chroma > 0.8 && lightness < 0.4) {
+  if (chroma > 0.15 && lightness < 0.4) {
     // Dramatic lighting - creates strong color temperature contrast
     const isWarm = hue < 180
     if (isWarm) {
@@ -151,6 +132,8 @@ export function generateComplementary(
 
   try {
     const baseColorObj = new Color(baseColor)
+    // No hue to complement → return a neutral ramp instead of silently treating gray as red.
+    if (isAchromatic(baseColorObj)) return generateNeutralPalette(baseColor, 6, 'complementary', format)
     const mainComplement = baseColorObj.clone()
     const lightComplement = baseColorObj.clone()
     const mutedComplement = baseColorObj.clone()
@@ -270,7 +253,7 @@ export function generateComplementary(
       const lightness = baseColorObj.oklch.l ?? 0.5
       const chroma = baseColorObj.oklch.c ?? 0
 
-      if (lightness > 0.8 && chroma < 0.3) {
+      if (lightness > 0.8 && chroma < 0.06) {
         // daylight - strong contrast but prevent over-darkening
         baseVariations = {
           dark: { l: Math.max(-0.3, 0.15 - lightness), c: 1.0 },
@@ -281,7 +264,7 @@ export function generateComplementary(
           light: { l: 0.05, c: 0.7 },
           muted: { l: -0.25, c: 0.4 },
         }
-      } else if (chroma > 0.8 && lightness < 0.4) {
+      } else if (chroma > 0.15 && lightness < 0.4) {
         // dramatic - enhance contrast while ensuring visibility
         baseVariations = {
           dark: { l: Math.max(-0.25, 0.15 - lightness), c: 1.3 },

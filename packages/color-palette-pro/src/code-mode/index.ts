@@ -359,6 +359,15 @@ function buildThemeData(
     ? surfaces.onSurface.clone()
     : syntax.accentColor.clone()
 
+  // ANSI magenta/cyan are pinned to canonical hues (≈330 / ≈195) rather than rotated off the
+  // definition color (the old `shiftHue(definition, ±)` could land them far from magenta/cyan,
+  // breaking what `ls`/`git`/`tmux` users expect). All chromatic ANSI colors are then floored
+  // to APCA Lc 45 against the terminal background so they stay readable. (Audit 4F.)
+  const defChroma = syntax.definitionColor.oklch.c ?? 0.12;
+  const ansiMagenta = new Color("oklch", [isDarkMode ? 0.70 : 0.50, Math.min(defChroma, 0.16), 330]);
+  const ansiCyan = new Color("oklch", [isDarkMode ? 0.75 : 0.52, Math.min(defChroma, 0.14), 195]);
+  const ansiFloor = (c: Color): Color => ensureAPCAAgainst(c, editorBgBase, 45);
+
   const semanticColors: SemanticColors = {
     editorBackground: { hex: toHex(editorBgBase) },
     editorForeground: { hex: toHex(surfaces.onSurface) },
@@ -412,12 +421,12 @@ function buildThemeData(
     onSecondaryContainer: { hex: toHex(secondaryContainerPair.onContainer) },
 
     terminalAnsiBlack: { hex: toHex(desaturate(surfaces.onSurface.clone(), 0.7)) },
-    terminalAnsiRed: { hex: toHex(semantics.error) },
-    terminalAnsiGreen: { hex: toHex(semantics.success) },
-    terminalAnsiYellow: { hex: toHex(semantics.warning) },
-    terminalAnsiBlue: { hex: toHex(infoColor) },
-    terminalAnsiMagenta: { hex: toHex(shiftHue(syntax.definitionColor, 120)) },
-    terminalAnsiCyan: { hex: toHex(shiftHue(syntax.definitionColor, -60)) },
+    terminalAnsiRed: { hex: toHex(ansiFloor(semantics.error)) },
+    terminalAnsiGreen: { hex: toHex(ansiFloor(semantics.success)) },
+    terminalAnsiYellow: { hex: toHex(ansiFloor(semantics.warning)) },
+    terminalAnsiBlue: { hex: toHex(ansiFloor(infoColor)) },
+    terminalAnsiMagenta: { hex: toHex(ansiFloor(ansiMagenta)) },
+    terminalAnsiCyan: { hex: toHex(ansiFloor(ansiCyan)) },
     terminalAnsiWhite: { hex: toHex(surfaces.onSurface) },
 
     markdownHeadingColor: { hex: toHex(syntax.definitionColor) },

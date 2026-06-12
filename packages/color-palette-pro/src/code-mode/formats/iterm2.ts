@@ -1,5 +1,6 @@
+import Color from 'colorjs.io'
 import type { ThemeData } from '../types'
-import { brightAnsiHex } from '../utils'
+import { brightAnsiHex, toHex } from '../utils'
 
 function hexToFloats(hex: string): [number, number, number] {
   const h = hex.startsWith('#') ? hex.slice(1) : hex
@@ -37,6 +38,15 @@ export function serializeAsIterm2(data: ThemeData): string {
 
   const bright = (hex: string, isBlack = false) => brightAnsiHex(hex, isDarkMode, isBlack)
 
+  // iTerm2 color dicts are written at full opacity, so composite the focus color over the
+  // editor bg at the legible selection alpha — otherwise selected text can vanish. (Audit 4G.)
+  const selectionBg = toHex(
+    new Color(c.editorBackground.hex).mix(new Color(c.focusBorder.hex), data.peakAlpha, {
+      space: 'srgb',
+      outputSpace: 'srgb',
+    }) as Color,
+  )
+
   const ansi: [string, string][] = [
     ['Ansi 0 Color', c.terminalAnsiBlack.hex],
     ['Ansi 1 Color', c.terminalAnsiRed.hex],
@@ -65,7 +75,7 @@ export function serializeAsIterm2(data: ThemeData): string {
     entry('Foreground Color', c.editorForeground.hex),
     entry('Link Color', c.infoForeground.hex),
     entry('Selected Text Color', c.editorForeground.hex),
-    entry('Selection Color', c.focusBorder.hex),
+    entry('Selection Color', selectionBg),
   ].join('\n')
 
   return [
