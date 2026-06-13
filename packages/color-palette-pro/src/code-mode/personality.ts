@@ -132,40 +132,25 @@ const STYLE_LENSES: Record<PaletteStyle, StyleLens> = {
 
 // ----- font styles -----
 //
+// Font styling is a *lens* property only — it never varies by palette character.
+// (Earlier the Cinematic lens added italic keywords for vivid and italic types for
+// mono; in review that read as haphazard — two of four characters getting a
+// different extra italic. The corpus confirms styling is a binary author choice,
+// uncorrelated with palette mood.)
+//
 // Exemplar consensus: Dark Modern and Nord use no font styles at all; Night Owl,
-// Kanagawa, Dracula(*) and One Dark italicize comments only. Identity must come
-// from color, so the grid is deliberately sparse:
-//   square  — nothing (the stock-IDE read)
-//   triangle / circle — comments italic (the One Dark convention)
-//   diamond — comments italic, plus exactly one signature treatment for the two
-//             characters that can carry it (vivid keywords, mono types).
-// Bold and bold-italic are reserved for markdown headings (base.ts).
+// Kanagawa, One Dark, Tokyo Night italicize comments only. So:
+//   square  — nothing (the engineered / stock-IDE read; Dark Modern / Nord)
+//   triangle / circle / diamond — comments italic, nothing else.
+// No code token is ever italicized. Bold is reserved for markdown headings, and
+// markdown emphasis / blockquotes / editor ghost-text are italic because the
+// *content* is italic, not as decoration (see base.ts / zed.ts).
 
-const FONT_STYLES: Record<PaletteStyle, Record<PaletteCharacter, PersonalityFontStyleProfile>> = {
-  square: {
-    serene: { comments: '', keywords: '' },
-    vivid:  { comments: '', keywords: '' },
-    crisp:  { comments: '', keywords: '' },
-    mono:   { comments: '', keywords: '' },
-  },
-  triangle: {
-    serene: { comments: 'italic', keywords: '' },
-    vivid:  { comments: 'italic', keywords: '' },
-    crisp:  { comments: 'italic', keywords: '' },
-    mono:   { comments: 'italic', keywords: '' },
-  },
-  circle: {
-    serene: { comments: 'italic', keywords: '' },
-    vivid:  { comments: 'italic', keywords: '' },
-    crisp:  { comments: 'italic', keywords: '' },
-    mono:   { comments: 'italic', keywords: '' },
-  },
-  diamond: {
-    serene: { comments: 'italic', keywords: '' },
-    vivid:  { comments: 'italic', keywords: 'italic' },
-    crisp:  { comments: 'italic', keywords: '' },
-    mono:   { comments: 'italic', keywords: '', types: 'italic' },
-  },
+const FONT_STYLES: Record<PaletteStyle, PersonalityFontStyleProfile> = {
+  square:   { comments: '' },
+  triangle: { comments: 'italic' },
+  circle:   { comments: 'italic' },
+  diamond:  { comments: 'italic' },
 }
 
 // ----- surface profile: (lens × character) → chrome behavior -----
@@ -293,7 +278,7 @@ export function getPersonalityConfig(kind: PaletteKinds, style: PaletteStyle): P
       light: offsets.light * lens.bgOffsetIntensity,
     },
     accentRoles: ACCENT_ROLES[character],
-    fontStyleProfile: FONT_STYLES[style][character],
+    fontStyleProfile: FONT_STYLES[style],
     surfaceProfile: buildSurfaceProfile(kind, style),
     lensName: lens.name,
     paletteCharacter: character,
