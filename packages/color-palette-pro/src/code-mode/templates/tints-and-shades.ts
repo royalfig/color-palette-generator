@@ -12,14 +12,15 @@ import { adaptLightnessForText, adaptLightnessForQuiet, shiftHue, mixColors, boo
  */
 
 // Deterministic hue offsets for loud roles, relative to base hue.
-// Modest spread (~80°) so the family identity stays cohesive even across distinction.
+// Tight spread (~±25°) keeps the family cohesive — mono distinction downstream steps
+// lightness rather than hue. The 180° accent stays: it's the moonlight signature.
 const TAS_HUE_STAMPS = {
   definition: 0,
-  string: 20,
-  keyword: -25,
-  type: 40,
-  number: -45,
-  regex: 60,
+  string: 12,
+  keyword: -14,
+  type: 22,
+  number: -24,
+  regex: 28,
   accent: 180, // The signature pop — comment uses the same family for consistency.
 } as const
 

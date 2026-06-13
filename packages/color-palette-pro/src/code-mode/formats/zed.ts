@@ -1,5 +1,6 @@
+import Color from 'colorjs.io'
 import type { ThemeData, ZedSyntaxToken, ZedTheme } from '../types'
-import { brightAnsiHex } from '../utils'
+import { brightAnsiHex, toHex } from '../utils'
 
 /** Convert #RRGGBB or #RRGGBBAA to Zed's required #rrggbbaa format. */
 function za(hex: string, alpha?: number): string {
@@ -15,10 +16,10 @@ function za(hex: string, alpha?: number): string {
 }
 
 export function serializeAsZed(data: ThemeData): ZedTheme {
-  const { semanticColors: c, isDarkMode, type, name, fontStyleProfile, peakAlpha } = data
+  const { semanticColors: c, isDarkMode, type, displayName, fontStyleProfile, peakAlpha } = data
 
   const commentStyle = fontStyleProfile?.comments !== undefined ? fontStyleProfile.comments : 'italic'
-  const keywordStyle = fontStyleProfile?.keywords !== undefined ? fontStyleProfile.keywords : 'italic'
+  const keywordStyle = fontStyleProfile?.keywords ?? ''
 
   const fs = (style: string): Pick<ZedSyntaxToken, 'font_style'> =>
     style === 'italic' ? { font_style: 'italic' } : {}
@@ -87,7 +88,8 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     'editor.selection.background': za(c.focusBorder.hex, peakAlpha),
     'editor.document_highlight.read_background': za(c.focusBorder.hex, peakAlpha * 0.35),
     'editor.document_highlight.write_background': za(c.focusBorder.hex, peakAlpha * 0.55),
-    'search.match_background': za(c.focusBorder.hex, peakAlpha * 0.65),
+    // Gold find-match — the universal highlighter-pen convention (see base.ts).
+    'search.match_background': za(toHex((() => { const g = new Color(c.focusBorder.hex); g.oklch.h = 75; g.oklch.c = Math.max(g.oklch.c ?? 0, 0.12); return g })()), peakAlpha * 0.65),
 
     // Chrome
     'status_bar.background': za(c.statusBarBackground.hex),
@@ -216,5 +218,6 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     syntax,
   }
 
-  return { name, appearance: type, style }
+  // Zed's theme picker displays this per-variant name — use the human-readable form.
+  return { name: displayName, appearance: type, style }
 }

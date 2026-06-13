@@ -201,6 +201,47 @@ export function ensureAPCAAgainst(color: Color, bg: Color, minLc: number): Color
 }
 
 /**
+ * Clip a color to the sRGB gamut and return it in OKLCH. Pipeline math (band
+ * normalization, distinction nudges) must operate on realizable colors — otherwise
+ * two distinct OKLCH values can collapse to near-identical hex at serialization.
+ */
+export function clipToSRGB(color: Color): Color {
+  const srgb = color.clone().to('srgb')
+  if (!srgb) return color.clone()
+  return srgb.toGamut().to('oklch')
+}
+
+/**
+ * Cap a color's contrast against a background: if |Lc| exceeds maxLc, walk L toward
+ * the background until it drops under. Used to keep comments *recessed* — the
+ * exemplar themes run comments at Lc 18–41, well below body-text contrast.
+ */
+export function capAPCAAgainst(color: Color, bg: Color, maxLc: number): Color {
+  if (Math.abs(color.contrastAPCA(bg)) <= maxLc) return color.clone()
+  const bgL = bg.oklch.l ?? 0.5
+  let lo = Math.min(color.oklch.l ?? 0.5, bgL)
+  let hi = Math.max(color.oklch.l ?? 0.5, bgL)
+  const fgIsLighter = (color.oklch.l ?? 0.5) >= bgL
+  let best = color.clone()
+  for (let i = 0; i < 20; i++) {
+    const testL = (lo + hi) / 2
+    const test = color.clone()
+    test.oklch.l = testL
+    if (Math.abs(test.contrastAPCA(bg)) <= maxLc) {
+      best = test
+      // under the cap — try moving back toward the original L for max legibility
+      if (fgIsLighter) lo = testL
+      else hi = testL
+    } else {
+      if (fgIsLighter) hi = testL
+      else lo = testL
+    }
+    if (hi - lo < 0.0005) break
+  }
+  return best
+}
+
+/**
  * ΔE in OKLab space (Euclidean on L, a, b), measured *after* sRGB gamut mapping
  * so we catch cases where two distinct OKLCH colors collapse to the same hex.
  */
@@ -229,6 +270,28 @@ export function nudgeForDistinction(color: Color, awayFrom: Color, isDarkMode: b
   c.oklch.c = Math.min(0.22, (c.oklch.c ?? 0) + 0.02)
   c.oklch.l = Math.max(isDarkMode ? 0.65 : 0.20, Math.min(isDarkMode ? 0.92 : 0.55, c.oklch.l ?? 0.5))
   return c
+}
+
+/**
+ * Lightness-based distinction nudge for monochromatic palettes: instead of rotating
+ * hue (which would break the single-hue identity), step L away from the collision —
+ * the Kanagawa/Poimandres strategy of tiering mono roles by lightness.
+ */
+export function nudgeLightnessForDistinction(color: Color, awayFrom: Color, isDarkMode: boolean, step = 0.07): Color {
+  const cl = color.oklch.l ?? 0.5
+  const [lMin, lMax] = isDarkMode ? [0.64, 0.92] : [0.36, 0.66]
+  const candidate = (l: number): Color => {
+    const c = color.clone()
+    c.oklch.l = l
+    // a whisper of extra chroma still helps separate without leaving the hue family
+    c.oklch.c = Math.min(0.16, (c.oklch.c ?? 0) + 0.01)
+    return clipToSRGB(c)
+  }
+  // Evaluate both directions by *post-gamut* ΔE — stepping blindly "away" from the
+  // anchor can pin the color against a band edge where the clamp makes it a no-op.
+  const up = candidate(Math.min(lMax, cl + step))
+  const down = candidate(Math.max(lMin, cl - step))
+  return deltaE(up, awayFrom) >= deltaE(down, awayFrom) ? up : down
 }
 
 /**

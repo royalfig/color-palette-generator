@@ -269,6 +269,18 @@ export function deriveUiColors(
   const peakAlpha = options.peakAlpha ?? (isDarkMode ? 0.70 : 0.30)
   const ramp = attentionRamp(semantic.focusBorder.hex, peakAlpha)
 
+  // Find-match is gold regardless of palette — the universal "highlighter pen"
+  // convention (corpus findMatch hues 49–93 even in all-blue themes: Dark Modern 74,
+  // GitHub 74/79, Dracula 63, One Dark 56). Sourced from the accent's L so it sits
+  // in the same attention band, but pinned to the gold hue.
+  const findMatchGold = (() => {
+    const g = new Color(semantic.focusBorder.hex)
+    g.oklch.h = 75
+    g.oklch.c = Math.max(g.oklch.c ?? 0, 0.12)
+    return toHex(g)
+  })()
+  const goldAlpha = (mult: number): string => toHex(withAlpha(findMatchGold, Math.min(0.95, peakAlpha * mult)))
+
   // Inactive selection style — chromatic (current ramp), complementary (Night Owl
   // move, hue-shifted primary), or neutral (mono — uses the chrome surface itself).
   const inactiveStyle = options.inactiveSelectionStyle ?? 'chromatic'
@@ -356,8 +368,8 @@ export function deriveUiColors(
     // attentionRamp(). 2026-style coherent "the editor is attending to this" language.
     'editor.selectionBackground': ramp.selection,
     'editor.selectionHighlightBackground': ramp.selectionHighlight,
-    'editor.findMatchBackground': ramp.findMatch,
-    'editor.findMatchHighlightBackground': ramp.findMatchHighlight,
+    'editor.findMatchBackground': goldAlpha(0.65),
+    'editor.findMatchHighlightBackground': goldAlpha(0.45),
     'editor.inactiveSelectionBackground': inactiveSelectionHex,
     'editor.wordHighlightBackground': ramp.wordHighlight,
     'editor.wordHighlightStrongBackground': ramp.wordHighlightStrong,
@@ -770,7 +782,7 @@ export function generateBaseTokenRules(
   fontStyleProfile?: PersonalityFontStyleProfile,
 ): TokenRule[] {
   const commentStyle = fontStyleProfile?.comments !== undefined ? fontStyleProfile.comments : 'italic'
-  const keywordStyle = fontStyleProfile?.keywords !== undefined ? fontStyleProfile.keywords : 'italic'
+  const keywordStyle = fontStyleProfile?.keywords ?? ''
   const definitionStyle = fontStyleProfile?.definitions ?? ''
   const typeStyle = fontStyleProfile?.types ?? ''
 
@@ -908,7 +920,7 @@ export function generateSemanticTokenRules(
   fontStyleProfile?: PersonalityFontStyleProfile,
 ): Record<string, string | { foreground?: string; fontStyle?: string }> {
   const commentStyle = fontStyleProfile?.comments !== undefined ? fontStyleProfile.comments : 'italic'
-  const keywordStyle = fontStyleProfile?.keywords !== undefined ? fontStyleProfile.keywords : 'italic'
+  const keywordStyle = fontStyleProfile?.keywords ?? ''
   const definitionStyle = fontStyleProfile?.definitions ?? ''
   const typeStyle = fontStyleProfile?.types ?? ''
 

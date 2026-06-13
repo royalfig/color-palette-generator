@@ -12,15 +12,16 @@ import { adaptLightnessForText, adaptLightnessForQuiet, mixColors, boostChroma, 
  */
 
 // Deterministic hue offsets for loud roles, relative to base hue.
-// Spread across ~120° so post-gamut they remain distinct even after personality scaling.
+// Tight spread (~±30°) keeps the mono identity honest — downstream distinction for
+// mono palettes steps *lightness*, not hue, so roles separate Kanagawa-style.
 const TONES_HUE_STAMPS = {
   definition: 0,
-  string: 25,
-  keyword: -30,
-  type: 50,
-  number: -55,
-  regex: 75,
-  accent: 18,
+  string: 14,
+  keyword: -16,
+  type: 26,
+  number: -28,
+  regex: 32,
+  accent: 10,
 } as const
 
 export const tonesTemplate: CodeThemeTemplate = {

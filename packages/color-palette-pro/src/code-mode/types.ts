@@ -175,14 +175,38 @@ export interface PersonalityBgTint {
   chromaBoost: number
 }
 
-export interface PersonalityContrastProfile {
-  fgLightnessScale: number
-  chromaScale: number
-  /** Bg L shift in dark mode (negative = deeper, positive = lifted). */
-  bgLightnessOffsetDark: number
-  /** Bg L shift in light mode (negative = darker, positive = whiter). */
-  bgLightnessOffsetLight: number
+/**
+ * Target band for loud syntax roles: all loud tokens are remapped (rank-preserving)
+ * into [lLo, lHi] lightness and [cLo, cHi] chroma — the "every great theme holds its
+ * tokens in a narrow band" property measured from the exemplar themes.
+ */
+export interface TokenBand {
+  lLo: number
+  lHi: number
+  cLo: number
+  cHi: number
 }
+
+/** Quiet-role band: identifiers (variable/property) clamp here; cHi is their tint ceiling. */
+export interface QuietBand {
+  lLo: number
+  lHi: number
+  cHi: number
+}
+
+export interface ModeBands {
+  loud: TokenBand
+  quiet: QuietBand
+}
+
+/** Loud roles eligible to carry a character's chroma accent. */
+export type SyntaxAccentRole =
+  | 'definitionColor'
+  | 'keywordColor'
+  | 'typeColor'
+  | 'stringColor'
+  | 'numberColor'
+  | 'accentColor'
 
 export interface PersonalityFontStyleProfile {
   comments?: string
@@ -209,6 +233,13 @@ export interface SurfaceProfile {
   sidebarSurface: { dark: 'container' | 'containerSunken'; light: 'container' | 'containerSunken' }
   /** Whether sidebar/chrome surfaces get a primary-hue tint. */
   chromeTint: boolean
+  /**
+   * Force fully neutral chrome + editor surfaces (chroma ≤ 0.003), the Dark Modern /
+   * Vitesse / min-light school. Measured rule from the top-theme corpus: themes are
+   * bimodal — chrome is either neutral, or tinted to *match the editor bg* (same hue,
+   * chroma never exceeding the bg's own).
+   */
+  chromeNeutral: boolean
   /** How the status bar is styled. */
   statusBarStyle: 'match-sidebar' | 'tinted' | 'primary' | 'primary-deep'
   /** Cursor color source. */
@@ -221,7 +252,12 @@ export interface SurfaceProfile {
 
 export interface PersonalityConfig {
   bgTint: PersonalityBgTint | null
-  contrastProfile: PersonalityContrastProfile | null
+  /** Per-mode token bands set by the style lens. */
+  tokenBands: { dark: ModeBands; light: ModeBands }
+  /** Editor bg L shift per mode (character × lens). */
+  bgOffset: { dark: number; light: number }
+  /** Which loud roles carry the chroma peak for this palette's character. */
+  accentRoles: SyntaxAccentRole[]
   fontStyleProfile: PersonalityFontStyleProfile | null
   surfaceProfile: SurfaceProfile
   /** Human-readable label for the style lens (e.g. "Engineered", "Cinematic"). */
