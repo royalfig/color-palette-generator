@@ -175,6 +175,46 @@ const COMMENT_C_MAX = 0.05
 const IDENTIFIER_ROLES = ['variableColor', 'propertyColor'] as const
 const STRUCTURAL_ROLES = ['operatorColor', 'punctuationColor'] as const
 
+// ----- ANSI terminal palette: deliberate, palette-driven "mismapping" -----
+//
+// A terminal theme's identity comes from the seed palette being *applied* to the ANSI
+// slots, even when that means a slot drifts off its textbook hue — Dracula's "blue" is
+// purple (Δ+51°), Synthwave's too (+48°), because those are purple-dominant palettes.
+// Measured from the corpus:
+//   1. Chroma is the dominant identity axis — Nord/Vitesse 0.06–0.14 (muted) vs
+//      Dracula/Synthwave 0.15–0.22 (neon). Driven by palette character here.
+//   2. Hue drift is asymmetric: red/green/yellow stay anchored (errors, diff, warnings
+//      depend on them), blue/magenta/cyan roam toward the palette (decorative end).
+//   3. The drift pulls toward the palette's actual hues, not randomly.
+// The lens is the deliberate-mismap dial: square stays faithful (terminal-correct),
+// diamond drifts hard toward the palette (cinematic identity).
+
+interface AnsiSlot { hue: number; drift: number }
+const ANSI_SLOTS: Record<'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan', AnsiSlot> = {
+  red:     { hue: 25,  drift: 18 }, // load-bearing (diff/errors) — barely moves
+  green:   { hue: 145, drift: 24 },
+  yellow:  { hue: 95,  drift: 24 },
+  blue:    { hue: 250, drift: 50 }, // decorative end — roams to the palette (Dracula purple-blue)
+  magenta: { hue: 330, drift: 42 },
+  cyan:    { hue: 200, drift: 40 },
+}
+
+// Fraction of each slot's max drift the lens permits (square faithful → diamond full).
+const ANSI_DRIFT_BY_LENS: Record<PaletteStyle, number> = {
+  square:   0.30,
+  triangle: 0.55,
+  circle:   0.80,
+  diamond:  1.00,
+}
+
+// Target ANSI chroma by palette character — the muted↔neon identity axis.
+const ANSI_CHROMA_BY_CHARACTER: Record<PaletteCharacter, number> = {
+  serene: 0.11,
+  mono:   0.09,
+  crisp:  0.13,
+  vivid:  0.17,
+}
+
 // Red (≈345–25°) is reserved vocabulary: the corpus uses it for tags, operators and
 // keywords, never strings/functions and almost never numbers — a saturated red
 // string reads as an error. These roles avoid the zone at every pipeline stage.
@@ -756,45 +796,47 @@ function buildThemeData(
     return fg
   })()
 
-  // ANSI palette echoes the *editor's* syntax colours (the Dracula/Nord/Tokyo-Night
-  // approach — a terminal that matches the editor) while staying terminal-correct.
-  // For each slot we take the syntax token nearest its canonical hue, clamp the hue
-  // into a ±28° band so `ls`/`git`/`tmux` semantics hold, and floor to APCA Lc 45.
-  // When no token reaches a hue family (mono palettes, warm-only palettes), a
-  // canonical colour is synthesised so the slot is never the wrong colour.
-  //
-  // The convention mapping aligns by construction: string→green, definition(function)
-  // →blue, keyword→magenta, type→cyan, number→yellow. Red stays sourced from `error`
-  // because red is reserved vocabulary the syntax palette deliberately avoids.
+  // ANSI palette: the seed palette resampled at the six chromatic ANSI positions,
+  // pulled toward the palette's actual hues by an amount the lens controls. Each slot's
+  // hue starts canonical and drifts toward the nearest palette member (syntax token or
+  // raw swatch), bounded by the slot's drift cap × the lens factor — so red stays warm
+  // for `git diff` while blue is free to become purple on a purple palette (diamond).
+  // Chroma is stamped by character (muted↔neon); lightness by mode; APCA-floored to 45.
   const ansiFloor = (c: Color): Color => ensureAPCAAgainst(c, editorBgBase, 45)
-  const deriveAnsi = (targetHue: number, candidates: Color[]): Color => {
-    let chosen: Color | null = null
+  const ansiChroma = ANSI_CHROMA_BY_CHARACTER[personality.paletteCharacter]
+  const ansiDriftFactor = ANSI_DRIFT_BY_LENS[paletteStyle]
+  // Candidate hue pool: convention-placed syntax tokens + raw palette swatches, so the
+  // pull reflects the genuine seed identity (a token may not reach a slot; a swatch can).
+  const huePool: number[] = []
+  for (const c of [syntax.keywordColor, syntax.stringColor, syntax.definitionColor, syntax.typeColor, syntax.numberColor, syntax.accentColor]) {
+    if ((c.oklch.c ?? 0) >= 0.04) huePool.push(c.oklch.h ?? 0)
+  }
+  for (const item of palette) {
+    const c = item?.color
+    if (c && (c.oklch.c ?? 0) >= 0.04) huePool.push(c.oklch.h ?? 0)
+  }
+  const deriveAnsi = (slot: AnsiSlot): Color => {
+    // Nearest palette hue to this slot's canonical position.
+    let nearest = slot.hue
     let bestGap = Infinity
-    for (const cand of candidates) {
-      if ((cand.oklch.c ?? 0) < 0.04) continue
-      const g = hueGapDeg(cand.oklch.h ?? 0, targetHue)
-      if (g < bestGap) { bestGap = g; chosen = cand }
+    for (const h of huePool) {
+      const g = hueGapDeg(h, slot.hue)
+      if (g < bestGap) { bestGap = g; nearest = h }
     }
-    const out = (chosen ?? candidates[candidates.length - 1]).clone()
-    if (!chosen || bestGap > 50) {
-      // No token in this hue family — synthesise a readable canonical colour.
-      out.oklch.h = targetHue
-      out.oklch.c = 0.11
-      out.oklch.l = isDarkMode ? 0.72 : 0.50
-    } else {
-      const signed = ((out.oklch.h ?? targetHue) - targetHue + 540) % 360 - 180
-      out.oklch.h = (targetHue + Math.max(-28, Math.min(28, signed)) + 360) % 360
-      out.oklch.c = Math.max(out.oklch.c ?? 0, 0.08)
-    }
+    // Drift toward it, bounded by slot cap × lens factor.
+    const cap = slot.drift * ansiDriftFactor
+    const signed = ((nearest - slot.hue + 540) % 360) - 180
+    const hue = (slot.hue + Math.max(-cap, Math.min(cap, signed)) + 360) % 360
+    const out = new Color('oklch', [isDarkMode ? 0.74 : 0.50, ansiChroma, hue])
     return ansiFloor(out)
   }
 
-  const ansiRed = deriveAnsi(25, [semantics.error])
-  const ansiGreen = deriveAnsi(145, [syntax.stringColor, semantics.success])
-  const ansiYellow = deriveAnsi(95, [syntax.numberColor, semantics.warning])
-  const ansiBlue = deriveAnsi(250, [syntax.definitionColor, infoColor])
-  const ansiMagenta = deriveAnsi(330, [syntax.keywordColor, syntax.accentColor])
-  const ansiCyan = deriveAnsi(200, [syntax.typeColor, syntax.regexColor])
+  const ansiRed = deriveAnsi(ANSI_SLOTS.red)
+  const ansiGreen = deriveAnsi(ANSI_SLOTS.green)
+  const ansiYellow = deriveAnsi(ANSI_SLOTS.yellow)
+  const ansiBlue = deriveAnsi(ANSI_SLOTS.blue)
+  const ansiMagenta = deriveAnsi(ANSI_SLOTS.magenta)
+  const ansiCyan = deriveAnsi(ANSI_SLOTS.cyan)
 
   // ANSI black is conventionally dark in *both* modes (deriving it from onSurface
   // made it near-white in dark themes). A lifted near-black keeps `ls`/`git` output
