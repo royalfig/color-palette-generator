@@ -191,28 +191,42 @@ const STRUCTURAL_ROLES = ['operatorColor', 'punctuationColor'] as const
 
 interface AnsiSlot { hue: number; drift: number }
 const ANSI_SLOTS: Record<'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan', AnsiSlot> = {
-  red:     { hue: 25,  drift: 18 }, // load-bearing (diff/errors) — barely moves
-  green:   { hue: 145, drift: 24 },
-  yellow:  { hue: 95,  drift: 24 },
-  blue:    { hue: 250, drift: 50 }, // decorative end — roams to the palette (Dracula purple-blue)
-  magenta: { hue: 330, drift: 42 },
-  cyan:    { hue: 200, drift: 40 },
+  red:     { hue: 25,  drift: 24 }, // load-bearing (diff/errors) — narrowest leeway
+  green:   { hue: 145, drift: 34 },
+  yellow:  { hue: 95,  drift: 34 },
+  blue:    { hue: 250, drift: 62 }, // decorative end — roams to the palette (Dracula purple-blue)
+  magenta: { hue: 330, drift: 52 },
+  cyan:    { hue: 200, drift: 48 },
 }
 
-// Fraction of each slot's max drift the lens permits (square faithful → diamond full).
+// Fraction of each slot's max hue drift the lens permits (square faithful → diamond full,
+// with a little overshoot so the Cinematic lens reads as deliberately stylised).
 const ANSI_DRIFT_BY_LENS: Record<PaletteStyle, number> = {
-  square:   0.30,
-  triangle: 0.55,
-  circle:   0.80,
-  diamond:  1.00,
+  square:   0.35,
+  triangle: 0.62,
+  circle:   0.88,
+  diamond:  1.12,
 }
 
-// Target ANSI chroma by palette character — the muted↔neon identity axis.
+// Chroma *centre* by palette character — the muted↔neon identity axis. The actual
+// per-slot chroma is pulled toward the palette swatch's own chroma (see deriveAnsi),
+// so each slot varies around this centre instead of sitting flat on it.
 const ANSI_CHROMA_BY_CHARACTER: Record<PaletteCharacter, number> = {
-  serene: 0.11,
-  mono:   0.09,
-  crisp:  0.13,
-  vivid:  0.17,
+  mono:   0.085,
+  serene: 0.115,
+  crisp:  0.145,
+  vivid:  0.190,
+}
+
+// How strongly each slot's chroma & lightness follow the palette swatch they land on
+// (the per-slot spread). Square stays tight/uniform (engineered); diamond lets the
+// palette's own contrast through (cinematic). Keeps the 16 colours from looking flat.
+const ANSI_CHROMA_FOLLOW_BY_LENS: Record<PaletteStyle, number> = {
+  square: 0.25, triangle: 0.45, circle: 0.65, diamond: 0.85,
+}
+// Amplitude of the hue-natural lightness spread (yellow/green lift, blue/magenta deepen).
+const ANSI_L_SPREAD_BY_LENS: Record<PaletteStyle, number> = {
+  square: 0.055, triangle: 0.085, circle: 0.115, diamond: 0.15,
 }
 
 // Red (≈345–25°) is reserved vocabulary: the corpus uses it for tags, operators and
@@ -796,47 +810,112 @@ function buildThemeData(
     return fg
   })()
 
-  // ANSI palette: the seed palette resampled at the six chromatic ANSI positions,
-  // pulled toward the palette's actual hues by an amount the lens controls. Each slot's
-  // hue starts canonical and drifts toward the nearest palette member (syntax token or
-  // raw swatch), bounded by the slot's drift cap × the lens factor — so red stays warm
-  // for `git diff` while blue is free to become purple on a purple palette (diamond).
-  // Chroma is stamped by character (muted↔neon); lightness by mode; APCA-floored to 45.
-  const ansiFloor = (c: Color): Color => ensureAPCAAgainst(c, editorBgBase, 45)
-  const ansiChroma = ANSI_CHROMA_BY_CHARACTER[personality.paletteCharacter]
+  // ANSI palette: the seed palette resampled at the six chromatic ANSI positions, with
+  // hue, chroma AND lightness all taking cues from the swatch each slot lands on so the
+  // 16 colours have real per-slot texture instead of one flat tone.
+  //   hue   — canonical, drifting toward the nearest palette member, bounded by the
+  //           slot's cap × lens factor (red stays warm for `git diff`; blue is free to
+  //           become purple on a purple palette at diamond — the Dracula effect).
+  //   chroma— the character centre pulled toward that swatch's own chroma (lens decides
+  //           how far): saturated palettes get punchy slots, muted palettes soft ones.
+  //   light — a mode band with a hue-natural tilt (yellow/green lift, blue/magenta
+  //           deepen) plus a nudge toward the swatch's lightness; lens sets the spread.
+  // Everything is gamut-clipped and APCA-floored so the leeway never costs legibility.
+  const ansiFloor = (c: Color): Color => ensureAPCAAgainst(clipToSRGB(c), editorBgBase, 45)
+  const ansiChromaCentre = ANSI_CHROMA_BY_CHARACTER[personality.paletteCharacter]
   const ansiDriftFactor = ANSI_DRIFT_BY_LENS[paletteStyle]
-  // Candidate hue pool: convention-placed syntax tokens + raw palette swatches, so the
-  // pull reflects the genuine seed identity (a token may not reach a slot; a swatch can).
-  const huePool: number[] = []
+  const ansiChromaFollow = ANSI_CHROMA_FOLLOW_BY_LENS[paletteStyle]
+  const ansiLSpread = ANSI_L_SPREAD_BY_LENS[paletteStyle]
+  const ansiLCentre = isDarkMode ? 0.73 : 0.52
+
+  // Candidate pool: convention-placed syntax tokens + raw palette swatches, so the pull
+  // reflects the genuine seed identity (a token may not reach a slot; a swatch can).
+  const ansiPool: Color[] = []
   for (const c of [syntax.keywordColor, syntax.stringColor, syntax.definitionColor, syntax.typeColor, syntax.numberColor, syntax.accentColor]) {
-    if ((c.oklch.c ?? 0) >= 0.04) huePool.push(c.oklch.h ?? 0)
+    if ((c.oklch.c ?? 0) >= 0.04) ansiPool.push(c)
   }
   for (const item of palette) {
     const c = item?.color
-    if (c && (c.oklch.c ?? 0) >= 0.04) huePool.push(c.oklch.h ?? 0)
+    if (c && (c.oklch.c ?? 0) >= 0.04) ansiPool.push(c)
   }
-  const deriveAnsi = (slot: AnsiSlot): Color => {
-    // Nearest palette hue to this slot's canonical position.
-    let nearest = slot.hue
+  // Hue-natural lightness tilt: cos peaks at ~100° (yellow-green) and troughs at ~280°
+  // (blue-purple). Dark mode lifts the light hues; light mode keeps them in check so
+  // intrinsically-bright yellow doesn't lose contrast on white.
+  const hueTilt = (h: number): number => Math.cos(((h - 100) * Math.PI) / 180)
+
+  // Only echo the palette where it actually *has* a colour near the slot; if the nearest
+  // member is further than this window the palette has nothing in that family, so we
+  // synthesise a clean canonical colour rather than chase a distant hue (which is what
+  // made cyan collapse into green on a green-dominant palette).
+  const ANSI_ECHO_WINDOW = 48
+  const deriveAnsi = (slot: AnsiSlot): { color: Color; canon: number } => {
+    let nearest: Color | null = null
     let bestGap = Infinity
-    for (const h of huePool) {
-      const g = hueGapDeg(h, slot.hue)
-      if (g < bestGap) { bestGap = g; nearest = h }
+    for (const c of ansiPool) {
+      const g = hueGapDeg(c.oklch.h ?? 0, slot.hue)
+      if (g < bestGap) { bestGap = g; nearest = c }
     }
-    // Drift toward it, bounded by slot cap × lens factor.
-    const cap = slot.drift * ansiDriftFactor
-    const signed = ((nearest - slot.hue + 540) % 360) - 180
-    const hue = (slot.hue + Math.max(-cap, Math.min(cap, signed)) + 360) % 360
-    const out = new Color('oklch', [isDarkMode ? 0.74 : 0.50, ansiChroma, hue])
-    return ansiFloor(out)
+    const echo = nearest !== null && bestGap <= ANSI_ECHO_WINDOW
+    const swatchC = echo ? (nearest!.oklch.c ?? ansiChromaCentre) : ansiChromaCentre
+    const swatchL = echo ? (nearest!.oklch.l ?? ansiLCentre) : ansiLCentre
+
+    // Hue: drift toward the swatch (only when echoing), bounded by cap × lens factor.
+    let hue = slot.hue
+    if (echo) {
+      const cap = slot.drift * ansiDriftFactor
+      const signed = ((nearest!.oklch.h ?? slot.hue) - slot.hue + 540) % 360 - 180
+      hue = (slot.hue + Math.max(-cap, Math.min(cap, signed)) + 360) % 360
+    }
+
+    // Chroma: character centre pulled toward the swatch's own chroma.
+    const chroma = Math.max(0.05, Math.min(0.24, ansiChromaCentre + (swatchC - ansiChromaCentre) * ansiChromaFollow))
+
+    // Lightness: mode centre + hue-natural tilt + a nudge toward the swatch's lightness.
+    const tilt = hueTilt(hue) * ansiLSpread * (isDarkMode ? 1 : -0.5)
+    const swatchPull = echo ? (swatchL - ansiLCentre) * ansiLSpread * 1.2 : 0
+    const lo = isDarkMode ? 0.58 : 0.40
+    const hi = isDarkMode ? 0.90 : 0.66
+    const light = Math.max(lo, Math.min(hi, ansiLCentre + tilt + swatchPull))
+
+    return { color: new Color('oklch', [light, chroma, hue]), canon: slot.hue }
   }
 
-  const ansiRed = deriveAnsi(ANSI_SLOTS.red)
-  const ansiGreen = deriveAnsi(ANSI_SLOTS.green)
-  const ansiYellow = deriveAnsi(ANSI_SLOTS.yellow)
-  const ansiBlue = deriveAnsi(ANSI_SLOTS.blue)
-  const ansiMagenta = deriveAnsi(ANSI_SLOTS.magenta)
-  const ansiCyan = deriveAnsi(ANSI_SLOTS.cyan)
+  // Derive in ring order, then guarantee a minimum hue separation so no two slots
+  // collide (e.g. a stylised cyan creeping into green). Colliding pairs are resolved
+  // by pulling whichever drifted *further* from its canonical hue back toward it —
+  // always safe, since the canonical hues are ≥50° apart.
+  const ANSI_MIN_GAP = 22
+  const ring = [
+    deriveAnsi(ANSI_SLOTS.red),
+    deriveAnsi(ANSI_SLOTS.yellow),
+    deriveAnsi(ANSI_SLOTS.green),
+    deriveAnsi(ANSI_SLOTS.cyan),
+    deriveAnsi(ANSI_SLOTS.blue),
+    deriveAnsi(ANSI_SLOTS.magenta),
+  ]
+  const signedTo = (from: number, to: number): number => ((to - from + 540) % 360) - 180
+  for (let pass = 0; pass < 8; pass++) {
+    let moved = false
+    for (let i = 0; i < ring.length; i++) {
+      const a = ring[i], b = ring[(i + 1) % ring.length]
+      const ah = a.color.oklch.h ?? 0, bh = b.color.oklch.h ?? 0
+      const gap = ((bh - ah + 360) % 360) // forward distance a→b around the ring
+      const fwd = gap > 180 ? 360 - gap : gap
+      if (fwd < ANSI_MIN_GAP) {
+        // Push BOTH toward their own canonical hue (which lies away from the collision,
+        // since they only collide by drifting toward each other) — resolves a slot
+        // squeezed between two neighbours that pulling one alone would oscillate on.
+        const half = (ANSI_MIN_GAP - fwd) / 2 + 0.3
+        a.color.oklch.h = (ah + (Math.sign(signedTo(ah, a.canon)) || -1) * half + 360) % 360
+        b.color.oklch.h = (bh + (Math.sign(signedTo(bh, b.canon)) || 1) * half + 360) % 360
+        moved = true
+      }
+    }
+    if (!moved) break
+  }
+
+  const [ansiRed, ansiYellow, ansiGreen, ansiCyan, ansiBlue, ansiMagenta] =
+    ring.map((r) => ansiFloor(r.color))
 
   // ANSI black is conventionally dark in *both* modes (deriving it from onSurface
   // made it near-white in dark themes). A lifted near-black keeps `ls`/`git` output
