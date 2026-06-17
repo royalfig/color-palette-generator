@@ -139,8 +139,8 @@ export default function App() {
   }, [color, palette, paletteType, paletteStyle, mode, isDarkMode])
 
   const colorContext = useMemo(
-    () => ({ originalColor: colorFactory(color, 'base', 0, colorSpace.format), palette, mode, codeTheme, isDarkMode }),
-    [color, palette, colorSpace.format, mode, codeTheme, isDarkMode],
+    () => ({ originalColor: colorFactory(color, 'base', 0, colorSpace.format), palette, mode, paletteStyle, codeTheme, isDarkMode }),
+    [color, palette, colorSpace.format, mode, paletteStyle, codeTheme, isDarkMode],
   )
 
   // const css = generateCss(palettes)

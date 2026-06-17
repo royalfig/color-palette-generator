@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
 import { colorFactory } from './factory'
-import { clampOKLCH, detectFormat, isAchromatic, generateNeutralPalette } from './utils'
+import { clampOKLCH as clampOKLCHG, detectFormat, isAchromatic, generateNeutralPalette, gamutForSpace } from './utils'
 import { ColorFormat, ColorSpace } from './types'
 import { enhancePalette, avoidMuddyZones, applyEnhancementsToAnalogous, polishPalette } from './enhancer'
 
@@ -287,6 +287,9 @@ export function generateAnalogous(
   },
 ) {
   const { chromaAdjust = 0.9, style } = options
+  // Keep generated swatches realizable in the selected display gamut (sRGB or P3).
+  const gamut = gamutForSpace(options.colorSpace.space)
+  const clampOKLCH = (l: number, c: number, h: number) => clampOKLCHG(l, c, h, gamut)
   const enhanced = style === 'square' ? false : true
 
   try {

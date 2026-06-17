@@ -18,9 +18,10 @@ function downloadAction(
   paletteTitle: string,
   colorFormat: ColorFormat,
   isUiMode: boolean,
+  paletteStyle: 'square' | 'triangle' | 'circle' | 'diamond',
   cb: (msg: string, type: 'success' | 'error') => void,
 ) {
-  const paletteAsCss = generateCssVariables(palette, { format: colorFormat, isUiMode, wrapper: 'root' })
+  const paletteAsCss = generateCssVariables(palette, { format: colorFormat, isUiMode, wrapper: 'root', style: paletteStyle })
   const filename = `${paletteTitle?.toLowerCase().replace(/\W/g, '-') || 'color-palette-pro'}.css`
   const type = 'text'
 
@@ -266,7 +267,7 @@ interface ExportOptionsProps {
 }
 
 export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: ExportOptionsProps) {
-  const { palette, originalColor, mode, codeTheme } = useContext(ColorContext)
+  const { palette, originalColor, mode, paletteStyle, codeTheme } = useContext(ColorContext)
   const { showMessage } = useContext(MessageContext)
 
   const colorNames = { fetchedData, isLoading, error }
@@ -276,7 +277,7 @@ export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: Ex
       if (codeTheme) copyCodeTheme(codeTheme, showMessage)
       return
     }
-    const paletteAsCss = generateCssVariables(palette, { format: colorFormat, isUiMode: mode === 'ui' })
+    const paletteAsCss = generateCssVariables(palette, { format: colorFormat, isUiMode: mode === 'ui', style: paletteStyle })
     navigator.clipboard.writeText(paletteAsCss)
     showMessage('Palette copied', 'success')
   }
@@ -320,7 +321,7 @@ export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: Ex
       if (codeTheme) downloadCodeTheme(codeTheme, colorNames.fetchedData?.paletteTitle || 'color-palette-pro', showMessage)
       return
     }
-    downloadAction(palette, colorNames.fetchedData?.paletteTitle || 'Palette', colorFormat, mode === 'ui', showMessage)
+    downloadAction(palette, colorNames.fetchedData?.paletteTitle || 'Palette', colorFormat, mode === 'ui', paletteStyle, showMessage)
   }
 
   return (

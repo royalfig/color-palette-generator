@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
 import { colorFactory } from './factory'
-import { clampOKLCH, detectFormat, applyVariation, isAchromatic, generateNeutralPalette, safeHue } from './utils'
+import { clampOKLCH as clampOKLCHG, detectFormat, applyVariation as applyVariationG, isAchromatic, generateNeutralPalette, safeHue, gamutForSpace } from './utils'
 import { ColorFormat, ColorSpace } from './types'
 import { enhancePalette, avoidMuddyZones, polishPalette, applyEnhancementsToComplementary } from './enhancer'
 
@@ -128,6 +128,10 @@ export function generateComplementary(
 ) {
   const { chromaAdjust = 0.9 } = options
   const format = options.colorSpace.format
+  // Keep generated swatches realizable in the selected display gamut (sRGB or P3).
+  const gamut = gamutForSpace(options.colorSpace.space)
+  const applyVariation = (c: Color, v: { l: number; c: number }, h: number) => applyVariationG(c, v, h, gamut)
+  const clampOKLCH = (l: number, c: number, h: number) => clampOKLCHG(l, c, h, gamut)
   const enhanced = options.style === 'square' ? false : true
 
   try {

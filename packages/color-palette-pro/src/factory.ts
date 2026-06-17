@@ -1,6 +1,5 @@
 import Color, { Coords } from 'colorjs.io'
 import { ColorFormat } from './types'
-import { clampChromaToGamut } from './color-math'
 function toPrecision(n: number | null, precision: number) {
   if (n === null || n === 0) {
     return 0
@@ -85,11 +84,12 @@ export function colorFactory(
   isBase = false,
   isUiMode = false,
 ): BaseColorData {
-  // Reduce chroma to the sRGB gamut up front (holding L and H), so the stored color and
-  // every downstream consumer (ui.ts reads `.oklch` off this) reason about a realizable
-  // color rather than one that gets hue-shifted by a naive clip at serialization time.
-  const rawColor = base instanceof Color ? base : new Color(base)
-  const color = clampChromaToGamut(rawColor)
+  // Keep the color exactly as authored — including chroma beyond the sRGB gamut (OKLCH/P3
+  // modes). The hex/rgb/hsl/fallback forms below each gamut-map independently (hue-stable
+  // toGamut), so serialized output stays realizable while the `.oklch`/`.lch`/`.lab` coords
+  // remain true to what the user set — which the channel sliders read back via `getValue`.
+  // (An earlier up-front sRGB chroma clamp here snapped the chroma slider to the gamut edge.)
+  const color = base instanceof Color ? base : new Color(base)
 
   // Conversion cache for lazy-loaded conversions
   const conversionCache: ConversionsCache = {}
@@ -132,8 +132,8 @@ export function colorFactory(
     cssValue: color.display().toString(),
     contrast: color.contrastWCAG21('#fff') > color.contrastWCAG21('#000') ? '#fff' : '#000',
     string: color.toString({ format, precision: 3 }),
-    // `color` is already chroma-reduced into sRGB above, so this serializes a hue-stable
-    // in-gamut value rather than a per-channel clip (which shifts hue at the extremes).
+    // srgbInGamut is gamut-mapped (toGamut → hue-stable chroma reduction), a realizable
+    // fallback that doesn't hue-shift the way a naive per-channel clip would.
     fallback: srgbInGamut.toString({ format }),
     conversions: {
       hex: conversionCache.hex,

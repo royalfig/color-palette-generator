@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
 import { BaseColorData } from './factory'
-import { detectFormat, clampOKLCH, applyVariation, buildPaletteColors, isAchromatic, generateNeutralPalette } from './utils'
+import { detectFormat, clampOKLCH, applyVariation as applyVariationG, buildPaletteColors, isAchromatic, generateNeutralPalette, gamutForSpace } from './utils'
 import { ColorFormat, ColorSpace } from './types'
 import { avoidMuddyZones, polishPalette, applyEnhancementsToTriadic } from './enhancer'
 
@@ -211,6 +211,9 @@ export function generateTriadic(
 ) {
   const { style } = options
   const format = options.colorSpace.format
+  // Keep generated swatches realizable in the selected display gamut (sRGB or P3).
+  const gamut = gamutForSpace(options.colorSpace.space)
+  const applyVariation = (c: Color, v: { l: number; c: number }, h: number) => applyVariationG(c, v, h, gamut)
   const enhanced = options.style === 'square' ? false : true
 
   try {

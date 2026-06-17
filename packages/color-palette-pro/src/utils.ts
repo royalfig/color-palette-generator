@@ -1,7 +1,7 @@
 import Color from 'colorjs.io'
 import { colorFactory, BaseColorData } from './factory'
 import { maxChromaFor } from './color-math'
-import { ColorFormat } from './types'
+import { ColorFormat, ColorSpace } from './types'
 
 export function detectFormat(str: string): 'hex' | undefined {
   if (str.startsWith('#')) return 'hex'
@@ -30,18 +30,28 @@ export function safeHue(color: Color, fallback = NaN): number {
 }
 
 /**
- * Clamp an OKLCH triple into a safe, *in-gamut* color. Lightness is bounded away from the
- * poles; chroma is reduced to the true per-(L,H) sRGB maximum (not a flat constant) so the
- * result is realizable without the output stage having to clip and shift its hue. A NaN hue
- * (achromatic) is preserved as NaN with chroma forced to 0.
+ * The display gamut to keep generated swatches realizable in. sRGB-bound spaces (srgb/hsl) stay
+ * sRGB; the wider model/display spaces (p3/oklch/oklab/lch/lab) target P3 — the widest commonly
+ * supported display — so P3 screens get richer palettes while sRGB output stays hue-stable.
  */
-export function clampOKLCH(l: number, c: number, h: number) {
+export type DisplayGamut = 'srgb' | 'p3'
+export function gamutForSpace(space: ColorSpace): DisplayGamut {
+  return space === 'srgb' || space === 'hsl' ? 'srgb' : 'p3'
+}
+
+/**
+ * Clamp an OKLCH triple into a safe, *in-gamut* color. Lightness is bounded away from the
+ * poles; chroma is reduced to the true per-(L,H) maximum for the target `gamut` (not a flat
+ * constant) so the result is realizable without the output stage having to clip and shift its
+ * hue. A NaN hue (achromatic) is preserved as NaN with chroma forced to 0.
+ */
+export function clampOKLCH(l: number, c: number, h: number, gamut: DisplayGamut = 'srgb') {
   const L = Math.max(OKLCH_LIMITS.l.min, Math.min(OKLCH_LIMITS.l.max, l))
   if (!Number.isFinite(h)) {
     return { l: L, c: 0, h: NaN }
   }
   const H = ((h % 360) + 360) % 360
-  const maxC = maxChromaFor(L, H)
+  const maxC = maxChromaFor(L, H, gamut)
   const C = Math.max(0, Math.min(c, maxC))
   return { l: L, c: C, h: H }
 }
@@ -50,11 +60,13 @@ export function applyVariation(
   baseColor: Color,
   variation: { l: number; c: number },
   hue: number,
+  gamut: DisplayGamut = 'srgb',
 ): Color {
   const values = clampOKLCH(
     (baseColor.oklch.l ?? 0.5) + variation.l,
     (baseColor.oklch.c ?? 0) * variation.c,
     hue,
+    gamut,
   )
   const result = baseColor.clone()
   result.oklch.l = values.l

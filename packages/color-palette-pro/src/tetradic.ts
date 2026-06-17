@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
 import { BaseColorData } from './factory'
-import { clampOKLCH, detectFormat, applyVariation, buildPaletteColors, isAchromatic, generateNeutralPalette } from './utils'
+import { clampOKLCH, detectFormat, applyVariation as applyVariationG, buildPaletteColors, isAchromatic, generateNeutralPalette, gamutForSpace } from './utils'
 import { ColorFormat } from './types'
 import { ColorSpace } from './types'
 import { enhancePalette, avoidMuddyZones, polishPalette, applyEnhancementsToTetradic } from './enhancer'
@@ -242,6 +242,9 @@ export function generateTetradic(
 ) {
   const { style } = options
   const format = options.colorSpace.format
+  // Keep generated swatches realizable in the selected display gamut (sRGB or P3).
+  const gamut = gamutForSpace(options.colorSpace.space)
+  const applyVariation = (c: Color, v: { l: number; c: number }, h: number) => applyVariationG(c, v, h, gamut)
   const enhanced = options.style === 'square' ? false : true
 
   try {
