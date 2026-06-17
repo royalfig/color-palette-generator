@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState, memo } from 'react'
+import { useContext, useEffect, useId, useMemo, useState, memo } from 'react'
 import { CaretUpIcon } from '@phosphor-icons/react/dist/csr/CaretUp'
 import { CaretDownIcon } from '@phosphor-icons/react/dist/csr/CaretDown'
 import { ColorContext } from '../ColorContext'
@@ -119,7 +119,12 @@ export const Slider = memo(function Slider({
   const thumbColor = useMemo(() => getThumbStyle(placeholders), [placeholders, getThumbStyle])
   const trackStyle = useMemo(() => getTrackStyle(placeholders), [placeholders, getTrackStyle])
 
-  const sliderId = `slider-${label}`
+  // useId() is unique per instance, so the ids stay distinct even while an exiting
+  // and entering SliderGroup overlap during the AnimatePresence color-space swap.
+  // It contains ':' (invalid in a CSS #id selector), so strip it for the id.
+  const uid = useId().replace(/:/g, '')
+  const sliderId = `slider-${type}-${uid}`
+  const numberInputId = `${sliderId}-input`
 
   // Memoize dynamic styles to avoid recreating on every render
   const dynamicStyles = useMemo(
@@ -151,12 +156,12 @@ export const Slider = memo(function Slider({
           <button onClick={handleIncrement}>
             <CaretUpIcon weight="fill" size={16} />
           </button>
-          <label htmlFor={`slider-input-${label}`} className="sr-only">
+          <label htmlFor={numberInputId} className="sr-only">
             number input
           </label>
           <input
-            name="slider-input"
-            id={`slider-input-${label}`}
+            name={`slider-input-${type}`}
+            id={numberInputId}
             type="text"
             value={inputValue}
             onChange={handleChange}
@@ -167,7 +172,7 @@ export const Slider = memo(function Slider({
         </div>
       </div>
       <input
-        name="slider"
+        name={`slider-${type}`}
         id={sliderId}
         type="range"
         min={min}
