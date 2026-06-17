@@ -535,7 +535,7 @@ export function generateSurfaceColors(
 
 // ===== OUTLINE AND INVERSE COLORS =====
 
-function generateOutlineAndInverse(
+export function generateOutlineAndInverse(
   primary: Color,
   isDarkMode: boolean,
   surface: Color,

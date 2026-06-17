@@ -25,7 +25,7 @@ import { triadicTemplate } from './templates/triadic'
 import { tintsAndShadesTemplate } from './templates/tints-and-shades'
 import { tonesTemplate } from './templates/tones'
 import { deriveUiColors, generateBaseTokenRules, generateSemanticTokenRules } from './templates/base'
-import { generateSurfaceColors, generateSemanticColors, adaptPrimaryForMode, makeContainerForAccent } from '../ui'
+import { generateSurfaceColors, generateSemanticColors, adaptPrimaryForMode, makeContainerForAccent, surfaceTreatmentFor, generateOutlineAndInverse } from '../ui'
 import {
   findColorByHue, toHex, shiftHue, desaturate,
   ensureAPCAAgainst, capAPCAAgainst, clipToSRGB, deltaE, nudgeForDistinction,
@@ -375,30 +375,6 @@ function enforceMonoHue(syntax: SyntaxColors, baseHue: number): SyntaxColors {
 }
 
 /**
- * Pick the bg tint hue: the palette hue closest to blue-violet (~265). Measured rule —
- * 10 of 13 chromatically-tinted dark bgs in the corpus sit at h 243–291 regardless of
- * the token palette; a cool ink reads "professional dark theme". Mono palettes simply
- * return their own family (Gruvbox-style warm inks are a mono identity, not an error).
- */
-const BG_TINT_ANCHOR = 265
-
-function coolestPaletteHue(palette: BaseColorData[], fallback: number): number {
-  let best = fallback
-  let bestGap = Infinity
-  for (const item of palette) {
-    const c = item?.color
-    if (!c || (c.oklch.c ?? 0) < 0.04) continue
-    const h = c.oklch.h ?? 0
-    const gap = hueGapDeg(h, BG_TINT_ANCHOR)
-    if (gap < bestGap) {
-      bestGap = gap
-      best = h
-    }
-  }
-  return best
-}
-
-/**
  * Comment hue rule from the corpus: comments are either tinted with the bg's own hue
  * (Nord, One Dark, Dracula, Tokyo Night — Δhue vs bg ≤ 13°) or go green (the VS Code /
  * Vitesse school) — and in nearly every theme they sit ≥ 90° from the string hue so
@@ -596,25 +572,6 @@ function legibleOverlayAlpha(
   return alpha
 }
 
-function deriveOutline(primary: Color, isDarkMode: boolean): { outline: Color; outlineVariant: Color } {
-  const baseHue = primary.oklch.h ?? 0
-  // `outline` stays visible — reserved for peekView / panel seams where we want
-  // a real line. Chrome borders should use `outlineVariant` (see deriveUiColors).
-  const outline = primary.clone()
-  outline.oklch.h = baseHue
-  outline.oklch.c = 0.005
-  outline.oklch.l = isDarkMode ? 0.32 : 0.78
-
-  // outlineVariant is the "barely there" tone used for almost every widget border
-  // in modern themes — sits just above editor L in dark, just below white in light.
-  const outlineVariant = primary.clone()
-  outlineVariant.oklch.h = baseHue
-  outlineVariant.oklch.c = 0.005
-  outlineVariant.oklch.l = isDarkMode ? 0.20 : 0.92
-
-  return { outline, outlineVariant }
-}
-
 const CHARACTER_PROSE: Record<PaletteCharacter, string> = {
   serene: 'calm and balanced',
   vivid: 'high-contrast and dramatic',
@@ -642,96 +599,37 @@ function buildThemeData(
   const rawPrimary = (palette[0]?.color ?? baseColor).clone()
   const primary = adaptPrimaryForMode(rawPrimary, isDarkMode)
 
-  const surfaceTones = generateSurfaceColors(primary, isDarkMode)
-  const { outline, outlineVariant } = deriveOutline(primary, isDarkMode)
+  const treatment = surfaceTreatmentFor(paletteStyle)
+  const surfaceTones = generateSurfaceColors(primary, isDarkMode, treatment)
+  const { outline, outlineVariant } = generateOutlineAndInverse(
+    primary, isDarkMode, surfaceTones.surface, surfaceTones.onSurface, treatment,
+  )
   const surfaces: SurfaceBundle = { ...surfaceTones, outline, outlineVariant }
 
   const sp = personality.surfaceProfile
+
+  // Passthrough: code-mode chrome uses the UI surface stack directly — the same style-aware
+  // surfaces the app palette gets (square neutral → diamond brutalist) — instead of the old
+  // per-lens editor-depth + chrome-chroma overrides. The editor is the page surface; sidebar /
+  // panel recede to the sunken well; overlays and inputs sit on the floating/sunken tiers. Kind
+  // identity now lives in the syntax bands and the surface hue (which follows the base color),
+  // not in a bespoke editor-bg tint.
   const editorBgBase = surfaces.surface.clone()
-  editorBgBase.oklch.l = isDarkMode ? sp.editorLDark : sp.editorLLight
-  if (personality.bgTint) {
-    // Caps calibrated to exemplar editor surfaces: Night Owl C ≈ 0.045 (dark), light
-    // exemplars stay near-neutral. Polychrome kinds prefer the palette's coolest member
-    // (the corpus blue-violet anchor); in-family kinds (analogous, monochrome) tint the bg
-    // with the BASE hue instead, so the editor surface stays inside the family.
-    const inFamilyBg = paletteKind === 'ana' || personality.paletteCharacter === 'mono'
-    editorBgBase.oklch.h = inFamilyBg
-      ? (primary.oklch.h ?? 0)
-      : coolestPaletteHue(palette, primary.oklch.h ?? 0)
-    if (isDarkMode) {
-      editorBgBase.oklch.c = Math.min((editorBgBase.oklch.c ?? 0) + personality.bgTint.chromaBoost, 0.045)
-    } else {
-      editorBgBase.oklch.c = Math.min((editorBgBase.oklch.c ?? 0) + personality.bgTint.chromaBoost * 0.35, 0.014)
-    }
-  }
-  const bgModeOffset = isDarkMode ? personality.bgOffset.dark : personality.bgOffset.light
-  if (bgModeOffset !== 0) {
-    const [lMin, lMax] = isDarkMode ? [0.12, 0.26] : [0.95, 1.00]
-    editorBgBase.oklch.l = Math.max(lMin, Math.min(lMax, (editorBgBase.oklch.l ?? 0.17) + bgModeOffset))
-  }
-
-  // Chrome chroma discipline (measured from the top-theme corpus): themes are
-  // bimodal. The neutral school (Dark Modern, Vitesse, min-light) holds every
-  // chrome surface at chroma ≤ 0.003; the tinted school (Nord, Dracula, Night Owl,
-  // Tokyo Night) tints chrome with the *editor bg's* hue and never lets chrome
-  // exceed the bg's own chroma by more than a whisper.
-  if (sp.chromeNeutral) {
-    editorBgBase.oklch.c = Math.min(editorBgBase.oklch.c ?? 0, 0.003)
-  }
-  const bgChromaCeiling = (editorBgBase.oklch.c ?? 0) + 0.006
-  const clampChrome = (c: Color): Color => {
-    const out = c.clone()
-    if (sp.chromeNeutral) {
-      out.oklch.c = Math.min(out.oklch.c ?? 0, 0.003)
-    } else {
-      out.oklch.h = editorBgBase.oklch.h ?? out.oklch.h
-      out.oklch.c = Math.min(out.oklch.c ?? 0, bgChromaCeiling)
-    }
-    return out
-  }
-
-  const sidebarRouteKey = isDarkMode ? sp.sidebarSurface.dark : sp.sidebarSurface.light
-  const sidebarBg = clampChrome(sidebarRouteKey === 'container' ? surfaces.container : surfaces.containerSunken)
-  if (sp.chromeTint) {
-    // Tinted chrome shares the *bg's* hue (corpus rule), not the primary's.
-    sidebarBg.oklch.h = editorBgBase.oklch.h ?? primary.oklch.h
-    sidebarBg.oklch.c = Math.min((sidebarBg.oklch.c ?? 0) + 0.006, bgChromaCeiling, isDarkMode ? 0.020 : 0.010)
-  }
+  const sidebarBg = surfaces.containerSunken.clone()
   const panelBg = sidebarBg.clone()
-  const overlayBg = clampChrome(surfaces.containerOverlay)
+  const overlayBg = surfaces.containerOverlay.clone()
+  const inputSunken = surfaces.containerSunken.clone()
 
-  const inputSunken = clampChrome(isDarkMode
-    ? surfaces.containerOverlay
-    : mixColors(surfaces.surface, surfaces.containerSunken, 0.3))
-
-  const statusBarBg = primary.clone()
-  let statusBarBorderTop: Color | undefined
-  switch (sp.statusBarStyle) {
-    case 'match-sidebar':
-      statusBarBg.oklch.l = sidebarBg.oklch.l ?? (isDarkMode ? 0.18 : 0.96)
-      statusBarBg.oklch.c = sidebarBg.oklch.c ?? 0
-      statusBarBg.oklch.h = sidebarBg.oklch.h ?? primary.oklch.h
-      break
-    case 'tinted':
-      statusBarBg.oklch.l = sidebarBg.oklch.l ?? (isDarkMode ? 0.18 : 0.96)
-      statusBarBg.oklch.c = Math.min((primary.oklch.c ?? 0) * 0.15, isDarkMode ? 0.020 : 0.010)
-      break
-    case 'primary':
-      statusBarBg.oklch.l = isDarkMode ? 0.22 : 0.88
-      statusBarBg.oklch.c = Math.min((primary.oklch.c ?? 0) * 0.3, 0.05)
-      break
-    case 'primary-deep':
-      statusBarBg.oklch.l = isDarkMode ? 0.22 : 0.85
-      statusBarBg.oklch.c = Math.min((primary.oklch.c ?? 0) * 0.45, 0.07)
-      statusBarBorderTop = primary.clone()
-      break
-  }
+  // Status bar: a UI-gen passthrough — the primary-container wash (a soft branded bar), the same
+  // token the app palette uses. Replaces the old bespoke per-style status-bar logic; the bar's
+  // border falls back to the divider (no special seam).
+  const statusBarBg = makeContainerForAccent(primary, isDarkMode).container
 
   const divider = outlineVariant.clone()
 
-  const neutralBandBase = clampChrome(isDarkMode
+  const neutralBandBase = isDarkMode
     ? mixColors(surfaces.container, surfaces.containerOverlay, 0.5)
-    : mixColors(surfaces.surface, surfaces.containerSunken, 0.4))
+    : mixColors(surfaces.surface, surfaces.containerSunken, 0.4)
   const neutralBand = sp.neutralBandTint > 0
     ? tintTowardHue(neutralBandBase, primary.oklch.h ?? 0, sp.neutralBandTint, 0.008)
     : neutralBandBase
@@ -857,14 +755,8 @@ function buildThemeData(
 
   // Editor foreground: tinted themes carry the bg hue into the fg at a whisper
   // (corpus Δhue vs bg ≤ 16°, C median ≈ 0.02); the neutral school stays at C 0.
-  const editorFg = (() => {
-    const fg = surfaces.onSurface.clone()
-    if (!sp.chromeNeutral && (editorBgBase.oklch.c ?? 0) > 0.006) {
-      fg.oklch.h = editorBgBase.oklch.h
-      fg.oklch.c = Math.min(0.022, Math.max(fg.oklch.c ?? 0, isDarkMode ? 0.016 : 0.010))
-    }
-    return fg
-  })()
+  // Passthrough: editor foreground is the UI on-surface text color directly.
+  const editorFg = surfaces.onSurface.clone()
 
   // ANSI palette: the seed palette resampled at the six chromatic ANSI positions, with
   // hue, chroma AND lightness all taking cues from the swatch each slot lands on so the
@@ -990,7 +882,6 @@ function buildThemeData(
     panelBackground: { hex: toHex(panelBg) },
     overlayBackground: { hex: toHex(overlayBg) },
     statusBarBackground: { hex: toHex(statusBarBg) },
-    ...(statusBarBorderTop ? { statusBarBorderTop: { hex: toHex(statusBarBorderTop) } } : {}),
     focusBorder: { hex: toHex(uiAccent) },
     inputBackground: { hex: toHex(panelBg) },
     inputSunken: { hex: toHex(inputSunken) },

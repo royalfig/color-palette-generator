@@ -171,10 +171,6 @@ export interface CodeThemeOutput {
  */
 export type PaletteCharacter = 'serene' | 'vivid' | 'crisp' | 'mono'
 
-export interface PersonalityBgTint {
-  chromaBoost: number
-}
-
 /**
  * Target band for loud syntax roles: all loud tokens are remapped (rank-preserving)
  * into [lLo, lHi] lightness and [cLo, cHi] chroma — the "every great theme holds its
@@ -218,30 +214,13 @@ export interface PersonalityFontStyleProfile {
 }
 
 /**
- * Surface profile — controls how chrome relates to the editor, how loud highlights
- * are, and where each character's signature moves land. Derived from (lens × character)
- * in personality.ts and consumed in index.ts + base.ts.
+ * Surface profile — the character-driven "feel" knobs that survive the surface passthrough
+ * (chrome surfaces, editor depth, and chrome-chroma are now inherited from ui.ts directly).
+ * Derived from (kind character × style) in personality.ts and consumed in index.ts + base.ts.
  */
 export interface SurfaceProfile {
-  /** Editor L override in dark mode. Modern themes anchor editor as the deepest point. */
-  editorLDark: number
-  /** Editor L in light mode — character driven (vivid → 1.0, serene/mono → 0.98). */
-  editorLLight: number
   /** Peak alpha for the chromatic highlight ramp, per mode. */
   peakAlpha: { dark: number; light: number }
-  /** Which surface plays "sidebar". Light mode often differs from dark. */
-  sidebarSurface: { dark: 'container' | 'containerSunken'; light: 'container' | 'containerSunken' }
-  /** Whether sidebar/chrome surfaces get a primary-hue tint. */
-  chromeTint: boolean
-  /**
-   * Force fully neutral chrome + editor surfaces (chroma ≤ 0.003), the Dark Modern /
-   * Vitesse / min-light school. Measured rule from the top-theme corpus: themes are
-   * bimodal — chrome is either neutral, or tinted to *match the editor bg* (same hue,
-   * chroma never exceeding the bg's own).
-   */
-  chromeNeutral: boolean
-  /** How the status bar is styled. */
-  statusBarStyle: 'match-sidebar' | 'tinted' | 'primary' | 'primary-deep'
   /** Cursor color source. */
   cursorSource: 'foreground' | 'accent'
   /** Inactive selection style. */
@@ -251,16 +230,13 @@ export interface SurfaceProfile {
 }
 
 export interface PersonalityConfig {
-  bgTint: PersonalityBgTint | null
-  /** Per-mode token bands set by the style lens. */
+  /** Per-mode token bands set by the palette kind (its exemplar). */
   tokenBands: { dark: ModeBands; light: ModeBands }
-  /** Editor bg L shift per mode (character × lens). */
-  bgOffset: { dark: number; light: number }
-  /** Which loud roles carry the chroma peak for this palette's character. */
+  /** Which loud roles carry the chroma peak for this palette's kind. */
   accentRoles: SyntaxAccentRole[]
   fontStyleProfile: PersonalityFontStyleProfile | null
   surfaceProfile: SurfaceProfile
-  /** Human-readable label for the style lens (e.g. "Engineered", "Cinematic"). */
+  /** Human-readable label for the style's surface material (Flat/Tinted/Toned/Brutalist). */
   lensName: string
   /** Palette's inherent character. */
   paletteCharacter: PaletteCharacter
