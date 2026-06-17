@@ -357,6 +357,24 @@ function linkIdentifierFamily(syntax: SyntaxColors, bg: Color): SyntaxColors {
 }
 
 /**
+ * True-monochrome guard: snap every syntax role's hue to the base hue and re-clip to gamut
+ * (preserving the now-correct hue). Roles are separated by lightness and chroma, so this never
+ * collapses them — it only removes the small hue drift the contrast/gamut passes can introduce
+ * (e.g. a high-L blue type gamut-twisting off-hue). Achromatic seeds are left untouched.
+ */
+function enforceMonoHue(syntax: SyntaxColors, baseHue: number): SyntaxColors {
+  if (!Number.isFinite(baseHue)) return syntax
+  const out = { ...syntax }
+  const keys = [...LOUD_ROLES, ...IDENTIFIER_ROLES, ...STRUCTURAL_ROLES, 'commentColor'] as const
+  for (const k of keys) {
+    const c = ((syntax as any)[k] as Color).clone()
+    c.oklch.h = baseHue
+    ;(out as any)[k] = clipToSRGB(c)
+  }
+  return out
+}
+
+/**
  * Pick the bg tint hue: the palette hue closest to blue-violet (~265). Measured rule —
  * 10 of 13 chromatically-tinted dark bgs in the corpus sit at h 243–291 regardless of
  * the token palette; a cool ink reads "professional dark theme". Mono palettes simply
@@ -387,7 +405,10 @@ function coolestPaletteHue(palette: BaseColorData[], fallback: number): number {
  * comments never read as strings. If the template left the comment too close to the
  * string family, re-aim it at whichever candidate hue lands farthest from strings.
  */
-function adjustCommentHue(syntax: SyntaxColors, bg: Color): SyntaxColors {
+function adjustCommentHue(syntax: SyntaxColors, bg: Color, monoIdentity = false): SyntaxColors {
+  // Monochrome keeps its comment on the base hue — re-aiming it would break the single-hue
+  // identity. (The mono comment is recessed by lightness, not separated by hue.)
+  if (monoIdentity) return syntax
   const comment = syntax.commentColor
   const cChroma = comment.oklch.c ?? 0
   if (cChroma < 0.012) return syntax // effectively gray — hue is moot
@@ -448,11 +469,19 @@ function enforceDistinction(
   isDarkMode: boolean,
   monoIdentity: boolean,
   minDeltaE = 8,
+  maxChroma = 0.2,
 ): SyntaxColors {
   const out = { ...syntax }
   const roles = DISTINCT_ROLES_BY_FREQ
   const nudge = monoIdentity ? nudgeLightnessForDistinction : nudgeForDistinction
-  const finalize = (c: Color): Color => ensureAPCAAgainst(clipToSRGB(c), bg, APCA_TARGET_LOUD)
+  // Cap every nudged result at the kind's loud chroma ceiling so separation happens along L
+  // and hue rather than by inflating chroma past the band — otherwise a cramped palette (Nord
+  // analogous) drifts as saturated as the neon kinds and loses its muted identity.
+  const finalize = (c: Color): Color => {
+    const cl = c.clone()
+    cl.oklch.c = Math.min(cl.oklch.c ?? 0, maxChroma)
+    return ensureAPCAAgainst(clipToSRGB(cl), bg, APCA_TARGET_LOUD)
+  }
 
   // Hue nudges must not rotate red-sensitive roles *through* the red zone. If a
   // nudge lands one of them in 345–25° at visible chroma, skip it past the zone.
@@ -621,10 +650,14 @@ function buildThemeData(
   const editorBgBase = surfaces.surface.clone()
   editorBgBase.oklch.l = isDarkMode ? sp.editorLDark : sp.editorLLight
   if (personality.bgTint) {
-    // Caps calibrated to exemplar editor surfaces: Night Owl C ≈ 0.045 (dark),
-    // light exemplars stay near-neutral. The tint hue prefers the palette's
-    // coolest member (blue-violet anchor) rather than the primary.
-    editorBgBase.oklch.h = coolestPaletteHue(palette, primary.oklch.h ?? 0)
+    // Caps calibrated to exemplar editor surfaces: Night Owl C ≈ 0.045 (dark), light
+    // exemplars stay near-neutral. Polychrome kinds prefer the palette's coolest member
+    // (the corpus blue-violet anchor); in-family kinds (analogous, monochrome) tint the bg
+    // with the BASE hue instead, so the editor surface stays inside the family.
+    const inFamilyBg = paletteKind === 'ana' || personality.paletteCharacter === 'mono'
+    editorBgBase.oklch.h = inFamilyBg
+      ? (primary.oklch.h ?? 0)
+      : coolestPaletteHue(palette, primary.oklch.h ?? 0)
     if (isDarkMode) {
       editorBgBase.oklch.c = Math.min((editorBgBase.oklch.c ?? 0) + personality.bgTint.chromaBoost, 0.045)
     } else {
@@ -703,7 +736,15 @@ function buildThemeData(
     ? tintTowardHue(neutralBandBase, primary.oklch.h ?? 0, sp.neutralBandTint, 0.008)
     : neutralBandBase
 
-  const semantics = generateSemanticColors(primary, palette, isDarkMode, editorBgBase)
+  // Aurora functional tier: error/warning/success keep their canonical hue (they must still
+  // read as error/warning/success) but adopt the kind's saturation, and — for the in-family
+  // kinds (analogous, monochrome) — lean a few degrees toward the base so they belong.
+  const inFamilySemantics = paletteKind === 'ana' || personality.paletteCharacter === 'mono'
+  const semantics = generateSemanticColors(primary, palette, isDarkMode, editorBgBase, {
+    chromaTarget: ANSI_CHROMA_BY_CHARACTER[personality.paletteCharacter],
+    familyHue: primary.oklch.h ?? undefined,
+    leanCap: inFamilySemantics ? 10 : 0,
+  })
 
   const primaryContainerPair = makeContainerForAccent(primary, isDarkMode)
   const errorContainerPair = makeContainerForAccent(semantics.error, isDarkMode)
@@ -751,20 +792,35 @@ function buildThemeData(
   const conventionalSyntax = applyHueConventions(rawSyntax)
   const modeBands = isDarkMode ? personality.tokenBands.dark : personality.tokenBands.light
   const bandedSyntax = normalizeToBands(conventionalSyntax, modeBands, personality.accentRoles, isDarkMode)
-  const commentedSyntax = adjustCommentHue(bandedSyntax, editorBgBase)
+  const commentedSyntax = adjustCommentHue(bandedSyntax, editorBgBase, personality.paletteCharacter === 'mono')
   // Contrast floor first, then distinction: APCA lifts compress L differences, so
   // running them after separation would re-collide pairs. Distinction re-floors its
   // own nudges against the real bg internally.
   const contrastedSyntax = ensureRoleContrast(commentedSyntax, editorBgBase, isDarkMode)
+  // Separation pressure is character-aware: Nord-muted (serene) and monochrome kinds pack
+  // their roles tighter (Nord legitimately ships ΔE ~2.9 pairs), so over-separating inflates
+  // chroma past the kind's band and erases the muted identity. The chroma ceiling is the loud
+  // band's cHi, so distinction separates via L/hue rather than blowing past it.
+  const loudBand = (isDarkMode ? personality.tokenBands.dark : personality.tokenBands.light).loud
+  const minDeltaE = personality.paletteCharacter === 'mono'
+    ? (isDarkMode ? 4.5 : 6)
+    : personality.paletteCharacter === 'serene'
+      ? (isDarkMode ? 6 : 8)
+      // Light themes keep their roles further apart (corpus p10: 8.0 dark, 10.7 light).
+      : (isDarkMode ? 8 : 10)
   const distinctSyntax = enforceDistinction(
     contrastedSyntax,
     editorBgBase,
     isDarkMode,
     personality.paletteCharacter === 'mono',
-    // Light themes keep their roles further apart (corpus p10: 8.0 dark, 10.7 light).
-    isDarkMode ? 8 : 10,
+    minDeltaE,
+    loudBand.cHi,
   )
-  const syntax = linkIdentifierFamily(distinctSyntax, editorBgBase)
+  let syntax = linkIdentifierFamily(distinctSyntax, editorBgBase)
+  // True monochrome: pin every role back to the base hue after the contrast/gamut passes.
+  if (personality.paletteCharacter === 'mono') {
+    syntax = enforceMonoHue(syntax, primary.oklch.h ?? NaN)
+  }
 
   const rawBracketPairs = template.deriveBracketPairs(baseColor, palette, isDarkMode)
   const bracketPairColors = rawBracketPairs.map(toHex)

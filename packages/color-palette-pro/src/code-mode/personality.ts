@@ -26,68 +26,93 @@ import type {
  *   3. Background tint is a real signature (Night Owl bg chroma ≈ 0.045, Nord
  *      ≈ 0.02) — stronger than decoration, never loud. → BASE_BG_TINTS.
  *
- * The four style lenses set the band envelope:
- *   square   → "Engineered"  — Dark Modern / Nord numbers. No font styles, no tint.
- *   triangle → "Natural"     — Kanagawa-comfortable: slightly tighter, softer band.
- *   circle   → "Expressive"  — One Dark / Night Owl: fuller chroma, visible bg tint.
- *   diamond  → "Cinematic"   — Dracula envelope: widest L band, highest chroma peak.
+ * Post-inversion (see ui.ts SURFACE_TREATMENT): the palette KIND owns the exemplar color
+ * model (token bands + accent placement + bg-tint character), and the four STYLES are a
+ * surface-material dial — Flat → Tinted → Toned → Brutalist — that no longer touches the
+ * token bands.
+ *   ana → Nord   com → Night Owl   spl → Dracula   tri → One Dark Pro   tet → Dark Modern
+ *   tas/ton → monochrome
  */
 
 // ----- palette character -----
 
+// Character now follows each KIND's exemplar mood (post-inversion): Nord/Dark Modern read
+// calm (serene), Night Owl/One Dark Pro medium-energy (crisp), Dracula neon (vivid), the
+// monochrome kinds mono. Character drives ANSI saturation, peak-alpha, cursor + inactive
+// selection — the "feel" knobs — while the token bands below carry the per-exemplar color
+// distribution.
 const PALETTE_CHARACTER: Record<PaletteKinds, PaletteCharacter> = {
-  ana: 'serene',
-  tri: 'serene',
-  com: 'vivid',
-  tet: 'vivid',
-  spl: 'crisp',
-  tas: 'mono',
-  ton: 'mono',
+  ana: 'serene', // Nord
+  tet: 'serene', // Dark Modern (Dark Plus)
+  com: 'crisp',  // Night Owl
+  tri: 'crisp',  // One Dark Pro
+  spl: 'vivid',  // Dracula
+  tas: 'mono',   // monochrome
+  ton: 'mono',   // tones
 }
 
-// ----- accent roles: where each character spends its saturation -----
+// ----- accent roles: where each KIND spends its saturation -----
 //
-// One or two roles per character get the chroma peak (band cHi); every other loud
-// role is compressed below it. This is the Dracula/Night Owl move — energy through
-// placement. The role choice aligns with what the templates already put there:
-// complementary/tetradic route the complement hue to keywords, so vivid accents
-// keywords; analogous/triadic keep everything in-family, so serene lifts the
-// function color (the Night Owl blue-pop); mono palettes spend their one allowed
-// counter-hue on accentColor (this/self/booleans + template punctuation).
-
-const ACCENT_ROLES: Record<PaletteCharacter, SyntaxAccentRole[]> = {
-  serene: ['definitionColor'],
-  vivid: ['keywordColor'],
-  crisp: ['keywordColor'],
-  mono: ['accentColor'],
+// One or two roles get the chroma peak (band cHi); every other loud role is compressed
+// below it. Energy through placement. Each kind mirrors its exemplar's signature pop:
+//   ana → Nord's Frost function/type teal; spl → Dracula's pink keyword + green function
+//   (two peaks); com/tri → Night Owl / One Dark purple keyword; tet → Dark Modern's
+//   restrained blue keyword; mono kinds spend their one saturated step on accentColor.
+const ACCENT_ROLES: Record<PaletteKinds, SyntaxAccentRole[]> = {
+  ana: ['definitionColor'],
+  com: ['keywordColor'],
+  spl: ['keywordColor', 'definitionColor'],
+  tri: ['keywordColor'],
+  tet: ['keywordColor'],
+  tas: ['accentColor'],
+  ton: ['accentColor'],
 }
 
-// ----- token bands (per lens, mode-aware) -----
+// ----- token bands (per KIND = exemplar, mode-aware) -----
 //
-// Measured exemplar ranges (dark): loud L 0.64–0.96 with per-theme spread 0.08–0.21,
-// loud C 0.05–0.22 with per-theme spread ≤ 0.07 outside Dracula. Light themes run
-// *more* chromatic than dark (One Light C 0.12–0.21) at L 0.52–0.66.
-
-const TOKEN_BANDS: Record<PaletteStyle, { dark: ModeBands; light: ModeBands }> = {
-  // Engineered: Dark Modern / Nord territory.
-  square: {
-    dark:  { loud: { lLo: 0.67, lHi: 0.85, cLo: 0.06, cHi: 0.12 }, quiet: { lLo: 0.70, lHi: 0.82, cHi: 0.08 } },
+// Each kind's loud/quiet L+C envelope is its exemplar's measured OKLCH band (dark from
+// `scripts/theme-metrics.mts`; light derived by the standard dark→light transform — light
+// themes sit darker and run *more* chromatic, cf. One Light C 0.12–0.21). This is the core
+// of the inversion: color distribution is now a property of the palette KIND, not the style.
+//
+//   ana → Nord (muted, tight)         com → Night Owl (expressive)
+//   spl → Dracula (neon, wide)        tri → One Dark Pro
+//   tet → Dark Modern / Dark Plus     tas/ton → synthetic monochrome
+const TOKEN_BANDS: Record<PaletteKinds, { dark: ModeBands; light: ModeBands }> = {
+  // Nord — measured L 0.69–0.77, C 0.048–0.075 (the most restrained exemplar).
+  ana: {
+    dark:  { loud: { lLo: 0.69, lHi: 0.79, cLo: 0.05, cHi: 0.085 }, quiet: { lLo: 0.69, lHi: 0.80, cHi: 0.06 } },
+    light: { loud: { lLo: 0.46, lHi: 0.56, cLo: 0.085, cHi: 0.12 }, quiet: { lLo: 0.37, lHi: 0.50, cHi: 0.07 } },
+  },
+  // Night Owl — measured L 0.74–0.87, C 0.084–0.138; chromatic variables (qC 0.135).
+  com: {
+    dark:  { loud: { lLo: 0.72, lHi: 0.88, cLo: 0.085, cHi: 0.145 }, quiet: { lLo: 0.70, lHi: 0.84, cHi: 0.12 } },
+    light: { loud: { lLo: 0.46, lHi: 0.62, cLo: 0.12, cHi: 0.18 }, quiet: { lLo: 0.35, lHi: 0.52, cHi: 0.10 } },
+  },
+  // Dracula — measured L 0.74–0.96, C 0.093–0.220 (the widest, most neon envelope).
+  spl: {
+    dark:  { loud: { lLo: 0.72, lHi: 0.92, cLo: 0.10, cHi: 0.19 }, quiet: { lLo: 0.70, lHi: 0.85, cHi: 0.10 } },
+    light: { loud: { lLo: 0.44, lHi: 0.64, cLo: 0.13, cHi: 0.21 }, quiet: { lLo: 0.34, lHi: 0.52, cHi: 0.11 } },
+  },
+  // One Dark Pro — measured L 0.69–0.82, C 0.095–0.164.
+  tri: {
+    dark:  { loud: { lLo: 0.69, lHi: 0.83, cLo: 0.09, cHi: 0.16 }, quiet: { lLo: 0.70, lHi: 0.82, cHi: 0.12 } },
+    light: { loud: { lLo: 0.45, lHi: 0.60, cLo: 0.12, cHi: 0.19 }, quiet: { lLo: 0.35, lHi: 0.52, cHi: 0.10 } },
+  },
+  // Dark Modern / Dark Plus — measured L 0.67–0.88, C 0.059–0.115 (structured, even).
+  tet: {
+    dark:  { loud: { lLo: 0.67, lHi: 0.86, cLo: 0.06, cHi: 0.12 }, quiet: { lLo: 0.70, lHi: 0.82, cHi: 0.10 } },
     light: { loud: { lLo: 0.46, lHi: 0.62, cLo: 0.10, cHi: 0.16 }, quiet: { lLo: 0.36, lHi: 0.52, cHi: 0.09 } },
   },
-  // Natural: Kanagawa-comfortable — tighter, softer.
-  triangle: {
-    dark:  { loud: { lLo: 0.66, lHi: 0.81, cLo: 0.05, cHi: 0.10 }, quiet: { lLo: 0.69, lHi: 0.80, cHi: 0.06 } },
-    light: { loud: { lLo: 0.47, lHi: 0.62, cLo: 0.09, cHi: 0.14 }, quiet: { lLo: 0.37, lHi: 0.52, cHi: 0.07 } },
+  // Monochrome — synthetic: a single hue tiered across L at low chroma.
+  tas: {
+    dark:  { loud: { lLo: 0.64, lHi: 0.86, cLo: 0.04, cHi: 0.10 }, quiet: { lLo: 0.66, lHi: 0.80, cHi: 0.05 } },
+    light: { loud: { lLo: 0.40, lHi: 0.60, cLo: 0.06, cHi: 0.13 }, quiet: { lLo: 0.34, lHi: 0.50, cHi: 0.06 } },
   },
-  // Expressive: One Dark / Night Owl.
-  circle: {
-    dark:  { loud: { lLo: 0.70, lHi: 0.86, cLo: 0.09, cHi: 0.15 }, quiet: { lLo: 0.71, lHi: 0.83, cHi: 0.09 } },
-    light: { loud: { lLo: 0.44, lHi: 0.63, cLo: 0.12, cHi: 0.18 }, quiet: { lLo: 0.35, lHi: 0.52, cHi: 0.10 } },
-  },
-  // Cinematic: Dracula envelope.
-  diamond: {
-    dark:  { loud: { lLo: 0.72, lHi: 0.90, cLo: 0.10, cHi: 0.18 }, quiet: { lLo: 0.72, lHi: 0.84, cHi: 0.10 } },
-    light: { loud: { lLo: 0.42, lHi: 0.63, cLo: 0.13, cHi: 0.20 }, quiet: { lLo: 0.34, lHi: 0.52, cHi: 0.11 } },
+  // Tones — monochrome with a touch more chroma than pure tints/shades.
+  ton: {
+    dark:  { loud: { lLo: 0.64, lHi: 0.84, cLo: 0.05, cHi: 0.11 }, quiet: { lLo: 0.66, lHi: 0.80, cHi: 0.06 } },
+    light: { loud: { lLo: 0.40, lHi: 0.58, cLo: 0.07, cHi: 0.14 }, quiet: { lLo: 0.34, lHi: 0.50, cHi: 0.07 } },
   },
 }
 
@@ -123,11 +148,14 @@ interface StyleLens {
   bgOffsetIntensity: number // multiplier on BASE_BG_OFFSETS
 }
 
+// Post-inversion the STYLE is the surface-material dial (see ui.ts SURFACE_TREATMENT): it no
+// longer carries token-band identity, only how much the kind's bg tint is applied and how the
+// chrome reads. Names match the material progression neutral → brutalist.
 const STYLE_LENSES: Record<PaletteStyle, StyleLens> = {
-  square:   { name: 'Engineered', bgChromaIntensity: 0,    bgOffsetIntensity: 0 },
-  triangle: { name: 'Natural',    bgChromaIntensity: 0.45, bgOffsetIntensity: 0.35 },
-  circle:   { name: 'Expressive', bgChromaIntensity: 0.85, bgOffsetIntensity: 0.80 },
-  diamond:  { name: 'Cinematic',  bgChromaIntensity: 1.15, bgOffsetIntensity: 1.30 },
+  square:   { name: 'Flat',      bgChromaIntensity: 0,    bgOffsetIntensity: 0 },
+  triangle: { name: 'Tinted',    bgChromaIntensity: 0.45, bgOffsetIntensity: 0.35 },
+  circle:   { name: 'Toned',     bgChromaIntensity: 0.85, bgOffsetIntensity: 0.80 },
+  diamond:  { name: 'Brutalist', bgChromaIntensity: 1.15, bgOffsetIntensity: 1.30 },
 }
 
 // ----- font styles -----
@@ -272,12 +300,12 @@ export function getPersonalityConfig(kind: PaletteKinds, style: PaletteStyle): P
 
   return {
     bgTint: scaledBgTint(BASE_BG_TINTS[kind], lens.bgChromaIntensity),
-    tokenBands: TOKEN_BANDS[style],
+    tokenBands: TOKEN_BANDS[kind],
     bgOffset: {
       dark: offsets.dark * lens.bgOffsetIntensity,
       light: offsets.light * lens.bgOffsetIntensity,
     },
-    accentRoles: ACCENT_ROLES[character],
+    accentRoles: ACCENT_ROLES[kind],
     fontStyleProfile: FONT_STYLES[style],
     surfaceProfile: buildSurfaceProfile(kind, style),
     lensName: lens.name,

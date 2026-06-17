@@ -1,6 +1,6 @@
 import Color from "colorjs.io";
 import { BaseColorData, colorFactory } from "./factory";
-import { PaletteKinds, ColorFormat } from "./types";
+import { PaletteKinds, ColorFormat, PaletteStyle } from "./types";
 import { findOptimalLightness, getMedianChroma, findColorByHue } from "./color-math";
 import { cvdDistance } from "./cvd";
 
@@ -12,6 +12,70 @@ import { cvdDistance } from "./cvd";
 // We keep WCAG 2.1 here because consumers validate against it, but dark-mode "on-*" colors
 // chosen to *just* clear 4.5:1 may be perceptually light; prefer the higher AAA tokens for body
 // text in dark mode. (Audit 2D.2.)
+
+// ===== SURFACE MATERIAL TREATMENT (per style) =====
+//
+// The four palette STYLES select how much brand color bleeds into the neutral surface stack
+// and how the chrome reads as a material — a monotonic dial from restrained to brutalist:
+//
+//   square   — neutral baseline: surfaces AND containers carry no brand tint.
+//   triangle — neutral surfaces, lightly tinted containers.
+//   circle   — lightly toned surfaces, more tinted containers.
+//   diamond  — toned surfaces + containers (brutalist), exaggerated elevation steps, harder
+//              outline contrast, hard-edged shadows.
+//
+// Scales multiply the per-role *intended* chroma; the existing pole-damping still applies, so
+// light-mode page canvases stay near-white regardless (the tone shows on containers and in
+// dark mode, by design). This is the single source of truth for surface material — consumed
+// by the UI palette here, and (from a later pass) by code-mode chrome.
+export interface SurfaceTreatment {
+  /** Multiplier on the page-canvas (surface) intended brand chroma. */
+  surfaceChromaScale: number;
+  /** Multiplier on container / sunken / overlay intended brand chroma. */
+  containerChromaScale: number;
+  /** Added to each role's pole-damping floor so the tint survives nearer white/black. */
+  minProximityBoost: number;
+  /** Extra lightness pushed into outline / outline-variant for crisper, higher-contrast edges. */
+  outlineContrast: number;
+  /** Multiplier on each elevation tier's ΔL from the surface (>1 widens the stack). */
+  elevationSpread: number;
+  /** Lightness shift applied to the whole surface stack in dark mode (diamond deepens for depth). */
+  stackLShiftDark: number;
+  /** Lightness shift for the whole stack in light mode (negative off-whites the page so it can hold a tone — light surfaces near pure white cannot). */
+  stackLShiftLight: number;
+  /** Shadow rendering: layered penumbra ('soft') or crisp offset block ('hard'). */
+  shadowProfile: "soft" | "hard";
+}
+
+// Reproduces the pre-style behavior exactly (scales 1, no boost, soft shadows). Used as the
+// fallback when no style is supplied — notably code-mode's generateSurfaceColors call, which
+// stays untouched until its own pass.
+const DEFAULT_TREATMENT: SurfaceTreatment = {
+  surfaceChromaScale: 1,
+  containerChromaScale: 1,
+  minProximityBoost: 0,
+  outlineContrast: 0,
+  elevationSpread: 1,
+  stackLShiftDark: 0,
+  stackLShiftLight: 0,
+  shadowProfile: "soft",
+};
+
+// surfaceChromaScale multiplies a deliberately small base (0.012), so it needs large values to
+// move the page canvas a perceptible amount once the pole-damping takes its cut — circle/diamond
+// run high so their surfaces read as genuinely toned, not just "technically non-zero". square +
+// triangle stay at 0 (neutral page) by design; triangle differs from square only in containers.
+const SURFACE_TREATMENT: Record<PaletteStyle, SurfaceTreatment> = {
+  square:   { surfaceChromaScale: 0,   containerChromaScale: 0,   minProximityBoost: 0,    outlineContrast: 0,    elevationSpread: 1,    stackLShiftDark: 0,     stackLShiftLight: 0,      shadowProfile: "soft" },
+  triangle: { surfaceChromaScale: 0,   containerChromaScale: 1.0, minProximityBoost: 0,    outlineContrast: 0,    elevationSpread: 1,    stackLShiftDark: 0,     stackLShiftLight: 0,      shadowProfile: "soft" },
+  circle:   { surfaceChromaScale: 3.5, containerChromaScale: 1.8, minProximityBoost: 0.12, outlineContrast: 0.03, elevationSpread: 1.15, stackLShiftDark: 0,     stackLShiftLight: -0.012, shadowProfile: "soft" },
+  diamond:  { surfaceChromaScale: 7.5, containerChromaScale: 3.0, minProximityBoost: 0.35, outlineContrast: 0.10, elevationSpread: 1.5,  stackLShiftDark: -0.04, stackLShiftLight: -0.035, shadowProfile: "hard" },
+};
+
+/** Resolve the surface treatment for a style (falls back to the pre-style default). */
+export function surfaceTreatmentFor(style?: PaletteStyle): SurfaceTreatment {
+  return style ? SURFACE_TREATMENT[style] ?? DEFAULT_TREATMENT : DEFAULT_TREATMENT;
+}
 
 /**
  * Searches outward from a preferred lightness until the contrast ratio is met.
@@ -160,12 +224,12 @@ function dampedSurfaceChroma(
   return Math.min(primaryC, intended) * proximity;
 }
 
-function surfaceChromaFor(primary: Color, isDarkMode: boolean): number {
+function surfaceChromaFor(primary: Color, isDarkMode: boolean, treatment: SurfaceTreatment, surfaceL: number): number {
   const c = primary.oklch.c ?? 0;
-  // Page canvas: the most restrained tint of the whole stack. At its lightness (L≈0.99 light /
-  // 0.23 dark) the damping drives light mode essentially neutral and keeps dark subtle.
-  const surfaceL = isDarkMode ? 0.23 : 0.99;
-  return dampedSurfaceChroma(c, surfaceL, isDarkMode, isDarkMode ? 0.012 : 0.012);
+  // Page canvas: the most restrained tint of the whole stack. Damping is computed at the surface's
+  // ACTUAL lightness (after any stack shift) so a diamond page pulled off pure white can hold its
+  // tone, while a square page at L≈0.99/0.23 stays near-neutral. surfaceChromaScale dials it.
+  return dampedSurfaceChroma(c, surfaceL, isDarkMode, 0.012 * treatment.surfaceChromaScale, treatment.minProximityBoost);
 }
 
 // ===== ELEVATION SHADOWS =====
@@ -212,7 +276,9 @@ export function generateElevationShadowVars(
   primary: Color,
   isDarkMode: boolean,
   format: ColorFormat = "oklch",
+  style: PaletteStyle = "square",
 ): Record<string, string> {
+  const { shadowProfile } = surfaceTreatmentFor(style);
   const hsl = primary.to("hsl");
   const isAchromatic = (primary.oklch.c ?? 0) < 0.01;
   const hue = Number.isFinite(hsl.coords[0] ?? NaN) ? (hsl.coords[0] as number) : 0;
@@ -236,7 +302,7 @@ export function generateElevationShadowVars(
 
   // [offset-distance, blur, spread, alpha] per layer. Dark tiers are deliberately shallow and
   // lean on the highlight; light tiers layer more, with darker low-alpha ink for a crisp edge.
-  const tiers = isDarkMode
+  const softTiers = isDarkMode
     ? {
         xs: [layer(0.5, 1, 0, 0.4)],
         low: [topHighlight(0.35), layer(1, 2, -0.5, 0.5)],
@@ -263,6 +329,17 @@ export function generateElevationShadowVars(
           layer(26, 29, -1.9, 0.11),
         ],
       };
+
+  // Hard (brutalist) tiers: one crisp offset block per level — no penumbra, no top highlight,
+  // higher alpha — so elevation reads as a hard-edged drop rather than a soft glow.
+  const hardTiers = {
+    xs: [layer(1, 0, 0, isDarkMode ? 0.6 : 0.5)],
+    low: [layer(2, 0, 0, isDarkMode ? 0.7 : 0.55)],
+    medium: [layer(4, 0, 0, isDarkMode ? 0.85 : 0.65)],
+    high: [layer(7, 0, 0, isDarkMode ? 1 : 0.8)],
+  };
+
+  const tiers = shadowProfile === "hard" ? hardTiers : softTiers;
 
   return {
     "--light-angle": "0deg",
@@ -371,6 +448,7 @@ function selectAccentColors(
 export function generateSurfaceColors(
   primary: Color,
   isDarkMode: boolean,
+  treatment: SurfaceTreatment = DEFAULT_TREATMENT,
 ): {
   surface: Color;
   onSurface: Color;
@@ -380,33 +458,46 @@ export function generateSurfaceColors(
   containerOverlay: Color;
 } {
   const primaryC = primary.oklch.c ?? 0;
+  const containerC = treatment.containerChromaScale;
+  const proxBoost = treatment.minProximityBoost;
+
+  const baseSurfaceL = isDarkMode ? 0.23 : 0.99;
+  const stackShift = isDarkMode ? treatment.stackLShiftDark : treatment.stackLShiftLight;
+  const clampL = (l: number): number => Math.max(0.02, Math.min(0.998, l));
+  const surfaceL = clampL(baseSurfaceL + stackShift);
 
   const surface = primary.clone();
-  surface.oklch.c = surfaceChromaFor(primary, isDarkMode);
-  surface.oklch.l = isDarkMode ? 0.23 : 0.99;
+  surface.oklch.l = surfaceL;
+  surface.oklch.c = surfaceChromaFor(primary, isDarkMode, treatment, surfaceL);
+
+  // Elevation tiers are placed relative to the UNSHIFTED surface reference: the whole stack
+  // shifts together by stackShift (diamond deepens dark / off-whites light so the page can hold
+  // a tone), then elevationSpread widens the steps around the shifted surface.
+  const spreadL = (tierL: number): number =>
+    clampL(surfaceL + (tierL - baseSurfaceL) * treatment.elevationSpread);
 
   // container: Standard cards — the most tinted of the stack (furthest from paper in light mode,
   // so the damping lets the brand tint actually show here). (Audit 4B.)
   const container = primary.clone();
-  const containerL = isDarkMode ? 0.27 : 0.96;
+  const containerL = spreadL(isDarkMode ? 0.27 : 0.96);
   container.oklch.l = containerL;
   // Dark containers sit at a lower (more mid) lightness, so they tolerate more chroma before
   // reading as oversaturated — give dark a higher intended so its tint matches the light card.
-  container.oklch.c = dampedSurfaceChroma(primaryC, containerL, isDarkMode, isDarkMode ? 0.032 : 0.018, 0.34);
+  container.oklch.c = dampedSurfaceChroma(primaryC, containerL, isDarkMode, (isDarkMode ? 0.032 : 0.018) * containerC, 0.34 + proxBoost);
 
   // container-sunken: Inset wells — recessed below surface or container
   const containerSunken = primary.clone();
-  const sunkenL = isDarkMode ? 0.18 : 0.935;
+  const sunkenL = spreadL(isDarkMode ? 0.18 : 0.935);
   containerSunken.oklch.l = sunkenL;
-  containerSunken.oklch.c = dampedSurfaceChroma(primaryC, sunkenL, isDarkMode, isDarkMode ? 0.024 : 0.014, 0.26);
+  containerSunken.oklch.c = dampedSurfaceChroma(primaryC, sunkenL, isDarkMode, (isDarkMode ? 0.024 : 0.014) * containerC, 0.26 + proxBoost);
 
   // container-overlay: Floating elements. Near-white in light mode → the damping makes it
   // essentially neutral, so it relies on the `shadow` token to read as elevated (see
   // generateUiColorPalette); visibly lifted (and faintly tinted) in dark.
   const containerOverlay = primary.clone();
-  const overlayL = isDarkMode ? 0.31 : 0.995;
+  const overlayL = spreadL(isDarkMode ? 0.31 : 0.995);
   containerOverlay.oklch.l = overlayL;
-  containerOverlay.oklch.c = dampedSurfaceChroma(primaryC, overlayL, isDarkMode, 0.014);
+  containerOverlay.oklch.c = dampedSurfaceChroma(primaryC, overlayL, isDarkMode, 0.014 * containerC, 0 + proxBoost);
 
   // Worst-case background for contrast checking, WITHIN THE NEUTRAL SURFACE STACK:
   // Light Mode (Dark Text): Lowest contrast occurs on the darkest background (sunken)
@@ -449,6 +540,7 @@ function generateOutlineAndInverse(
   isDarkMode: boolean,
   surface: Color,
   onSurface: Color,
+  treatment: SurfaceTreatment = DEFAULT_TREATMENT,
 ): {
   outline: Color;
   outlineVariant: Color;
@@ -458,13 +550,17 @@ function generateOutlineAndInverse(
   const outlineBase = primary.clone();
   outlineBase.oklch.c = 0.005;
 
+  // outlineContrast pushes the lines further from the surface lightness (diamond → harder,
+  // more visible borders for the brutalist read); 0 leaves the calm default.
+  const contrastDir = isDarkMode ? 1 : -1;
+
   const outline = outlineBase.clone();
-  outline.oklch.l = isDarkMode ? 0.6 : 0.5;
+  outline.oklch.l = (isDarkMode ? 0.6 : 0.5) + contrastDir * treatment.outlineContrast;
   const outlineAdjusted = ensureContrast(outline, surface, 3.0);
 
   // outline-variant: Decorative dividers — subtle delta (~0.06) from surface
   const outlineVariant = outlineBase.clone();
-  outlineVariant.oklch.l = isDarkMode ? 0.2 : 0.92;
+  outlineVariant.oklch.l = (isDarkMode ? 0.2 : 0.92) + contrastDir * treatment.outlineContrast * 1.5;
 
   // Inverse colors (snackbars, etc.): a whisper of the brand tint so they stay in the same
   // family as the rest of the (tinted-neutral) surfaces rather than reading as a foreign pure
@@ -487,11 +583,24 @@ function generateOutlineAndInverse(
 
 // ===== SEMANTIC COLOR GENERATION =====
 
+/** Aurora overrides (code-mode): pull functional colors to the kind's saturation + lean them
+ *  toward the base family, so error/warning/success belong to the theme without losing their
+ *  canonical meaning. Omitted by the UI palette, which keeps the fixed signal band. */
+export interface SemanticAuroraOptions {
+  /** Target chroma for all semantics (the kind's character centre), clamped to a signal-safe band. */
+  chromaTarget?: number;
+  /** Hue of the base family; canonical semantic hues lean toward it by up to leanCap. */
+  familyHue?: number;
+  /** Max degrees a semantic hue may lean toward familyHue (default 0 = no lean). */
+  leanCap?: number;
+}
+
 export function generateSemanticColors(
   primary: Color,
   palette: BaseColorData[],
   isDarkMode: boolean,
   surface?: Color,
+  options: SemanticAuroraOptions = {},
 ): {
   error: Color;
   onError: Color;
@@ -507,6 +616,11 @@ export function generateSemanticColors(
   // *chroma* from a nearby palette member so the semantics feel related to the brand, with a
   // floor so they stay saturated enough to signal. (Audit 2A.)
   const borrowChroma = (hue: number): number => {
+    // Aurora: when a chroma target is supplied (code-mode), every semantic sits at the kind's
+    // saturation (Nord-muted → Dracula-neon), clamped so even the muted kinds still signal.
+    if (options.chromaTarget !== undefined) {
+      return Math.min(Math.max(options.chromaTarget, 0.10), 0.19);
+    }
     const match = findColorByHue(palette, hue, 25);
     const c = match?.oklch.c ?? medianChroma;
     // Floor keeps semantics saturated enough to read AND to stay separable under CVD
@@ -525,15 +639,23 @@ export function generateSemanticColors(
   // Construct fresh from explicit OKLCH coords. Building via `primary.clone()` breaks for
   // achromatic seeds (NaN hue): assigning `.oklch.h` onto a chroma-0 color doesn't reliably
   // take, leaving the semantics neutral (and thus indistinguishable under CVD).
+  // Aurora hue lean: nudge each canonical hue a bounded amount toward the base family so the
+  // semantics feel related (Nord's aurora) without drifting far enough to lose their meaning.
+  const leanHue = (canonical: number): number => {
+    if (options.familyHue === undefined || !options.leanCap) return canonical;
+    const signed = ((options.familyHue - canonical + 540) % 360) - 180;
+    return (canonical + Math.max(-options.leanCap, Math.min(options.leanCap, signed)) + 360) % 360;
+  };
+
   const make = (hue: number, l: number): Color =>
     new Color("oklch", [l, borrowChroma(hue), hue]);
 
   // Success uses a teal-leaning green (162°) rather than a pure green (~145°). The blue-yellow
   // axis it gains is preserved under red-green CVD, so success stays distinct from both amber
   // (warning) and red (error) for deuteranopes/protanopes — pure green collapses onto amber.
-  let error = make(27, targetL.error);
-  let warning = make(83, targetL.warning);
-  let success = make(162, targetL.success);
+  let error = make(leanHue(27), targetL.error);
+  let warning = make(leanHue(83), targetL.warning);
+  let success = make(leanHue(162), targetL.success);
 
   // Step the semantic L back toward the surface only as far as needed to keep 4.5:1 — preserves
   // the perceived hue while making inline use (text/icons on surface) safe. Done FIRST so the
@@ -654,7 +776,11 @@ export function generateUiColorPalette(
   isDarkMode: boolean,
   paletteType: PaletteKinds,
   colorFormat: ColorFormat,
+  paletteStyle: PaletteStyle = "square",
 ): BaseColorData[] {
+  // Per-style surface material treatment — neutral (square) → brutalist (diamond).
+  const treatment = surfaceTreatmentFor(paletteStyle);
+
   // Step 1: Adapt primary family roles. All four branches route through
   // adaptPrimaryForMode so the assigned L is verified against surface contrast.
   const isNaturallyLight = (color.oklch.l ?? 0.5) > 0.5;
@@ -667,7 +793,7 @@ export function generateUiColorPalette(
     makeContainerForAccent(primary, isDarkMode);
 
   // Step 3: Surface colors (AAA contrast) — generated before accents so surface is available
-  const surfaces = generateSurfaceColors(primary, isDarkMode);
+  const surfaces = generateSurfaceColors(primary, isDarkMode, treatment);
 
   // Step 4: Accent colors — adapted for the current mode
   const { secondary: secondaryRaw, tertiary: tertiaryRaw } = selectAccentColors(
@@ -705,6 +831,7 @@ export function generateUiColorPalette(
     isDarkMode,
     surfaces.surface,
     surfaces.onSurface,
+    treatment,
   );
 
   // Step 6: Semantic colors (AA contrast) — clamped against surface so inline use is safe

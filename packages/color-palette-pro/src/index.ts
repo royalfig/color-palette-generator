@@ -53,7 +53,7 @@ export function createPalettes(
   const modulatedPalette = paletteModulator(basePalette, modulateValues)
   if (isUiMode) {
     // Use the original user color, not the modulated palette color
-    return generateUiColorPalette(new Color(color), modulatedPalette, isDarkMode, palette, colorSpace.format)
+    return generateUiColorPalette(new Color(color), modulatedPalette, isDarkMode, palette, colorSpace.format, style)
   }
   return modulatedPalette
 }
