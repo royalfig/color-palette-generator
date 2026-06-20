@@ -427,6 +427,7 @@ export function deriveUiColors(
     'editorMarkerNavigation.background': overlayBackground.hex,
     'editorOverviewRuler.addedForeground': toHex(withAlpha(semantic.successForeground.hex, 0.5)),
     'editorOverviewRuler.border': outlineVariant.hex,
+    'editorOverviewRuler.findMatchForeground': goldAlpha(0.6),
     'editorOverviewRuler.deletedForeground': toHex(withAlpha(semantic.errorForeground.hex, 0.5)),
     'editorOverviewRuler.errorForeground': toHex(withAlpha(semantic.errorForeground.hex, 0.5)),
     'editorOverviewRuler.infoForeground': toHex(withAlpha(semantic.infoForeground.hex, 0.5)),
@@ -438,9 +439,11 @@ export function deriveUiColors(
     'editorSuggestWidget.foreground': editorForeground.hex,
     'editorSuggestWidget.border': outlineVariant.hex,
     'editorSuggestWidget.selectedBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.3)),
+    'editorSuggestWidget.highlightForeground': semantic.infoForeground.hex,
     'editorWhitespace.foreground': toHex(withAlpha(editorForeground.hex, 0.08)),
     'editorWidget.background': overlayBackground.hex,
     'editorWidget.border': outlineVariant.hex,
+    'editorWidget.foreground': editorForeground.hex,
 
     // Error/warning
     'editorError.foreground': semantic.errorForeground.hex,
@@ -453,9 +456,24 @@ export function deriveUiColors(
     'foreground': editorForeground.hex,
     'selection.background': toHex(withAlpha(semantic.focusBorder.hex, 0.3)),
 
+    // Base text / icons / links (rendered markdown in hovers, welcome page, etc.)
+    'descriptionForeground': toHex(withAlpha(editorForeground.hex, 0.7)),
+    'disabledForeground': toHex(withAlpha(editorForeground.hex, 0.4)),
+    'icon.foreground': editorForeground.hex,
+    'textLink.foreground': semantic.infoForeground.hex,
+    'textLink.activeForeground': semantic.accentColor.hex,
+    'textPreformat.foreground': semantic.stringColor.hex,
+    'textPreformat.background': toHex(withAlpha(editorForeground.hex, 0.08)),
+    'textBlockQuote.background': toHex(withAlpha(editorForeground.hex, 0.04)),
+    'textBlockQuote.border': divider.hex,
+    'textCodeBlock.background': toHex(withAlpha(editorForeground.hex, 0.06)),
+    'textSeparator.foreground': toHex(withAlpha(editorForeground.hex, 0.2)),
+    'widget.border': outlineVariant.hex,
+
     // Side bar
     'sideBar.background': sidebarBackground.hex,
     'sideBar.foreground': editorForeground.hex,
+    'sideBar.border': divider.hex,
     'sideBarSectionHeader.background': sidebarBackground.hex,
     'sideBarSectionHeader.border': divider.hex,
     'sideBarSectionHeader.foreground': editorForeground.hex,
@@ -471,7 +489,12 @@ export function deriveUiColors(
     'statusBar.noFolderForeground': editorForeground.hex,
     'statusBar.debuggingBackground': semantic.warningForeground.hex,
     'statusBar.debuggingForeground': sidebarBackground.hex,
+    'statusBar.focusBorder': focusBorderAlpha,
+    'statusBarItem.activeBackground': toHex(withAlpha(editorForeground.hex, 0.18)),
+    'statusBarItem.hoverBackground': toHex(withAlpha(editorForeground.hex, 0.12)),
+    'statusBarItem.focusBorder': focusBorderAlpha,
     'statusBarItem.prominentBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.4)),
+    'statusBarItem.prominentForeground': editorForeground.hex,
     'statusBarItem.prominentHoverBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.6)),
     'statusBarItem.remoteBackground': semantic.accentColor.hex,
     'statusBarItem.remoteForeground': toHex(getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5)),
@@ -485,9 +508,12 @@ export function deriveUiColors(
     'tab.inactiveBackground': sidebarBackground.hex,
     'tab.inactiveForeground': toHex(withAlpha(editorForeground.hex, 0.55)),
     'tab.hoverBackground': editorBackground.hex,
+    'tab.hoverForeground': editorForeground.hex,
     'tab.unfocusedActiveBackground': editorBackground.hex,
     'tab.unfocusedActiveForeground': toHex(withAlpha(editorForeground.hex, 0.7)),
     'tab.unfocusedActiveBorderTop': toHex(withAlpha(semantic.accentColor.hex, 0.5)),
+    'tab.unfocusedInactiveBackground': sidebarBackground.hex,
+    'tab.unfocusedInactiveForeground': toHex(withAlpha(editorForeground.hex, 0.4)),
     'tab.lastPinnedBorder': outlineVariant.hex,
 
     // Title bar
@@ -496,6 +522,29 @@ export function deriveUiColors(
     'titleBar.inactiveBackground': statusBarBackground.hex,
     'titleBar.inactiveForeground': toHex(withAlpha(editorForeground.hex, 0.55)),
     'titleBar.border': divider.hex,
+
+    // Command center (title-bar search)
+    'commandCenter.foreground': editorForeground.hex,
+    'commandCenter.activeForeground': editorForeground.hex,
+    'commandCenter.background': sidebarBackground.hex,
+    'commandCenter.activeBackground': toHex(withAlpha(editorForeground.hex, 0.06)),
+    'commandCenter.border': outlineVariant.hex,
+    'commandCenter.activeBorder': controlBorder,
+
+    // Menu bar + menus
+    'menubar.selectionBackground': toHex(withAlpha(editorForeground.hex, 0.08)),
+    'menubar.selectionForeground': editorForeground.hex,
+    'menu.background': overlayBackground.hex,
+    'menu.foreground': editorForeground.hex,
+    'menu.selectionBackground': toHex(withAlpha(semantic.focusBorder.hex, isDarkMode ? 0.3 : 0.2)),
+    'menu.selectionForeground': editorForeground.hex,
+    'menu.selectionBorder': '#00000000',
+    'menu.separatorBackground': divider.hex,
+    'menu.border': outlineVariant.hex,
+
+    // Toolbar (hover/active states on icon toolbars)
+    'toolbar.hoverBackground': toHex(withAlpha(editorForeground.hex, 0.08)),
+    'toolbar.activeBackground': toHex(withAlpha(editorForeground.hex, 0.12)),
 
     // Input
     'input.background': panelBackground.hex,
@@ -510,6 +559,12 @@ export function deriveUiColors(
     'dropdown.background': overlayBackground.hex,
     'dropdown.foreground': editorForeground.hex,
     'dropdown.border': controlBorder,
+    'dropdown.listBackground': overlayBackground.hex,
+
+    // Checkbox
+    'checkbox.background': overlayBackground.hex,
+    'checkbox.border': controlBorder,
+    'checkbox.foreground': editorForeground.hex,
 
     // Button — secondary now uses the real secondary role (not a fake foreground@10%),
     // giving the theme a proper two-tier button system.
@@ -519,6 +574,8 @@ export function deriveUiColors(
     'button.secondaryBackground': semantic.secondaryContainer.hex,
     'button.secondaryForeground': semantic.onSecondaryContainer.hex,
     'button.secondaryHoverBackground': toHex(boostChroma(new Color(semantic.secondaryContainer.hex), 1.05)),
+    'button.border': '#00000000',
+    'button.secondaryBorder': controlBorder,
 
     // Lists
     'list.activeSelectionBackground': toHex(withAlpha(semantic.focusBorder.hex, isDarkMode ? 0.3 : 0.2)),
@@ -531,6 +588,10 @@ export function deriveUiColors(
     'list.inactiveSelectionForeground': editorForeground.hex,
     'list.errorForeground': semantic.errorForeground.hex,
     'list.warningForeground': semantic.warningForeground.hex,
+    'list.hoverForeground': editorForeground.hex,
+    'list.focusOutline': focusBorderAlpha,
+    'list.dropBackground': toHex(withAlpha(semantic.focusBorder.hex, isDarkMode ? 0.15 : 0.1)),
+    'list.invalidItemForeground': toHex(withAlpha(editorForeground.hex, 0.4)),
 
     // Panel
     'panel.background': panelBackground.hex,
@@ -548,6 +609,8 @@ export function deriveUiColors(
     'peekViewEditor.matchHighlightBackground': toHex(withAlpha(semantic.accentColor.hex, 0.4)),
     'peekViewResult.background': panelBackground.hex,
     'peekViewResult.matchHighlightBackground': toHex(withAlpha(semantic.accentColor.hex, 0.4)),
+    'peekViewResult.fileForeground': editorForeground.hex,
+    'peekViewResult.lineForeground': toHex(withAlpha(editorForeground.hex, 0.6)),
     'peekViewResult.selectionBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.4)),
     'peekViewResult.selectionForeground': editorForeground.hex,
     'peekViewTitle.background': sidebarBackground.hex,
@@ -569,6 +632,7 @@ export function deriveUiColors(
     'progressBar.background': semantic.accentColor.hex,
 
     // Git decoration
+    'gitDecoration.addedResourceForeground': semantic.successForeground.hex,
     'gitDecoration.ignoredResourceForeground': toHex(withAlpha(editorForeground.hex, 0.4)),
     'gitDecoration.modifiedResourceForeground': semantic.infoForeground.hex,
     'gitDecoration.deletedResourceForeground': semantic.errorForeground.hex,
@@ -619,11 +683,15 @@ export function deriveUiColors(
     // Notification
     'notificationCenter.border': outlineVariant.hex,
     'notificationCenterHeader.background': sidebarBackground.hex,
+    'notificationCenterHeader.foreground': editorForeground.hex,
     'notificationToast.border': outlineVariant.hex,
     'notifications.background': overlayBackground.hex,
     'notifications.foreground': editorForeground.hex,
     'notifications.border': outlineVariant.hex,
     'notificationLink.foreground': semantic.infoForeground.hex,
+    'notificationsErrorIcon.foreground': semantic.errorForeground.hex,
+    'notificationsWarningIcon.foreground': semantic.warningForeground.hex,
+    'notificationsInfoIcon.foreground': semantic.infoForeground.hex,
 
     // Scrollbar
     'scrollbar.shadow': editorBackground.hex,
@@ -669,9 +737,14 @@ export function deriveUiColors(
     'activityBar.inactiveForeground': toHex(withAlpha(editorForeground.hex, 0.4)),
     'activityBar.border': outlineVariant.hex,
     'activityBar.activeBorder': semantic.accentColor.hex,
+    'activityBar.activeFocusBorder': semantic.accentColor.hex,
     'activityBar.activeBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.15)),
     'activityBarBadge.background': semantic.primaryContainer.hex,
     'activityBarBadge.foreground': semantic.onPrimaryContainer.hex,
+    'activityErrorBadge.background': semantic.errorForeground.hex,
+    'activityErrorBadge.foreground': toHex(getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.errorForeground.hex), 4.5)),
+    'activityWarningBadge.background': semantic.warningForeground.hex,
+    'activityWarningBadge.foreground': toHex(getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.warningForeground.hex), 4.5)),
     'activityBarTop.foreground': editorForeground.hex,
     'activityBarTop.inactiveForeground': toHex(withAlpha(editorForeground.hex, 0.4)),
     'activityBarTop.activeBorder': semantic.accentColor.hex,
@@ -688,6 +761,9 @@ export function deriveUiColors(
     'quickInputList.focusBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.30)),
     'quickInputList.focusForeground': editorForeground.hex,
     'quickInputList.focusIconForeground': semantic.accentColor.hex,
+    'quickInputList.focusHighlightForeground': semantic.infoForeground.hex,
+    'quickInputList.hoverBackground': toHex(withAlpha(semantic.focusBorder.hex, isDarkMode ? 0.15 : 0.1)),
+    'quickInput.border': outlineVariant.hex,
     'quickInputTitle.background': sidebarBackground.hex,
 
     // Terminal UI
@@ -695,6 +771,7 @@ export function deriveUiColors(
     'terminal.foreground': editorForeground.hex,
     'terminal.selectionBackground': ramp.findMatchHighlight,
     'terminal.border': outlineVariant.hex,
+    'terminal.tab.activeBorder': semantic.accentColor.hex,
     'terminalCursor.foreground': cursorColor.hex,
     'terminalCursor.background': editorBackground.hex,
 
@@ -776,6 +853,15 @@ export function deriveUiColors(
     'charts.yellow': semantic.warningForeground.hex,
     'charts.orange': semantic.accentColor.hex,
     'charts.purple': chartsPurpleHex,
+
+    // Gauge (Copilot usage meters etc.) — primary fill with soft track, semantic states.
+    'gauge.foreground': semantic.accentColor.hex,
+    'gauge.background': toHex(withAlpha(semantic.accentColor.hex, 0.3)),
+    'gauge.border': outlineVariant.hex,
+    'gauge.warningForeground': semantic.warningForeground.hex,
+    'gauge.warningBackground': toHex(withAlpha(semantic.warningForeground.hex, 0.3)),
+    'gauge.errorForeground': semantic.errorForeground.hex,
+    'gauge.errorBackground': toHex(withAlpha(semantic.errorForeground.hex, 0.3)),
   }
 }
 

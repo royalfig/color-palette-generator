@@ -261,3 +261,15 @@ export function brightWhiteHex(hex: string, isDarkMode: boolean): string {
   c.oklch.c = (c.oklch.c ?? 0) * 0.35;
   return toHex(c);
 }
+
+/**
+ * Dim ANSI (the 8 dim_* slots) from a base ANSI color: a reduced-intensity variant.
+ * Drop a step of lightness and pull chroma in — exported Zed themes seat dim a notch
+ * deeper than the base in both light and dark, so darken regardless of mode.
+ */
+export function dimAnsiHex(hex: string): string {
+  const c = new Color(hex);
+  c.oklch.l = Math.max(0, (c.oklch.l ?? 0.5) - 0.12);
+  c.oklch.c = (c.oklch.c ?? 0) * 0.8;
+  return toHex(c);
+}

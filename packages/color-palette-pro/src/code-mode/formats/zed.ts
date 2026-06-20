@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
 import type { ThemeData, ZedSyntaxToken, ZedTheme } from '../types'
-import { brightAnsiHex, brightWhiteHex, toHex } from '../utils'
+import { brightAnsiHex, brightWhiteHex, dimAnsiHex, toHex } from '../utils'
 
 /** Convert #RRGGBB or #RRGGBBAA to Zed's required #rrggbbaa format. */
 function za(hex: string, alpha?: number): string {
@@ -25,6 +25,17 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     style === 'italic' ? { font_style: 'italic' } : {}
 
   const bright = (hex: string, isBlack = false) => za(brightAnsiHex(hex, isDarkMode, isBlack))
+  const dim = (hex: string) => za(dimAnsiHex(hex))
+
+  // Gold find-match — the universal highlighter-pen convention (see base.ts).
+  const goldHex = toHex(
+    (() => {
+      const g = new Color(c.focusBorder.hex)
+      g.oklch.h = 75
+      g.oklch.c = Math.max(g.oklch.c ?? 0, 0.12)
+      return g
+    })(),
+  )
 
   const syntax: Record<string, ZedSyntaxToken> = {
     keyword: { color: za(c.keywordColor.hex), ...fs(keywordStyle) },
@@ -49,11 +60,15 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     attribute: { color: za(c.definitionColor.hex) },
     tag: { color: za(c.keywordColor.hex) },
     operator: { color: za(c.operatorColor.hex) },
+    namespace: { color: za(c.defaultForeground.hex) },
     punctuation: { color: za(c.punctuationColor.hex) },
     'punctuation.bracket': { color: za(c.punctuationColor.hex) },
     'punctuation.delimiter': { color: za(c.punctuationColor.hex) },
     'punctuation.special': { color: za(c.accentColor.hex) },
     'punctuation.list_marker': { color: za(c.accentColor.hex) },
+    'punctuation.markup': { color: za(c.accentColor.hex) },
+    selector: { color: za(c.typeColor.hex) },
+    'selector.pseudo': { color: za(c.accentColor.hex) },
     label: { color: za(c.definitionColor.hex) },
     preproc: { color: za(c.keywordColor.hex) },
     embedded: { color: za(c.accentColor.hex) },
@@ -74,22 +89,35 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     'elevated_surface.background': za(c.overlayBackground.hex),
     'surface.background': za(c.sidebarBackground.hex),
     'panel.background': za(c.panelBackground.hex),
+    'panel.focused_border': za(c.focusBorder.hex),
+    'panel.overlay_background': za(c.overlayBackground.hex),
+    'panel.overlay_hover': za(c.neutralBand.hex),
+    'panel.indent_guide': za(c.editorForeground.hex, isDarkMode ? 0.08 : 0.07),
+    'panel.indent_guide_active': za(c.editorForeground.hex, isDarkMode ? 0.20 : 0.18),
+    'panel.indent_guide_hover': za(c.editorForeground.hex, isDarkMode ? 0.14 : 0.12),
+    'pane.focused_border': za(c.focusBorder.hex),
+    'pane_group.border': za(c.outlineVariant.hex),
 
     // Editor
+    'editor.foreground': za(c.editorForeground.hex),
     'editor.background': za(c.editorBackground.hex),
     'editor.gutter.background': za(c.editorBackground.hex),
+    'editor.subheader.background': za(c.sidebarBackground.hex),
     'editor.active_line.background': za(c.neutralBand.hex),
     'editor.highlighted_line.background': za(c.neutralBand.hex, 0.5),
     'editor.line_number': za(c.editorForeground.hex, isDarkMode ? 0.35 : 0.45),
+    'editor.hover_line_number': za(c.editorForeground.hex, isDarkMode ? 0.55 : 0.65),
     'editor.active_line_number': za(c.editorForeground.hex),
     'editor.invisible': za(c.outlineVariant.hex),
     'editor.wrap_guide': za(c.outlineVariant.hex),
     'editor.active_wrap_guide': za(c.outline.hex),
-    'editor.selection.background': za(c.focusBorder.hex, peakAlpha),
+    'editor.indent_guide': za(c.editorForeground.hex, isDarkMode ? 0.08 : 0.07),
+    'editor.indent_guide_active': za(c.editorForeground.hex, isDarkMode ? 0.20 : 0.18),
     'editor.document_highlight.read_background': za(c.focusBorder.hex, peakAlpha * 0.35),
     'editor.document_highlight.write_background': za(c.focusBorder.hex, peakAlpha * 0.55),
-    // Gold find-match — the universal highlighter-pen convention (see base.ts).
-    'search.match_background': za(toHex((() => { const g = new Color(c.focusBorder.hex); g.oklch.h = 75; g.oklch.c = Math.max(g.oklch.c ?? 0, 0.12); return g })()), peakAlpha * 0.65),
+    'editor.document_highlight.bracket_background': za(c.focusBorder.hex, peakAlpha * 0.4),
+    'search.match_background': za(goldHex, peakAlpha * 0.65),
+    'search.active_match_background': za(goldHex, peakAlpha * 0.9),
 
     // Chrome
     'status_bar.background': za(c.statusBarBackground.hex),
@@ -119,7 +147,7 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     'icon.disabled': za(c.editorForeground.hex, 0.4),
     'icon.placeholder': za(c.editorForeground.hex, 0.5),
     'icon.accent': za(c.accentColor.hex),
-    link_text_hover: za(c.infoForeground.hex),
+    'link_text.hover': za(c.infoForeground.hex),
 
     // Element interaction states
     'element.background': '#00000000',
@@ -141,6 +169,11 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     'scrollbar.track.background': '#00000000',
     'scrollbar.track.border': za(c.outlineVariant.hex),
 
+    // Minimap (mirrors the scrollbar thumb)
+    'minimap.thumb.background': za(c.editorForeground.hex, isDarkMode ? 0.15 : 0.12),
+    'minimap.thumb.hover_background': za(c.editorForeground.hex, isDarkMode ? 0.25 : 0.20),
+    'minimap.thumb.border': za(c.outlineVariant.hex),
+
     // Diagnostic / status
     error: za(c.errorForeground.hex),
     'error.background': za(c.errorContainer.hex),
@@ -160,6 +193,9 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     predictive: za(c.commentColor.hex),
     'predictive.background': '#00000000',
     'predictive.border': '#00000000',
+    unreachable: za(c.editorForeground.hex, 0.55),
+    'unreachable.background': za(c.panelBackground.hex),
+    'unreachable.border': za(c.outlineVariant.hex),
 
     // Git file status
     created: za(c.successForeground.hex),
@@ -183,6 +219,16 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     renamed: za(c.accentColor.hex),
     'renamed.background': '#00000000',
     'renamed.border': '#00000000',
+
+    // Version control (git gutter / blame): added=green, modified=amber, deleted=red.
+    'version_control.added': za(c.successForeground.hex),
+    'version_control.modified': za(c.warningForeground.hex),
+    'version_control.deleted': za(c.errorForeground.hex),
+    'version_control.renamed': za(c.accentColor.hex),
+    'version_control.conflict': za(c.warningForeground.hex),
+    'version_control.ignored': za(c.commentColor.hex),
+    'version_control.word_added': za(c.successForeground.hex, 0.35),
+    'version_control.word_deleted': za(c.errorForeground.hex, 0.5),
 
     // Players (multi-cursor / collab)
     players: [
@@ -216,6 +262,14 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     'terminal.ansi.bright_magenta': bright(c.terminalAnsiMagenta.hex),
     'terminal.ansi.bright_cyan': bright(c.terminalAnsiCyan.hex),
     'terminal.ansi.bright_white': za(brightWhiteHex(c.terminalAnsiWhite.hex, isDarkMode)),
+    'terminal.ansi.dim_black': dim(c.terminalAnsiBlack.hex),
+    'terminal.ansi.dim_red': dim(c.terminalAnsiRed.hex),
+    'terminal.ansi.dim_green': dim(c.terminalAnsiGreen.hex),
+    'terminal.ansi.dim_yellow': dim(c.terminalAnsiYellow.hex),
+    'terminal.ansi.dim_blue': dim(c.terminalAnsiBlue.hex),
+    'terminal.ansi.dim_magenta': dim(c.terminalAnsiMagenta.hex),
+    'terminal.ansi.dim_cyan': dim(c.terminalAnsiCyan.hex),
+    'terminal.ansi.dim_white': za(c.editorForeground.hex, 0.6),
 
     syntax,
   }
