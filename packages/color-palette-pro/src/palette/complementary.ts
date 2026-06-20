@@ -1,0 +1,385 @@
+import Color from "colorjs.io";
+import { colorFactory } from "../factory";
+import { ColorFormat, ColorSpace } from "../types/types";
+import {
+  applyVariation as applyVariationG,
+  clampOKLCH as clampOKLCHG,
+  gamutForSpace,
+  generateNeutralPalette,
+  isAchromatic,
+  safeHue,
+} from "../utils";
+import {
+  applyEnhancementsToComplementary,
+  avoidMuddyZones,
+  polishPalette,
+} from "./enhancer";
+
+export function getWarmCoolComplement(hue: number) {
+  const adjustedHue = (hue + 180) % 360;
+
+  if (hue >= 0 && hue < 60) return (adjustedHue - 15 + 360) % 360; // Reds → deeper teals
+  if (hue >= 60 && hue < 120) return (adjustedHue + 10) % 360; // Yellows → richer blues
+  if (hue >= 240 && hue < 300) return (adjustedHue - 10 + 360) % 360; // Blues → warmer oranges
+
+  return adjustedHue;
+}
+
+function getMathematicalComplement(hue: number): number {
+  // Pure mathematical - rigid 180° opposite
+  return (hue + 180) % 360;
+}
+
+function getOpticalComplement(baseColor: Color): number {
+  // Approximate "perceptual" complement, CONTINUOUS in hue. The previous version was a
+  // piecewise table whose branches overlapped and disagreed at the boundaries (e.g. hue 30
+  // mapped to both ~179° and ~240°), so two visually-identical seeds 1° apart could produce
+  // complements 60° apart. This starts from the mathematical 180° opposite and applies a
+  // smooth ±18° skew that biases the complement warmer/cooler the way afterimage complements
+  // skew vs the naive opposite — no band cliffs. (Audit 3C.)
+  const hue = safeHue(baseColor, 0);
+  const base = (hue + 180) % 360;
+  const skew = Math.sin((hue * Math.PI) / 180) * 18;
+  return (((base + skew) % 360) + 360) % 360;
+}
+
+function getAdaptiveComplement(baseColor: Color): number {
+  // Emotional Resonance: Creates complements that enhance the emotional story
+  const oklch = baseColor.to("oklch");
+  const hue = oklch.h ?? 0;
+  const chroma = oklch.c ?? 0;
+  const lightness = oklch.l ?? 0.5;
+
+  // Determine emotional profile and create meaningful opposition
+  if (hue >= 345 || hue < 30) {
+    // Passionate reds → Calming teals (emotional cooling)
+    return 180 + Math.sin((hue * Math.PI) / 180) * 20; // Gentle teal variations
+  }
+
+  if (hue >= 30 && hue < 90) {
+    // Energetic oranges/yellows → Mysterious deep blues (energy vs. depth)
+    // Vividness = chroma as a fraction of a typical OKLCH max (~0.3), clamped 0–1. More vivid
+    // inputs nudge the complement a little further. This is a deliberate aesthetic nudge, not a
+    // perceptual law — chroma (not chroma×lightness) is the better proxy for saturation/arousal.
+    const intensity = Math.min(chroma / 0.3, 1);
+    return 240 + intensity * 12;
+  }
+
+  if (hue >= 90 && hue < 150) {
+    // Natural greens → Passionate magentas (nature vs. artifice)
+    return 320 + (hue - 90) * 0.5; // Shifts from magenta to red
+  }
+
+  if (hue >= 150 && hue < 210) {
+    // Tranquil blues → Warm, comforting oranges (cool vs. warm comfort)
+    return 30 + Math.cos((hue * Math.PI) / 180) * 15; // Gentle orange variations
+  }
+
+  if (hue >= 210 && hue < 270) {
+    // Mysterious blues → Energetic golds (mystery vs. clarity)
+    return 50 + (270 - hue) * 0.4; // From gold to orange
+  }
+
+  // Creative purples → Natural greens (imagination vs. reality)
+  return 100 + Math.sin(((hue - 270) * Math.PI) / 90) * 25;
+}
+
+function getLuminosityComplement(baseColor: Color): number {
+  // Luminosity Dance: Based on how light and shadow create natural complements
+  const oklch = baseColor.to("oklch");
+  const hue = oklch.h ?? 0;
+  const chroma = oklch.c ?? 0;
+  const lightness = oklch.l ?? 0.5;
+
+  // Determine the lighting scenario and create realistic complements
+
+  if (lightness > 0.8 && chroma < 0.06) {
+    // Bright, desaturated = daylight scenario
+    // Shadows go cool, highlights stay neutral
+    return (hue + 200) % 360; // Slightly cool complement
+  }
+
+  if (hue >= 30 && hue < 90 && lightness > 0.6) {
+    // Golden light scenario - shadows go deep blue-purple
+    return 240 + (hue - 30) * 0.3; // Cool shadow complements
+  }
+
+  if (hue >= 180 && hue < 240 && lightness < 0.5) {
+    // Cool/moonlight scenario - warm complements emerge
+    return 40 + (hue - 180) * 0.4; // Warm candlelight colors
+  }
+
+  if (chroma > 0.15 && lightness < 0.4) {
+    // Dramatic lighting - creates strong color temperature contrast
+    const isWarm = hue < 180;
+    if (isWarm) {
+      return (hue + 160) % 360; // Warm lights get cool complements
+    } else {
+      return (hue + 200) % 360; // Cool lights get warm complements
+    }
+  }
+
+  if (hue >= 270 && hue < 330) {
+    // Artificial/magical light - creates unnatural but beautiful complements
+    return 90 + (hue - 270) * 0.6; // Complementary artificial colors
+  }
+
+  // Natural light scenario - gentle, realistic complements
+  const lightInfluence = lightness * 20 - 10; // -10 to +10 degree shift
+  return (hue + 180 + lightInfluence) % 360;
+}
+
+export function generateComplementary(
+  baseColor: string,
+  options: {
+    chromaAdjust?: number;
+    style: "square" | "triangle" | "circle" | "diamond";
+    colorSpace: { space: ColorSpace; format: ColorFormat };
+  },
+) {
+  const { chromaAdjust = 0.9 } = options;
+  const format = options.colorSpace.format;
+  // Keep generated swatches realizable in the selected display gamut (sRGB or P3).
+  const gamut = gamutForSpace(options.colorSpace.space);
+  const applyVariation = (c: Color, v: { l: number; c: number }, h: number) =>
+    applyVariationG(c, v, h, gamut);
+  const clampOKLCH = (l: number, c: number, h: number) =>
+    clampOKLCHG(l, c, h, gamut);
+  const enhanced = options.style === "square" ? false : true;
+
+  try {
+    const baseColorObj = new Color(baseColor);
+    // No hue to complement → return a neutral ramp instead of silently treating gray as red.
+    if (isAchromatic(baseColorObj))
+      return generateNeutralPalette(baseColor, 6, "complementary", format);
+    const mainComplement = baseColorObj.clone();
+    const lightComplement = baseColorObj.clone();
+    const mutedComplement = baseColorObj.clone();
+
+    let complementHue: number;
+
+    switch (options.style) {
+      case "square":
+        complementHue = getMathematicalComplement(baseColorObj.oklch.h ?? 0);
+        break;
+      case "triangle":
+        complementHue = getOpticalComplement(baseColorObj);
+        break;
+      case "circle":
+        complementHue = getAdaptiveComplement(baseColorObj);
+        break;
+      case "diamond":
+        complementHue = getLuminosityComplement(baseColorObj);
+        break;
+    }
+
+    // Get base color properties for adaptive lightness
+    const baseLightness = baseColorObj.oklch.l ?? 0.5;
+    const baseChroma = baseColorObj.oklch.c ?? 0;
+
+    // Create adaptive lightness adjustments based on input color
+    function getAdaptiveLightnessAdjustments() {
+      // Ensure palette spans a good lightness range (0.15 to 0.9)
+      const targetRange = { min: 0.15, max: 0.9 };
+
+      // Calculate adjustments to create balanced distribution
+      let baseVariations, complementVariations;
+
+      if (baseLightness < 0.3) {
+        // Dark base: create more lighter variants
+        baseVariations = {
+          dark: { l: Math.max(-0.1, targetRange.min - baseLightness), c: 1.0 },
+          light: { l: Math.min(0.4, targetRange.max - baseLightness), c: 0.8 },
+        };
+        complementVariations = {
+          main: { l: 0.2, c: 1.0 },
+          light: { l: 0.35, c: 0.7 },
+          muted: { l: 0.1, c: 0.5 },
+        };
+      } else if (baseLightness > 0.7) {
+        // Light base: create more darker variants
+        baseVariations = {
+          dark: { l: Math.max(-0.4, targetRange.min - baseLightness), c: 1.1 },
+          light: { l: Math.min(0.1, targetRange.max - baseLightness), c: 0.8 },
+        };
+        complementVariations = {
+          main: { l: -0.2, c: 1.0 },
+          light: { l: -0.1, c: 0.8 },
+          muted: { l: -0.3, c: 0.6 },
+        };
+      } else {
+        // Mid-range base: create balanced distribution
+        baseVariations = {
+          dark: { l: -0.2, c: 1.1 },
+          light: { l: 0.2, c: 0.8 },
+        };
+        complementVariations = {
+          main: { l: 0.05, c: 1.0 },
+          light: { l: 0.25, c: 0.7 },
+          muted: { l: -0.15, c: 0.5 },
+        };
+      }
+
+      return { baseVariations, complementVariations };
+    }
+
+    let { baseVariations, complementVariations } =
+      getAdaptiveLightnessAdjustments();
+
+    if (options.style === "triangle") {
+      // Perceptual harmony: adjust based on base lightness while maintaining natural feel
+      const lightnessModifier =
+        baseLightness < 0.4 ? 0.1 : baseLightness > 0.6 ? -0.1 : 0;
+
+      baseVariations = {
+        dark: { l: Math.max(-0.2 + lightnessModifier, -0.3), c: 0.9 },
+        light: { l: Math.min(0.15 + lightnessModifier, 0.3), c: 0.7 },
+      };
+      complementVariations = {
+        main: { l: 0.05 - lightnessModifier, c: 1.0 },
+        light: { l: 0.2 - lightnessModifier, c: 0.75 },
+        muted: { l: -0.1 - lightnessModifier, c: 0.5 },
+      };
+    } else if (options.style === "circle") {
+      // Emotional resonance: varies by emotional type, adapted for base lightness
+      const hue = baseColorObj.oklch.h ?? 0;
+      const lightnessAdaptation =
+        baseLightness < 0.4 ? 0.15 : baseLightness > 0.6 ? -0.15 : 0;
+
+      if (hue >= 345 || hue < 30) {
+        // passionate - adapt intensity based on base lightness
+        baseVariations = {
+          dark: { l: Math.max(-0.25 + lightnessAdaptation, -0.4), c: 1.2 },
+          light: { l: Math.min(0.1 + lightnessAdaptation, 0.3), c: 0.8 },
+        };
+        complementVariations = {
+          main: { l: 0.15 - lightnessAdaptation, c: 0.9 },
+          light: { l: 0.3 - lightnessAdaptation, c: 0.6 },
+          muted: { l: -0.05 - lightnessAdaptation, c: 0.5 },
+        };
+      } else if (hue >= 150 && hue < 210) {
+        // tranquil - maintain gentleness while ensuring range
+        baseVariations = {
+          dark: { l: Math.max(-0.15 + lightnessAdaptation, -0.3), c: 0.8 },
+          light: { l: Math.min(0.15 + lightnessAdaptation, 0.25), c: 0.5 },
+        };
+        complementVariations = {
+          main: { l: 0.1 - lightnessAdaptation, c: 1.0 },
+          light: { l: 0.25 - lightnessAdaptation, c: 0.85 },
+          muted: { l: -0.05 - lightnessAdaptation, c: 0.6 },
+        };
+      }
+    } else if (options.style === "diamond") {
+      // Luminosity dance: based on lighting scenario
+      const lightness = baseColorObj.oklch.l ?? 0.5;
+      const chroma = baseColorObj.oklch.c ?? 0;
+
+      if (lightness > 0.8 && chroma < 0.06) {
+        // daylight - strong contrast but prevent over-darkening
+        baseVariations = {
+          dark: { l: Math.max(-0.3, 0.15 - lightness), c: 1.0 },
+          light: { l: Math.min(0.05, 0.9 - lightness), c: 0.7 },
+        };
+        complementVariations = {
+          main: { l: -0.1, c: 0.9 },
+          light: { l: 0.05, c: 0.7 },
+          muted: { l: -0.25, c: 0.4 },
+        };
+      } else if (chroma > 0.15 && lightness < 0.4) {
+        // dramatic - enhance contrast while ensuring visibility
+        baseVariations = {
+          dark: { l: Math.max(-0.25, 0.15 - lightness), c: 1.3 },
+          light: { l: Math.min(0.3, 0.8 - lightness), c: 0.9 },
+        };
+        complementVariations = {
+          main: { l: 0.25, c: 1.2 },
+          light: { l: 0.4, c: 0.9 },
+          muted: { l: 0.1, c: 0.6 },
+        };
+      }
+    }
+
+    let finalComplementHue = complementHue;
+
+    if (enhanced) {
+      const cleaned = avoidMuddyZones(
+        complementHue,
+        (baseColorObj.oklch.l ?? 0.5) + complementVariations.main.l,
+        (baseColorObj.oklch.c ?? 0) * complementVariations.main.c,
+      );
+      finalComplementHue = cleaned.h;
+    }
+
+    const darkBase = applyVariation(
+      baseColorObj,
+      baseVariations.dark,
+      baseColorObj.oklch.h ?? 0,
+    );
+    const mutedBase = applyVariation(
+      baseColorObj,
+      baseVariations.light,
+      baseColorObj.oklch.h ?? 0,
+    );
+
+    // Main complement
+    const mainCompValues = clampOKLCH(
+      (baseColorObj.oklch.l ?? 0.5) + complementVariations.main.l,
+      (baseColorObj.oklch.c ?? 0) * chromaAdjust * complementVariations.main.c,
+      finalComplementHue,
+    );
+    mainComplement.oklch.l = mainCompValues.l;
+    mainComplement.oklch.c = mainCompValues.c;
+    mainComplement.oklch.h = mainCompValues.h;
+
+    // Light complement
+    const lightCompValues = clampOKLCH(
+      (baseColorObj.oklch.l ?? 0.5) + complementVariations.light.l,
+      (baseColorObj.oklch.c ?? 0) * complementVariations.light.c,
+      finalComplementHue,
+    );
+    lightComplement.oklch.l = lightCompValues.l;
+    lightComplement.oklch.c = lightCompValues.c;
+    lightComplement.oklch.h = lightCompValues.h;
+
+    // Muted complement
+    const mutedCompValues = clampOKLCH(
+      (baseColorObj.oklch.l ?? 0.5) + complementVariations.muted.l,
+      (baseColorObj.oklch.c ?? 0) * complementVariations.muted.c,
+      finalComplementHue,
+    );
+    mutedComplement.oklch.l = mutedCompValues.l;
+    mutedComplement.oklch.c = mutedCompValues.c;
+    mutedComplement.oklch.h = mutedCompValues.h;
+
+    const initialColors = [
+      new Color(baseColor), // Base (preserved)
+      mainComplement, // Main complement
+      darkBase, // Dark base
+      mutedBase, // Light base (renamed for better distribution)
+      lightComplement, // Light complement
+      mutedComplement, // Muted complement
+    ];
+
+    // Apply enhancements if enabled
+    const finalColors = enhanced
+      ? polishPalette(
+          applyEnhancementsToComplementary(initialColors, options.style, 0),
+          0,
+        ) // Base is at index 0
+      : initialColors;
+
+    // Convert to your color factory format
+    return [
+      colorFactory(baseColor, "complementary", 0, format, true), // Always preserve base
+      colorFactory(finalColors[1], "complementary", 1, format),
+      colorFactory(finalColors[2], "complementary", 2, format),
+      colorFactory(finalColors[3], "complementary", 3, format),
+      colorFactory(finalColors[4], "complementary", 4, format),
+      colorFactory(finalColors[5], "complementary", 5, format),
+    ];
+  } catch (e) {
+    throw new Error(
+      `Failed to generate complementary colors for ${baseColor}: ${e}`,
+    );
+  }
+}

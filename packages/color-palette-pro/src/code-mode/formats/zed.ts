@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
 import type { ThemeData, ZedSyntaxToken, ZedTheme } from '../types'
-import { brightAnsiHex, toHex } from '../utils'
+import { brightAnsiHex, brightWhiteHex, toHex } from '../utils'
 
 /** Convert #RRGGBB or #RRGGBBAA to Zed's required #rrggbbaa format. */
 function za(hex: string, alpha?: number): string {
@@ -196,7 +196,9 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     // Terminal
     'terminal.background': za(c.editorBackground.hex),
     'terminal.foreground': za(c.editorForeground.hex),
-    'terminal.bright_foreground': za(c.editorForeground.hex),
+    // Bright/bold terminal text lifts a step above the foreground; a flat +L clips because
+    // the fg already sits at the brightness ceiling. Audit note 2.
+    'terminal.bright_foreground': za(brightWhiteHex(c.terminalAnsiWhite.hex, isDarkMode)),
     'terminal.dim_foreground': za(c.editorForeground.hex, 0.6),
     'terminal.ansi.black': za(c.terminalAnsiBlack.hex),
     'terminal.ansi.red': za(c.terminalAnsiRed.hex),
@@ -213,7 +215,7 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     'terminal.ansi.bright_blue': bright(c.terminalAnsiBlue.hex),
     'terminal.ansi.bright_magenta': bright(c.terminalAnsiMagenta.hex),
     'terminal.ansi.bright_cyan': bright(c.terminalAnsiCyan.hex),
-    'terminal.ansi.bright_white': bright(c.terminalAnsiWhite.hex),
+    'terminal.ansi.bright_white': za(brightWhiteHex(c.terminalAnsiWhite.hex, isDarkMode)),
 
     syntax,
   }

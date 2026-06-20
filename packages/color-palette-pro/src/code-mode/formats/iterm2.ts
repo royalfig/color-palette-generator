@@ -1,6 +1,5 @@
-import Color from 'colorjs.io'
 import type { ThemeData } from '../types'
-import { brightAnsiHex, toHex } from '../utils'
+import { brightAnsiHex, brightWhiteHex } from '../utils'
 
 function hexToFloats(hex: string): [number, number, number] {
   const h = hex.startsWith('#') ? hex.slice(1) : hex
@@ -38,15 +37,6 @@ export function serializeAsIterm2(data: ThemeData): string {
 
   const bright = (hex: string, isBlack = false) => brightAnsiHex(hex, isDarkMode, isBlack)
 
-  // iTerm2 color dicts are written at full opacity, so composite the focus color over the
-  // editor bg at the legible selection alpha — otherwise selected text can vanish. (Audit 4G.)
-  const selectionBg = toHex(
-    new Color(c.editorBackground.hex).mix(new Color(c.focusBorder.hex), data.peakAlpha, {
-      space: 'srgb',
-      outputSpace: 'srgb',
-    }) as Color,
-  )
-
   const ansi: [string, string][] = [
     ['Ansi 0 Color', c.terminalAnsiBlack.hex],
     ['Ansi 1 Color', c.terminalAnsiRed.hex],
@@ -63,7 +53,8 @@ export function serializeAsIterm2(data: ThemeData): string {
     ['Ansi 12 Color', bright(c.terminalAnsiBlue.hex)],
     ['Ansi 13 Color', bright(c.terminalAnsiMagenta.hex)],
     ['Ansi 14 Color', bright(c.terminalAnsiCyan.hex)],
-    ['Ansi 15 Color', c.editorForeground.hex],
+    // Bright white (15) lifts a step above white (7) so bold/bright text registers. Audit note 2.
+    ['Ansi 15 Color', brightWhiteHex(c.terminalAnsiWhite.hex, isDarkMode)],
   ]
 
   const entries = [
@@ -74,8 +65,10 @@ export function serializeAsIterm2(data: ThemeData): string {
     entry('Cursor Text Color', c.editorBackground.hex),
     entry('Foreground Color', c.editorForeground.hex),
     entry('Link Color', c.infoForeground.hex),
-    entry('Selected Text Color', c.editorForeground.hex),
-    entry('Selection Color', selectionBg),
+    // Selection reuses the UI primary-container pair (soft branded bg + contrast-checked
+    // on-color) rather than compositing the focus colour, which washed out to ~1.9:1. Audit note 1.
+    entry('Selected Text Color', c.onPrimaryContainer.hex),
+    entry('Selection Color', c.primaryContainer.hex),
   ].join('\n')
 
   return [

@@ -1,6 +1,5 @@
-import Color from 'colorjs.io'
 import type { ThemeData } from '../types'
-import { brightAnsiHex, toHex } from '../utils'
+import { brightAnsiHex, brightWhiteHex } from '../utils'
 
 export function serializeAsGhostty(data: ThemeData): string {
   const { semanticColors: c, isDarkMode, displayName } = data
@@ -9,17 +8,6 @@ export function serializeAsGhostty(data: ThemeData): string {
 
   // Strip any alpha suffix — Ghostty uses plain #RRGGBB
   const hex = (h: string) => h.slice(0, 7).toUpperCase()
-
-  // Ghostty can't render a translucent selection, so a full-opacity focus color would erase
-  // the selected text. Composite the focus color over the editor bg at the same legible alpha
-  // the alpha-aware formats use, baking a solid hex that keeps selection-foreground readable.
-  // (Audit 4G.)
-  const selectionBg = toHex(
-    new Color(c.editorBackground.hex).mix(new Color(c.focusBorder.hex), data.peakAlpha, {
-      space: 'srgb',
-      outputSpace: 'srgb',
-    }) as Color,
-  )
 
   const palette: [number, string][] = [
     [0, c.terminalAnsiBlack.hex],
@@ -37,7 +25,9 @@ export function serializeAsGhostty(data: ThemeData): string {
     [12, bright(c.terminalAnsiBlue.hex)],
     [13, bright(c.terminalAnsiMagenta.hex)],
     [14, bright(c.terminalAnsiCyan.hex)],
-    [15, c.editorForeground.hex],
+    // Bright white (15) lifts a step above white (7) so bold/bright text registers —
+    // matching Tokyo Night / Gruvbox / Dracula, where 15 is brighter than 7. Audit note 2.
+    [15, brightWhiteHex(c.terminalAnsiWhite.hex, isDarkMode)],
   ]
 
   const lines: string[] = [
@@ -47,8 +37,13 @@ export function serializeAsGhostty(data: ThemeData): string {
     `background = ${hex(c.editorBackground.hex)}`,
     `foreground = ${hex(c.editorForeground.hex)}`,
     `cursor-color = ${hex(c.cursorColor.hex)}`,
-    `selection-background = ${hex(selectionBg)}`,
-    `selection-foreground = ${hex(c.editorForeground.hex)}`,
+    // Selection reuses the UI primary-container pair — a soft branded background with a
+    // contrast-checked on-color — instead of compositing the focus colour at peak alpha,
+    // which left a light-on-light wash (~1.9:1). The container is L 0.30 dark / 0.90 light,
+    // pairing with its on-color at ~10:1 (dark) / ~14:1 (light) — well clear of the wash and
+    // in/above the popular-theme range (7.3–10.7). Audit note 1.
+    `selection-background = ${hex(c.primaryContainer.hex)}`,
+    `selection-foreground = ${hex(c.onPrimaryContainer.hex)}`,
     '',
     ...palette.map(([i, v]) => `palette = ${i}=${hex(v)}`),
   ]

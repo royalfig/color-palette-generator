@@ -1,6 +1,6 @@
 import Color from 'colorjs.io'
 import type { PersonalityFontStyleProfile, SemanticColors, SurfaceProfile, TokenRule } from '../types'
-import { toHex, desaturate, boostChroma, ensureContrast, getAccessibleVariant, withAlpha, shiftHue } from '../utils'
+import { toHex, desaturate, boostChroma, ensureContrast, getAccessibleVariant, withAlpha, shiftHue, brightWhiteHex } from '../utils'
 
 /**
  * Common scope sets used across all templates.
@@ -712,7 +712,9 @@ export function deriveUiColors(
     'terminal.ansiBrightBlue': brightAnsi(semantic.terminalAnsiBlue.hex),
     'terminal.ansiBrightMagenta': brightAnsi(semantic.terminalAnsiMagenta.hex),
     'terminal.ansiBrightCyan': brightAnsi(semantic.terminalAnsiCyan.hex),
-    'terminal.ansiBrightWhite': editorForeground.hex,
+    // Bright white lifts a step above white (ansiWhite == foreground) so bold/bright text
+    // registers; a flat +L clips because the fg already sits at the brightness ceiling. Audit note 2.
+    'terminal.ansiBrightWhite': brightWhiteHex(semantic.terminalAnsiWhite.hex, isDarkMode),
 
     // Minimap slider — three alpha tiers on a neutral fg tone, matches 2026.
     'minimapSlider.background': sliderAlpha(0.20),
