@@ -9,7 +9,6 @@ import {
 } from "../utils";
 import { ColorFormat, ColorSpace } from "../types/types";
 import {
-  enhancePalette,
   avoidMuddyZones,
   applyEnhancementsToAnalogous,
   polishPalette,

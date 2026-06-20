@@ -13,7 +13,6 @@ const KIND_NAMES: Record<PaletteKinds, { slug: string; displayName: string }> =
     tet: { slug: "tetradic", displayName: "Tetradic" },
     tri: { slug: "triadic", displayName: "Triadic" },
     tas: { slug: "tints-and-shades", displayName: "Tints & Shades" },
-    ton: { slug: "tones", displayName: "Tones" },
   };
 
 const STYLE_NAMES: Record<PaletteStyle, { slug: string; displayName: string }> =

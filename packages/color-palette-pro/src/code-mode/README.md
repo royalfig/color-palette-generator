@@ -13,7 +13,7 @@ Every entry point takes the same five inputs:
 | `baseColor` | `Color` | The seed color. |
 | `palette` | `BaseColorData[]` | The generated palette for `(kind, style)` (from `createPalettes`). |
 | `isDarkMode` | `boolean` | Dark or light variant. |
-| `paletteKind` | `PaletteKinds` | `ana \| com \| spl \| tet \| tri \| tas \| ton` — the *color model*. |
+| `paletteKind` | `PaletteKinds` | `ana \| com \| spl \| tet \| tri \| tas` — the *color model*. |
 | `paletteStyle` | `PaletteStyle` | `square \| triangle \| circle \| diamond` — the *surface material*. |
 
 ### KIND vs STYLE
@@ -22,7 +22,7 @@ This is the core mental model (the "style/kind inversion"):
 
 - **KIND = the exemplar color model.** Each kind maps to a hand-tuned reference theme and owns
   the syntax *token bands* and *accent placement*: `ana`→Nord, `com`→Night Owl, `spl`→Dracula,
-  `tri`→One Dark Pro, `tet`→Dark Modern, `tas`/`ton`→monochrome. Lives in `personality.ts`.
+  `tri`→One Dark Pro, `tet`→Dark Modern, `tas`→monochrome. Lives in `personality.ts`.
 - **STYLE = the surface material dial.** square (flat/neutral) → diamond (brutalist/toned).
   Implemented once in `../ui.ts` (`SURFACE_TREATMENT`) and inherited here as a passthrough — the
   editor chrome *is* the UI surface stack. Style also modulates ANSI hue-drift and intensity.

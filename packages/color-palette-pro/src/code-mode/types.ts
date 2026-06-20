@@ -1,5 +1,8 @@
 import Color from "colorjs.io";
 import { PaletteKinds } from "../types/types";
+// Single source of truth for the palette color shape is factory.ts; imported for in-file use
+// and re-exported below so existing code-mode imports (`from "./types"`) keep resolving.
+import type { BaseColorData } from "../factory";
 
 // ===== SEMANTIC COLOR ROLES =====
 
@@ -295,17 +298,6 @@ export interface ZedThemeOutput {
   themes: ZedTheme[];
 }
 
-// ===== COLOR DATA (from factory.ts) =====
-
-export interface BaseColorData {
-  code: `${string}-${number}` | string;
-  isBase: boolean;
-  base: string | Color;
-  color: Color;
-  colorSpace: string;
-  cssValue: string;
-  contrast: string;
-  string: string;
-  conversions: Record<string, any>;
-  fallback: string;
-}
+// ===== COLOR DATA =====
+// Re-export the canonical factory type (imported at the top of this file).
+export type { BaseColorData };

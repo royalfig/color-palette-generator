@@ -1,130 +1,37 @@
 import Color from "colorjs.io";
-import { BaseColorData } from "./types";
+import { findColorByHue } from "../ui/colorMath";
 import {
-  findOptimalLightness,
+  toHex,
+  withAlpha,
+  mix,
+  deltaE,
+  hueGapDeg,
+  shiftHue,
+  desaturate,
+  boostChroma,
+} from "../color/oklch";
+
+// Shared OKLCH/format primitives now live in color/oklch.ts (colorjs-backed). They're re-exported
+// here — alongside the palette-search helper from ui/colorMath — so existing code-mode imports
+// from "./utils" keep working. What remains *defined* in this file is the code-mode-specific
+// pipeline machinery: APCA contrast control, gamut clipping, and the distinction nudges.
+export {
   findColorByHue,
-  getMedianChroma,
-} from "../ui/colorMath";
-
-export { findColorByHue };
-
-/**
- * Generates an accessible (4.5:1) version of a color on a given background.
- */
-export function getAccessibleVariant(
-  color: Color,
-  background: Color,
-  minRatio: number = 4.5,
-): string {
-  const target = color.clone();
-  target.oklch.c = Math.max(target.oklch.c ?? 0, 0.06);
-
-  const isDarkBg = (background.oklch.l ?? 0.5) < 0.5;
-  target.oklch.l = isDarkBg ? 0.9 : 0.12;
-
-  if (target.contrastWCAG21(background) >= minRatio) {
-    return toHex(target);
-  }
-
-  target.oklch.l = isDarkBg ? 0.98 : 0.02;
-  if (target.contrastWCAG21(background) >= minRatio) {
-    return toHex(target);
-  }
-
-  const best = findOptimalLightness(target, background, minRatio);
-  return toHex(best);
-}
-
-/**
- * Ensure a color has sufficient contrast against a background.
- */
-export function ensureContrast(
-  color: Color,
-  background: Color,
-  minRatio: number,
-): string {
-  if (color.contrastWCAG21(background) >= minRatio) {
-    return toHex(color);
-  }
-  return getAccessibleVariant(color, background, minRatio);
-}
-
-/**
- * Desaturate a color while preserving its hue and lightness.
- */
-export function desaturate(color: Color, factor: number): Color {
-  const c = color.clone();
-  c.oklch.c = Math.max((c.oklch.c ?? 0) * (1 - factor), 0);
-  return c;
-}
-
-/**
- * Smallest unsigned angle between two hues, in degrees (0–180).
- */
-export function hueGapDeg(a: number, b: number): number {
-  const d = Math.abs(a - b) % 360;
-  return d > 180 ? 360 - d : d;
-}
-
-/**
- * Shift hue by degrees while preserving chroma and lightness.
- */
-export function shiftHue(color: Color, degrees: number): Color {
-  const c = color.clone();
-  c.oklch.h = ((c.oklch.h ?? 0) + degrees + 360) % 360;
-  return c;
-}
-
-/**
- * Boost chroma of a color.
- */
-export function boostChroma(color: Color, factor: number): Color {
-  const c = color.clone();
-  c.oklch.c = Math.min((c.oklch.c ?? 0) * factor, 0.25);
-  return c;
-}
-
-/**
- * Convert a Color to hex string, including alpha channel if present.
- */
-export function toHex(color: Color): string {
-  const srgb = color.to("srgb");
-  if (!srgb) return "#000000";
-  const gamut = srgb.toGamut();
-  const r = Math.round((gamut.coords[0] ?? 0) * 255);
-  const g = Math.round((gamut.coords[1] ?? 0) * 255);
-  const b = Math.round((gamut.coords[2] ?? 0) * 255);
-  const a = color.alpha !== undefined ? Math.round(color.alpha * 255) : 255;
-
-  const hex = `#${clamp(r).toString(16).padStart(2, "0")}${clamp(g).toString(16).padStart(2, "0")}${clamp(b).toString(16).padStart(2, "0")}`;
-  if (a < 255) {
-    return (hex + clamp(a).toString(16).padStart(2, "0")).toUpperCase();
-  }
-  return hex.toUpperCase();
-}
-
-/**
- * Returns a new color with the specified alpha value.
- */
-export function withAlpha(color: Color | string, alpha: number): Color {
-  const c = new Color(color).clone();
-  c.alpha = alpha;
-  return c;
-}
-
-function clamp(v: number): number {
-  if (Number.isNaN(v)) return 0;
-  return Math.max(0, Math.min(255, v));
-}
+  toHex,
+  withAlpha,
+  deltaE,
+  hueGapDeg,
+  shiftHue,
+  desaturate,
+  boostChroma,
+};
+export { mix as mixColors };
 
 /**
  * Clamp/adapt OKLCH lightness (L) for AAA text legibility while preserving hue and chroma.
  * Legibility ranges: 0.75-0.90 for dark mode, 0.20-0.45 for light mode.
  */
-export function adaptLightnessForText(
-  color: Color,
-  isDarkMode: boolean,
-): Color {
+export function adaptLightnessForText(color: Color, isDarkMode: boolean): Color {
   const c = color.clone();
   if (isDarkMode) {
     c.oklch.l = Math.max(0.75, Math.min(0.9, c.oklch.l ?? 0.5));
@@ -227,11 +134,7 @@ function findOptimalLightnessAPCA(
  * Like ensureContrastAgainst, but using APCA (perception-aligned). Returns the
  * original color if it already meets the target Lc.
  */
-export function ensureAPCAAgainst(
-  color: Color,
-  bg: Color,
-  minLc: number,
-): Color {
+export function ensureAPCAAgainst(color: Color, bg: Color, minLc: number): Color {
   if (Math.abs(color.contrastAPCA(bg)) >= minLc) return color.clone();
   return findOptimalLightnessAPCA(color, bg, minLc);
 }
@@ -275,27 +178,6 @@ export function capAPCAAgainst(color: Color, bg: Color, maxLc: number): Color {
     if (hi - lo < 0.0005) break;
   }
   return best;
-}
-
-/**
- * ΔE in OKLab space (Euclidean on L, a, b), measured *after* sRGB gamut mapping
- * so we catch cases where two distinct OKLCH colors collapse to the same hex.
- */
-export function deltaE(a: Color, b: Color): number {
-  const ca = (() => {
-    const c = a.clone().to("srgb");
-    return c?.toGamut()?.to("oklab") ?? a.clone();
-  })();
-  const cb = (() => {
-    const c = b.clone().to("srgb");
-    return c?.toGamut()?.to("oklab") ?? b.clone();
-  })();
-  const caCoords = ca.coords ?? [0, 0, 0];
-  const cbCoords = cb.coords ?? [0, 0, 0];
-  const dL = ((caCoords[0] ?? 0) - (cbCoords[0] ?? 0)) * 100;
-  const da = ((caCoords[1] ?? 0) - (cbCoords[1] ?? 0)) * 100;
-  const db = ((caCoords[2] ?? 0) - (cbCoords[2] ?? 0)) * 100;
-  return Math.sqrt(dL * dL + da * da + db * db);
 }
 
 /**
@@ -370,8 +252,7 @@ export function brightAnsiHex(
  * ceiling, so the flat +L lift brightAnsiHex applies to the chromatic slots clips to no
  * visible change. In dark mode, push toward pure white instead — climb past the ceiling
  * and shed a step of the bg-hue tint — so bold/bright text lifts a notch above body text
- * (the Tokyo Night / Gruvbox / Dracula pattern). Light mode keeps the standard dim. Audit
- * note 2.
+ * (the Tokyo Night / Gruvbox / Dracula pattern). Light mode keeps the standard dim.
  */
 export function brightWhiteHex(hex: string, isDarkMode: boolean): string {
   if (!isDarkMode) return brightAnsiHex(hex, isDarkMode);
@@ -379,36 +260,4 @@ export function brightWhiteHex(hex: string, isDarkMode: boolean): string {
   c.oklch.l = Math.min(1, Math.max(c.oklch.l ?? 0.95, 0.985));
   c.oklch.c = (c.oklch.c ?? 0) * 0.35;
   return toHex(c);
-}
-
-/**
- * Mathematical OKLCH interpolation between two colors with a ratio.
- */
-export function mixColors(colorA: Color, colorB: Color, ratio: number): Color {
-  const cA = colorA.clone();
-  const cB = colorB.clone();
-
-  const l = (cA.oklch.l ?? 0.5) * (1 - ratio) + (cB.oklch.l ?? 0.5) * ratio;
-  const c = (cA.oklch.c ?? 0) * (1 - ratio) + (cB.oklch.c ?? 0) * ratio;
-
-  // Interpolating hue requires taking the shortest path around the 360-degree circle
-  let hA = cA.oklch.h ?? 0;
-  let hB = cB.oklch.h ?? 0;
-  let diff = hB - hA;
-
-  // Normalize difference to [-180, 180]
-  if (diff > 180) {
-    hB -= 360;
-  } else if (diff < -180) {
-    hB += 360;
-  }
-
-  const h = (hA * (1 - ratio) + hB * ratio + 360) % 360;
-
-  const result = cA.clone();
-  result.oklch.l = l;
-  result.oklch.c = c;
-  result.oklch.h = h;
-
-  return result;
 }

@@ -1,5 +1,5 @@
 import Color from "colorjs.io";
-import { BaseColorData } from "../code-mode/types";
+import type { BaseColorData } from "../factory";
 import { findColorByHue, getMedianChroma } from "./colorMath";
 import {
   enforceCvdDistinctSemantics,

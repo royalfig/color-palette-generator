@@ -21,7 +21,6 @@ import { splitComplementaryTemplate } from "./templates/splitcomp";
 import { tetradicTemplate } from "./templates/tetradic";
 import { triadicTemplate } from "./templates/triadic";
 import { tintsAndShadesTemplate } from "./templates/tintsAndShades";
-import { tonesTemplate } from "./templates/tones";
 import {
   deriveUiColors,
   generateBaseTokenRules,
@@ -54,7 +53,6 @@ const templateRegistry: Record<PaletteKinds, CodeThemeTemplate> = {
   tet: tetradicTemplate,
   tri: triadicTemplate,
   tas: tintsAndShadesTemplate,
-  ton: tonesTemplate,
 };
 
 function buildThemeData(
@@ -162,7 +160,6 @@ function buildThemeData(
     tet: 3,
     ana: 2,
     tas: 3,
-    ton: 1,
   };
   const secondaryPaletteIdx = SECONDARY_INDEX[paletteKind] ?? 1;
   const secondaryRaw = (

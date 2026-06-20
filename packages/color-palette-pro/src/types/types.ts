@@ -4,7 +4,6 @@ export type PaletteKinds =
   | "tet"
   | "com"
   | "spl"
-  | "ton"
   | "tas";
 
 export type ColorSpace =

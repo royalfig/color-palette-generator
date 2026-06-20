@@ -20,7 +20,7 @@ import type {
  * + lens label, and the character-driven "feel" knobs (peak-alpha, cursor, inactive selection,
  * neutral-band tint).
  *   ana → Nord   com → Night Owl   spl → Dracula   tri → One Dark Pro   tet → Dark Modern
- *   tas/ton → monochrome
+ *   tas → monochrome
  */
 
 // ----- palette character -----
@@ -36,7 +36,6 @@ const PALETTE_CHARACTER: Record<PaletteKinds, PaletteCharacter> = {
   tri: "crisp", // One Dark Pro
   spl: "vivid", // Dracula
   tas: "mono", // monochrome
-  ton: "mono", // tones
 };
 
 // ----- accent roles: where each KIND spends its saturation -----
@@ -53,7 +52,6 @@ const ACCENT_ROLES: Record<PaletteKinds, SyntaxAccentRole[]> = {
   tri: ["keywordColor"],
   tet: ["keywordColor"],
   tas: ["accentColor"],
-  ton: ["accentColor"],
 };
 
 // ----- token bands (per KIND = exemplar, mode-aware) -----
@@ -65,7 +63,7 @@ const ACCENT_ROLES: Record<PaletteKinds, SyntaxAccentRole[]> = {
 //
 //   ana → Nord (muted, tight)         com → Night Owl (expressive)
 //   spl → Dracula (neon, wide)        tri → One Dark Pro
-//   tet → Dark Modern / Dark Plus     tas/ton → synthetic monochrome
+//   tet → Dark Modern / Dark Plus     tas → synthetic monochrome
 const TOKEN_BANDS: Record<PaletteKinds, { dark: ModeBands; light: ModeBands }> =
   {
     // Nord — measured L 0.69–0.77, C 0.048–0.075 (the most restrained exemplar).
@@ -132,17 +130,6 @@ const TOKEN_BANDS: Record<PaletteKinds, { dark: ModeBands; light: ModeBands }> =
       light: {
         loud: { lLo: 0.4, lHi: 0.6, cLo: 0.06, cHi: 0.13 },
         quiet: { lLo: 0.34, lHi: 0.5, cHi: 0.06 },
-      },
-    },
-    // Tones — monochrome with a touch more chroma than pure tints/shades.
-    ton: {
-      dark: {
-        loud: { lLo: 0.64, lHi: 0.84, cLo: 0.05, cHi: 0.11 },
-        quiet: { lLo: 0.66, lHi: 0.8, cHi: 0.06 },
-      },
-      light: {
-        loud: { lLo: 0.4, lHi: 0.58, cLo: 0.07, cHi: 0.14 },
-        quiet: { lLo: 0.34, lHi: 0.5, cHi: 0.07 },
       },
     },
   };

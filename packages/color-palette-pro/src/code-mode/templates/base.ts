@@ -1,6 +1,9 @@
 import Color from 'colorjs.io'
 import type { PersonalityFontStyleProfile, SemanticColors, SurfaceProfile, TokenRule } from '../types'
-import { toHex, desaturate, boostChroma, ensureContrast, getAccessibleVariant, withAlpha, shiftHue, brightWhiteHex } from '../utils'
+import { toHex, desaturate, boostChroma, withAlpha, shiftHue, brightWhiteHex } from '../utils'
+// Accessibility helpers come from the single canonical (ui) implementation; they return a Color,
+// so wrap each call in toHex() for the hex-string theme output.
+import { ensureContrast, getAccessibleVariant } from '../../ui/uiUtils'
 
 /**
  * Common scope sets used across all templates.
@@ -317,7 +320,7 @@ export function deriveUiColors(
   // inputs, dropdowns, checkboxes) must meet WCAG 1.4.11 non-text contrast (3:1) against the
   // surface behind it. `outlineVariant` is intentionally ~1.2:1 (decorative dividers/seams),
   // so functional control borders use this verified token instead. (Audit 2C.2.)
-  const controlBorder = ensureContrast(new Color(outline.hex), new Color(panelBackground.hex), 3.0)
+  const controlBorder = toHex(ensureContrast(new Color(outline.hex), new Color(panelBackground.hex), 3.0))
 
   // chat.inputWorkingBorder gradient — three lightness steps of primary. The sweep
   // direction inverts by mode so the "working" animation reads as motion both ways.
@@ -347,7 +350,7 @@ export function deriveUiColors(
 
   // Status-bar foreground — `statusBar.foreground` must hit at least 4.5:1 against
   // the bar background.
-  const statusBarFg = ensureContrast(new Color(editorForeground.hex), new Color(statusBarBackground.hex), 4.5)
+  const statusBarFg = toHex(ensureContrast(new Color(editorForeground.hex), new Color(statusBarBackground.hex), 4.5))
 
   return {
     // Editor
@@ -471,7 +474,7 @@ export function deriveUiColors(
     'statusBarItem.prominentBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.4)),
     'statusBarItem.prominentHoverBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.6)),
     'statusBarItem.remoteBackground': semantic.accentColor.hex,
-    'statusBarItem.remoteForeground': getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5),
+    'statusBarItem.remoteForeground': toHex(getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5)),
 
     // Tabs — active tab merges visually with the editor (continuous surface).
     'tab.activeBackground': editorBackground.hex,
@@ -511,7 +514,7 @@ export function deriveUiColors(
     // Button — secondary now uses the real secondary role (not a fake foreground@10%),
     // giving the theme a proper two-tier button system.
     'button.background': semantic.focusBorder.hex,
-    'button.foreground': getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.focusBorder.hex), 4.5),
+    'button.foreground': toHex(getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.focusBorder.hex), 4.5)),
     'button.hoverBackground': toHex(boostChroma(new Color(semantic.focusBorder.hex), 1.1)),
     'button.secondaryBackground': semantic.secondaryContainer.hex,
     'button.secondaryForeground': semantic.onSecondaryContainer.hex,
@@ -748,9 +751,9 @@ export function deriveUiColors(
     'agentsNewSessionButton.border': outlineVariant.hex,
     'agentsNewSessionButton.hoverBackground': toHex(withAlpha(editorForeground.hex, 0.08)),
     'agentsBadge.background': semantic.accentColor.hex,
-    'agentsBadge.foreground': getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5),
+    'agentsBadge.foreground': toHex(getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5)),
     'agentsUnreadBadge.background': semantic.accentColor.hex,
-    'agentsUnreadBadge.foreground': getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5),
+    'agentsUnreadBadge.foreground': toHex(getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5)),
 
     // chat.* (request bubbles + working-input gradient sweep)
     'chat.requestBubbleBackground': toHex(withAlpha(editorForeground.hex, isDarkMode ? 0.06 : 0.04)),
