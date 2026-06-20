@@ -1,12 +1,8 @@
 import Color from "colorjs.io";
 import { BaseColorData } from "./factory";
 import { paletteModulator } from "./modifiers";
-import { generateAnalogous } from "./palette/analogous";
-import { generateComplementary } from "./palette/complementary";
-import { generateSplitComplementary } from "./palette/splitcomp";
-import { generateTetradic } from "./palette/tetradic";
+import { generatePalette } from "./palette/generate";
 import { generateTintsAndShades } from "./palette/tintsAndShades";
-import { generateTriadic } from "./palette/triadic";
 import { ColorFormat, ColorSpace, PaletteKinds } from "./types/types";
 import { generateUiColorPalette } from "./ui";
 
@@ -34,28 +30,12 @@ export function createPalettes(
   isUiMode = false,
   isDarkMode = false,
 ) {
-  let basePalette: BaseColorData[] = [];
-
-  switch (palette) {
-    case "ana":
-      basePalette = generateAnalogous(color, { style, colorSpace });
-      break;
-    case "tri":
-      basePalette = generateTriadic(color, { style, colorSpace });
-      break;
-    case "tet":
-      basePalette = generateTetradic(color, { style, colorSpace });
-      break;
-    case "com":
-      basePalette = generateComplementary(color, { style, colorSpace });
-      break;
-    case "spl":
-      basePalette = generateSplitComplementary(color, { style, colorSpace });
-      break;
-    case "tas":
-      basePalette = generateTintsAndShades(color, { style, colorSpace });
-      break;
-  }
+  // tints-and-shades is a single-hue lightness ramp (its own generator); every other kind is a
+  // hue-based scheme produced from the declarative tables in palette/schemes.ts.
+  const basePalette: BaseColorData[] =
+    palette === "tas"
+      ? generateTintsAndShades(color, { style, colorSpace })
+      : generatePalette(color, palette, { style, colorSpace });
 
   const modulatedPalette = paletteModulator(basePalette, modulateValues);
   if (isUiMode) {

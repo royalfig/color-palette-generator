@@ -15,6 +15,9 @@ dist-ssr
 # generate-all-themes.mts output
 packages/color-palette-pro/generated-themes/
 
+# color-gen.ts catalog output
+packages/color-palette-pro/scripts/*.html
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
