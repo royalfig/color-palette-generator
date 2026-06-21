@@ -1,7 +1,7 @@
 import Color from "colorjs.io";
-import { colorFactory, BaseColorData } from "./factory";
-import { maxChromaFor } from "./ui/colorMath";
+import { BaseColorData, colorFactory } from "./factory";
 import { ColorFormat, ColorSpace } from "./types/types";
+import { maxChromaFor } from "./ui/colorMath";
 
 export function detectFormat(str: string): "hex" | undefined {
   if (str.startsWith("#")) return "hex";
