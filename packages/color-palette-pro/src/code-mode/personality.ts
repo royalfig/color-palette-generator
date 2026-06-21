@@ -7,6 +7,7 @@ import type {
   PersonalityFontStyleProfile,
   SurfaceProfile,
 } from "./types";
+import { hueSpreadDeg } from "./utils";
 
 /**
  * Personality system (palette-primary). After the redesign, color distribution is a property of
@@ -27,17 +28,6 @@ import type {
 // saturated swatch, so peak chroma flattens everything to "vivid" — mean reflects how saturated the
 // palette runs as a whole. (Was a hardcoded per-kind map: ana→Nord serene, spl→Dracula vivid, …;
 // now it follows the actual colours.)
-
-/** Angular spread of a set of hues on the colour wheel (0 = all one hue, → 360 = spread around). */
-function hueSpreadDeg(hues: number[]): number {
-  if (hues.length < 2) return 0;
-  const sorted = [...hues].sort((a, b) => a - b);
-  let maxGap = sorted[0] + 360 - sorted[sorted.length - 1];
-  for (let i = 1; i < sorted.length; i++) {
-    maxGap = Math.max(maxGap, sorted[i] - sorted[i - 1]);
-  }
-  return 360 - maxGap;
-}
 
 function deriveCharacter(
   palette: BaseColorData[],

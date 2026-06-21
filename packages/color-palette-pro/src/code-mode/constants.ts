@@ -17,8 +17,8 @@ export const LOUD_ROLES = [
 ] as const;
 
 // Roles whose visual distinctness matters, ordered by typical token frequency in code.
-// Frequency-weighted enforcement: high-frequency roles claim hue space first; less-frequent
-// roles adapt around them. keyword and string dominate most languages; type is rarest.
+// Frequency-weighted enforcement: high-frequency roles anchor the lightness/chroma space and
+// less-frequent roles step around them. keyword and string dominate most languages; type is rarest.
 export const DISTINCT_ROLES_BY_FREQ = [
   "keywordColor",
   "stringColor",

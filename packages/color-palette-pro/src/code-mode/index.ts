@@ -33,6 +33,7 @@ import {
   mixColors,
   tintTowardHue,
   hueGapDeg,
+  hueSpreadDeg,
 } from "./utils";
 import { getPersonalityConfig } from "./personality";
 import { APCA_TARGET_SELECTION_OVERLAY } from "./constants";
@@ -123,10 +124,16 @@ function buildThemeData(
       : neutralBandBase;
 
   // Aurora functional tier: error/warning/success keep their canonical hue (they must still
-  // read as error/warning/success) but adopt the kind's saturation, and — for the in-family
-  // kinds (analogous, monochrome) — lean a few degrees toward the base so they belong.
+  // read as error/warning/success) but adopt the seed's saturation, and — when the palette is a
+  // tight single family (hue spread < 90°: analogous, or any monochrome) — lean a few degrees
+  // toward the base so they belong. Palette-driven: keyed off the actual hue spread, not a
+  // hardcoded kind.
+  const paletteHues = palette
+    .map((p) => p?.color)
+    .filter((c): c is Color => !!c && (c.oklch.c ?? 0) > 0.03)
+    .map((c) => c.oklch.h ?? 0);
   const inFamilySemantics =
-    paletteKind === "ana" || personality.paletteCharacter === "mono";
+    paletteHues.length < 2 || hueSpreadDeg(paletteHues) < 90;
   const semantics = generateSemanticColors(
     primary,
     palette,

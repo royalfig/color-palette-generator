@@ -60,6 +60,21 @@ export function adaptLightnessForQuiet(
 }
 
 /**
+ * Angular spread of a set of hues on the colour wheel: 0 when they're all one hue, approaching
+ * 360 as they spread around it. Computed as 360 minus the largest empty arc between adjacent hues.
+ * Used to read a palette's geometry (tight analogous family vs. spread-out polychrome).
+ */
+export function hueSpreadDeg(hues: number[]): number {
+  if (hues.length < 2) return 0;
+  const sorted = [...hues].sort((a, b) => a - b);
+  let maxGap = sorted[0] + 360 - sorted[sorted.length - 1];
+  for (let i = 1; i < sorted.length; i++) {
+    maxGap = Math.max(maxGap, sorted[i] - sorted[i - 1]);
+  }
+  return 360 - maxGap;
+}
+
+/**
  * Tint a neutral color toward a hue. Used to derive quiet roles (variable, property)
  * from onSurfaceVariant so they carry a whiff of palette identity without competing.
  */
