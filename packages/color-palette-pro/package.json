@@ -1,6 +1,6 @@
 {
   "name": "@royalfig/color-palette-pro",
-  "version": "2.6.2",
+  "version": "3.0.0",
   "description": "Powerful, mathematical color palette generation logic using OKLCH and colorjs.io",
   "author": "",
   "license": "MIT",
