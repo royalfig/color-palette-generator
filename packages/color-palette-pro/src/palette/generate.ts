@@ -30,7 +30,7 @@ const L_MAX = 0.92;
 
 /**
  * Turn one scheme slot into a realizable color, anchored on the base:
- *   hue  = baseH + hueOffset·hueScale
+ *   hue  = baseH + hueOffset           (style never touches hue — geometry is style-invariant)
  *   L    = baseL + dL·lSpread        (reflected into [L_MIN, L_MAX])
  *   C    = baseC · (1 + (cMul−1)·cContrast)
  * then a single gamut-aware OKLCH clamp. This is the one place a derived swatch's L/C/H is decided.
@@ -45,7 +45,7 @@ function deriveSwatch(
   const baseC = base.oklch.c ?? 0;
   const baseH = safeHue(base, 0);
 
-  const h = baseH + slot.hueOffset * shape.hueScale;
+  const h = baseH + slot.hueOffset;
 
   let l = baseL + slot.dL * shape.lSpread;
   if (l > L_MAX) l = L_MAX - (l - L_MAX); // reflect overshoot back into the band

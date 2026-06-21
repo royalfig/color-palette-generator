@@ -9,8 +9,9 @@ import { PaletteKinds, PaletteStyle } from "../types/types";
 //     itself (preserved exactly). This is the only place the "what hues, how light, how saturated"
 //     decision is expressed — no hidden enhancer/narrative/polish stages on top.
 //
-//   • STYLE is a shaping dial applied uniformly to every scheme: how far the lightness spreads,
-//     how hard the chroma contrast runs, how tight/wide the hue geometry sits. Four presets.
+//   • STYLE is a shaping dial applied uniformly to every scheme: how far the lightness spreads and
+//     how hard the chroma contrast runs. STYLE is *material only* — it never touches hue, so the
+//     scheme's geometry (and therefore the palette's hues) is identical across all four styles.
 //
 // `generate.ts` reads these tables in one `deriveSwatch()` pass. To retune a palette you edit the
 // numbers here — nothing else.
@@ -78,23 +79,24 @@ export const SCHEME_SLOTS: Record<Exclude<PaletteKinds, "tas">, SlotSpec[]> = {
   ],
 };
 
-/** A style is a uniform shaping of any scheme's baseline slots. */
+/**
+ * A style is a uniform shaping of any scheme's baseline slots. Material only: it shapes lightness
+ * and chroma but never hue — the scheme owns the geometry, so a palette's hues are style-invariant.
+ */
 export interface StyleShape {
   /** Scales each slot's lightness delta — the drama of the light/dark spread. */
   lSpread: number;
   /** Scales each slot's chroma deviation from the base (>1 = more pop + more mute). */
   cContrast: number;
-  /** Scales each slot's hue offset — tightens (<1) or widens (>1) the geometry. */
-  hueScale: number;
 }
 
 export const STYLE_SHAPES: Record<PaletteStyle, StyleShape> = {
-  // Square — the textbook baseline: even spread, true geometry, full saturation.
-  square: { lSpread: 1.0, cContrast: 1.0, hueScale: 1.0 },
-  // Triangle — perceptual restraint: gentler lightness, slightly calmer chroma + tighter hues.
-  triangle: { lSpread: 0.85, cContrast: 0.9, hueScale: 0.92 },
+  // Square — the textbook baseline: even spread, full saturation.
+  square: { lSpread: 1.0, cContrast: 1.0 },
+  // Triangle — perceptual restraint: gentler lightness, slightly calmer chroma.
+  triangle: { lSpread: 0.85, cContrast: 0.9 },
   // Circle — expressive: a wider lightness journey with a stronger chroma crescendo.
-  circle: { lSpread: 1.2, cContrast: 1.25, hueScale: 1.08 },
-  // Diamond — luminosity-led: the most dramatic lightness range, true geometry held.
-  diamond: { lSpread: 1.45, cContrast: 1.15, hueScale: 1.0 },
+  circle: { lSpread: 1.2, cContrast: 1.25 },
+  // Diamond — luminosity-led: the most dramatic lightness range.
+  diamond: { lSpread: 1.45, cContrast: 1.15 },
 };

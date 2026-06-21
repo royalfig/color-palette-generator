@@ -25,7 +25,8 @@ This is the core mental model (the "style/kind inversion"):
   `tri`→One Dark Pro, `tet`→Dark Modern, `tas`→monochrome. Lives in `personality.ts`.
 - **STYLE = the surface material dial.** square (flat/neutral) → diamond (brutalist/toned).
   Implemented once in `../ui.ts` (`SURFACE_TREATMENT`) and inherited here as a passthrough — the
-  editor chrome *is* the UI surface stack. Style also modulates ANSI hue-drift and intensity.
+  editor chrome *is* the UI surface stack. Style also modulates ANSI intensity and lightness spread
+  (material only — never hue: the palette's hues are identical across all four styles).
 
 Intensity (how saturated the palette runs) is **seed-driven**: it comes from the base color's
 chroma, not the kind. See `intensity.ts`.
@@ -88,9 +89,10 @@ Red (≈345–25°) is reserved for tags/keywords; strings/functions/numbers avo
 The six chromatic slots resample the seed palette at canonical hues, with **hue / chroma /
 lightness** each taking a cue from the nearest palette swatch:
 
-- **hue** — canonical, drifting toward the nearest palette member, bounded by the slot's cap ×
-  style factor (red stays warm for `git diff`; blue may become purple on a purple palette — the
-  Dracula effect). A ring pass guarantees ≥22° between neighbors.
+- **hue** — canonical, drifting toward the nearest palette member, bounded by the slot's cap × a
+  global drift factor (style-independent — hue is not a style axis; red stays warm for `git diff`;
+  blue may become purple on a purple palette — the Dracula effect). A ring pass guarantees ≥22°
+  between neighbors.
 - **chroma** — the seed-driven `intensityChroma` centre pulled toward the swatch's own chroma.
 - **lightness** — a mode band + hue-natural tilt + a nudge toward the swatch's lightness.
 

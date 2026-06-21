@@ -4,7 +4,7 @@ import type { BaseColorData } from "./types";
 import {
   AnsiSlot,
   ANSI_SLOTS,
-  ANSI_DRIFT_BY_LENS,
+  ANSI_DRIFT_FACTOR,
   ANSI_CHROMA_FOLLOW_BY_LENS,
   ANSI_L_SPREAD_BY_LENS,
 } from "./constants";
@@ -39,8 +39,8 @@ export interface AnsiPaletteInput {
  * lightness all taking cues from the swatch each slot lands on, so the 16 colours have real
  * per-slot texture instead of one flat tone.
  *   hue   — canonical, drifting toward the nearest palette member, bounded by the slot's cap
- *           × lens factor (red stays warm for `git diff`; blue is free to become purple on a
- *           purple palette at diamond — the Dracula effect).
+ *           × the global drift factor (red stays warm for `git diff`; blue is free to become
+ *           purple on a purple palette — the Dracula effect — the same in every style).
  *   chroma— the seed-driven centre pulled toward that swatch's own chroma (lens decides how
  *           far): saturated palettes get punchy slots, muted palettes soft ones.
  *   light — a mode band with a hue-natural tilt (yellow/green lift, blue/magenta deepen) plus
@@ -62,7 +62,7 @@ export function deriveAnsiPalette(input: AnsiPaletteInput): AnsiPalette {
   const ansiFloor = (c: Color): Color =>
     ensureAPCAAgainst(clipToSRGB(c), editorBg, 45);
   const ansiChromaCentre = chromaCentre;
-  const ansiDriftFactor = ANSI_DRIFT_BY_LENS[style];
+  const ansiDriftFactor = ANSI_DRIFT_FACTOR;
   const ansiChromaFollow = ANSI_CHROMA_FOLLOW_BY_LENS[style];
   const ansiLSpread = ANSI_L_SPREAD_BY_LENS[style];
   const ansiLCentre = isDarkMode ? 0.73 : 0.52;
@@ -103,7 +103,7 @@ export function deriveAnsiPalette(input: AnsiPaletteInput): AnsiPalette {
       : ansiChromaCentre;
     const swatchL = echo ? (nearest!.oklch.l ?? ansiLCentre) : ansiLCentre;
 
-    // Hue: drift toward the swatch (only when echoing), bounded by cap × lens factor.
+    // Hue: drift toward the swatch (only when echoing), bounded by cap × the global drift factor.
     let hue = slot.hue;
     if (echo) {
       const cap = slot.drift * ansiDriftFactor;

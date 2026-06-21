@@ -93,8 +93,10 @@ export const RED_SENSITIVE_ROLES: ReadonlySet<string> = new Set([
 //   2. Hue drift is asymmetric: red/green/yellow stay anchored (errors, diff, warnings
 //      depend on them), blue/magenta/cyan roam toward the palette (decorative end).
 //   3. The drift pulls toward the palette's actual hues, not randomly.
-// The lens is the deliberate-mismap dial: square stays faithful (terminal-correct),
-// diamond drifts hard toward the palette (cinematic identity).
+// The mismap is palette-driven only: the pull toward the seed palette's hues is identical across
+// styles. Style is material (chroma / lightness), never hue — so ANSI hue no longer changes when
+// you switch square↔diamond. The per-slot caps keep the load-bearing slots anchored while the
+// decorative slots roam toward the palette.
 
 export interface AnsiSlot {
   hue: number;
@@ -112,14 +114,12 @@ export const ANSI_SLOTS: Record<
   cyan: { hue: 200, drift: 48 },
 };
 
-// Fraction of each slot's max hue drift the lens permits (square faithful → diamond full,
-// with a little overshoot so the Cinematic lens reads as deliberately stylised).
-export const ANSI_DRIFT_BY_LENS: Record<PaletteStyle, number> = {
-  square: 0.35,
-  triangle: 0.62,
-  circle: 0.88,
-  diamond: 1.12,
-};
+// Fraction of each slot's max hue drift permitted — one global factor, applied to every style
+// (Phase 0 of the palette-primary redesign: hue is no longer a style axis). Sits at the expressive
+// end so the palette-driven mismap (Dracula's purple-blue) still reads, while each slot's own cap
+// holds the load-bearing colors (red/green/yellow) near canonical for git diff / errors / warnings.
+// Tunable: lower → more terminal-faithful, higher → snaps harder onto the palette's hues.
+export const ANSI_DRIFT_FACTOR = 0.75;
 
 // Chroma *centre* — the muted↔neon identity axis — is seed-driven (see intensity.ts):
 // the base color's chroma remaps into [ANSI_C_BAND], shape modulates that anchor by
