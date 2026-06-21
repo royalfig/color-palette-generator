@@ -1,138 +1,61 @@
+import Color from "colorjs.io";
 import type { PaletteKinds, PaletteStyle } from "../types/types";
 import type {
-  ModeBands,
+  BaseColorData,
   PaletteCharacter,
   PersonalityConfig,
   PersonalityFontStyleProfile,
   SurfaceProfile,
-  SyntaxAccentRole,
 } from "./types";
 
 /**
- * Personality system — calibrated against six reference themes:
- * VS Code Dark Modern, Night Owl, Kanagawa Wave, Dracula, Nord, One Dark Pro / One Light
- * (measured via scripts/theme-metrics.mts).
+ * Personality system (palette-primary). After the redesign, color distribution is a property of
+ * the generated PALETTE, not a per-kind exemplar: the templates map palette swatches onto roles and
+ * the syntax pipeline preserves their hues (see syntax.ts). So the per-kind TOKEN_BANDS (Nord/
+ * Dracula L/C envelopes) and ACCENT_ROLES that used to reshape the syntax colors are gone.
  *
- * Post-inversion the palette KIND owns the exemplar color model (token bands + accent
- * placement), and the four STYLES are the surface-material dial in ui.ts SURFACE_TREATMENT —
- * which code-mode now inherits directly (surfaces / foreground / outline are a passthrough, see
- * buildThemeData). What remains here: per-kind token bands + accent roles, per-style font styles
- * + lens label, and the character-driven "feel" knobs (peak-alpha, cursor, inactive selection,
- * neutral-band tint).
- *   ana → Nord   com → Night Owl   spl → Dracula   tri → One Dark Pro   tet → Dark Modern
- *   tas → monochrome
+ * What remains here: per-style font styles + lens label, and the character-driven "feel" knobs
+ * (peak-alpha, cursor, inactive selection, neutral-band tint). Character itself is now *derived*
+ * from the palette rather than assigned per kind.
  */
 
-// ----- palette character -----
-
-// Character follows each KIND's exemplar mood: Nord/Dark Modern read calm (serene), Night Owl/
-// One Dark Pro medium-energy (crisp), Dracula neon (vivid), the monochrome kinds mono. Character
-// drives ANSI saturation, peak-alpha, cursor + inactive selection — the "feel" knobs — while the
-// token bands below carry the per-exemplar color distribution.
-const PALETTE_CHARACTER: Record<PaletteKinds, PaletteCharacter> = {
-  ana: "serene", // Nord
-  tet: "serene", // Dark Modern (Dark Plus)
-  com: "crisp", // Night Owl
-  tri: "crisp", // One Dark Pro
-  spl: "vivid", // Dracula
-  tas: "mono", // monochrome
-};
-
-// ----- accent roles: where each KIND spends its saturation -----
+// ----- palette character (derived) -----
 //
-// One or two roles get the chroma peak (band cHi); every other loud role is compressed
-// below it. Energy through placement. Each kind mirrors its exemplar's signature pop:
-//   ana → Nord's Frost function/type teal; spl → Dracula's pink keyword + green function
-//   (two peaks); com/tri → Night Owl / One Dark purple keyword; tet → Dark Modern's
-//   restrained blue keyword; mono kinds spend their one saturated step on accentColor.
-const ACCENT_ROLES: Record<PaletteKinds, SyntaxAccentRole[]> = {
-  ana: ["definitionColor"],
-  com: ["keywordColor"],
-  spl: ["keywordColor", "definitionColor"],
-  tri: ["keywordColor"],
-  tet: ["keywordColor"],
-  tas: ["accentColor"],
-};
+// Character is the palette's inherent "feel"; it drives the surface knobs below and the description
+// prose. A single-hue palette reads mono; otherwise the palette's *overall* (mean) chroma tiers it
+// muted → serene, mid → crisp, saturated → vivid. Mean, not peak: nearly every palette has one
+// saturated swatch, so peak chroma flattens everything to "vivid" — mean reflects how saturated the
+// palette runs as a whole. (Was a hardcoded per-kind map: ana→Nord serene, spl→Dracula vivid, …;
+// now it follows the actual colours.)
 
-// ----- token bands (per KIND = exemplar, mode-aware) -----
-//
-// Each kind's loud/quiet L+C envelope is its exemplar's measured OKLCH band (dark from
-// `scripts/theme-metrics.mts`; light derived by the standard dark→light transform — light
-// themes sit darker and run *more* chromatic, cf. One Light C 0.12–0.21). This is the core
-// of the inversion: color distribution is now a property of the palette KIND, not the style.
-//
-//   ana → Nord (muted, tight)         com → Night Owl (expressive)
-//   spl → Dracula (neon, wide)        tri → One Dark Pro
-//   tet → Dark Modern / Dark Plus     tas → synthetic monochrome
-const TOKEN_BANDS: Record<PaletteKinds, { dark: ModeBands; light: ModeBands }> =
-  {
-    // Nord — measured L 0.69–0.77, C 0.048–0.075 (the most restrained exemplar).
-    ana: {
-      dark: {
-        loud: { lLo: 0.69, lHi: 0.79, cLo: 0.05, cHi: 0.085 },
-        quiet: { lLo: 0.69, lHi: 0.8, cHi: 0.06 },
-      },
-      light: {
-        loud: { lLo: 0.46, lHi: 0.56, cLo: 0.085, cHi: 0.12 },
-        quiet: { lLo: 0.37, lHi: 0.5, cHi: 0.07 },
-      },
-    },
-    // Night Owl — measured L 0.74–0.87, C 0.084–0.138; chromatic variables (qC 0.135).
-    com: {
-      dark: {
-        loud: { lLo: 0.72, lHi: 0.88, cLo: 0.085, cHi: 0.145 },
-        quiet: { lLo: 0.7, lHi: 0.84, cHi: 0.12 },
-      },
-      light: {
-        loud: { lLo: 0.46, lHi: 0.62, cLo: 0.12, cHi: 0.18 },
-        quiet: { lLo: 0.35, lHi: 0.52, cHi: 0.1 },
-      },
-    },
-    // Dracula — measured L 0.74–0.96, C 0.093–0.220 (the widest, most neon envelope).
-    spl: {
-      dark: {
-        loud: { lLo: 0.72, lHi: 0.92, cLo: 0.1, cHi: 0.19 },
-        quiet: { lLo: 0.7, lHi: 0.85, cHi: 0.1 },
-      },
-      light: {
-        loud: { lLo: 0.44, lHi: 0.64, cLo: 0.13, cHi: 0.21 },
-        quiet: { lLo: 0.34, lHi: 0.52, cHi: 0.11 },
-      },
-    },
-    // One Dark Pro — measured L 0.69–0.82, C 0.095–0.164.
-    tri: {
-      dark: {
-        loud: { lLo: 0.69, lHi: 0.83, cLo: 0.09, cHi: 0.16 },
-        quiet: { lLo: 0.7, lHi: 0.82, cHi: 0.12 },
-      },
-      light: {
-        loud: { lLo: 0.45, lHi: 0.6, cLo: 0.12, cHi: 0.19 },
-        quiet: { lLo: 0.35, lHi: 0.52, cHi: 0.1 },
-      },
-    },
-    // Dark Modern / Dark Plus — measured L 0.67–0.88, C 0.059–0.115 (structured, even).
-    tet: {
-      dark: {
-        loud: { lLo: 0.67, lHi: 0.86, cLo: 0.06, cHi: 0.12 },
-        quiet: { lLo: 0.7, lHi: 0.82, cHi: 0.1 },
-      },
-      light: {
-        loud: { lLo: 0.46, lHi: 0.62, cLo: 0.1, cHi: 0.16 },
-        quiet: { lLo: 0.36, lHi: 0.52, cHi: 0.09 },
-      },
-    },
-    // Monochrome — synthetic: a single hue tiered across L at low chroma.
-    tas: {
-      dark: {
-        loud: { lLo: 0.64, lHi: 0.86, cLo: 0.04, cHi: 0.1 },
-        quiet: { lLo: 0.66, lHi: 0.8, cHi: 0.05 },
-      },
-      light: {
-        loud: { lLo: 0.4, lHi: 0.6, cLo: 0.06, cHi: 0.13 },
-        quiet: { lLo: 0.34, lHi: 0.5, cHi: 0.06 },
-      },
-    },
-  };
+/** Angular spread of a set of hues on the colour wheel (0 = all one hue, → 360 = spread around). */
+function hueSpreadDeg(hues: number[]): number {
+  if (hues.length < 2) return 0;
+  const sorted = [...hues].sort((a, b) => a - b);
+  let maxGap = sorted[0] + 360 - sorted[sorted.length - 1];
+  for (let i = 1; i < sorted.length; i++) {
+    maxGap = Math.max(maxGap, sorted[i] - sorted[i - 1]);
+  }
+  return 360 - maxGap;
+}
+
+function deriveCharacter(
+  palette: BaseColorData[],
+  kind: PaletteKinds,
+): PaletteCharacter {
+  const chromatic = palette
+    .map((p) => p?.color)
+    .filter((c): c is Color => !!c && (c.oklch.c ?? 0) > 0.03);
+  // Mono: the single-hue kind (tas) or a palette with no real hue spread (achromatic seed).
+  const spread = hueSpreadDeg(chromatic.map((c) => c.oklch.h ?? 0));
+  if (kind === "tas" || chromatic.length < 2 || spread < 25) return "mono";
+  // Vividness from the palette's overall (mean) chroma.
+  const meanC =
+    chromatic.reduce((a, c) => a + (c.oklch.c ?? 0), 0) / chromatic.length;
+  if (meanC < 0.07) return "serene";
+  if (meanC < 0.12) return "crisp";
+  return "vivid";
+}
 
 // ----- lens label (per style) -----
 //
@@ -205,10 +128,9 @@ const NEUTRAL_BAND_TINT_BY_LENS: Record<PaletteStyle, number> = {
 };
 
 function buildSurfaceProfile(
-  kind: PaletteKinds,
+  character: PaletteCharacter,
   style: PaletteStyle,
 ): SurfaceProfile {
-  const character = PALETTE_CHARACTER[kind];
   return {
     peakAlpha: PEAK_ALPHA_BY_CHARACTER[character],
     cursorSource: CURSOR_SOURCE_BY_CHARACTER[character],
@@ -222,13 +144,13 @@ function buildSurfaceProfile(
 export function getPersonalityConfig(
   kind: PaletteKinds,
   style: PaletteStyle,
+  palette: BaseColorData[],
 ): PersonalityConfig {
+  const character = deriveCharacter(palette, kind);
   return {
-    tokenBands: TOKEN_BANDS[kind],
-    accentRoles: ACCENT_ROLES[kind],
     fontStyleProfile: FONT_STYLES[style],
-    surfaceProfile: buildSurfaceProfile(kind, style),
+    surfaceProfile: buildSurfaceProfile(character, style),
     lensName: LENS_NAMES[style],
-    paletteCharacter: PALETTE_CHARACTER[kind],
+    paletteCharacter: character,
   };
 }

@@ -65,7 +65,7 @@ function buildThemeData(
   const template = templateRegistry[paletteKind];
   if (!template) throw new Error(`Unknown palette kind: ${paletteKind}`);
 
-  const personality = getPersonalityConfig(paletteKind, paletteStyle);
+  const personality = getPersonalityConfig(paletteKind, paletteStyle, palette);
 
   const rawPrimary = (palette[0]?.color ?? baseColor).clone();
   const primary = adaptPrimaryForMode(rawPrimary, isDarkMode);

@@ -177,39 +177,6 @@ export interface CodeThemeOutput {
  */
 export type PaletteCharacter = "serene" | "vivid" | "crisp" | "mono";
 
-/**
- * Target band for loud syntax roles: all loud tokens are remapped (rank-preserving)
- * into [lLo, lHi] lightness and [cLo, cHi] chroma — the "every great theme holds its
- * tokens in a narrow band" property measured from the exemplar themes.
- */
-export interface TokenBand {
-  lLo: number;
-  lHi: number;
-  cLo: number;
-  cHi: number;
-}
-
-/** Quiet-role band: identifiers (variable/property) clamp here; cHi is their tint ceiling. */
-export interface QuietBand {
-  lLo: number;
-  lHi: number;
-  cHi: number;
-}
-
-export interface ModeBands {
-  loud: TokenBand;
-  quiet: QuietBand;
-}
-
-/** Loud roles eligible to carry a character's chroma accent. */
-export type SyntaxAccentRole =
-  | "definitionColor"
-  | "keywordColor"
-  | "typeColor"
-  | "stringColor"
-  | "numberColor"
-  | "accentColor";
-
 export interface PersonalityFontStyleProfile {
   comments?: string;
   keywords?: string;
@@ -236,15 +203,11 @@ export interface SurfaceProfile {
 }
 
 export interface PersonalityConfig {
-  /** Per-mode token bands set by the palette kind (its exemplar). */
-  tokenBands: { dark: ModeBands; light: ModeBands };
-  /** Which loud roles carry the chroma peak for this palette's kind. */
-  accentRoles: SyntaxAccentRole[];
   fontStyleProfile: PersonalityFontStyleProfile | null;
   surfaceProfile: SurfaceProfile;
   /** Human-readable label for the style's surface material (Flat/Tinted/Toned/Brutalist). */
   lensName: string;
-  /** Palette's inherent character. */
+  /** Palette's inherent character, derived from the palette (see personality.ts). */
   paletteCharacter: PaletteCharacter;
 }
 

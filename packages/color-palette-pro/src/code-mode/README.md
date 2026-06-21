@@ -39,7 +39,7 @@ chroma, not the kind. See `intensity.ts`.
 | File | Responsibility |
 |---|---|
 | `index.ts` | `buildThemeData` orchestrator + the public API (`generateTheme`, `generateCodeTheme`, pairs, serialize). |
-| `personality.ts` | Per-style font/lens; character "feel" knobs (peak-alpha, cursor, inactive selection, neutral-band tint). (Per-kind `tokenBands` / `accentRoles` are no longer consumed by the syntax pipeline — slated for removal in Phase 2 of the palette-primary redesign.) |
+| `personality.ts` | Per-style font/lens; character "feel" knobs (peak-alpha, cursor, inactive selection, neutral-band tint). Character is *derived from the palette* (mean chroma → serene/crisp/vivid, single-hue → mono), not assigned per kind. |
 | `constants.ts` | Role lists, APCA targets, chroma tiers, the generic `READABILITY_BAND`, and the ANSI tables (slots, drift factor, follow, L-spread, intensity band). Data only. |
 | `intensity.ts` | `intensityChromaFor(seedChroma, style)` — the seed→chroma-band remap. |
 | `syntax.ts` | The syntax-color pipeline + `buildSyntax()` orchestrator. |
