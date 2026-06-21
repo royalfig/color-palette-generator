@@ -181,32 +181,10 @@ export function capAPCAAgainst(color: Color, bg: Color, maxLc: number): Color {
 }
 
 /**
- * Nudge a color along the hue circle and slightly in chroma to separate it
- * from a too-close neighbor. Used when ΔE between roles is too small.
- */
-export function nudgeForDistinction(
-  color: Color,
-  awayFrom: Color,
-  isDarkMode: boolean,
-): Color {
-  const c = color.clone();
-  const ch = c.oklch.h ?? 0;
-  const ah = awayFrom.oklch.h ?? 0;
-  let diff = ((ch - ah + 540) % 360) - 180;
-  const direction = diff >= 0 ? 1 : -1;
-  c.oklch.h = (ch + direction * 18 + 360) % 360;
-  c.oklch.c = Math.min(0.22, (c.oklch.c ?? 0) + 0.02);
-  c.oklch.l = Math.max(
-    isDarkMode ? 0.65 : 0.2,
-    Math.min(isDarkMode ? 0.92 : 0.55, c.oklch.l ?? 0.5),
-  );
-  return c;
-}
-
-/**
- * Lightness-based distinction nudge for monochromatic palettes: instead of rotating
- * hue (which would break the single-hue identity), step L away from the collision —
- * the Kanagawa/Poimandres strategy of tiering mono roles by lightness.
+ * Lightness-based distinction nudge: instead of rotating hue (which would break the palette's
+ * hue geometry — the whole point of the palette-primary model), step L away from the collision
+ * and add a whisper of chroma. The Kanagawa/Poimandres strategy, now used for every kind so two
+ * too-close roles separate by tier rather than by leaving the palette's hues.
  */
 export function nudgeLightnessForDistinction(
   color: Color,

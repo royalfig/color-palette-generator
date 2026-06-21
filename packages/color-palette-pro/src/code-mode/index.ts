@@ -201,9 +201,10 @@ function buildThemeData(
   infoColor.oklch.l = isDarkMode ? 0.75 : 0.45;
   const infoContainerPair = makeContainerForAccent(infoColor, isDarkMode);
 
-  // Push the template's raw per-role colors through the syntax pipeline (see syntax.ts):
-  // hue conventions → band normalize → comment hue → contrast floor → distinction →
-  // identifier family → mono pin.
+  // Push the template's palette-derived per-role colors through the legibility pipeline (syntax.ts):
+  // readability normalize → comment hue → contrast floor → L/C distinction → mono pin. The template's
+  // role→swatch assignment and the palette's hues are preserved; the pipeline only makes them
+  // legible and distinct (no convention re-permutation, no exemplar band-squeeze).
   const rawSyntax = template.deriveColors(
     baseColor,
     palette,
@@ -213,9 +214,7 @@ function buildThemeData(
   const syntax = buildSyntax(rawSyntax, {
     bg: editorBgBase,
     isDarkMode,
-    bands: personality.tokenBands,
-    accentRoles: personality.accentRoles,
-    character: personality.paletteCharacter,
+    isMono: personality.paletteCharacter === "mono",
     monoHue: primary.oklch.h ?? NaN,
   });
 

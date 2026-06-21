@@ -20,9 +20,12 @@ Every entry point takes the same five inputs:
 
 This is the core mental model (the "style/kind inversion"):
 
-- **KIND = the exemplar color model.** Each kind maps to a hand-tuned reference theme and owns
-  the syntax *token bands* and *accent placement*: `ana`→Nord, `com`→Night Owl, `spl`→Dracula,
-  `tri`→One Dark Pro, `tet`→Dark Modern, `tas`→monochrome. Lives in `personality.ts`.
+- **KIND = the color model (geometry).** Each kind is a palette scheme — `ana` analogous, `com`
+  complementary, `spl` split-comp, `tri` triadic, `tet` tetradic, `tas` monochrome — and its
+  `templates/*.ts` maps that geometry's swatches onto the syntax roles. The generated palette's
+  hues flow into the theme intact (**palette-primary**): an analogous palette yields an analogous
+  theme, a tetradic palette a four-family one. The kind no longer imitates a specific exemplar
+  theme (the old per-kind Nord/Dracula token-band envelopes were retired).
 - **STYLE = the surface material dial.** square (flat/neutral) → diamond (brutalist/toned).
   Implemented once in `../ui.ts` (`SURFACE_TREATMENT`) and inherited here as a passthrough — the
   editor chrome *is* the UI surface stack. Style also modulates ANSI intensity and lightness spread
@@ -36,8 +39,8 @@ chroma, not the kind. See `intensity.ts`.
 | File | Responsibility |
 |---|---|
 | `index.ts` | `buildThemeData` orchestrator + the public API (`generateTheme`, `generateCodeTheme`, pairs, serialize). |
-| `personality.ts` | Per-kind token bands + accent roles; per-style font/lens; character "feel" knobs (peak-alpha, cursor, inactive selection, neutral-band tint). |
-| `constants.ts` | Role lists, APCA contrast targets, chroma tiers, and the ANSI tables (slots, drift, follow, L-spread, intensity band). Data only. |
+| `personality.ts` | Per-style font/lens; character "feel" knobs (peak-alpha, cursor, inactive selection, neutral-band tint). (Per-kind `tokenBands` / `accentRoles` are no longer consumed by the syntax pipeline — slated for removal in Phase 2 of the palette-primary redesign.) |
+| `constants.ts` | Role lists, APCA targets, chroma tiers, the generic `READABILITY_BAND`, and the ANSI tables (slots, drift factor, follow, L-spread, intensity band). Data only. |
 | `intensity.ts` | `intensityChromaFor(seedChroma, style)` — the seed→chroma-band remap. |
 | `syntax.ts` | The syntax-color pipeline + `buildSyntax()` orchestrator. |
 | `ansi.ts` | `deriveAnsiPalette()` — the 16-color terminal palette. |
@@ -67,22 +70,23 @@ inputs ─► personality (kind bands + style/character knobs)
 
 ### Syntax pipeline (`buildSyntax`, `syntax.ts`)
 
-Raw template colors are pushed through a fixed, load-bearing order:
+Palette-primary: a template (`templates/*.ts`) has already mapped the generated palette's swatches
+onto roles — *that* assignment is the theme's identity. The pipeline never re-permutes roles or
+rewrites hues to a convention/exemplar; it only makes the template's colors legible and distinct,
+preserving every hue:
 
-1. **hue conventions** — permute loud colors so green=string, purple=keyword, … (people read
-   the convention before the geometry).
-2. **band normalize** — remap loud L/C into the kind's measured envelope; the accent role(s)
-   get the chroma peak, everything else compresses below it.
-3. **comment hue** — keep comments ≥ 60° from strings (skipped for mono).
-4. **contrast floor** — APCA-lift every role against the real editor bg (loud Lc 60, quiet 45,
+1. **readability normalize** — pull each role's L into a generic, mode-only band and clamp chroma;
+   hue and relative chroma are kept (no per-kind exemplar envelope, no forced accent peak).
+2. **comment hue** — keep comments ≥ 60° from strings (skipped for mono).
+3. **contrast floor** — APCA-lift every role against the real editor bg (loud Lc 60, quiet 45,
    comments held in a recessed band).
-5. **distinction** — separate too-close roles. Polychrome rotates hue; mono steps lightness.
-   Runs *after* the contrast floor (lifts compress L and would re-collide pairs). Pressure is
-   character-aware so muted kinds stay muted.
-6. **identifier family** — link variables/properties to the cool loud family.
-7. **mono pin** — for mono kinds, snap every role back to the base hue.
+4. **distinction** — separate too-close roles by **lightness/chroma, never hue**, so an analogous
+   palette stays analogous and a polychrome palette keeps its swatch hues. Runs *after* the
+   contrast floor (lifts compress L and would re-collide pairs).
+5. **mono pin** — for the single-hue kind (`tas`), snap every role back to the base hue.
 
-Red (≈345–25°) is reserved for tags/keywords; strings/functions/numbers avoid it at every stage.
+Red (≈345–25°) is reserved for tags/keywords: a saturated-red string/function/number is shifted to
+orange — the one hue move in the pipeline, a legibility guard since a red string reads as an error.
 
 ### ANSI palette (`deriveAnsiPalette`, `ansi.ts`)
 
@@ -123,13 +127,13 @@ Public surface (re-exported from the package root):
 - `generateCodeTheme` / `generateCodeThemePair` → the VS Code `CodeThemeOutput` object.
 - `serializeTheme` / `serializeThemePair` → JSON-stringify a `CodeThemeOutput`.
 
-## Verification scripts
+## Verification
 
-- `scripts/selection-contrast.mts` — WCAG selection-fg/bg contrast + palette 7≠15 across seeds.
-- `scripts/intensity-check.mts` — ANSI chroma rises with seed chroma + shape; chroma floor holds.
-- `scripts/theme-metrics.mts` — OKLCH "shape" of generated vs exemplar themes.
-- `generate-all-themes.mts` (VS Code) / `generate-editor-themes.mts` (zed/ghostty/warp/alacritty)
-  — write every permutation to `generated-themes/` for eyeballing.
+- `scripts/color-gen.ts '#hex' [out.html]` — the visual catalog: every kind × style, palettes + UI
+  tokens + a code-mode preview, light and dark, for one seed. Open the HTML and eyeball.
 
-When changing pipeline logic, generate a full set before and after and diff — most refactors
-should be **byte-identical**.
+The palette-primary redesign **intentionally changes output** — the old "diff a full set, expect
+byte-identical" rule does not apply to it. Validate instead by goal: a fixed seed+kind has identical
+hues across all four styles (style is material-only); syntax-token hues track the palette's swatches
+(analogous → tight spread, tetradic → four families); every loud token clears its APCA floor and
+stays ≥ ~6 ΔE from its neighbors.

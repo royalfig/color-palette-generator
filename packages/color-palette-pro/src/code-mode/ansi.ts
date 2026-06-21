@@ -67,15 +67,24 @@ export function deriveAnsiPalette(input: AnsiPaletteInput): AnsiPalette {
   const ansiLSpread = ANSI_L_SPREAD_BY_LENS[style];
   const ansiLCentre = isDarkMode ? 0.73 : 0.52;
 
-  // Candidate pool: convention-placed syntax tokens + raw palette swatches, so the pull
-  // reflects the genuine seed identity (a token may not reach a slot; a swatch can).
+  // Candidate pool: the placed syntax tokens + raw palette swatches, so the pull reflects the
+  // genuine seed identity (a token may not reach a slot; a swatch can). The palette-swatch gate is
+  // RELATIVE to the palette's own peak chroma, not an absolute 0.04: style scales chroma (Phase 0
+  // fixes hue but not chroma), and an absolute gate let marginal swatches enter/leave the pool
+  // between styles — flipping which swatch a slot snapped toward and so its hue. A relative gate
+  // keeps pool membership (and thus ANSI hue) stable across styles. Tokens are style-invariant.
+  const paletteMaxC = palette.reduce(
+    (m, it) => Math.max(m, it?.color?.oklch.c ?? 0),
+    0,
+  );
+  const swatchGate = Math.max(0.03, paletteMaxC * 0.4);
   const ansiPool: Color[] = [];
   for (const c of tokens) {
     if ((c.oklch.c ?? 0) >= 0.04) ansiPool.push(c);
   }
   for (const item of palette) {
     const c = item?.color;
-    if (c && (c.oklch.c ?? 0) >= 0.04) ansiPool.push(c);
+    if (c && (c.oklch.c ?? 0) >= swatchGate) ansiPool.push(c);
   }
   // Hue-natural lightness tilt: cos peaks at ~100° (yellow-green) and troughs at ~280°
   // (blue-purple). Dark mode lifts the light hues; light mode keeps them in check so

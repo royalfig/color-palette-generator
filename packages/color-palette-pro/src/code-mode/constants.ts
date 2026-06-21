@@ -27,26 +27,6 @@ export const DISTINCT_ROLES_BY_FREQ = [
   "typeColor",
 ] as const;
 
-// Role hue conventions, measured across the top-marketplace corpus (dark themes;
-// light themes follow the same families). Each role has one or two anchor hues:
-//   strings:   warm-to-green (14/15 themes in 30–146)
-//   keywords:  purple/magenta 300–350 or blue 230–250
-//   functions: blue ~245–265 or yellow ~107
-//   types:     teal/cyan 160–220 or gold ~80
-//   numbers:   warm orange 7–63 or purple ~300 (Dracula school)
-// The matcher permutes the template's loud colors among these roles to honor the
-// conventions — same palette, conventional placement.
-export const ROLE_HUE_ANCHORS: Record<
-  (typeof DISTINCT_ROLES_BY_FREQ)[number],
-  number[]
-> = {
-  keywordColor: [315, 240],
-  stringColor: [120, 45],
-  definitionColor: [255, 105],
-  numberColor: [40, 310],
-  typeColor: [190, 80],
-};
-
 // APCA contrast targets (perceptual; Lc scale):
 //   75 = body text (the gold standard)
 //   60 = fluent text (acceptable for syntax tokens)
@@ -72,6 +52,26 @@ export const COMMENT_C_MAX = 0.05;
 
 export const IDENTIFIER_ROLES = ["variableColor", "propertyColor"] as const;
 export const STRUCTURAL_ROLES = ["operatorColor", "punctuationColor"] as const;
+
+// Generic, mode-only readability band (palette-primary redesign). The syntax pipeline preserves
+// every token's *hue and relative chroma* from the palette; this band only governs the L window a
+// token must sit in to stay legible, plus sane chroma floors/ceilings. There is deliberately NO
+// per-kind variant — the old per-exemplar TOKEN_BANDS (Nord/Dracula envelopes) are what made every
+// palette converge on the same six famous looks. Loud = code tokens; quiet = identifiers/structural.
+export interface ReadBand {
+  loud: { lLo: number; lHi: number; cFloor: number; cCeil: number };
+  quiet: { lLo: number; lHi: number; cFloor: number; cCeil: number };
+}
+export const READABILITY_BAND: { dark: ReadBand; light: ReadBand } = {
+  dark: {
+    loud: { lLo: 0.62, lHi: 0.9, cFloor: 0.045, cCeil: 0.2 },
+    quiet: { lLo: 0.6, lHi: 0.82, cFloor: 0.015, cCeil: 0.12 },
+  },
+  light: {
+    loud: { lLo: 0.34, lHi: 0.62, cFloor: 0.055, cCeil: 0.21 },
+    quiet: { lLo: 0.34, lHi: 0.55, cFloor: 0.015, cCeil: 0.11 },
+  },
+};
 
 // Red (≈345–25°) is reserved vocabulary: the corpus uses it for tags, operators and
 // keywords, never strings/functions and almost never numbers — a saturated red
