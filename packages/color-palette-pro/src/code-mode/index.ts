@@ -1,5 +1,32 @@
 import Color from "colorjs.io";
 import { PaletteKinds, PaletteStyle } from "../types/types";
+import { generateOutlineAndInverse } from "../ui/outline";
+import { generateSemanticColors } from "../ui/semantic";
+import { generateSurfaceColors, makeContainerForAccent } from "../ui/surface";
+import { adaptPrimaryForMode, surfaceTreatmentFor } from "../ui/uiUtils";
+import { deriveAnsiPalette } from "./ansi";
+import { APCA_TARGET_SELECTION_OVERLAY } from "./constants";
+import { serializeAsAlacritty } from "./formats/alacritty";
+import { serializeAsGhostty } from "./formats/ghostty";
+import { serializeAsIterm2 } from "./formats/iterm2";
+import { serializeAsWarp } from "./formats/warp";
+import { serializeAsZed } from "./formats/zed";
+import { intensityChromaFor } from "./intensity";
+import { buildDescription, themeNames } from "./names";
+import { legibleOverlayAlpha } from "./overlay";
+import { getPersonalityConfig } from "./personality";
+import { buildSyntax } from "./syntax";
+import { analogousTemplate } from "./templates/analogous";
+import {
+  deriveUiColors,
+  generateBaseTokenRules,
+  generateSemanticTokenRules,
+} from "./templates/base";
+import { complementaryTemplate } from "./templates/complementary";
+import { splitComplementaryTemplate } from "./templates/splitcomp";
+import { tetradicTemplate } from "./templates/tetradic";
+import { tintsAndShadesTemplate } from "./templates/tintsAndShades";
+import { triadicTemplate } from "./templates/triadic";
 import type {
   BaseColorData,
   CodeThemeOutput,
@@ -10,42 +37,15 @@ import type {
   ThemeFormat,
   ZedThemeOutput,
 } from "./types";
-import { serializeAsZed } from "./formats/zed";
-import { serializeAsIterm2 } from "./formats/iterm2";
-import { serializeAsGhostty } from "./formats/ghostty";
-import { serializeAsWarp } from "./formats/warp";
-import { serializeAsAlacritty } from "./formats/alacritty";
-import { analogousTemplate } from "./templates/analogous";
-import { complementaryTemplate } from "./templates/complementary";
-import { splitComplementaryTemplate } from "./templates/splitcomp";
-import { tetradicTemplate } from "./templates/tetradic";
-import { triadicTemplate } from "./templates/triadic";
-import { tintsAndShadesTemplate } from "./templates/tintsAndShades";
 import {
-  deriveUiColors,
-  generateBaseTokenRules,
-  generateSemanticTokenRules,
-} from "./templates/base";
-import {
-  findColorByHue,
-  toHex,
   desaturate,
-  mixColors,
-  tintTowardHue,
+  findColorByHue,
   hueGapDeg,
   hueSpreadDeg,
+  mixColors,
+  tintTowardHue,
+  toHex,
 } from "./utils";
-import { getPersonalityConfig } from "./personality";
-import { APCA_TARGET_SELECTION_OVERLAY } from "./constants";
-import { themeNames, buildDescription } from "./names";
-import { buildSyntax } from "./syntax";
-import { deriveAnsiPalette } from "./ansi";
-import { intensityChromaFor } from "./intensity";
-import { legibleOverlayAlpha } from "./overlay";
-import { generateOutlineAndInverse } from "../ui/outline";
-import { generateSemanticColors } from "../ui/semantic";
-import { generateSurfaceColors, makeContainerForAccent } from "../ui/surface";
-import { adaptPrimaryForMode, surfaceTreatmentFor } from "../ui/uiUtils";
 
 const templateRegistry: Record<PaletteKinds, CodeThemeTemplate> = {
   ana: analogousTemplate,
@@ -68,7 +68,9 @@ function buildThemeData(
 
   const personality = getPersonalityConfig(paletteKind, paletteStyle, palette);
 
-  const rawPrimary = (palette[0]?.color ?? baseColor).clone();
+  const rawPrimary = (
+    palette.filter((p) => p.isBase)[0].color ?? baseColor
+  ).clone();
   const primary = adaptPrimaryForMode(rawPrimary, isDarkMode);
 
   // Seed-driven palette intensity (audit note 3): the base color's chroma — not the palette

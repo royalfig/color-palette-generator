@@ -95,7 +95,7 @@ export function deriveAnsiPalette(input: AnsiPaletteInput): AnsiPalette {
   // member is further than this window the palette has nothing in that family, so we
   // synthesise a clean canonical colour rather than chase a distant hue (which is what
   // made cyan collapse into green on a green-dominant palette).
-  const ANSI_ECHO_WINDOW = 48;
+  const ANSI_ECHO_WINDOW = 58;
   const deriveAnsi = (slot: AnsiSlot): { color: Color; canon: number } => {
     let nearest: Color | null = null;
     let bestGap = Infinity;
@@ -121,12 +121,14 @@ export function deriveAnsiPalette(input: AnsiPaletteInput): AnsiPalette {
       hue = (slot.hue + Math.max(-cap, Math.min(cap, signed)) + 360) % 360;
     }
 
-    // Chroma: seed-driven centre pulled toward the swatch's own chroma.
+    // Chroma: seed-driven centre pulled toward the swatch's own chroma, then shaped by the slot's
+    // hue-natural chroma multiplier so the ramp isn't flat (red/green punchy, yellow/cyan softer).
     const chroma = Math.max(
       0.05,
       Math.min(
         0.24,
-        ansiChromaCentre + (swatchC - ansiChromaCentre) * ansiChromaFollow,
+        (ansiChromaCentre + (swatchC - ansiChromaCentre) * ansiChromaFollow) *
+          slot.cScale,
       ),
     );
 

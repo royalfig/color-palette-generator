@@ -70,23 +70,31 @@ inputs ─► personality (kind bands + style/character knobs)
 
 ### Syntax pipeline (`buildSyntax`, `syntax.ts`)
 
-Palette-primary: a template (`templates/*.ts`) has already mapped the generated palette's swatches
-onto roles — *that* assignment is the theme's identity. The pipeline never re-permutes roles or
-rewrites hues to a convention/exemplar; it only makes the template's colors legible and distinct,
-preserving every hue:
+Palette-primary: a template (`templates/*.ts`) maps the generated palette's swatches onto roles by
+geometry. The pipeline preserves the palette's hue *set* (it never invents or rotates a hue to an
+exemplar), but it **does** re-permute which swatch lands on which role to honour the two load-bearing
+conventions, then makes everything legible, distinct, and led by one peak:
 
+0. **conventionalize roles** — permute the loud colours so the string is green/warm and the keyword
+   is a loud cool/hot hue (a blue/violet string or a muted-gold keyword reads as amateur even when
+   the colours are individually fine). Only swaps when the template's choice is actually violating,
+   so palettes that already land right are untouched; skipped for mono. The hue set is preserved —
+   this redistributes the palette's own hues, it doesn't rewrite them.
 1. **readability normalize** — pull each role's L into a generic, mode-only band and clamp chroma;
-   hue and relative chroma are kept (no per-kind exemplar envelope, no forced accent peak).
+   hue and relative chroma are kept (no per-kind exemplar envelope).
 2. **comment hue** — keep comments ≥ 60° from strings (skipped for mono).
 3. **contrast floor** — APCA-lift every role against the real editor bg (loud Lc 60, quiet 45,
    comments held in a recessed band).
 4. **distinction** — separate too-close roles by **lightness/chroma, never hue**, so an analogous
    palette stays analogous and a polychrome palette keeps its swatch hues. Runs *after* the
    contrast floor (lifts compress L and would re-collide pairs).
-5. **mono pin** — for the single-hue kind (`tas`), snap every role back to the base hue.
+5. **hero peak** — raise the keyword's chroma a clear step above the rest of the loud field (capped
+   at the band ceiling / sRGB gamut) so one token leads the eye instead of a flat mid-chroma field.
+   Runs last so the final field is the reference; chroma-only, so contrast and distinction hold.
+6. **mono pin** — for the single-hue kind (`tas`), snap every role back to the base hue.
 
 Red (≈345–25°) is reserved for tags/keywords: a saturated-red string/function/number is shifted to
-orange — the one hue move in the pipeline, a legibility guard since a red string reads as an error.
+orange — a legibility guard since a red string reads as an error.
 
 ### ANSI palette (`deriveAnsiPalette`, `ansi.ts`)
 
@@ -97,7 +105,10 @@ lightness** each taking a cue from the nearest palette swatch:
   global drift factor (style-independent — hue is not a style axis; red stays warm for `git diff`;
   blue may become purple on a purple palette — the Dracula effect). A ring pass guarantees ≥22°
   between neighbors.
-- **chroma** — the seed-driven `intensityChroma` centre pulled toward the swatch's own chroma.
+- **chroma** — the seed-driven `intensityChroma` centre pulled toward the swatch's own chroma
+  (`ANSI_CHROMA_FOLLOW_BY_LENS`), then shaped by the slot's hue-natural multiplier (`cScale`:
+  red/green/magenta punchier, yellow/cyan softer) so the ramp has the intrinsic saturation profile
+  of the loved themes instead of a flat one-chroma rainbow.
 - **lightness** — a mode band + hue-natural tilt + a nudge toward the swatch's lightness.
 
 Black is a lifted near-black; white = the editor foreground; bright variants come from
