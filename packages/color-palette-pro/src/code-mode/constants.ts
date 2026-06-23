@@ -53,6 +53,16 @@ export const COMMENT_C_MAX = 0.05;
 export const IDENTIFIER_ROLES = ["variableColor", "propertyColor"] as const;
 export const STRUCTURAL_ROLES = ["operatorColor", "punctuationColor"] as const;
 
+// Hero token: the corpus themes have a clear chromatic lead — one token noticeably more saturated
+// than the rest — so the eye has somewhere to land. The palette-primary pipeline, having dropped the
+// old forced accent-peak, flattened every loud role into one mid-chroma band (measured output ran
+// C 0.07–0.13 with no peak). This restores a single peak: the keyword (the most frequent loud token
+// and the conventional lead) is guaranteed to clear the rest of the loud field by HERO_CHROMA_GAP,
+// capped at the band ceiling. It only raises chroma — hue (palette identity) and L (contrast) are
+// untouched — so it's a prominence dial, not a restyle.
+export const HERO_ROLE = "keywordColor" as const;
+export const HERO_CHROMA_GAP = 0.045;
+
 // Generic, mode-only readability band (palette-primary redesign). The syntax pipeline preserves
 // every token's *hue and relative chroma* from the palette; this band only governs the L window a
 // token must sit in to stay legible, plus sane chroma floors/ceilings. There is deliberately NO
@@ -101,17 +111,23 @@ export const RED_SENSITIVE_ROLES: ReadonlySet<string> = new Set([
 export interface AnsiSlot {
   hue: number;
   drift: number;
+  // Hue-natural chroma multiplier. A flat ANSI ramp (every slot the same chroma) is the dead
+  // giveaway of a generated terminal theme; the loved ones aren't flat — they carry an intrinsic
+  // saturation profile where red/green/magenta run punchy and yellow/cyan sit softer (measured:
+  // Dracula red 0.21 / cyan 0.09; Tokyo Night red 0.16 / cyan/yellow 0.11). This scales each slot's
+  // computed chroma so the ramp has life even when the seed palette's swatches are uniform.
+  cScale: number;
 }
 export const ANSI_SLOTS: Record<
   "red" | "green" | "yellow" | "blue" | "magenta" | "cyan",
   AnsiSlot
 > = {
-  red: { hue: 25, drift: 24 }, // load-bearing (diff/errors) — narrowest leeway
-  green: { hue: 145, drift: 34 },
-  yellow: { hue: 95, drift: 34 },
-  blue: { hue: 250, drift: 62 }, // decorative end — roams to the palette (Dracula purple-blue)
-  magenta: { hue: 330, drift: 52 },
-  cyan: { hue: 200, drift: 48 },
+  red: { hue: 25, drift: 24, cScale: 1.15 }, // load-bearing (diff/errors) — narrowest leeway, runs punchy
+  green: { hue: 145, drift: 34, cScale: 1.1 },
+  yellow: { hue: 95, drift: 34, cScale: 0.85 }, // intrinsically light — softer chroma reads cleaner
+  blue: { hue: 250, drift: 62, cScale: 1.0 }, // decorative end — roams to the palette (Dracula purple-blue)
+  magenta: { hue: 330, drift: 52, cScale: 1.05 },
+  cyan: { hue: 200, drift: 48, cScale: 0.8 }, // softest, like the corpus
 };
 
 // Fraction of each slot's max hue drift permitted — one global factor, applied to every style
@@ -119,7 +135,7 @@ export const ANSI_SLOTS: Record<
 // end so the palette-driven mismap (Dracula's purple-blue) still reads, while each slot's own cap
 // holds the load-bearing colors (red/green/yellow) near canonical for git diff / errors / warnings.
 // Tunable: lower → more terminal-faithful, higher → snaps harder onto the palette's hues.
-export const ANSI_DRIFT_FACTOR = 0.75;
+export const ANSI_DRIFT_FACTOR = 0.82;
 
 // Chroma *centre* — the muted↔neon identity axis — is seed-driven (see intensity.ts):
 // the base color's chroma remaps into [ANSI_C_BAND], shape modulates that anchor by
@@ -139,15 +155,17 @@ export const SHAPE_INTENSITY: Record<PaletteStyle, number> = {
 // (the per-slot spread). Square stays tight/uniform (engineered); diamond lets the
 // palette's own contrast through (cinematic). Keeps the 16 colours from looking flat.
 export const ANSI_CHROMA_FOLLOW_BY_LENS: Record<PaletteStyle, number> = {
-  square: 0.25,
-  triangle: 0.45,
-  circle: 0.65,
-  diamond: 0.85,
+  square: 0.5,
+  triangle: 0.6,
+  circle: 0.78,
+  diamond: 0.95,
 };
-// Amplitude of the hue-natural lightness spread (yellow/green lift, blue/magenta deepen).
+// Amplitude of the hue-natural lightness spread (yellow/green lift, blue/magenta deepen). Even the
+// restrained corpus themes spread their ANSI lightness ≥0.10 (Tokyo Night) and the bold ones ≥0.28
+// (Dracula); the old square 0.055 produced a near-flat ramp, so the floor is lifted across lenses.
 export const ANSI_L_SPREAD_BY_LENS: Record<PaletteStyle, number> = {
-  square: 0.055,
-  triangle: 0.085,
-  circle: 0.115,
-  diamond: 0.15,
+  square: 0.09,
+  triangle: 0.11,
+  circle: 0.135,
+  diamond: 0.17,
 };

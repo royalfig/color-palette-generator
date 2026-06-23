@@ -4,26 +4,127 @@ import {
   LOUD_ROLES, DISTINCT_ROLES_BY_FREQ, RED_SENSITIVE_ROLES,
   IDENTIFIER_ROLES, STRUCTURAL_ROLES, STRUCTURAL_C_MAX, COMMENT_C_MAX,
   APCA_TARGET_LOUD, APCA_TARGET_QUIET, APCA_COMMENT_MIN, APCA_COMMENT_MAX_DARK, APCA_COMMENT_MAX_LIGHT,
-  READABILITY_BAND, type ReadBand,
+  READABILITY_BAND, HERO_ROLE, HERO_CHROMA_GAP, type ReadBand,
 } from './constants'
 import {
   hueGapDeg, ensureAPCAAgainst, capAPCAAgainst, clipToSRGB, deltaE,
   nudgeLightnessForDistinction,
 } from './utils'
 
-// The syntax-color pipeline (palette-primary). A template (templates/*.ts) has already mapped the
-// generated palette's swatches onto roles — that assignment IS the theme's identity, so this
-// pipeline never re-permutes roles or rewrites hues to match a convention or an exemplar theme.
-// All it does is make the template's colors *legible and distinct* while preserving their hue:
+// The syntax-color pipeline (palette-primary). A template (templates/*.ts) maps the generated
+// palette's swatches onto roles by geometry; this pipeline keeps the palette's hue *set* intact and
+// never rotates a hue to a convention/exemplar. What it does: re-assign which swatch lands on which
+// role to honour the two load-bearing conventions (string=green/warm, keyword=loud cool/hot), then
+// make every role legible, distinct, and led by one chromatic peak:
+//   0. conventionalize roles — permute loud colours so string/keyword aren't convention-violating
 //   1. readability normalize — pull L into a mode band, clamp chroma; hue + relative chroma kept
 //   2. comment hue           — keep comments ≥ 60° from strings (unless mono)
 //   3. contrast floor        — APCA-lift every role against the real editor bg
 //   4. distinction           — separate too-close roles by LIGHTNESS/chroma (never hue)
-//   5. mono pin              — for the single-hue kind, snap every role back to the base hue
+//   5. hero peak             — raise the keyword's chroma so one token clearly leads the eye
+//   6. mono pin              — for the single-hue kind, snap every role back to the base hue
 // buildSyntax() at the bottom runs the stages in order.
 
 function isErrorRed(c: Color): boolean {
   return (c.oklch.c ?? 0) >= 0.10 && hueGapDeg(c.oklch.h ?? 0, 5) <= 20
+}
+
+// ----- convention-aware role assignment (palette-primary) -----
+//
+// The template maps palette swatches onto roles by GEOMETRY. But two cross-theme conventions are
+// strong enough that violating them reads as "amateur" even when every colour is individually fine:
+//   • strings are green or warm — a blue/violet string reads like a comment, a red one like an error;
+//   • keywords are a loud cool/hot hue — never a muted earth-gold.
+// This pass PERMUTES the loud colours among the loud roles to honour those two conventions while
+// preserving the palette's hue *set* (no hue is invented or rotated — palette identity is intact).
+// It only intervenes when the template's choice is actually violating, so a palette that already
+// lands a green string / cool keyword is left untouched. Skipped for mono (one hue — nothing to
+// permute). This is the convention layer the palette-primary redesign deliberately dropped, brought
+// back as a swatch *reassignment* rather than a hue rewrite.
+
+const ASSIGNABLE_LOUD = [
+  'definitionColor', 'keywordColor', 'typeColor', 'stringColor', 'numberColor', 'regexColor',
+] as const
+
+// Fitness is HUE-ONLY by design. Hue is the one swatch property that is style-invariant (style is
+// material — it modulates chroma/L, never hue), and role→swatch is a hue decision, so scoring on
+// chroma would make the *same* token land on different hues across square↔diamond. Loudness is not
+// this pass's concern: the hero peak (applyHero) supplies keyword prominence via chroma downstream.
+
+const norm = (h: number): number => ((h % 360) + 360) % 360
+
+function stringFitness(c: Color): number {
+  const h = norm(c.oklch.h ?? 0)
+  // closeness to a string-friendly anchor: green (140) or warm-yellow (85)
+  let score = -Math.min(hueGapDeg(h, 140), hueGapDeg(h, 85))
+  if (hueGapDeg(h, 5) <= 22) score -= 200 // a red string reads as an error
+  if (h >= 200 && h <= 320) score -= 70 // a cool/violet string reads wrong
+  return score
+}
+
+function keywordFitness(c: Color): number {
+  const h = norm(c.oklch.h ?? 0)
+  if (h >= 45 && h <= 95) return -55 // a muted earth-gold keyword is the classic "off" note
+  if (h >= 268 && h < 330) return 40 // violet/purple — the canonical keyword
+  if (h >= 330 || h <= 20) return 30 // red / pink / magenta
+  if (h >= 210 && h < 268) return 25 // blue
+  if (h > 95 && h < 160) return 15 // green — acceptable
+  if (h >= 160 && h < 210) return 8 // cyan / teal — weak
+  return 0 // orange (21–44) — neutral
+}
+
+function isViolatingString(c: Color): boolean {
+  const h = norm(c.oklch.h ?? 0)
+  return hueGapDeg(h, 5) <= 22 || (h >= 200 && h <= 320)
+}
+function isEarthyKeyword(c: Color): boolean {
+  const h = c.oklch.h ?? 0
+  return h >= 45 && h <= 95
+}
+
+function conventionalizeRoles(syntax: SyntaxColors, isMono: boolean): SyntaxColors {
+  if (isMono) return syntax
+  const out = { ...syntax }
+  const colors = ASSIGNABLE_LOUD.map((r) => (out as any)[r] as Color)
+  const SI = ASSIGNABLE_LOUD.indexOf('stringColor')
+  const KI = ASSIGNABLE_LOUD.indexOf('keywordColor')
+  const swap = (i: number, j: number): void => { const t = colors[i]; colors[i] = colors[j]; colors[j] = t }
+
+  // Tie margin: only override an earlier candidate when it's better by more than this. Two swatches
+  // of the same family score within float noise of each other, and that noise drifts sub-degree
+  // across styles (style adjusts chroma, which nudges hue ~1e-4°) — without a margin the winner of a
+  // tie would flip square↔diamond and the *same* token would change hue across styles. The margin
+  // makes near-ties resolve to the lowest index (the template's own order) deterministically.
+  const TIE = 2
+
+  // 1. string → greenest/warmest available, but only when the template's string is violating.
+  if (isViolatingString(colors[SI])) {
+    let best = SI
+    let bestScore = stringFitness(colors[SI])
+    for (let i = 0; i < colors.length; i++) {
+      const s = stringFitness(colors[i])
+      if (s > bestScore + TIE) { bestScore = s; best = i }
+    }
+    if (best !== SI) swap(SI, best)
+  }
+
+  // 2. keyword → best cool/hot hue available (never the slot just given to string). Swap when the
+  //    template's keyword is earthy, or a clearly better hue exists.
+  {
+    let best = KI
+    let bestScore = keywordFitness(colors[KI])
+    for (let i = 0; i < colors.length; i++) {
+      if (i === SI) continue
+      const s = keywordFitness(colors[i])
+      if (s > bestScore + TIE) { bestScore = s; best = i }
+    }
+    if (best !== KI && (isEarthyKeyword(colors[KI]) || bestScore > keywordFitness(colors[KI]) + TIE)) {
+      swap(KI, best)
+    }
+  }
+
+  ASSIGNABLE_LOUD.forEach((r, i) => { (out as any)[r] = colors[i] })
+  return out
 }
 
 /**
@@ -228,6 +329,27 @@ function enforceDistinction(
   return out
 }
 
+/**
+ * Hero peak: guarantee one loud role leads the eye. The keyword (HERO_ROLE) is raised in chroma to
+ * clear the rest of the loud field by HERO_CHROMA_GAP, capped at the band ceiling. Runs *last* (after
+ * distinction) so the final field is the reference and the peak is never re-flattened: it only adds
+ * chroma, which moves the hero *away* from its neighbours in ΔE, so it can't reintroduce a collision.
+ * L is untouched, so the APCA floor still holds.
+ */
+function applyHero(syntax: SyntaxColors, band: ReadBand): SyntaxColors {
+  const out = { ...syntax }
+  const hero = ((syntax as any)[HERO_ROLE] as Color).clone()
+  let maxOther = 0
+  for (const k of LOUD_ROLES) {
+    if (k === HERO_ROLE) continue
+    maxOther = Math.max(maxOther, ((syntax as any)[k] as Color).oklch.c ?? 0)
+  }
+  const target = Math.min(band.loud.cCeil, Math.max(hero.oklch.c ?? 0, maxOther + HERO_CHROMA_GAP))
+  hero.oklch.c = target
+  ;(out as any)[HERO_ROLE] = clipToSRGB(hero)
+  return out
+}
+
 /** Inputs the pipeline needs beyond the raw template colors. */
 export interface SyntaxBuildContext {
   /** The actual editor background, for every contrast/distinction pass. */
@@ -241,23 +363,28 @@ export interface SyntaxBuildContext {
 
 /**
  * Run the template's palette-derived colors through the legibility pipeline:
- *   1. readability normalize — L into the mode band, chroma clamped (hue preserved)
+ *   0. conventionalize roles  — permute loud swatches so string is green/warm and keyword is a loud
+ *                               cool/hot hue (hue set preserved; skipped for mono)
+ *   1. readability normalize  — L into the mode band, chroma clamped (hue preserved)
  *   2. comment hue            — keep comments ≥ 60° from strings (unless mono)
  *   3. contrast floor         — APCA-lift every role against the real bg
  *   4. distinction            — separate too-close roles by L/chroma (contrast lifts compress L, so
  *                               this runs after); mono packs tighter since L is its only axis
- *   5. mono pin               — for the single-hue kind, snap every role back to the base hue
+ *   5. hero peak              — raise the keyword's chroma a clear step above the loud field
+ *   6. mono pin               — for the single-hue kind, snap every role back to the base hue
  */
 export function buildSyntax(raw: SyntaxColors, ctx: SyntaxBuildContext): SyntaxColors {
   const { bg, isDarkMode, isMono } = ctx
   const band = isDarkMode ? READABILITY_BAND.dark : READABILITY_BAND.light
 
-  const banded = normalizeForReadability(raw, band)
+  const assigned = conventionalizeRoles(raw, isMono)
+  const banded = normalizeForReadability(assigned, band)
   const commented = adjustCommentHue(banded, bg, isMono)
   const contrasted = ensureRoleContrast(commented, bg, isDarkMode)
 
   const minDeltaE = isMono ? (isDarkMode ? 4.5 : 6) : isDarkMode ? 6 : 8
   const distinct = enforceDistinction(contrasted, bg, isDarkMode, minDeltaE, band.loud.cCeil)
 
-  return isMono ? enforceMonoHue(distinct, ctx.monoHue) : distinct
+  const heroed = applyHero(distinct, band)
+  return isMono ? enforceMonoHue(heroed, ctx.monoHue) : heroed
 }

@@ -32,6 +32,7 @@ export function createPalettes(
 ) {
   // tints-and-shades is a single-hue lightness ramp (its own generator); every other kind is a
   // hue-based scheme produced from the declarative tables in palette/schemes.ts.
+  //
   const basePalette: BaseColorData[] =
     palette === "tas"
       ? generateTintsAndShades(color, { style, colorSpace })
