@@ -12,7 +12,7 @@ import { serializeAsIterm2 } from "./formats/iterm2";
 import { serializeAsWarp } from "./formats/warp";
 import { serializeAsZed } from "./formats/zed";
 import { intensityChromaFor } from "./intensity";
-import { buildDescription, themeNames } from "./names";
+import { themeNames } from "./names";
 import { legibleOverlayAlpha } from "./overlay";
 import { getPersonalityConfig } from "./personality";
 import { buildSyntax } from "./syntax";
@@ -380,13 +380,8 @@ function buildThemeData(
     type: isDarkMode ? "dark" : "light",
     name: isDarkMode ? nameInfo.dark : nameInfo.light,
     displayName: `${nameInfo.displayName} ${isDarkMode ? "Dark" : "Light"}`,
-    description: buildDescription(
-      nameInfo.displayName,
-      personality.lensName,
-      personality.paletteCharacter,
-      isDarkMode,
-    ),
-    author: "color-palette-pro / code-mode",
+    description: `A ${isDarkMode ? "dark" : "light"} ${nameInfo.displayName} theme generated from the base color ${toHex(baseColor)} and a ${paletteStyle} ${paletteKind} palette`,
+    author: "@royalfig",
     peakAlpha,
     inactiveSelectionStyle: sp.inactiveSelectionStyle,
     fontStyleProfile: personality.fontStyleProfile,
@@ -512,7 +507,7 @@ export function generateTheme(
       const zedOutput: ZedThemeOutput = {
         $schema: "https://zed.dev/schema/themes/v0.2.0.json",
         name: nameInfo.displayName,
-        author: "color-palette-pro / code-mode",
+        author: "@royalfig",
         themes: [serializeAsZed(data)],
       };
       return JSON.stringify(zedOutput, null, 2);
