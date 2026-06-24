@@ -36,20 +36,3 @@ export function themeNames(
     displayName: `${k.displayName} ${s.displayName}`,
   };
 }
-
-const CHARACTER_PROSE: Record<PaletteCharacter, string> = {
-  serene: "calm and balanced",
-  vivid: "high-contrast and dramatic",
-  crisp: "structured and medium-energy",
-  mono: "monochromatic and moody",
-};
-
-export function buildDescription(
-  displayName: string,
-  lensName: string,
-  character: PaletteCharacter,
-  isDarkMode: boolean,
-): string {
-  const mode = isDarkMode ? "dark" : "light";
-  return `${displayName} in the ${lensName} lens — a ${CHARACTER_PROSE[character]} ${mode} theme generated from a ${displayName.toLowerCase()} palette.`;
-}
