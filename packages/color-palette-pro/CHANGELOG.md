@@ -1,5 +1,11 @@
 # @royalfig/color-palette-pro
 
+## 3.1.1
+
+### Patch Changes
+
+- 86ef11d: Naming convention change
+
 ## 3.1.0
 
 ### Minor Changes
