@@ -1,9 +1,4 @@
 import type { PaletteKinds, PaletteStyle } from "../types/types";
-import type { PaletteCharacter } from "./types";
-
-// Theme naming + human-readable descriptions. The slug/displayName per (kind × style)
-// drives file names and the theme picker label; the prose description is shown in the
-// VSCode/Zed theme metadata.
 
 const KIND_NAMES: Record<PaletteKinds, { slug: string; displayName: string }> =
   {
