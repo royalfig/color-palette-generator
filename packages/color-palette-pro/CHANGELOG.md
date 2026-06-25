@@ -1,5 +1,11 @@
 # @royalfig/color-palette-pro
 
+## 3.2.0
+
+### Minor Changes
+
+- 0ec5252: Updated hues for ansi
+
 ## 3.1.1
 
 ### Patch Changes
