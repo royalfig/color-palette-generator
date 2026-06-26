@@ -1,0 +1,39 @@
+{
+  "name": "color-code-pro",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.6.0",
+    "@phosphor-icons/react": "^2.1.10",
+    "@royalfig/color-palette-pro": "workspace:*",
+    "@shikijs/langs": "^4.3.0",
+    "prettier": "^3.8.5",
+    "react": "^19.2.7",
+    "react-colorful": "^5.7.0",
+    "react-dom": "^19.2.7",
+    "shiki": "^4.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@rolldown/plugin-babel": "^0.2.3",
+    "@types/node": "^25.9.4",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "eslint": "^10.5.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.7.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.62.0",
+    "vite": "^8.1.0"
+  }
+}

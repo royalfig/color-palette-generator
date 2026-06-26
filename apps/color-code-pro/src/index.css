@@ -1,0 +1,91 @@
+@import "reset.css";
+
+:root {
+  --radius: 0.625rem;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+.light {
+  color-scheme: only light;
+}
+
+.dark {
+  color-scheme: only dark;
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: montreal, sans-serif;
+  font-variant-ligatures: discretionary-ligatures;
+}
+
+:root[data-style="diamond"] {
+  --light-angle: -30deg;
+  --shadow-strength: 0.5;
+}
+
+/* Reset default <pre> margin so Shiki output sits flush in its container */
+/*.shiki {
+  margin: 0;
+}*/
+
+.container {
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+code,
+pre {
+  font-family: code, monospace;
+}
+
+@font-face {
+  font-family: montreal;
+  src: url("./assets/PPNeueMontreal-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: code;
+  font-style: italic;
+  src: url("./assets/PPNeueMontrealMono-RegularItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: code;
+  font-weight: bold;
+  src: url("./assets/PPNeueMontrealMono-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: code;
+  font-weight: bold;
+  font-style: italic;
+  src: url("./assets/PPNeueMontrealMono-BoldItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: code;
+  src: url("./assets/PPNeueMontrealMono-Regular.woff2") format("woff2");
+}
+
+.cc-start {
+  justify-content: start;
+}
+
+.cc-center {
+  justify-content: center;
+}
+
+::selection {
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+}

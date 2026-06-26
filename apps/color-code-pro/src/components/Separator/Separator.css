@@ -1,0 +1,9 @@
+.cc-separator {
+  height: 1em;
+  width: 1px;
+  background-color: var(--color-outline-variant);
+
+  [data-style="diamond"] & {
+    background-color: var(--color-outline);
+  }
+}

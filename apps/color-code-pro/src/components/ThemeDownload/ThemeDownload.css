@@ -1,0 +1,20 @@
+.cc-split {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+/* Join the main button and the caret into one split control. */
+.cc-split .cc-split-main {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.cc-split .cc-split-caret {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  padding-inline: 0.5rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* The format menu reuses the language select's popup/item styles
+   (.cc-select-popup, .cc-select-item, .cc-list-*) — see Select.css. */
