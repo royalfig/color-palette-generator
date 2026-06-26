@@ -1,5 +1,11 @@
 # @royalfig/color-palette-pro
 
+## 3.2.1
+
+### Patch Changes
+
+- f23643f: bg lightness for circle
+
 ## 3.2.0
 
 ### Minor Changes
