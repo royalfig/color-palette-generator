@@ -42,7 +42,7 @@ export const SURFACE_TREATMENT: Record<PaletteStyle, SurfaceTreatment> = {
     minProximityBoost: 0.12,
     outlineContrast: 0.03,
     elevationSpread: 1.15,
-    stackLShiftDark: 0,
+    stackLShiftDark: 0.025,
     stackLShiftLight: -0.012,
     shadowProfile: "soft",
   },
