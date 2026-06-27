@@ -27,14 +27,36 @@ export const triadicTemplate: CodeThemeTemplate = {
 
     const baseHue = c0.oklch.h ?? 0
     const variableColor = adaptLightnessForQuiet(tintTowardHue(surfaces.onSurface, baseHue, 0.4), isDarkMode)
-    const propertyColor = adaptLightnessForQuiet(tintTowardHue(surfaces.onSurfaceVariant, baseHue, 0.5, 0.016), isDarkMode)
-    const operatorColor = adaptLightnessForQuiet(tintTowardHue(surfaces.outline, c2.oklch.h ?? baseHue, 0.3, 0.012), isDarkMode)
-    const punctuationColor = adaptLightnessForQuiet(tintTowardHue(surfaces.outlineVariant, baseHue, 0.2, 0.008), isDarkMode)
-    const commentColor = adaptLightnessForQuiet(tintTowardHue(surfaces.onSurfaceVariant, c1.oklch.h ?? baseHue, 0.4, 0.012), isDarkMode)
+    const propertyColor = adaptLightnessForQuiet(
+      tintTowardHue(surfaces.onSurfaceVariant, baseHue, 0.5, 0.016),
+      isDarkMode,
+    )
+    const operatorColor = adaptLightnessForQuiet(
+      tintTowardHue(surfaces.outline, c2.oklch.h ?? baseHue, 0.3, 0.012),
+      isDarkMode,
+    )
+    const punctuationColor = adaptLightnessForQuiet(
+      tintTowardHue(surfaces.outlineVariant, baseHue, 0.2, 0.008),
+      isDarkMode,
+    )
+    const commentColor = adaptLightnessForQuiet(
+      tintTowardHue(surfaces.onSurfaceVariant, c1.oklch.h ?? baseHue, 0.4, 0.012),
+      isDarkMode,
+    )
 
     return {
-      definitionColor, keywordColor, typeColor, stringColor, numberColor, regexColor, accentColor,
-      variableColor, propertyColor, operatorColor, punctuationColor, commentColor,
+      definitionColor,
+      keywordColor,
+      typeColor,
+      stringColor,
+      numberColor,
+      regexColor,
+      accentColor,
+      variableColor,
+      propertyColor,
+      operatorColor,
+      punctuationColor,
+      commentColor,
     }
   },
 

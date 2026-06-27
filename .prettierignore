@@ -1,0 +1,6 @@
+dist
+node_modules
+pnpm-lock.yaml
+*.png
+*.svg
+*.woff2

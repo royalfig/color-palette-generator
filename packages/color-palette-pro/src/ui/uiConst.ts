@@ -1,4 +1,4 @@
-import { SurfaceTreatment, PaletteStyle } from "../types/types";
+import { SurfaceTreatment, PaletteStyle } from '../types/types'
 
 export const DEFAULT_TREATMENT: SurfaceTreatment = {
   surfaceChromaScale: 1,
@@ -8,8 +8,8 @@ export const DEFAULT_TREATMENT: SurfaceTreatment = {
   elevationSpread: 1,
   stackLShiftDark: 0,
   stackLShiftLight: 0,
-  shadowProfile: "soft",
-};
+  shadowProfile: 'soft',
+}
 
 // surfaceChromaScale multiplies a deliberately small base (0.012), so it needs large values to
 // move the page canvas a perceptible amount once the pole-damping takes its cut — circle/diamond
@@ -24,7 +24,7 @@ export const SURFACE_TREATMENT: Record<PaletteStyle, SurfaceTreatment> = {
     elevationSpread: 1,
     stackLShiftDark: 0,
     stackLShiftLight: 0,
-    shadowProfile: "soft",
+    shadowProfile: 'soft',
   },
   triangle: {
     surfaceChromaScale: 0,
@@ -34,7 +34,7 @@ export const SURFACE_TREATMENT: Record<PaletteStyle, SurfaceTreatment> = {
     elevationSpread: 1,
     stackLShiftDark: 0,
     stackLShiftLight: 0,
-    shadowProfile: "soft",
+    shadowProfile: 'soft',
   },
   circle: {
     surfaceChromaScale: 3.5,
@@ -44,7 +44,7 @@ export const SURFACE_TREATMENT: Record<PaletteStyle, SurfaceTreatment> = {
     elevationSpread: 1.15,
     stackLShiftDark: 0.025,
     stackLShiftLight: -0.012,
-    shadowProfile: "soft",
+    shadowProfile: 'soft',
   },
   diamond: {
     surfaceChromaScale: 7.5,
@@ -54,6 +54,6 @@ export const SURFACE_TREATMENT: Record<PaletteStyle, SurfaceTreatment> = {
     elevationSpread: 1.5,
     stackLShiftDark: -0.04,
     stackLShiftLight: -0.035,
-    shadowProfile: "hard",
+    shadowProfile: 'hard',
   },
-};
+}

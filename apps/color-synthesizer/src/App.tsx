@@ -102,7 +102,10 @@ export default function App() {
   const [showPaletteColors, setShowPaletteColors] = useState(false)
   const [paletteType, setPaletteType] = useState<PaletteKinds>(initialPaletteType)
   const [showColorHistory, setShowColorHistory] = useState(false)
-  const [colorHistory, setColorHistory] = useState<string[]>([])
+  const [colorHistory, setColorHistory] = useState<string[]>(() => {
+    const stored = localStorage.getItem('color-history')
+    return stored ? JSON.parse(stored) : []
+  })
   const [paletteStyle, setPaletteStyle] = useState<'square' | 'triangle' | 'circle' | 'diamond'>(initialPaletteStyle)
   const [colorSpace, setColorSpace] = useState<ColorSpaceAndFormat>(parsedInitialColorSpace(initialColorFormat))
   const [knobValues, setKnobValues] = useState(initialKnobValues)
@@ -131,7 +134,10 @@ export default function App() {
     [message, messageType, showMessage],
   )
 
-  const palette = useMemo(() => createPalettes(color, paletteType, paletteStyle, colorSpace, knobValues, mode === 'ui', isDarkMode), [color, paletteType, paletteStyle, colorSpace, knobValues, mode, isDarkMode])
+  const palette = useMemo(
+    () => createPalettes(color, paletteType, paletteStyle, colorSpace, knobValues, mode === 'ui', isDarkMode),
+    [color, paletteType, paletteStyle, colorSpace, knobValues, mode, isDarkMode],
+  )
 
   const codeTheme = useMemo(() => {
     if (mode !== 'code') return undefined
@@ -139,7 +145,14 @@ export default function App() {
   }, [color, palette, paletteType, paletteStyle, mode, isDarkMode])
 
   const colorContext = useMemo(
-    () => ({ originalColor: colorFactory(color, 'base', 0, colorSpace.format), palette, mode, paletteStyle, codeTheme, isDarkMode }),
+    () => ({
+      originalColor: colorFactory(color, 'base', 0, colorSpace.format),
+      palette,
+      mode,
+      paletteStyle,
+      codeTheme,
+      isDarkMode,
+    }),
     [color, palette, colorSpace.format, mode, paletteStyle, codeTheme, isDarkMode],
   )
 
@@ -161,14 +174,6 @@ export default function App() {
   //     document.head.removeChild(styleEl)
   //   }
   // }, [css])
-
-  // Load color history from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem('color-history')
-    if (stored) {
-      setColorHistory(JSON.parse(stored))
-    }
-  }, [])
 
   // Debounced localStorage update for color history
   const debouncedColorHistoryUpdate = useDebouncedCallback((colorString: string) => {
@@ -248,7 +253,15 @@ export default function App() {
       effectsString,
       mode,
     )
-  }, [colorContext.originalColor.string, paletteType, paletteStyle, colorSpace.format, knobValues, debouncedUrlUpdate, mode])
+  }, [
+    colorContext.originalColor.string,
+    paletteType,
+    paletteStyle,
+    colorSpace.format,
+    knobValues,
+    debouncedUrlUpdate,
+    mode,
+  ])
 
   // Debounced favicon update
   const debouncedFaviconUpdate = useDebouncedCallback((cssValue: string) => {
@@ -317,7 +330,7 @@ export default function App() {
             <main className="synth-container">
               <SectionHeader />
               <Display>
-                  <ColorDisplay
+                <ColorDisplay
                   fetchedData={fetchedData}
                   isLoading={isLoading}
                   error={colorNameError}

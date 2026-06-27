@@ -10,10 +10,10 @@
 }
 
 .cc-split .cc-split-caret {
+  padding-inline: 0.5rem;
+  border-left: 1px solid rgb(255 255 255 / 25%);
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  padding-inline: 0.5rem;
-  border-left: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 /* The format menu reuses the language select's popup/item styles

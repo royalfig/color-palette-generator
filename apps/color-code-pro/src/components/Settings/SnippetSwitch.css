@@ -3,11 +3,12 @@
   --height: calc(var(--width) * 0.55);
   --thumb: calc(var(--width) * 0.38);
   --translate: calc(var(--width) * 0.44);
+
   display: flex;
-  align-items: center;
   gap: 0.5rem;
-  font-size: 0.8125rem;
+  align-items: center;
   padding: 0.2rem 0.75rem;
+  font-size: 0.8125rem;
   color: var(--color-on-surface);
 }
 
@@ -15,12 +16,12 @@
   box-sizing: border-box;
   display: flex;
   flex-shrink: 0;
-  border: 1px solid var(--color-outline);
-  border-radius: 1000px;
-  padding: 0.15em;
   width: var(--width);
   height: var(--height);
+  padding: 0.15em;
   background-color: var(--color-surface);
+  border: 1px solid var(--color-outline);
+  border-radius: 1000px;
   transition: background-color 150ms ease;
 
   &[data-checked] {
@@ -43,7 +44,7 @@
     background-color 150ms ease;
 
   &[data-checked] {
-    translate: var(--translate) 0;
     background-color: var(--color-surface);
+    translate: var(--translate) 0;
   }
 }

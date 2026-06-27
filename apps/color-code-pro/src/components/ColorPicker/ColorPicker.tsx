@@ -1,40 +1,37 @@
-import { Button } from "@/components/Button/Button";
-import { useTheme } from "@/hooks/useTheme";
-import { Popover } from "@base-ui/react/popover";
-import { useEffect, useRef, useCallback } from "react";
-import { HexColorPicker } from "react-colorful";
-import "./ColorPicker.css";
+import { Button } from '@/components/Button/Button'
+import { useTheme } from '@/hooks/useTheme'
+import { Popover } from '@base-ui/react/popover'
+import { useEffect, useRef, useCallback } from 'react'
+import { HexColorPicker } from 'react-colorful'
+import './ColorPicker.css'
 
 export default function ColorPicker() {
-  const { baseColor, setBaseColor } = useTheme();
-  const hexInputRef = useRef<HTMLInputElement>(null);
+  const { baseColor, setBaseColor } = useTheme()
+  const hexInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (hexInputRef.current && document.activeElement !== hexInputRef.current) {
-      hexInputRef.current.value = baseColor;
+      hexInputRef.current.value = baseColor
     }
-  }, [baseColor]);
+  }, [baseColor])
 
   const handleHexInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value;
-      const normalized = val.startsWith("#") ? val : `#${val}`;
+      const val = e.target.value
+      const normalized = val.startsWith('#') ? val : `#${val}`
       if (/^#[0-9a-fA-F]{6}$/.test(normalized)) {
-        setBaseColor(normalized);
+        setBaseColor(normalized)
       }
     },
     [setBaseColor],
-  );
+  )
 
   return (
     <Popover.Root>
       <Popover.Trigger
         render={
           <Button aria-label="Pick base color">
-            <span
-              className="cc-color-swatch"
-              style={{ backgroundColor: baseColor }}
-            ></span>
+            <span className="cc-color-swatch" style={{ backgroundColor: baseColor }}></span>
             <span className="cc-title">{baseColor}</span>
           </Button>
         }
@@ -59,5 +56,5 @@ export default function ColorPicker() {
         </Popover.Positioner>
       </Popover.Portal>
     </Popover.Root>
-  );
+  )
 }

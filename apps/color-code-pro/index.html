@@ -10,22 +10,17 @@
       // flash of the wrong scheme. Colors are generated at runtime, so we read
       // the surface color the app persisted (themeProvider) rather than compute
       // it here; falls back to neutral defaults on first visit.
-      (function () {
+      ;(function () {
         try {
-          var t = localStorage.getItem("theme") || "dual";
-          if (t === "system") t = "dual";
-          var dark =
-            t === "dark" ||
-            (t !== "light" &&
-              window.matchMedia("(prefers-color-scheme: dark)").matches);
-          var el = document.documentElement;
-          el.classList.add(dark ? "dark" : "light");
-          el.style.colorScheme = dark ? "dark" : "light";
-          el.style.background =
-            localStorage.getItem(dark ? "bg-dark" : "bg-light") ||
-            (dark ? "#1d1d1d" : "#fcfcfc");
+          var t = localStorage.getItem('theme') || 'dual'
+          if (t === 'system') t = 'dual'
+          var dark = t === 'dark' || (t !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          var el = document.documentElement
+          el.classList.add(dark ? 'dark' : 'light')
+          el.style.colorScheme = dark ? 'dark' : 'light'
+          el.style.background = localStorage.getItem(dark ? 'bg-dark' : 'bg-light') || (dark ? '#1d1d1d' : '#fcfcfc')
         } catch (e) {}
-      })();
+      })()
     </script>
   </head>
   <body>

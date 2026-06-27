@@ -10,7 +10,7 @@ import './palette-tool-selector.css'
 import { LinearGradientSVG } from '../LinearGradientSVG'
 
 const MODES = ['palette', 'ui', 'code'] as const
-type Mode = typeof MODES[number]
+type Mode = (typeof MODES)[number]
 
 export function PaletteToolSelector({
   showPaletteColors,

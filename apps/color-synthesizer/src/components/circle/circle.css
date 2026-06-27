@@ -17,6 +17,7 @@
 
 .circle-item {
   /* CSS transitions for SVG attributes - modern browsers support this */
+
   /* Transitions are set inline in JS for better control */
   will-change: cx, cy, fill; /* Hint to browser for GPU acceleration */
 }

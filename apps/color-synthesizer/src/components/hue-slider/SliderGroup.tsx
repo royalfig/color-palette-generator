@@ -80,7 +80,7 @@ export function SliderGroup({
   setColor: Dispatch<SetStateAction<string>>
 }) {
   const shouldReduceMotion = useReducedMotion()
-  
+
   // Memoize transition config to avoid recreating object on every render
   // This prevents unnecessary re-renders of motion.div
   const transition = useMemo(
@@ -93,10 +93,7 @@ export function SliderGroup({
 
   // Memoize sliders to avoid recreating on every render
   // Only recreate when colorSpace.space changes (setColor is stable)
-  const sliders = useMemo(
-    () => renderSliders(colorSpace, setColor),
-    [colorSpace.space, colorSpace.format, setColor],
-  )
+  const sliders = useMemo(() => renderSliders(colorSpace, setColor), [colorSpace.space, colorSpace.format, setColor])
 
   return (
     <AnimatePresence mode="sync">

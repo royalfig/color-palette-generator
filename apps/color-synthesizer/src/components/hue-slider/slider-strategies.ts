@@ -36,8 +36,8 @@ const hueStrategy = (space: ColorSpace): SliderStrategy => ({
     space === 'hsl'
       ? `hsl(${values.hue} ${values.saturation} ${values.lightness})`
       : space === 'lch'
-      ? `lch(${values.lightness} ${values.saturation} ${values.hue})`
-      : `oklch(${values.lightness} ${values.saturation} ${values.hue})`,
+        ? `lch(${values.lightness} ${values.saturation} ${values.hue})`
+        : `oklch(${values.lightness} ${values.saturation} ${values.hue})`,
 })
 
 const saturationStrategy = (space: ColorSpace): SliderStrategy => {
@@ -196,8 +196,8 @@ const rgbStrategy = (coord: 'r' | 'g' | 'b'): SliderStrategy => ({
     coord === 'r'
       ? `color-mix(in srgb, red ${values['value-as-percent']}, gray)`
       : coord === 'g'
-      ? `color-mix(in srgb, green ${values['value-as-percent']}, gray)`
-      : `color-mix(in srgb, blue ${values['value-as-percent']}, gray)`,
+        ? `color-mix(in srgb, green ${values['value-as-percent']}, gray)`
+        : `color-mix(in srgb, blue ${values['value-as-percent']}, gray)`,
 })
 
 const p3Strategy = (coord: 'p3-r' | 'p3-g' | 'p3-b'): SliderStrategy => ({
@@ -223,8 +223,8 @@ const p3Strategy = (coord: 'p3-r' | 'p3-g' | 'p3-b'): SliderStrategy => ({
     coord === 'p3-r'
       ? `color-mix(in display-p3, red ${values['value-as-percent']}, gray)`
       : coord === 'p3-g'
-      ? `color-mix(in display-p3, green ${values['value-as-percent']}, gray)`
-      : `color-mix(in display-p3, blue ${values['value-as-percent']}, gray)`,
+        ? `color-mix(in display-p3, green ${values['value-as-percent']}, gray)`
+        : `color-mix(in display-p3, blue ${values['value-as-percent']}, gray)`,
 })
 
 const labAStrategy = (): SliderStrategy => ({

@@ -1,169 +1,157 @@
-import Color from "colorjs.io";
-import { PaletteKinds } from "../types/types";
+import Color from 'colorjs.io'
+import { PaletteKinds } from '../types/types'
 // Single source of truth for the palette color shape is factory.ts; imported for in-file use
 // and re-exported below so existing code-mode imports (`from "./types"`) keep resolving.
-import type { BaseColorData } from "../factory";
+import type { BaseColorData } from '../factory'
 
 // ===== SEMANTIC COLOR ROLES =====
 
 export type SemanticColor = {
-  hex: string;
-};
+  hex: string
+}
 
 export interface SemanticColors {
   // Surface and structural
-  editorBackground: SemanticColor;
-  editorForeground: SemanticColor;
-  sidebarBackground: SemanticColor;
-  panelBackground: SemanticColor;
-  overlayBackground: SemanticColor;
-  statusBarBackground: SemanticColor;
+  editorBackground: SemanticColor
+  editorForeground: SemanticColor
+  sidebarBackground: SemanticColor
+  panelBackground: SemanticColor
+  overlayBackground: SemanticColor
+  statusBarBackground: SemanticColor
   /** Optional top-border accent for the status bar (diamond lens only). */
-  statusBarBorderTop?: SemanticColor;
-  focusBorder: SemanticColor;
-  inputBackground: SemanticColor;
+  statusBarBorderTop?: SemanticColor
+  focusBorder: SemanticColor
+  inputBackground: SemanticColor
   /** Surface used for chat / agents input fields — sunken in dark, lifted in light. */
-  inputSunken: SemanticColor;
-  divider: SemanticColor;
-  outline: SemanticColor;
-  outlineVariant: SemanticColor;
+  inputSunken: SemanticColor
+  divider: SemanticColor
+  outline: SemanticColor
+  outlineVariant: SemanticColor
   /** Solid neutral one step from editor, used for line/range/hover highlights. */
-  neutralBand: SemanticColor;
+  neutralBand: SemanticColor
   /** Cursor color — character-driven (foreground for calm characters, accent for loud). */
-  cursorColor: SemanticColor;
+  cursorColor: SemanticColor
 
   // Primary syntax roles (chromatic)
-  definitionColor: SemanticColor;
-  keywordColor: SemanticColor;
-  typeColor: SemanticColor;
-  stringColor: SemanticColor;
-  numberColor: SemanticColor;
-  regexColor: SemanticColor;
-  accentColor: SemanticColor;
+  definitionColor: SemanticColor
+  keywordColor: SemanticColor
+  typeColor: SemanticColor
+  stringColor: SemanticColor
+  numberColor: SemanticColor
+  regexColor: SemanticColor
+  accentColor: SemanticColor
 
   // Quiet roles (mostly neutral with palette tint)
-  defaultForeground: SemanticColor;
-  variableColor: SemanticColor;
-  propertyColor: SemanticColor;
-  operatorColor: SemanticColor;
-  punctuationColor: SemanticColor;
-  commentColor: SemanticColor;
+  defaultForeground: SemanticColor
+  variableColor: SemanticColor
+  propertyColor: SemanticColor
+  operatorColor: SemanticColor
+  punctuationColor: SemanticColor
+  commentColor: SemanticColor
 
   // Status (foregrounds + paired soft containers for backgrounds)
-  errorForeground: SemanticColor;
-  errorContainer: SemanticColor;
-  onErrorContainer: SemanticColor;
-  warningForeground: SemanticColor;
-  warningContainer: SemanticColor;
-  onWarningContainer: SemanticColor;
-  infoForeground: SemanticColor;
-  infoContainer: SemanticColor;
-  onInfoContainer: SemanticColor;
-  successForeground: SemanticColor;
-  successContainer: SemanticColor;
-  onSuccessContainer: SemanticColor;
+  errorForeground: SemanticColor
+  errorContainer: SemanticColor
+  onErrorContainer: SemanticColor
+  warningForeground: SemanticColor
+  warningContainer: SemanticColor
+  onWarningContainer: SemanticColor
+  infoForeground: SemanticColor
+  infoContainer: SemanticColor
+  onInfoContainer: SemanticColor
+  successForeground: SemanticColor
+  successContainer: SemanticColor
+  onSuccessContainer: SemanticColor
 
   // Accent containers (soft backgrounds for badges, secondary buttons, regions)
-  primaryContainer: SemanticColor;
-  onPrimaryContainer: SemanticColor;
-  secondaryColor: SemanticColor;
-  onSecondaryColor: SemanticColor;
-  secondaryContainer: SemanticColor;
-  onSecondaryContainer: SemanticColor;
+  primaryContainer: SemanticColor
+  onPrimaryContainer: SemanticColor
+  secondaryColor: SemanticColor
+  onSecondaryColor: SemanticColor
+  secondaryContainer: SemanticColor
+  onSecondaryContainer: SemanticColor
 
   // Terminal ANSI
-  terminalAnsiBlack: SemanticColor;
-  terminalAnsiRed: SemanticColor;
-  terminalAnsiGreen: SemanticColor;
-  terminalAnsiYellow: SemanticColor;
-  terminalAnsiBlue: SemanticColor;
-  terminalAnsiMagenta: SemanticColor;
-  terminalAnsiCyan: SemanticColor;
-  terminalAnsiWhite: SemanticColor;
+  terminalAnsiBlack: SemanticColor
+  terminalAnsiRed: SemanticColor
+  terminalAnsiGreen: SemanticColor
+  terminalAnsiYellow: SemanticColor
+  terminalAnsiBlue: SemanticColor
+  terminalAnsiMagenta: SemanticColor
+  terminalAnsiCyan: SemanticColor
+  terminalAnsiWhite: SemanticColor
 
   // Markdown (heading is the most prominent; lower levels ramp down)
-  markdownHeadingColor: SemanticColor;
-  markdownLinkColor: SemanticColor;
-  markdownQuoteColor: SemanticColor;
+  markdownHeadingColor: SemanticColor
+  markdownLinkColor: SemanticColor
+  markdownQuoteColor: SemanticColor
 
   // Bracket pair spread (6 hex strings, harmonic, alpha-baked)
-  bracketPairColors: string[];
+  bracketPairColors: string[]
 }
 
 // ===== TEMPLATE CONFIGURATION =====
 
 export interface SyntaxColors {
   // Chromatic — driven by palette swatches
-  definitionColor: Color;
-  keywordColor: Color;
-  typeColor: Color;
-  stringColor: Color;
-  numberColor: Color;
-  regexColor: Color;
-  accentColor: Color;
+  definitionColor: Color
+  keywordColor: Color
+  typeColor: Color
+  stringColor: Color
+  numberColor: Color
+  regexColor: Color
+  accentColor: Color
 
   // Quiet — derived from surface neutrals with palette tint
-  variableColor: Color;
-  propertyColor: Color;
-  operatorColor: Color;
-  punctuationColor: Color;
-  commentColor: Color;
+  variableColor: Color
+  propertyColor: Color
+  operatorColor: Color
+  punctuationColor: Color
+  commentColor: Color
 }
 
 /** Bundle of surface tones the templates use to derive quiet roles. */
 export interface SurfaceBundle {
-  surface: Color;
-  onSurface: Color;
-  onSurfaceVariant: Color;
-  container: Color;
-  containerSunken: Color;
-  containerOverlay: Color;
-  outline: Color;
-  outlineVariant: Color;
+  surface: Color
+  onSurface: Color
+  onSurfaceVariant: Color
+  container: Color
+  containerSunken: Color
+  containerOverlay: Color
+  outline: Color
+  outlineVariant: Color
 }
 
 export interface CodeThemeTemplate {
   /** Human-readable name for the palette type */
-  displayName: string;
+  displayName: string
 
   /** Derive the syntax token colors. Receives surfaces so quiet roles tint against real neutrals. */
-  deriveColors(
-    baseColor: Color,
-    palette: BaseColorData[],
-    isDarkMode: boolean,
-    surfaces: SurfaceBundle,
-  ): SyntaxColors;
+  deriveColors(baseColor: Color, palette: BaseColorData[], isDarkMode: boolean, surfaces: SurfaceBundle): SyntaxColors
 
   /** Six bracket-pair colors as Color objects. base.ts applies alpha at render. */
-  deriveBracketPairs(
-    baseColor: Color,
-    palette: BaseColorData[],
-    isDarkMode: boolean,
-  ): Color[];
+  deriveBracketPairs(baseColor: Color, palette: BaseColorData[], isDarkMode: boolean): Color[]
 }
 
 export interface TokenRule {
-  scope?: string[] | string;
+  scope?: string[] | string
   settings: {
-    foreground: string;
-    fontStyle?: string;
-  };
+    foreground: string
+    fontStyle?: string
+  }
 }
 
 export interface CodeThemeOutput {
-  $schema?: string;
-  name: string;
-  displayName: string;
-  description?: string;
-  author?: string;
-  type: "dark" | "light";
-  semanticHighlighting: boolean;
-  colors: Record<string, string>;
-  tokenColors: TokenRule[];
-  semanticTokenColors: Record<
-    string,
-    string | { foreground?: string; fontStyle?: string }
-  >;
+  $schema?: string
+  name: string
+  displayName: string
+  description?: string
+  author?: string
+  type: 'dark' | 'light'
+  semanticHighlighting: boolean
+  colors: Record<string, string>
+  tokenColors: TokenRule[]
+  semanticTokenColors: Record<string, string | { foreground?: string; fontStyle?: string }>
 }
 
 // ===== PERSONALITY SYSTEM =====
@@ -175,15 +163,15 @@ export interface CodeThemeOutput {
  * - crisp:   medium-energy, structured (split-complementary)
  * - mono:    near-single-hue, moody (tones, tints-and-shades)
  */
-export type PaletteCharacter = "serene" | "vivid" | "crisp" | "mono";
+export type PaletteCharacter = 'serene' | 'vivid' | 'crisp' | 'mono'
 
 export interface PersonalityFontStyleProfile {
-  comments?: string;
-  keywords?: string;
-  definitions?: string;
-  types?: string;
+  comments?: string
+  keywords?: string
+  definitions?: string
+  types?: string
   /** Per-scope overrides keyed by TextMate scope prefix. Empty string removes default. */
-  scopeOverrides?: Record<string, string>;
+  scopeOverrides?: Record<string, string>
 }
 
 /**
@@ -193,33 +181,27 @@ export interface PersonalityFontStyleProfile {
  */
 export interface SurfaceProfile {
   /** Peak alpha for the chromatic highlight ramp, per mode. */
-  peakAlpha: { dark: number; light: number };
+  peakAlpha: { dark: number; light: number }
   /** Cursor color source. */
-  cursorSource: "foreground" | "accent";
+  cursorSource: 'foreground' | 'accent'
   /** Inactive selection style. */
-  inactiveSelectionStyle: "chromatic" | "complementary" | "neutral";
+  inactiveSelectionStyle: 'chromatic' | 'complementary' | 'neutral'
   /** Amount of primary-hue tint applied to the neutral band (0 = pure neutral). */
-  neutralBandTint: number;
+  neutralBandTint: number
 }
 
 export interface PersonalityConfig {
-  fontStyleProfile: PersonalityFontStyleProfile | null;
-  surfaceProfile: SurfaceProfile;
+  fontStyleProfile: PersonalityFontStyleProfile | null
+  surfaceProfile: SurfaceProfile
   /** Human-readable label for the style's surface material (Flat/Tinted/Toned/Brutalist). */
-  lensName: string;
+  lensName: string
   /** Palette's inherent character, derived from the palette (see personality.ts). */
-  paletteCharacter: PaletteCharacter;
+  paletteCharacter: PaletteCharacter
 }
 
 // ===== FORMAT SELECTION =====
 
-export type ThemeFormat =
-  | "vscode"
-  | "zed"
-  | "iterm2"
-  | "ghostty"
-  | "warp"
-  | "alacritty";
+export type ThemeFormat = 'vscode' | 'zed' | 'iterm2' | 'ghostty' | 'warp' | 'alacritty'
 
 // ===== FORMAT-AGNOSTIC THEME DATA =====
 
@@ -228,39 +210,39 @@ export type ThemeFormat =
  * and consumed by serializeAsVSCode / serializeAsZed / serializeAsIterm2 / etc.
  */
 export interface ThemeData {
-  semanticColors: SemanticColors;
-  isDarkMode: boolean;
-  type: "dark" | "light";
-  name: string;
-  displayName: string;
-  description: string;
-  author: string;
-  peakAlpha: number;
-  inactiveSelectionStyle: SurfaceProfile["inactiveSelectionStyle"];
-  fontStyleProfile: PersonalityFontStyleProfile | null;
+  semanticColors: SemanticColors
+  isDarkMode: boolean
+  type: 'dark' | 'light'
+  name: string
+  displayName: string
+  description: string
+  author: string
+  peakAlpha: number
+  inactiveSelectionStyle: SurfaceProfile['inactiveSelectionStyle']
+  fontStyleProfile: PersonalityFontStyleProfile | null
 }
 
 // ===== ZED OUTPUT =====
 
 export interface ZedSyntaxToken {
-  color?: string;
-  font_style?: "italic" | "normal" | "oblique";
-  font_weight?: 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
+  color?: string
+  font_style?: 'italic' | 'normal' | 'oblique'
+  font_weight?: 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900
 }
 
 export interface ZedTheme {
-  name: string;
-  appearance: "dark" | "light";
-  style: Record<string, unknown>;
+  name: string
+  appearance: 'dark' | 'light'
+  style: Record<string, unknown>
 }
 
 export interface ZedThemeOutput {
-  $schema: string;
-  name: string;
-  author: string;
-  themes: ZedTheme[];
+  $schema: string
+  name: string
+  author: string
+  themes: ZedTheme[]
 }
 
 // ===== COLOR DATA =====
 // Re-export the canonical factory type (imported at the top of this file).
-export type { BaseColorData };
+export type { BaseColorData }

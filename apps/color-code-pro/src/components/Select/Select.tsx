@@ -1,42 +1,24 @@
-import { PALETTE_LABELS } from "@/lib/const";
-import { LANG_SHORT } from "@/lib/languages";
-import type { PaletteKind } from "@/types";
-import { Select } from "@base-ui/react/select";
-import {
-  CaretDownIcon,
-  CaretUpIcon,
-  CaretUpDownIcon,
-  CheckIcon,
-} from "@phosphor-icons/react";
-import "./Select.css";
+import { PALETTE_LABELS } from '@/lib/const'
+import { LANG_SHORT } from '@/lib/languages'
+import type { PaletteKind } from '@/types'
+import { Select } from '@base-ui/react/select'
+import { CaretDownIcon, CaretUpIcon, CaretUpDownIcon, CheckIcon } from '@phosphor-icons/react'
+import './Select.css'
 
-export function LangSelect({
-  handleLangChange,
-  lang,
-}: {
-  handleLangChange: (newLang: string) => void;
-  lang: string;
-}) {
+export function LangSelect({ handleLangChange, lang }: { handleLangChange: (newLang: string) => void; lang: string }) {
   // const currentLabel = LANG_SHORT[lang];
 
   const handleValChange = (val: string | null) => {
-    if (!val) return;
-    handleLangChange(val);
-  };
+    if (!val) return
+    handleLangChange(val)
+  }
 
   return (
     <div className="cc-field">
-      <Select.Root
-        items={LANG_SHORT}
-        onValueChange={handleValChange}
-        value={lang}
-      >
+      <Select.Root items={LANG_SHORT} onValueChange={handleValChange} value={lang}>
         {/*<Select.Label className="cc-select-label">{currentLabel}</Select.Label>*/}
         <Select.Trigger className="cc-select-trigger">
-          <Select.Value
-            className="cc-trigger-value"
-            placeholder="Select language"
-          />
+          <Select.Value className="cc-trigger-value" placeholder="Select language" />
           <Select.Icon>
             <CaretUpDownIcon size={12} />
           </Select.Icon>
@@ -49,17 +31,11 @@ export function LangSelect({
               </Select.ScrollUpArrow>
               <Select.List className="cc-select-list">
                 {Object.entries(LANG_SHORT).map(([value, label]) => (
-                  <Select.Item
-                    key={label}
-                    value={value}
-                    className="cc-select-item"
-                  >
+                  <Select.Item key={label} value={value} className="cc-select-item">
                     <Select.ItemIndicator className="cc-list-indicator">
-                      <CheckIcon size={"1em"} />
+                      <CheckIcon size={'1em'} />
                     </Select.ItemIndicator>
-                    <Select.ItemText className="cc-list-text">
-                      {label}
-                    </Select.ItemText>
+                    <Select.ItemText className="cc-list-text">{label}</Select.ItemText>
                   </Select.Item>
                 ))}
               </Select.List>
@@ -71,33 +47,26 @@ export function LangSelect({
         </Select.Portal>
       </Select.Root>
     </div>
-  );
+  )
 }
 
 export function PaletteKindSelect({
   setPaletteKind,
   paletteKind,
 }: {
-  setPaletteKind: (kind: PaletteKind) => void;
-  paletteKind: PaletteKind;
+  setPaletteKind: (kind: PaletteKind) => void
+  paletteKind: PaletteKind
 }) {
   const handleValChange = (val: string | null) => {
-    if (!val) return;
-    setPaletteKind(val as PaletteKind);
-  };
+    if (!val) return
+    setPaletteKind(val as PaletteKind)
+  }
 
   return (
     <div className="cc-field">
-      <Select.Root
-        items={PALETTE_LABELS}
-        onValueChange={handleValChange}
-        value={paletteKind}
-      >
+      <Select.Root items={PALETTE_LABELS} onValueChange={handleValChange} value={paletteKind}>
         <Select.Trigger className="cc-select-trigger">
-          <Select.Value
-            className="cc-trigger-value"
-            placeholder="Palette kind"
-          />
+          <Select.Value className="cc-trigger-value" placeholder="Palette kind" />
           <Select.Icon>
             <CaretUpDownIcon size={12} />
           </Select.Icon>
@@ -109,20 +78,12 @@ export function PaletteKindSelect({
                 <CaretUpIcon size={12} />
               </Select.ScrollUpArrow>
               <Select.List className="cc-select-list">
-                {(
-                  Object.entries(PALETTE_LABELS) as [PaletteKind, string][]
-                ).map(([value, label]) => (
-                  <Select.Item
-                    key={value}
-                    value={value}
-                    className="cc-select-item"
-                  >
+                {(Object.entries(PALETTE_LABELS) as [PaletteKind, string][]).map(([value, label]) => (
+                  <Select.Item key={value} value={value} className="cc-select-item">
                     <Select.ItemIndicator className="cc-list-indicator">
-                      <CheckIcon size={"1em"} />
+                      <CheckIcon size={'1em'} />
                     </Select.ItemIndicator>
-                    <Select.ItemText className="cc-list-text">
-                      {label}
-                    </Select.ItemText>
+                    <Select.ItemText className="cc-list-text">{label}</Select.ItemText>
                   </Select.Item>
                 ))}
               </Select.List>
@@ -134,5 +95,5 @@ export function PaletteKindSelect({
         </Select.Portal>
       </Select.Root>
     </div>
-  );
+  )
 }

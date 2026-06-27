@@ -1,19 +1,14 @@
-import { Button, IconButton } from "@/components/Button/Button";
-import { useTheme } from "@/hooks/useTheme";
-import { useThemeDownload } from "@/hooks/useThemeDownload";
-import baseCss from "@/lib/base.css?raw";
-import baseJs from "@/lib/base.js?raw";
-import { Menu } from "@base-ui/react/menu";
-import { Switch } from "@base-ui/react/switch";
-import {
-  ArrowSquareOutIcon,
-  CircleIcon,
-  DownloadSimpleIcon,
-  GearIcon,
-} from "@phosphor-icons/react";
-import { useCallback, useId } from "react";
-import "./SettingsMenu.css";
-import "./SnippetSwitch.css";
+import { Button, IconButton } from '@/components/Button/Button'
+import { useTheme } from '@/hooks/useTheme'
+import { useThemeDownload } from '@/hooks/useThemeDownload'
+import baseCss from '@/lib/base.css?raw'
+import baseJs from '@/lib/base.js?raw'
+import { Menu } from '@base-ui/react/menu'
+import { Switch } from '@base-ui/react/switch'
+import { ArrowSquareOutIcon, CircleIcon, DownloadSimpleIcon, GearIcon } from '@phosphor-icons/react'
+import { useCallback, useId } from 'react'
+import './SettingsMenu.css'
+import './SnippetSwitch.css'
 
 function GitHubLogo() {
   return (
@@ -30,73 +25,41 @@ function GitHubLogo() {
         </clipPath>
       </defs>
     </svg>
-  );
+  )
 }
 
 // Inline version of the dynamic favicon: stacked palette color bands clipped to
 // a rounded square. Mirrors the canvas favicon drawn in themeProvider.
-function PaletteMark({
-  colors,
-  size = 18,
-}: {
-  colors: string[];
-  size?: number;
-}) {
-  const clipId = useId();
-  const bands = colors.slice(0, 5);
-  const pad = 4;
-  const inner = 64 - pad * 2;
-  const bandH = bands.length ? inner / bands.length : inner;
+function PaletteMark({ colors, size = 18 }: { colors: string[]; size?: number }) {
+  const clipId = useId()
+  const bands = colors.slice(0, 5)
+  const pad = 4
+  const inner = 64 - pad * 2
+  const bandH = bands.length ? inner / bands.length : inner
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 64 64"
-      aria-hidden="true"
-      style={{ display: "block", flexShrink: 0 }}
-    >
+    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" style={{ display: 'block', flexShrink: 0 }}>
       <rect width="64" height="64" rx="12" fill="#12121f" />
       <clipPath id={clipId}>
         <rect x={pad} y={pad} width={inner} height={inner} rx="8" />
       </clipPath>
       <g clipPath={`url(#${clipId})`}>
         {bands.map((color, i) => (
-          <rect
-            key={i}
-            x={pad}
-            y={pad + i * bandH}
-            width={inner}
-            height={bandH}
-            fill={color}
-          />
+          <rect key={i} x={pad} y={pad + i * bandH} width={inner} height={bandH} fill={color} />
         ))}
       </g>
     </svg>
-  );
+  )
 }
 
 export function SettingsMenu() {
-  const {
-    paletteKind,
-    paletteStyle,
-    uiVarsPair,
-    palette,
-    baseColor,
-    mode,
-    setMode,
-  } = useTheme();
-  const { downloadFile } = useThemeDownload();
+  const { paletteKind, paletteStyle, uiVarsPair, palette, baseColor, mode, setMode } = useTheme()
+  const { downloadFile } = useThemeDownload()
 
   const downloadCss = useCallback(() => {
-    const scope = (selector: string, vars: string) =>
-      `${selector} {\n${vars.replace(/^/gm, "  ")}\n}`;
-    const css = [
-      scope(".cc-light", uiVarsPair.light.css),
-      scope(".cc-dark", uiVarsPair.dark.css),
-      baseCss,
-    ].join("\n\n");
-    downloadFile(css, "color-code-base.css", "text/css");
-  }, [uiVarsPair, downloadFile]);
+    const scope = (selector: string, vars: string) => `${selector} {\n${vars.replace(/^/gm, '  ')}\n}`
+    const css = [scope('.cc-light', uiVarsPair.light.css), scope('.cc-dark', uiVarsPair.dark.css), baseCss].join('\n\n')
+    downloadFile(css, 'color-code-base.css', 'text/css')
+  }, [uiVarsPair, downloadFile])
 
   return (
     <Menu.Root>
@@ -108,15 +71,10 @@ export function SettingsMenu() {
         }
       ></Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner
-          className="cc-positioner"
-          sideOffset={8}
-          side="bottom"
-          align="end"
-        >
+        <Menu.Positioner className="cc-positioner" sideOffset={8} side="bottom" align="end">
           <Menu.Popup className="cc-popup">
             <p className="cc-menu-title">
-              <PaletteMark colors={palette.map((c) => c.cssValue)} />
+              <PaletteMark colors={palette.map(c => c.cssValue)} />
               ColorCode Pro
             </p>
 
@@ -124,10 +82,10 @@ export function SettingsMenu() {
 
             <label className="cc-switch-label">
               <Switch.Root
-                checked={mode === "snippet"}
+                checked={mode === 'snippet'}
                 className="cc-switch"
-                onCheckedChange={(checked) => {
-                  setMode(checked ? "snippet" : "theme");
+                onCheckedChange={checked => {
+                  setMode(checked ? 'snippet' : 'theme')
                 }}
               >
                 <Switch.Thumb className="cc-switch-thumb" />
@@ -135,23 +93,13 @@ export function SettingsMenu() {
               Snippet Mode
             </label>
 
-            <Button
-              variant="ghost"
-              onClick={downloadCss}
-              icon={<DownloadSimpleIcon size={14} />}
-            >
+            <Button variant="ghost" onClick={downloadCss} icon={<DownloadSimpleIcon size={14} />}>
               CSS
             </Button>
 
             <Button
               variant="ghost"
-              onClick={() =>
-                downloadFile(
-                  baseJs,
-                  "color-code-base.js",
-                  "application/javascript",
-                )
-              }
+              onClick={() => downloadFile(baseJs, 'color-code-base.js', 'application/javascript')}
               icon={<DownloadSimpleIcon size={14} />}
             >
               JS
@@ -164,25 +112,20 @@ export function SettingsMenu() {
               href={`https://colorpalette.pro?color=${encodeURIComponent(baseColor)}&colorFormat=hex&paletteType=${paletteKind}&paletteStyle=${paletteStyle}`}
             >
               <span>
-                <CircleIcon color={baseColor} weight="fill" size={"1em"} />{" "}
-                ColorPalette Pro
+                <CircleIcon color={baseColor} weight="fill" size={'1em'} /> ColorPalette Pro
               </span>
-              <ArrowSquareOutIcon size={"1em"} />
+              <ArrowSquareOutIcon size={'1em'} />
             </a>
-            <a
-              className="cc-settings-link"
-              target="_blank"
-              href="https://github.com/royalfig/color-code-pro"
-            >
+            <a className="cc-settings-link" target="_blank" href="https://github.com/royalfig/color-code-pro">
               <span>
                 <GitHubLogo />
                 GitHub
               </span>
-              <ArrowSquareOutIcon size={"1em"} />
+              <ArrowSquareOutIcon size={'1em'} />
             </a>
           </Menu.Popup>
         </Menu.Positioner>
       </Menu.Portal>
     </Menu.Root>
-  );
+  )
 }

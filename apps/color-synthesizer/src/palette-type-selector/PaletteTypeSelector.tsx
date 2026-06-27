@@ -9,7 +9,7 @@ export function PaletteTypeSelector({
   setPaletteType,
 }: {
   paletteType: PaletteKinds
-  setPaletteType: Function
+  setPaletteType: (value: PaletteKinds) => void
 }) {
   return (
     <div className="palette-type-container">

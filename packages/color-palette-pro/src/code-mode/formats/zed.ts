@@ -21,8 +21,7 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
   const commentStyle = fontStyleProfile?.comments !== undefined ? fontStyleProfile.comments : 'italic'
   const keywordStyle = fontStyleProfile?.keywords ?? ''
 
-  const fs = (style: string): Pick<ZedSyntaxToken, 'font_style'> =>
-    style === 'italic' ? { font_style: 'italic' } : {}
+  const fs = (style: string): Pick<ZedSyntaxToken, 'font_style'> => (style === 'italic' ? { font_style: 'italic' } : {})
 
   const bright = (hex: string, isBlack = false) => za(brightAnsiHex(hex, isDarkMode, isBlack))
   const dim = (hex: string) => za(dimAnsiHex(hex))
@@ -93,7 +92,7 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     'panel.overlay_background': za(c.overlayBackground.hex),
     'panel.overlay_hover': za(c.neutralBand.hex),
     'panel.indent_guide': za(c.editorForeground.hex, isDarkMode ? 0.08 : 0.07),
-    'panel.indent_guide_active': za(c.editorForeground.hex, isDarkMode ? 0.20 : 0.18),
+    'panel.indent_guide_active': za(c.editorForeground.hex, isDarkMode ? 0.2 : 0.18),
     'panel.indent_guide_hover': za(c.editorForeground.hex, isDarkMode ? 0.14 : 0.12),
     'pane.focused_border': za(c.focusBorder.hex),
     'pane_group.border': za(c.outlineVariant.hex),
@@ -112,7 +111,7 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     'editor.wrap_guide': za(c.outlineVariant.hex),
     'editor.active_wrap_guide': za(c.outline.hex),
     'editor.indent_guide': za(c.editorForeground.hex, isDarkMode ? 0.08 : 0.07),
-    'editor.indent_guide_active': za(c.editorForeground.hex, isDarkMode ? 0.20 : 0.18),
+    'editor.indent_guide_active': za(c.editorForeground.hex, isDarkMode ? 0.2 : 0.18),
     'editor.document_highlight.read_background': za(c.focusBorder.hex, peakAlpha * 0.35),
     'editor.document_highlight.write_background': za(c.focusBorder.hex, peakAlpha * 0.55),
     'editor.document_highlight.bracket_background': za(c.focusBorder.hex, peakAlpha * 0.4),
@@ -151,9 +150,9 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
 
     // Element interaction states
     'element.background': '#00000000',
-    'element.hover': za(c.focusBorder.hex, isDarkMode ? 0.12 : 0.10),
-    'element.active': za(c.focusBorder.hex, isDarkMode ? 0.20 : 0.15),
-    'element.selected': za(c.focusBorder.hex, isDarkMode ? 0.25 : 0.20),
+    'element.hover': za(c.focusBorder.hex, isDarkMode ? 0.12 : 0.1),
+    'element.active': za(c.focusBorder.hex, isDarkMode ? 0.2 : 0.15),
+    'element.selected': za(c.focusBorder.hex, isDarkMode ? 0.25 : 0.2),
     'element.disabled': za(c.outlineVariant.hex, 0.5),
     'ghost_element.background': '#00000000',
     'ghost_element.hover': za(c.editorForeground.hex, isDarkMode ? 0.08 : 0.06),
@@ -164,14 +163,14 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
 
     // Scrollbar
     'scrollbar.thumb.background': za(c.editorForeground.hex, isDarkMode ? 0.15 : 0.12),
-    'scrollbar.thumb.hover_background': za(c.editorForeground.hex, isDarkMode ? 0.25 : 0.20),
+    'scrollbar.thumb.hover_background': za(c.editorForeground.hex, isDarkMode ? 0.25 : 0.2),
     'scrollbar.thumb.border': za(c.outlineVariant.hex),
     'scrollbar.track.background': '#00000000',
     'scrollbar.track.border': za(c.outlineVariant.hex),
 
     // Minimap (mirrors the scrollbar thumb)
     'minimap.thumb.background': za(c.editorForeground.hex, isDarkMode ? 0.15 : 0.12),
-    'minimap.thumb.hover_background': za(c.editorForeground.hex, isDarkMode ? 0.25 : 0.20),
+    'minimap.thumb.hover_background': za(c.editorForeground.hex, isDarkMode ? 0.25 : 0.2),
     'minimap.thumb.border': za(c.outlineVariant.hex),
 
     // Diagnostic / status

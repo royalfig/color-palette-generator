@@ -11,85 +11,85 @@
  * Output defaults to scripts/catalog-<hex>.html (git-ignored). Open it in a browser. To see the
  * effect of a change: tweak src/palette/schemes.ts or src/palette/polish.ts and re-run.
  */
-import { writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import Color from "colorjs.io";
-import { createPalettes, generateCodeTheme } from "../src/index.ts";
-import { POLISH } from "../src/palette/polish.ts";
-import type { BaseColorData } from "../src/factory.ts";
-import type { PaletteKinds, PaletteStyle } from "../src/types/types.ts";
+import { writeFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import Color from 'colorjs.io'
+import { createPalettes, generateCodeTheme } from '../src/index.ts'
+import { POLISH } from '../src/palette/polish.ts'
+import type { BaseColorData } from '../src/factory.ts'
+import type { PaletteKinds, PaletteStyle } from '../src/types/types.ts'
 
 const KINDS: { id: PaletteKinds; name: string }[] = [
-  { id: "ana", name: "Analogous" },
-  { id: "com", name: "Complementary" },
-  { id: "spl", name: "Split Complementary" },
-  { id: "tri", name: "Triadic" },
-  { id: "tet", name: "Tetradic" },
-  { id: "tas", name: "Tints & Shades" },
-];
-const STYLES: PaletteStyle[] = ["square", "triangle", "circle", "diamond"];
-const SPACE = { space: "srgb", format: "hex" } as const;
+  { id: 'ana', name: 'Analogous' },
+  { id: 'com', name: 'Complementary' },
+  { id: 'spl', name: 'Split Complementary' },
+  { id: 'tri', name: 'Triadic' },
+  { id: 'tet', name: 'Tetradic' },
+  { id: 'tas', name: 'Tints & Shades' },
+]
+const STYLES: PaletteStyle[] = ['square', 'triangle', 'circle', 'diamond']
+const SPACE = { space: 'srgb', format: 'hex' } as const
 
 // ---- args ----
-const baseColor = process.argv[2];
+const baseColor = process.argv[2]
 if (!baseColor) {
-  console.error("usage: npx tsx scripts/color-gen.ts '#666633' [out.html]");
-  process.exit(1);
+  console.error("usage: npx tsx scripts/color-gen.ts '#666633' [out.html]")
+  process.exit(1)
 }
-let baseOklch: string;
+let baseOklch: string
 try {
-  const c = new Color(baseColor);
-  baseOklch = `L ${(c.oklch.l ?? 0).toFixed(2)}  C ${(c.oklch.c ?? 0).toFixed(3)}  H ${Math.round(c.oklch.h ?? 0)}`;
+  const c = new Color(baseColor)
+  baseOklch = `L ${(c.oklch.l ?? 0).toFixed(2)}  C ${(c.oklch.c ?? 0).toFixed(3)}  H ${Math.round(c.oklch.h ?? 0)}`
 } catch {
-  console.error(`Not a valid color: ${baseColor}`);
-  process.exit(1);
+  console.error(`Not a valid color: ${baseColor}`)
+  process.exit(1)
 }
 
 // ---- helpers ----
-const hexOf = (sw: BaseColorData): string => sw.conversions[SPACE.format].value;
+const hexOf = (sw: BaseColorData): string => sw.conversions[SPACE.format].value
 const oklchTitle = (sw: BaseColorData): string => {
-  const o = sw.color.oklch;
-  return `${sw.code}\nL ${(o.l ?? 0).toFixed(2)} C ${(o.c ?? 0).toFixed(3)} H ${Math.round(o.h ?? 0)}`;
-};
+  const o = sw.color.oklch
+  return `${sw.code}\nL ${(o.l ?? 0).toFixed(2)} C ${(o.c ?? 0).toFixed(3)} H ${Math.round(o.h ?? 0)}`
+}
 
 function swatch(sw: BaseColorData, label?: string): string {
-  const hex = hexOf(sw);
+  const hex = hexOf(sw)
   return `<div class="sw" style="background:${hex};color:${sw.contrast}" title="${oklchTitle(sw)}">
-    <span class="lab">${label ?? ""}</span><span class="hex">${hex}</span></div>`;
+    <span class="lab">${label ?? ''}</span><span class="hex">${hex}</span></div>`
 }
 
 function paletteStrip(arr: BaseColorData[]): string {
-  return `<div class="strip">${arr.map((sw, i) => swatch(sw, String(i))).join("")}</div>`;
+  return `<div class="strip">${arr.map((sw, i) => swatch(sw, String(i))).join('')}</div>`
 }
 
 function uiGrid(arr: BaseColorData[]): string {
-  return `<div class="ui">${arr.map((sw) => swatch(sw, sw.code)).join("")}</div>`;
+  return `<div class="ui">${arr.map(sw => swatch(sw, sw.code)).join('')}</div>`
 }
 
 // code-mode preview ----------------------------------------------------------
 const semHex = (theme: any, key: string, fallback: string): string => {
-  const v = theme.semanticTokenColors?.[key];
-  if (!v) return fallback;
-  return typeof v === "string" ? v : (v.foreground ?? fallback);
-};
+  const v = theme.semanticTokenColors?.[key]
+  if (!v) return fallback
+  return typeof v === 'string' ? v : (v.foreground ?? fallback)
+}
 
 function codePreview(theme: any): string {
-  const bg = theme.colors["editor.background"];
-  const fg = theme.colors["editor.foreground"];
+  const bg = theme.colors['editor.background']
+  const fg = theme.colors['editor.foreground']
   const r = {
-    kw: semHex(theme, "keyword", fg),
-    str: semHex(theme, "string", fg),
-    cmt: semHex(theme, "comment", fg),
-    fn: semHex(theme, "function", fg),
-    ty: semHex(theme, "type", fg),
-    num: semHex(theme, "number", fg),
-    vr: semHex(theme, "variable", fg),
-    op: semHex(theme, "operator", fg),
-    prop: semHex(theme, "property", fg),
-    bool: semHex(theme, "boolean", fg),
-  };
-  const vars = `--kw:${r.kw};--str:${r.str};--cmt:${r.cmt};--fn:${r.fn};--ty:${r.ty};--num:${r.num};--vr:${r.vr};--op:${r.op};--prop:${r.prop};--bool:${r.bool}`;
+    kw: semHex(theme, 'keyword', fg),
+    str: semHex(theme, 'string', fg),
+    cmt: semHex(theme, 'comment', fg),
+    fn: semHex(theme, 'function', fg),
+    ty: semHex(theme, 'type', fg),
+    num: semHex(theme, 'number', fg),
+    vr: semHex(theme, 'variable', fg),
+    op: semHex(theme, 'operator', fg),
+    prop: semHex(theme, 'property', fg),
+    bool: semHex(theme, 'boolean', fg),
+  }
+  const vars = `--kw:${r.kw};--str:${r.str};--cmt:${r.cmt};--fn:${r.fn};--ty:${r.ty};--num:${r.num};--vr:${r.vr};--op:${r.op};--prop:${r.prop};--bool:${r.bool}`
   const code = [
     `<span class="cmt">// pricing — generated sample</span>`,
     `<span class="kw">import</span> { computeTotal } <span class="kw">from</span> <span class="str">"./cart"</span>`,
@@ -104,46 +104,46 @@ function codePreview(theme: any): string {
     ``,
     `<span class="kw">const</span> <span class="vr">config</span> <span class="op">=</span> { <span class="prop">active</span>: <span class="bool">true</span>, <span class="prop">name</span>: <span class="str">"cart"</span> }`,
     `<span class="kw">export const</span> <span class="vr">total</span> <span class="op">=</span> <span class="fn">priceFor</span>(<span class="str">"pro"</span>) <span class="op">*</span> (<span class="num">1</span> <span class="op">+</span> <span class="vr">TAX</span>)`,
-  ].join("\n");
-  return `<pre class="code" style="background:${bg};color:${fg};${vars}">${code}</pre>`;
+  ].join('\n')
+  return `<pre class="code" style="background:${bg};color:${fg};${vars}">${code}</pre>`
 }
 
 // ---- build sections --------------------------------------------------------
-let palettesHtml = "";
-let uiHtml = "";
-let codeHtml = "";
+let palettesHtml = ''
+let uiHtml = ''
+let codeHtml = ''
 
 for (const { id, name } of KINDS) {
   // palettes (current output)
-  let rows = "";
+  let rows = ''
   for (const style of STYLES) {
-    const pal = createPalettes(baseColor, id, style, SPACE) as BaseColorData[];
-    rows += `<div class="prow"><div class="styname">${style}</div>${paletteStrip(pal)}</div>`;
+    const pal = createPalettes(baseColor, id, style, SPACE) as BaseColorData[]
+    rows += `<div class="prow"><div class="styname">${style}</div>${paletteStrip(pal)}</div>`
   }
-  palettesHtml += `<h3>${name}</h3>${rows}`;
+  palettesHtml += `<h3>${name}</h3>${rows}`
 
   // ui tokens: light + dark (polished — the real output)
-  let uiBlocks = "";
+  let uiBlocks = ''
   for (const style of STYLES) {
-    const light = createPalettes(baseColor, id, style, SPACE, [0, 0, 0, 0], true, false) as BaseColorData[];
-    const dark = createPalettes(baseColor, id, style, SPACE, [0, 0, 0, 0], true, true) as BaseColorData[];
+    const light = createPalettes(baseColor, id, style, SPACE, [0, 0, 0, 0], true, false) as BaseColorData[]
+    const dark = createPalettes(baseColor, id, style, SPACE, [0, 0, 0, 0], true, true) as BaseColorData[]
     uiBlocks += `<div class="uiblock"><h4>${style}</h4>
       <div class="modecol"><span class="modelab">light</span>${uiGrid(light)}</div>
-      <div class="modecol"><span class="modelab">dark</span>${uiGrid(dark)}</div></div>`;
+      <div class="modecol"><span class="modelab">dark</span>${uiGrid(dark)}</div></div>`
   }
-  uiHtml += `<details><summary>${name}</summary>${uiBlocks}</details>`;
+  uiHtml += `<details><summary>${name}</summary>${uiBlocks}</details>`
 
   // code mode: light + dark
-  let codeBlocks = "";
+  let codeBlocks = ''
   for (const style of STYLES) {
-    const basePalette = createPalettes(baseColor, id, style, SPACE) as BaseColorData[];
-    const baseC = new Color(baseColor);
-    const lightTheme = generateCodeTheme(baseC, basePalette, false, id, style);
-    const darkTheme = generateCodeTheme(baseC, basePalette, true, id, style);
+    const basePalette = createPalettes(baseColor, id, style, SPACE) as BaseColorData[]
+    const baseC = new Color(baseColor)
+    const lightTheme = generateCodeTheme(baseC, basePalette, false, id, style)
+    const darkTheme = generateCodeTheme(baseC, basePalette, true, id, style)
     codeBlocks += `<div class="codeblock"><h4>${style}</h4>
-      <div class="codepair">${codePreview(lightTheme)}${codePreview(darkTheme)}</div></div>`;
+      <div class="codepair">${codePreview(lightTheme)}${codePreview(darkTheme)}</div></div>`
   }
-  codeHtml += `<details><summary>${name}</summary>${codeBlocks}</details>`;
+  codeHtml += `<details><summary>${name}</summary>${codeBlocks}</details>`
 }
 
 // ---- assemble --------------------------------------------------------------
@@ -185,7 +185,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8">
 </style></head><body>
   <h1>Color catalog</h1>
   <div class="base"><div class="chip" style="background:${baseColor}"></div>
-    <div><code>${baseColor}</code> &nbsp; ${baseOklch} &nbsp;·&nbsp; current output · polish <b>${POLISH.enabled ? "ON" : "OFF"}</b></div></div>
+    <div><code>${baseColor}</code> &nbsp; ${baseOklch} &nbsp;·&nbsp; current output · polish <b>${POLISH.enabled ? 'ON' : 'OFF'}</b></div></div>
 
   <h2>Palettes</h2>
   ${palettesHtml}
@@ -195,11 +195,11 @@ const html = `<!doctype html><html><head><meta charset="utf-8">
 
   <h2>Code mode — light &amp; dark</h2>
   ${codeHtml}
-</body></html>`;
+</body></html>`
 
-const here = dirname(fileURLToPath(import.meta.url));
-const slug = baseColor.replace(/[^0-9a-zA-Z]/g, "");
-const outArg = process.argv[3];
-const outPath = outArg ? resolve(process.cwd(), outArg) : resolve(here, `catalog-${slug}.html`);
-writeFileSync(outPath, html);
-console.log(`wrote ${outPath}`);
+const here = dirname(fileURLToPath(import.meta.url))
+const slug = baseColor.replace(/[^0-9a-zA-Z]/g, '')
+const outArg = process.argv[3]
+const outPath = outArg ? resolve(process.cwd(), outArg) : resolve(here, `catalog-${slug}.html`)
+writeFileSync(outPath, html)
+console.log(`wrote ${outPath}`)

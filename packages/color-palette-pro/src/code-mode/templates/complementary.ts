@@ -1,6 +1,13 @@
 import Color from 'colorjs.io'
 import type { BaseColorData, CodeThemeTemplate, SurfaceBundle, SyntaxColors } from '../types'
-import { adaptLightnessForText, adaptLightnessForQuiet, mixColors, shiftHue, tintTowardHue, boostChroma } from '../utils'
+import {
+  adaptLightnessForText,
+  adaptLightnessForQuiet,
+  mixColors,
+  shiftHue,
+  tintTowardHue,
+  boostChroma,
+} from '../utils'
 
 /**
  * Complementary — maximum two-hue tension.
@@ -28,15 +35,34 @@ export const complementaryTemplate: CodeThemeTemplate = {
     const baseHue = c0.oklch.h ?? 0
     const compHue = c1.oklch.h ?? baseHue
     const variableColor = adaptLightnessForQuiet(tintTowardHue(surfaces.onSurface, baseHue, 0.4), isDarkMode)
-    const propertyColor = adaptLightnessForQuiet(tintTowardHue(surfaces.onSurfaceVariant, baseHue, 0.5, 0.016), isDarkMode)
+    const propertyColor = adaptLightnessForQuiet(
+      tintTowardHue(surfaces.onSurfaceVariant, baseHue, 0.5, 0.016),
+      isDarkMode,
+    )
     // Operator brings a whisper of the complement into the punctuation glue — distinguishes the theme.
     const operatorColor = adaptLightnessForQuiet(mixColors(surfaces.outline, c1, 0.3), isDarkMode)
-    const punctuationColor = adaptLightnessForQuiet(tintTowardHue(surfaces.outlineVariant, baseHue, 0.2, 0.008), isDarkMode)
-    const commentColor = adaptLightnessForQuiet(tintTowardHue(surfaces.onSurfaceVariant, c3.oklch.h ?? baseHue, 0.4, 0.012), isDarkMode)
+    const punctuationColor = adaptLightnessForQuiet(
+      tintTowardHue(surfaces.outlineVariant, baseHue, 0.2, 0.008),
+      isDarkMode,
+    )
+    const commentColor = adaptLightnessForQuiet(
+      tintTowardHue(surfaces.onSurfaceVariant, c3.oklch.h ?? baseHue, 0.4, 0.012),
+      isDarkMode,
+    )
 
     return {
-      definitionColor, keywordColor, typeColor, stringColor, numberColor, regexColor, accentColor,
-      variableColor, propertyColor, operatorColor, punctuationColor, commentColor,
+      definitionColor,
+      keywordColor,
+      typeColor,
+      stringColor,
+      numberColor,
+      regexColor,
+      accentColor,
+      variableColor,
+      propertyColor,
+      operatorColor,
+      punctuationColor,
+      commentColor,
     }
   },
 

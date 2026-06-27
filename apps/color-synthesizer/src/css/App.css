@@ -11,13 +11,19 @@
   max-width: 1180px;
   container: synth / inline-size;
   background-image: url('/noise.svg'), var(--synth-body);
-  background-size: 200px 200px, auto;
+  background-size:
+    200px 200px,
+    auto;
   border-radius: var(--radius);
-  box-shadow: inset 0 1px 1px #eaeaf2, var(--shadow-elevation-high);
+  box-shadow:
+    inset 0 1px 1px #eaeaf2,
+    var(--shadow-elevation-high);
 }
 
 [data-mode='dark'] .synth-container {
-  box-shadow: inset 0 1px 1px hsl(248deg 11% 35%), var(--shadow-elevation-high);
+  box-shadow:
+    inset 0 1px 1px hsl(248deg 11% 35%),
+    var(--shadow-elevation-high);
 }
 
 .synth-body {

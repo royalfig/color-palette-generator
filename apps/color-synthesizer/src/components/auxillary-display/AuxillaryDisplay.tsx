@@ -92,7 +92,7 @@ function PaletteDetails({
 
   // UI mode: 24×10 semantically-grouped grid, label-only rendering.
   if (mode === 'ui') {
-    const byCode = new Map(palette.map((c) => [c.code, c]))
+    const byCode = new Map(palette.map(c => [c.code, c]))
     return (
       <div className="palette-details palette-details-ui" ref={scope}>
         {UI_TOKEN_LAYOUT.map(({ code, span }) => {
@@ -101,11 +101,13 @@ function PaletteDetails({
           return (
             <div
               key={code}
-              style={{
-                '--bg': color.cssValue,
-                '--color': color.contrast,
-                gridColumn: `span ${span}`,
-              } as React.CSSProperties}
+              style={
+                {
+                  '--bg': color.cssValue,
+                  '--color': color.contrast,
+                  gridColumn: `span ${span}`,
+                } as React.CSSProperties
+              }
               className="palette-detail"
               data-color-value={color.conversions[colorSpace.format].value}
               onClick={handleColorClick}
@@ -208,7 +210,7 @@ function CodeThemeDetails({ codeTheme }: { codeTheme: CodeThemeOutput }) {
       ref={scope}
       style={{ '--items': Math.min(tokens.length / 2, 6) } as React.CSSProperties}
     >
-      {tokens.map((token) => (
+      {tokens.map(token => (
         <div
           key={token.label}
           style={{ '--bg': token.value, '--color': contrastHex(token.value) } as React.CSSProperties}

@@ -1,4 +1,4 @@
-@import "reset.css";
+@import url('reset.css');
 
 :root {
   --radius: 0.625rem;
@@ -20,26 +20,27 @@
 }
 
 body {
-  background: var(--color-surface);
-  color: var(--color-on-surface);
   font-family: montreal, sans-serif;
   font-variant-ligatures: discretionary-ligatures;
+  color: var(--color-on-surface);
+  background: var(--color-surface);
 }
 
-:root[data-style="diamond"] {
+:root[data-style='diamond'] {
   --light-angle: -30deg;
   --shadow-strength: 0.5;
 }
 
 /* Reset default <pre> margin so Shiki output sits flush in its container */
-/*.shiki {
+
+/* .shiki {
   margin: 0;
-}*/
+} */
 
 .container {
-  height: 100dvh;
   display: grid;
   place-items: center;
+  height: 100dvh;
   padding: 1rem;
 }
 
@@ -50,31 +51,31 @@ pre {
 
 @font-face {
   font-family: montreal;
-  src: url("./assets/PPNeueMontreal-Regular.woff2") format("woff2");
+  src: url('./assets/PPNeueMontreal-Regular.woff2') format('woff2');
 }
 
 @font-face {
   font-family: code;
   font-style: italic;
-  src: url("./assets/PPNeueMontrealMono-RegularItalic.woff2") format("woff2");
+  src: url('./assets/PPNeueMontrealMono-RegularItalic.woff2') format('woff2');
 }
 
 @font-face {
   font-family: code;
   font-weight: bold;
-  src: url("./assets/PPNeueMontrealMono-Bold.woff2") format("woff2");
+  src: url('./assets/PPNeueMontrealMono-Bold.woff2') format('woff2');
 }
 
 @font-face {
   font-family: code;
-  font-weight: bold;
   font-style: italic;
-  src: url("./assets/PPNeueMontrealMono-BoldItalic.woff2") format("woff2");
+  font-weight: bold;
+  src: url('./assets/PPNeueMontrealMono-BoldItalic.woff2') format('woff2');
 }
 
 @font-face {
   font-family: code;
-  src: url("./assets/PPNeueMontrealMono-Regular.woff2") format("woff2");
+  src: url('./assets/PPNeueMontrealMono-Regular.woff2') format('woff2');
 }
 
 .cc-start {
@@ -86,6 +87,6 @@ pre {
 }
 
 ::selection {
-  background-color: var(--color-primary-container);
   color: var(--color-on-primary-container);
+  background-color: var(--color-primary-container);
 }
