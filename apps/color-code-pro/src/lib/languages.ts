@@ -1,4 +1,4 @@
-import type { LanguageInput } from "shiki";
+import type { LanguageInput } from 'shiki'
 
 /**
  * Single source of truth for every language the app supports.
@@ -16,19 +16,19 @@ import type { LanguageInput } from "shiki";
  * - `sample` is the placeholder code shown when the language is first selected.
  */
 export type LanguageDef = {
-  id: string;
-  label: string;
-  load: () => LanguageInput;
-  prettier?: string;
-  sample?: string;
-};
+  id: string
+  label: string
+  load: () => LanguageInput
+  prettier?: string
+  sample?: string
+}
 
 export const LANGUAGES: LanguageDef[] = [
   {
-    id: "typescript",
-    label: "TS",
-    load: () => import("@shikijs/langs/typescript"),
-    prettier: "typescript",
+    id: 'typescript',
+    label: 'TS',
+    load: () => import('@shikijs/langs/typescript'),
+    prettier: 'typescript',
     sample: `const greet = (name: string): string => {
   return \`Hello, \${name}!\`;
 };
@@ -36,10 +36,10 @@ export const LANGUAGES: LanguageDef[] = [
 console.log(greet("world"));`,
   },
   {
-    id: "tsx",
-    label: "TSX",
-    load: () => import("@shikijs/langs/tsx"),
-    prettier: "typescript",
+    id: 'tsx',
+    label: 'TSX',
+    load: () => import('@shikijs/langs/tsx'),
+    prettier: 'typescript',
     sample: `function Greeting({ name }: { name: string }) {
   return <h1>Hello, {name}!</h1>;
 }
@@ -47,10 +47,10 @@ console.log(greet("world"));`,
 export default Greeting;`,
   },
   {
-    id: "javascript",
-    label: "JS",
-    load: () => import("@shikijs/langs/javascript"),
-    prettier: "babel",
+    id: 'javascript',
+    label: 'JS',
+    load: () => import('@shikijs/langs/javascript'),
+    prettier: 'babel',
     sample: `const greet = (name) => {
   return \`Hello, \${name}!\`;
 };
@@ -58,10 +58,10 @@ export default Greeting;`,
 console.log(greet("world"));`,
   },
   {
-    id: "jsx",
-    label: "JSX",
-    load: () => import("@shikijs/langs/jsx"),
-    prettier: "babel",
+    id: 'jsx',
+    label: 'JSX',
+    load: () => import('@shikijs/langs/jsx'),
+    prettier: 'babel',
     sample: `function Greeting({ name }) {
   return <h1 className="title">Hello, {name}!</h1>;
 }
@@ -69,18 +69,18 @@ console.log(greet("world"));`,
 export default Greeting;`,
   },
   {
-    id: "python",
-    label: "PY",
-    load: () => import("@shikijs/langs/python"),
+    id: 'python',
+    label: 'PY',
+    load: () => import('@shikijs/langs/python'),
     sample: `def greet(name: str) -> str:
     return f"Hello, {name}!"
 
 print(greet("world"))`,
   },
   {
-    id: "go",
-    label: "Go",
-    load: () => import("@shikijs/langs/go"),
+    id: 'go',
+    label: 'Go',
+    load: () => import('@shikijs/langs/go'),
     sample: `package main
 
 import "fmt"
@@ -90,9 +90,9 @@ func main() {
 }`,
   },
   {
-    id: "rust",
-    label: "Rust",
-    load: () => import("@shikijs/langs/rust"),
+    id: 'rust',
+    label: 'Rust',
+    load: () => import('@shikijs/langs/rust'),
     sample: `fn greet(name: &str) -> String {
     format!("Hello, {name}!")
 }
@@ -102,9 +102,9 @@ fn main() {
 }`,
   },
   {
-    id: "java",
-    label: "Java",
-    load: () => import("@shikijs/langs/java"),
+    id: 'java',
+    label: 'Java',
+    load: () => import('@shikijs/langs/java'),
     sample: `public class Main {
     public static void main(String[] args) {
         String name = "world";
@@ -113,9 +113,9 @@ fn main() {
 }`,
   },
   {
-    id: "c",
-    label: "C",
-    load: () => import("@shikijs/langs/c"),
+    id: 'c',
+    label: 'C',
+    load: () => import('@shikijs/langs/c'),
     sample: `#include <stdio.h>
 
 int main(void) {
@@ -124,9 +124,9 @@ int main(void) {
 }`,
   },
   {
-    id: "cpp",
-    label: "C++",
-    load: () => import("@shikijs/langs/cpp"),
+    id: 'cpp',
+    label: 'C++',
+    load: () => import('@shikijs/langs/cpp'),
     sample: `#include <iostream>
 
 int main() {
@@ -136,9 +136,9 @@ int main() {
 }`,
   },
   {
-    id: "csharp",
-    label: "C#",
-    load: () => import("@shikijs/langs/csharp"),
+    id: 'csharp',
+    label: 'C#',
+    load: () => import('@shikijs/langs/csharp'),
     sample: `using System;
 
 class Program {
@@ -149,9 +149,9 @@ class Program {
 }`,
   },
   {
-    id: "ruby",
-    label: "Ruby",
-    load: () => import("@shikijs/langs/ruby"),
+    id: 'ruby',
+    label: 'Ruby',
+    load: () => import('@shikijs/langs/ruby'),
     sample: `def greet(name)
   "Hello, #{name}!"
 end
@@ -159,9 +159,9 @@ end
 puts greet("world")`,
   },
   {
-    id: "php",
-    label: "PHP",
-    load: () => import("@shikijs/langs/php"),
+    id: 'php',
+    label: 'PHP',
+    load: () => import('@shikijs/langs/php'),
     sample: `<?php
 
 function greet(string $name): string {
@@ -171,9 +171,9 @@ function greet(string $name): string {
 echo greet("world");`,
   },
   {
-    id: "kotlin",
-    label: "Kotlin",
-    load: () => import("@shikijs/langs/kotlin"),
+    id: 'kotlin',
+    label: 'Kotlin',
+    load: () => import('@shikijs/langs/kotlin'),
     sample: `fun greet(name: String): String {
     return "Hello, $name!"
 }
@@ -183,9 +183,9 @@ fun main() {
 }`,
   },
   {
-    id: "swift",
-    label: "Swift",
-    load: () => import("@shikijs/langs/swift"),
+    id: 'swift',
+    label: 'Swift',
+    load: () => import('@shikijs/langs/swift'),
     sample: `func greet(_ name: String) -> String {
     return "Hello, \\(name)!"
 }
@@ -193,9 +193,9 @@ fun main() {
 print(greet("world"))`,
   },
   {
-    id: "sql",
-    label: "SQL",
-    load: () => import("@shikijs/langs/sql"),
+    id: 'sql',
+    label: 'SQL',
+    load: () => import('@shikijs/langs/sql'),
     sample: `SELECT id, name, email
 FROM users
 WHERE active = true
@@ -203,10 +203,10 @@ ORDER BY created_at DESC
 LIMIT 10;`,
   },
   {
-    id: "html",
-    label: "HTML",
-    load: () => import("@shikijs/langs/html"),
-    prettier: "html",
+    id: 'html',
+    label: 'HTML',
+    load: () => import('@shikijs/langs/html'),
+    prettier: 'html',
     sample: `<!doctype html>
 <html lang="en">
   <head>
@@ -218,10 +218,10 @@ LIMIT 10;`,
 </html>`,
   },
   {
-    id: "css",
-    label: "CSS",
-    load: () => import("@shikijs/langs/css"),
-    prettier: "css",
+    id: 'css',
+    label: 'CSS',
+    load: () => import('@shikijs/langs/css'),
+    prettier: 'css',
     sample: `.container {
   display: flex;
   gap: 1rem;
@@ -229,10 +229,10 @@ LIMIT 10;`,
 }`,
   },
   {
-    id: "scss",
-    label: "SCSS",
-    load: () => import("@shikijs/langs/scss"),
-    prettier: "scss",
+    id: 'scss',
+    label: 'SCSS',
+    load: () => import('@shikijs/langs/scss'),
+    prettier: 'scss',
     sample: `$primary: #6c5ce7;
 
 .button {
@@ -244,10 +244,10 @@ LIMIT 10;`,
 }`,
   },
   {
-    id: "vue",
-    label: "Vue",
-    load: () => import("@shikijs/langs/vue"),
-    prettier: "vue",
+    id: 'vue',
+    label: 'Vue',
+    load: () => import('@shikijs/langs/vue'),
+    prettier: 'vue',
     sample: `<script setup>
 import { ref } from "vue";
 
@@ -259,9 +259,9 @@ const count = ref(0);
 </template>`,
   },
   {
-    id: "svelte",
-    label: "Svelte",
-    load: () => import("@shikijs/langs/svelte"),
+    id: 'svelte',
+    label: 'Svelte',
+    load: () => import('@shikijs/langs/svelte'),
     sample: `<script>
   let count = 0;
 </script>
@@ -271,9 +271,9 @@ const count = ref(0);
 </button>`,
   },
   {
-    id: "astro",
-    label: "Astro",
-    load: () => import("@shikijs/langs/astro"),
+    id: 'astro',
+    label: 'Astro',
+    load: () => import('@shikijs/langs/astro'),
     sample: `---
 const name = "world";
 ---
@@ -281,10 +281,10 @@ const name = "world";
 <h1>Hello, {name}!</h1>`,
   },
   {
-    id: "markdown",
-    label: "MD",
-    load: () => import("@shikijs/langs/markdown"),
-    prettier: "markdown",
+    id: 'markdown',
+    label: 'MD',
+    load: () => import('@shikijs/langs/markdown'),
+    prettier: 'markdown',
     sample: `# Hello
 
 A **bold** idea with \`inline code\`.
@@ -295,10 +295,10 @@ A **bold** idea with \`inline code\`.
 > A blockquote.`,
   },
   {
-    id: "graphql",
-    label: "GraphQL",
-    load: () => import("@shikijs/langs/graphql"),
-    prettier: "graphql",
+    id: 'graphql',
+    label: 'GraphQL',
+    load: () => import('@shikijs/langs/graphql'),
+    prettier: 'graphql',
     sample: `type User {
   id: ID!
   name: String!
@@ -312,10 +312,10 @@ query GetUser {
 }`,
   },
   {
-    id: "json",
-    label: "JSON",
-    load: () => import("@shikijs/langs/json"),
-    prettier: "json",
+    id: 'json',
+    label: 'JSON',
+    load: () => import('@shikijs/langs/json'),
+    prettier: 'json',
     sample: `{
   "name": "my-app",
   "version": "1.0.0",
@@ -325,10 +325,10 @@ query GetUser {
 }`,
   },
   {
-    id: "yaml",
-    label: "YAML",
-    load: () => import("@shikijs/langs/yaml"),
-    prettier: "yaml",
+    id: 'yaml',
+    label: 'YAML',
+    load: () => import('@shikijs/langs/yaml'),
+    prettier: 'yaml',
     sample: `name: my-app
 version: 1.0.0
 scripts:
@@ -336,9 +336,9 @@ scripts:
   build: tsc && vite build`,
   },
   {
-    id: "toml",
-    label: "TOML",
-    load: () => import("@shikijs/langs/toml"),
+    id: 'toml',
+    label: 'TOML',
+    load: () => import('@shikijs/langs/toml'),
     sample: `[package]
 name = "my-app"
 version = "1.0.0"
@@ -347,9 +347,9 @@ version = "1.0.0"
 serde = { version = "1.0", features = ["derive"] }`,
   },
   {
-    id: "xml",
-    label: "XML",
-    load: () => import("@shikijs/langs/xml"),
+    id: 'xml',
+    label: 'XML',
+    load: () => import('@shikijs/langs/xml'),
     sample: `<?xml version="1.0" encoding="UTF-8"?>
 <note>
   <to>World</to>
@@ -358,9 +358,9 @@ serde = { version = "1.0", features = ["derive"] }`,
 </note>`,
   },
   {
-    id: "bash",
-    label: "BASH",
-    load: () => import("@shikijs/langs/bash"),
+    id: 'bash',
+    label: 'BASH',
+    load: () => import('@shikijs/langs/bash'),
     sample: `#!/usr/bin/env bash
 set -e
 
@@ -368,9 +368,9 @@ echo "Hello, world!"
 ls -la`,
   },
   {
-    id: "docker",
-    label: "Docker",
-    load: () => import("@shikijs/langs/docker"),
+    id: 'docker',
+    label: 'Docker',
+    load: () => import('@shikijs/langs/docker'),
     sample: `FROM node:20-alpine
 WORKDIR /app
 COPY package.json .
@@ -378,9 +378,9 @@ RUN npm install
 CMD ["npm", "start"]`,
   },
   {
-    id: "diff",
-    label: "Diff",
-    load: () => import("@shikijs/langs/diff"),
+    id: 'diff',
+    label: 'Diff',
+    load: () => import('@shikijs/langs/diff'),
     sample: `--- a/greet.ts
 +++ b/greet.ts
 @@ -1,3 +1,3 @@
@@ -388,25 +388,24 @@ CMD ["npm", "start"]`,
 +const greeting = "Hello";
  console.log(greeting);`,
   },
-];
+]
 
 /** Dropdown labels, keyed by language id, alphabetized by label for display. */
 export const LANG_SHORT: Record<string, string> = Object.fromEntries(
   [...LANGUAGES]
-    .sort((a, b) => a.label.localeCompare(b.label, "en", { sensitivity: "base" }))
-    .map((l) => [l.id, l.label]),
-);
+    .sort((a, b) => a.label.localeCompare(b.label, 'en', { sensitivity: 'base' }))
+    .map(l => [l.id, l.label]),
+)
 
 /** Prettier parser per language id, for languages that support formatting. */
 export const LANG_PRETTIER: Record<string, string> = Object.fromEntries(
-  LANGUAGES.filter((l) => l.prettier).map((l) => [l.id, l.prettier!]),
-);
+  LANGUAGES.filter(l => l.prettier).map(l => [l.id, l.prettier!]),
+)
 
 /** Placeholder sample per language id. */
 export const LANG_PLACEHOLDER: Record<string, string> = Object.fromEntries(
-  LANGUAGES.filter((l) => l.sample).map((l) => [l.id, l.sample!]),
-);
+  LANGUAGES.filter(l => l.sample).map(l => [l.id, l.sample!]),
+)
 
 /** Lazy grammar loaders per language id, consumed by `ensureLanguage`. */
-export const LANG_LOADERS: Record<string, () => LanguageInput> =
-  Object.fromEntries(LANGUAGES.map((l) => [l.id, l.load]));
+export const LANG_LOADERS: Record<string, () => LanguageInput> = Object.fromEntries(LANGUAGES.map(l => [l.id, l.load]))

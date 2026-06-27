@@ -185,11 +185,7 @@ export function ColorDisplay({
               color={context.palette[0]?.color?.clone()?.to('lch')?.set({ l: 80 })?.display() || 'var(--dimmed)'}
             />
           ) : context.mode === 'code' ? (
-            <CodeSimpleIcon
-              weight="fill"
-              size={14}
-              color="var(--base-color)"
-            />
+            <CodeSimpleIcon weight="fill" size={14} color="var(--base-color)" />
           ) : (
             <PaletteIcon
               weight="fill"
@@ -225,7 +221,9 @@ export function ColorDisplay({
           <FadersHorizontalIcon
             weight="fill"
             color={
-              effectsEnabled && context.palette[3] ? context.palette[3].color.clone().to('lch').set({ l: 80 }).display() : 'var(--dimmed)'
+              effectsEnabled && context.palette[3]
+                ? context.palette[3].color.clone().to('lch').set({ l: 80 }).display()
+                : 'var(--dimmed)'
             }
             size={14}
           />

@@ -1,13 +1,13 @@
-import { type RefObject, type ChangeEvent } from "react";
-import "./Editor.css";
+import { type RefObject, type ChangeEvent } from 'react'
+import './Editor.css'
 
 interface EditorProps {
-  editorBg: string;
-  renderedHtml: string | null;
-  textRef: RefObject<HTMLTextAreaElement | null>;
-  onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
-  lineCol: string;
-  defaultValue?: string;
+  editorBg: string
+  renderedHtml: string | null
+  textRef: RefObject<HTMLTextAreaElement | null>
+  onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void
+  lineCol: string
+  defaultValue?: string
 }
 
 export function Editor({
@@ -27,10 +27,7 @@ export function Editor({
         } as React.CSSProperties
       }
     >
-      <div
-        className="cc-editor-preview"
-        dangerouslySetInnerHTML={{ __html: renderedHtml || "" }}
-      />
+      <div className="cc-editor-preview" dangerouslySetInnerHTML={{ __html: renderedHtml || '' }} />
       <textarea
         id="cc-editor-textarea"
         ref={textRef}
@@ -40,5 +37,5 @@ export function Editor({
         defaultValue={defaultValue}
       />
     </div>
-  );
+  )
 }

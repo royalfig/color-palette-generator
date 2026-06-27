@@ -1,61 +1,62 @@
 .Positioner {
   width: var(--positioner-width);
-  height: var(--positioner-height);
   max-width: var(--available-width);
+  height: var(--positioner-height);
 }
 
 .cc-color-swatch {
+  flex-shrink: 0;
   width: 1rem;
   height: 1rem;
-  flex-shrink: 0;
+  border: 1.5px solid oklch(from var(--color-outline) l c h / 50%);
   border-radius: 50%;
-  border: 1.5px solid oklch(from var(--color-outline) l c h / 0.5);
 }
 
 /* Hex input inside popover */
 .cc-color-input {
-  margin-top: 0.5rem;
+  box-sizing: border-box;
   width: 100%;
   padding: 0.375rem 0.5rem;
-  border-radius: var(--radius-md);
-  border: 1px solid oklch(from var(--color-outline) l c h / 0.25);
-  background: var(--color-container-sunken);
-  color: var(--color-on-surface);
+  margin-top: 0.5rem;
   font-family: code, monospace;
   font-size: 0.8125rem;
+  color: var(--color-on-surface);
   text-align: center;
-  box-sizing: border-box;
   outline: none;
+  background: var(--color-container-sunken);
+  border: 1px solid oklch(from var(--color-outline) l c h / 25%);
+  border-radius: var(--radius-md);
 }
+
 .cc-color-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px
-    color-mix(in srgb, var(--color-primary) 25%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 25%, transparent);
 }
 
 .cc-popup {
-  box-sizing: border-box;
   position: relative;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  width: var(--popup-width, auto);
+  min-width: 10rem;
+  max-width: 500px;
+  height: var(--popup-height, auto);
   padding: 0.75rem;
-  outline: none;
-  /*border: 1px solid var(--color-outline);*/
-  border-radius: var(--radius-md);
-  background-color: var(--color-container);
   color: var(--color-on-surface);
+  outline: none;
+  background-color: var(--color-container);
+
+  /* border: 1px solid var(--color-outline); */
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-elevation-high);
   transform-origin: var(--transform-origin);
   transition:
     transform 100ms ease-out,
     opacity 100ms ease-out;
-  width: var(--popup-width, auto);
-  height: var(--popup-height, auto);
-  max-width: 500px;
-  min-width: 10rem;
 
-  [data-style="diamond"] & {
+  [data-style='diamond'] & {
     border: 1px solid var(--color-outline);
     box-shadow: var(--shadow-elevation-medium);
   }

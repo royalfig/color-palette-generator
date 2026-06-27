@@ -70,19 +70,17 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
   )
 
   const paletteValues = useMemo(
-    () => sortedPalette.map((color, idx) => ({
-      ...getCirclePosition(color, idx, type),
-      fill: sortedPalette[idx].cssValue,
-      filter: getElevationFilter(getCirclePosition(color, idx, type).l),
-    })),
+    () =>
+      sortedPalette.map((color, idx) => ({
+        ...getCirclePosition(color, idx, type),
+        fill: sortedPalette[idx].cssValue,
+        filter: getElevationFilter(getCirclePosition(color, idx, type).l),
+      })),
     [sortedPalette, type],
   )
 
-   const paletteKey = useMemo(
-    () => `${type}:${sortedPalette.map(p => p.cssValue).join('|')}`,
-    [sortedPalette, type],
-  )
-  
+  const paletteKey = useMemo(() => `${type}:${sortedPalette.map(p => p.cssValue).join('|')}`, [sortedPalette, type])
+
   // High-performance CSS transition approach for SVG circles
   // Modern browsers support CSS transitions on SVG attributes (cx, cy, fill)
   useEffect(() => {
@@ -154,15 +152,7 @@ export function Circle({ type = 'default' }: { type: 'default' | 'circle' }) {
         {/* Animated color circles */}
         {/* Using CSS transitions for SVG attributes - much more performant than JS animations */}
         {paletteValues.map(({ cx, cy, fill, filter }, idx) => (
-          <circle
-            key={`circle-${idx}`}
-            className="circle-item"
-            cx={cx}
-            cy={cy}
-            fill={fill}
-            filter={filter}
-            r={18}
-          />
+          <circle key={`circle-${idx}`} className="circle-item" cx={cx} cy={cy} fill={fill} filter={filter} r={18} />
         ))}
       </svg>
     </div>

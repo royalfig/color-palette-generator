@@ -3,11 +3,7 @@ import { brightAnsiHex, brightWhiteHex } from '../utils'
 
 function hexToFloats(hex: string): [number, number, number] {
   const h = hex.startsWith('#') ? hex.slice(1) : hex
-  return [
-    parseInt(h.slice(0, 2), 16) / 255,
-    parseInt(h.slice(2, 4), 16) / 255,
-    parseInt(h.slice(4, 6), 16) / 255,
-  ]
+  return [parseInt(h.slice(0, 2), 16) / 255, parseInt(h.slice(2, 4), 16) / 255, parseInt(h.slice(4, 6), 16) / 255]
 }
 
 function colorDict(hex: string): string {

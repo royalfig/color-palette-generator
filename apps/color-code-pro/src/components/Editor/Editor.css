@@ -1,54 +1,55 @@
 .cc-editor {
   position: relative;
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  max-width: 100%;
+  height: auto;
   min-height: 15rem;
+  aspect-ratio: 2.5;
+  overflow: auto;
   font-family: code, monospace;
   font-size: 0.875rem;
   line-height: 1.5rem;
-  max-width: 100%;
-  overflow: auto;
-  aspect-ratio: 2.5;
-  height: auto;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 1fr;
   scrollbar-color: var(--color-outline) var(--color-container);
 }
 
 .cc-editor-preview,
 .cc-editor-textarea {
-  grid-column: 1;
   grid-row: 1;
+  grid-column: 1;
   overflow: clip;
 
-  [data-style="diamond"] & {
-    border-left: 1px solid var(--color-outline);
+  [data-style='diamond'] & {
     border-right: 1px solid var(--color-outline);
+    border-left: 1px solid var(--color-outline);
   }
 }
 
 .cc-editor-preview {
-  font-family: code, monospace;
   position: relative;
   width: 100%;
   height: 100%;
   padding: 1rem;
+  font-family: code, monospace;
 }
 
 .cc-editor-textarea {
-  /*position: absolute;
-  inset: 0;*/
+  z-index: 10;
+
+  /* position: absolute;
+  inset: 0; */
   width: 100%;
   height: 100%;
-  z-index: 10;
-  background: transparent;
-  color: transparent;
-  caret-color: var(--color-primary);
-  resize: none;
+  padding: 1rem;
   font-family: code, monospace;
   font-size: 0.875rem;
   line-height: 1.5rem;
-  padding: 1rem;
-  border: none;
-  outline: none;
+  color: transparent;
   white-space: pre;
+  caret-color: var(--color-primary);
+  resize: none;
+  outline: none;
+  background: transparent;
+  border: none;
 }

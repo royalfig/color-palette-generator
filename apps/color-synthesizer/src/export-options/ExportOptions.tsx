@@ -21,7 +21,12 @@ function downloadAction(
   paletteStyle: 'square' | 'triangle' | 'circle' | 'diamond',
   cb: (msg: string, type: 'success' | 'error') => void,
 ) {
-  const paletteAsCss = generateCssVariables(palette, { format: colorFormat, isUiMode, wrapper: 'root', style: paletteStyle })
+  const paletteAsCss = generateCssVariables(palette, {
+    format: colorFormat,
+    isUiMode,
+    wrapper: 'root',
+    style: paletteStyle,
+  })
   const filename = `${paletteTitle?.toLowerCase().replace(/\W/g, '-') || 'color-palette-pro'}.css`
   const type = 'text'
 
@@ -121,7 +126,7 @@ function downloadPaletteAsImage(
           )
         }
 
-       const colorValue = color.conversions[colorFormat].value
+        const colorValue = color.conversions[colorFormat].value
         if (isUiMode) {
           const maxWidth = squareSize * 0.9
           ctx.font = '12px system-ui'
@@ -223,7 +228,11 @@ function downloadCodeThemeAsImage(
 
     let colorValue = hex
     if (colorFormat !== 'hex') {
-      try { colorValue = new Color(hex).toString({ format: colorFormat as any, precision: 3 }) } catch { /* keep hex */ }
+      try {
+        colorValue = new Color(hex).toString({ format: colorFormat as any, precision: 3 })
+      } catch {
+        /* keep hex */
+      }
     }
     ctx.font = '12px system-ui'
     if (ctx.measureText(colorValue).width > maxWidth) ctx.font = '10px system-ui'
@@ -240,7 +249,11 @@ function downloadCodeThemeAsImage(
   cb('Preview created', 'success')
 }
 
-function downloadCodeTheme(theme: CodeThemeOutput, paletteTitle: string, cb: (msg: string, type: 'success' | 'error') => void) {
+function downloadCodeTheme(
+  theme: CodeThemeOutput,
+  paletteTitle: string,
+  cb: (msg: string, type: 'success' | 'error') => void,
+) {
   const json = JSON.stringify(theme, null, 2)
   const filename = `${paletteTitle?.toLowerCase().replace(/\W/g, '-') || 'color-palette-pro'}.json`
   const blob = new Blob([json], { type: 'application/json' })
@@ -277,7 +290,11 @@ export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: Ex
       if (codeTheme) copyCodeTheme(codeTheme, showMessage)
       return
     }
-    const paletteAsCss = generateCssVariables(palette, { format: colorFormat, isUiMode: mode === 'ui', style: paletteStyle })
+    const paletteAsCss = generateCssVariables(palette, {
+      format: colorFormat,
+      isUiMode: mode === 'ui',
+      style: paletteStyle,
+    })
     navigator.clipboard.writeText(paletteAsCss)
     showMessage('Palette copied', 'success')
   }
@@ -318,10 +335,18 @@ export function ExportOptions({ fetchedData, isLoading, error, colorFormat }: Ex
 
   function handleFileDownload() {
     if (mode === 'code') {
-      if (codeTheme) downloadCodeTheme(codeTheme, colorNames.fetchedData?.paletteTitle || 'color-palette-pro', showMessage)
+      if (codeTheme)
+        downloadCodeTheme(codeTheme, colorNames.fetchedData?.paletteTitle || 'color-palette-pro', showMessage)
       return
     }
-    downloadAction(palette, colorNames.fetchedData?.paletteTitle || 'Palette', colorFormat, mode === 'ui', paletteStyle, showMessage)
+    downloadAction(
+      palette,
+      colorNames.fetchedData?.paletteTitle || 'Palette',
+      colorFormat,
+      mode === 'ui',
+      paletteStyle,
+      showMessage,
+    )
   }
 
   return (

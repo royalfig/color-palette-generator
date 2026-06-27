@@ -1,7 +1,7 @@
-import path from "path";
-import react, { reactCompilerPreset } from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
-import babel from "@rolldown/plugin-babel";
+import path from 'path'
+import react, { reactCompilerPreset } from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
+import babel from '@rolldown/plugin-babel'
 
 export default defineConfig({
   plugins: [
@@ -12,10 +12,10 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
     },
   },
   server: {
     port: 5174,
   },
-});
+})

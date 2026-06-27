@@ -34,16 +34,12 @@ const MATRICES: Record<CvdType, number[][]> = {
 /** Simulate how `color` appears to a viewer with the given dichromacy. */
 export function simulateCvd(color: Color, type: CvdType): Color {
   const srgb = color.to('srgb').toGamut({ space: 'srgb' })
-  const [r, g, b] = srgb.coords.map((v) => Math.max(0, Math.min(1, v ?? 0)))
+  const [r, g, b] = srgb.coords.map(v => Math.max(0, Math.min(1, v ?? 0)))
   const m = MATRICES[type]
   const nr = m[0][0] * r + m[0][1] * g + m[0][2] * b
   const ng = m[1][0] * r + m[1][1] * g + m[1][2] * b
   const nb = m[2][0] * r + m[2][1] * g + m[2][2] * b
-  return new Color('srgb', [
-    Math.max(0, Math.min(1, nr)),
-    Math.max(0, Math.min(1, ng)),
-    Math.max(0, Math.min(1, nb)),
-  ])
+  return new Color('srgb', [Math.max(0, Math.min(1, nr)), Math.max(0, Math.min(1, ng)), Math.max(0, Math.min(1, nb))])
 }
 
 /**

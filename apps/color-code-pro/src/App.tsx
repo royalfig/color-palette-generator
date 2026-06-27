@@ -1,5 +1,5 @@
-import { ThemeProvider } from "@/context/themeProvider";
-import { Container } from "@/components/Container/Container";
+import { ThemeProvider } from '@/context/themeProvider'
+import { Container } from '@/components/Container/Container'
 
 export default function App() {
   return (
@@ -8,5 +8,5 @@ export default function App() {
         <Container />
       </div>
     </ThemeProvider>
-  );
+  )
 }

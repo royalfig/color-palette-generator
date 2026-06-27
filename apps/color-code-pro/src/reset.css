@@ -18,12 +18,14 @@
 }
 
 body {
-  /* 4. Increase line-height */
-  line-height: 1.5;
-  /* 5. Improve text rendering */
-  -webkit-font-smoothing: antialiased;
   /* Base UI requirement to work on Safari mobile */
   position: relative;
+
+  /* 4. Increase line-height */
+  line-height: 1.5;
+
+  /* 5. Improve text rendering */
+  -webkit-font-smoothing: antialiased;
 }
 
 /* 6. Improve media defaults */
@@ -64,6 +66,7 @@ h6 {
 p {
   text-wrap: pretty;
 }
+
 h1,
 h2,
 h3,

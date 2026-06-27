@@ -1,15 +1,24 @@
 import Color from 'colorjs.io'
 import type { SyntaxColors } from './types'
 import {
-  LOUD_ROLES, DISTINCT_ROLES_BY_FREQ, RED_SENSITIVE_ROLES,
-  IDENTIFIER_ROLES, STRUCTURAL_ROLES, STRUCTURAL_C_MAX, COMMENT_C_MAX,
-  APCA_TARGET_LOUD, APCA_TARGET_QUIET, APCA_COMMENT_MIN, APCA_COMMENT_MAX_DARK, APCA_COMMENT_MAX_LIGHT,
-  READABILITY_BAND, HERO_ROLE, HERO_CHROMA_GAP, type ReadBand,
+  LOUD_ROLES,
+  DISTINCT_ROLES_BY_FREQ,
+  RED_SENSITIVE_ROLES,
+  IDENTIFIER_ROLES,
+  STRUCTURAL_ROLES,
+  STRUCTURAL_C_MAX,
+  COMMENT_C_MAX,
+  APCA_TARGET_LOUD,
+  APCA_TARGET_QUIET,
+  APCA_COMMENT_MIN,
+  APCA_COMMENT_MAX_DARK,
+  APCA_COMMENT_MAX_LIGHT,
+  READABILITY_BAND,
+  HERO_ROLE,
+  HERO_CHROMA_GAP,
+  type ReadBand,
 } from './constants'
-import {
-  hueGapDeg, ensureAPCAAgainst, capAPCAAgainst, clipToSRGB, deltaE,
-  nudgeLightnessForDistinction,
-} from './utils'
+import { hueGapDeg, ensureAPCAAgainst, capAPCAAgainst, clipToSRGB, deltaE, nudgeLightnessForDistinction } from './utils'
 
 // The syntax-color pipeline (palette-primary). A template (templates/*.ts) maps the generated
 // palette's swatches onto roles by geometry; this pipeline keeps the palette's hue *set* intact and
@@ -26,7 +35,7 @@ import {
 // buildSyntax() at the bottom runs the stages in order.
 
 function isErrorRed(c: Color): boolean {
-  return (c.oklch.c ?? 0) >= 0.10 && hueGapDeg(c.oklch.h ?? 0, 5) <= 20
+  return (c.oklch.c ?? 0) >= 0.1 && hueGapDeg(c.oklch.h ?? 0, 5) <= 20
 }
 
 // ----- convention-aware role assignment (palette-primary) -----
@@ -43,7 +52,12 @@ function isErrorRed(c: Color): boolean {
 // back as a swatch *reassignment* rather than a hue rewrite.
 
 const ASSIGNABLE_LOUD = [
-  'definitionColor', 'keywordColor', 'typeColor', 'stringColor', 'numberColor', 'regexColor',
+  'definitionColor',
+  'keywordColor',
+  'typeColor',
+  'stringColor',
+  'numberColor',
+  'regexColor',
 ] as const
 
 // Fitness is HUE-ONLY by design. Hue is the one swatch property that is style-invariant (style is
@@ -85,10 +99,14 @@ function isEarthyKeyword(c: Color): boolean {
 function conventionalizeRoles(syntax: SyntaxColors, isMono: boolean): SyntaxColors {
   if (isMono) return syntax
   const out = { ...syntax }
-  const colors = ASSIGNABLE_LOUD.map((r) => (out as any)[r] as Color)
+  const colors = ASSIGNABLE_LOUD.map(r => (out as any)[r] as Color)
   const SI = ASSIGNABLE_LOUD.indexOf('stringColor')
   const KI = ASSIGNABLE_LOUD.indexOf('keywordColor')
-  const swap = (i: number, j: number): void => { const t = colors[i]; colors[i] = colors[j]; colors[j] = t }
+  const swap = (i: number, j: number): void => {
+    const t = colors[i]
+    colors[i] = colors[j]
+    colors[j] = t
+  }
 
   // Tie margin: only override an earlier candidate when it's better by more than this. Two swatches
   // of the same family score within float noise of each other, and that noise drifts sub-degree
@@ -103,7 +121,10 @@ function conventionalizeRoles(syntax: SyntaxColors, isMono: boolean): SyntaxColo
     let bestScore = stringFitness(colors[SI])
     for (let i = 0; i < colors.length; i++) {
       const s = stringFitness(colors[i])
-      if (s > bestScore + TIE) { bestScore = s; best = i }
+      if (s > bestScore + TIE) {
+        bestScore = s
+        best = i
+      }
     }
     if (best !== SI) swap(SI, best)
   }
@@ -116,14 +137,19 @@ function conventionalizeRoles(syntax: SyntaxColors, isMono: boolean): SyntaxColo
     for (let i = 0; i < colors.length; i++) {
       if (i === SI) continue
       const s = keywordFitness(colors[i])
-      if (s > bestScore + TIE) { bestScore = s; best = i }
+      if (s > bestScore + TIE) {
+        bestScore = s
+        best = i
+      }
     }
     if (best !== KI && (isEarthyKeyword(colors[KI]) || bestScore > keywordFitness(colors[KI]) + TIE)) {
       swap(KI, best)
     }
   }
 
-  ASSIGNABLE_LOUD.forEach((r, i) => { (out as any)[r] = colors[i] })
+  ASSIGNABLE_LOUD.forEach((r, i) => {
+    ;(out as any)[r] = colors[i]
+  })
   return out
 }
 
@@ -144,8 +170,9 @@ function normalizeForReadability(syntax: SyntaxColors, band: ReadBand): SyntaxCo
     c.oklch.c = clamp(c.oklch.c ?? 0, band.loud.cFloor, band.loud.cCeil)
     // Saturated error-red on a role that must not read as an error (string/function/number):
     // shift to orange — keeps the warmth, sheds the error read. Pastel reds pass through.
-    if (RED_SENSITIVE_ROLES.has(k) && isErrorRed(c)) c.oklch.h = 30
-    // Clip to gamut now: downstream distinction must see what will actually render.
+    if (RED_SENSITIVE_ROLES.has(k) && isErrorRed(c))
+      c.oklch.h = 30
+      // Clip to gamut now: downstream distinction must see what will actually render.
     ;(out as any)[k] = clipToSRGB(c)
   }
 
@@ -275,7 +302,7 @@ function enforceDistinction(
         const a = (out as any)[roles[i]] as Color
         const b = (out as any)[roles[j]] as Color
         if (deltaE(a, b) < minDeltaE) {
-          (out as any)[roles[j]] = finalize(nudgeLightnessForDistinction(b, a, isDarkMode))
+          ;(out as any)[roles[j]] = finalize(nudgeLightnessForDistinction(b, a, isDarkMode))
         }
       }
     }
@@ -309,8 +336,8 @@ function enforceDistinction(
             candidateAt(b, Math.min(lMax, bl + step), -0.05),
             candidateAt(b, Math.max(lMin, bl - step), +0.05),
           ]
-          const others = roles.filter((r) => r !== roles[j]).map((r) => (out as any)[r] as Color)
-          const minDE = (c: Color): number => Math.min(...others.map((o) => deltaE(c, o)))
+          const others = roles.filter(r => r !== roles[j]).map(r => (out as any)[r] as Color)
+          const minDE = (c: Color): number => Math.min(...others.map(o => deltaE(c, o)))
           let best = candidates[0]
           let bestScore = minDE(best)
           for (const cand of candidates.slice(1)) {

@@ -17,26 +17,26 @@
 
 /* The frame — border, radius, padding, background, token colors — is inlined
    directly on the <pre> so the snippet is fully self-contained (essential for
-   email, which strips <style>/class rules). The only thing left for this file
+   email, which strips \3c style>/class rules). The only thing left for this file
    is the copy button that base.js overlays on the web. Colors are literal, not
    custom properties, so the snippet looks right on any site. */
 .cc-code-copy {
   position: absolute;
   top: 50%;
   right: 0.5rem;
-  translate: 0 -50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 1.75rem;
   height: 1.75rem;
   padding: 0;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
   color: inherit;
   cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
   opacity: 0.55;
+  translate: 0 -50%;
   transition:
     opacity 200ms ease,
     color 200ms ease;

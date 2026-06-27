@@ -12,7 +12,9 @@
   font-size: 1.2rem;
   color: var(--input-color);
   background-color: var(--input-bg);
-  box-shadow: inset 2px 2px 0.5em hsl(0deg 0% 0% / 15%), inset -2px -2px 0.5em hsl(0deg 0% 100% / 15%);
+  box-shadow:
+    inset 2px 2px 0.5em hsl(0deg 0% 0% / 15%),
+    inset -2px -2px 0.5em hsl(0deg 0% 100% / 15%);
 }
 
 @container synth (width < 900px) {

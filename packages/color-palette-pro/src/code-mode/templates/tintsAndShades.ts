@@ -48,12 +48,28 @@ export const tintsAndShadesTemplate: CodeThemeTemplate = {
     const variableColor = adaptLightnessForQuiet(tintTowardHue(surfaces.onSurface, baseHue, 0.4), isDarkMode)
     const propertyColor = adaptLightnessForQuiet(mixColors(surfaces.onSurfaceVariant, baseSwatch, 0.3), isDarkMode)
     const operatorColor = adaptLightnessForQuiet(tintTowardHue(surfaces.outline, baseHue, 0.3, 0.012), isDarkMode)
-    const punctuationColor = adaptLightnessForQuiet(tintTowardHue(surfaces.outlineVariant, baseHue, 0.2, 0.008), isDarkMode)
-    const commentColor = adaptLightnessForQuiet(tintTowardHue(surfaces.onSurfaceVariant, baseHue, 0.5, 0.012), isDarkMode)
+    const punctuationColor = adaptLightnessForQuiet(
+      tintTowardHue(surfaces.outlineVariant, baseHue, 0.2, 0.008),
+      isDarkMode,
+    )
+    const commentColor = adaptLightnessForQuiet(
+      tintTowardHue(surfaces.onSurfaceVariant, baseHue, 0.5, 0.012),
+      isDarkMode,
+    )
 
     return {
-      definitionColor, keywordColor, typeColor, stringColor, numberColor, regexColor, accentColor,
-      variableColor, propertyColor, operatorColor, punctuationColor, commentColor,
+      definitionColor,
+      keywordColor,
+      typeColor,
+      stringColor,
+      numberColor,
+      regexColor,
+      accentColor,
+      variableColor,
+      propertyColor,
+      operatorColor,
+      punctuationColor,
+      commentColor,
     }
   },
 

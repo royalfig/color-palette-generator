@@ -92,13 +92,7 @@ const scopeSets = {
     'support.class',
   ],
 
-  variables: [
-    'variable',
-    'variable.parameter',
-    'variable.other.readwrite',
-    'variable.other.object',
-    'meta.parameter',
-  ],
+  variables: ['variable', 'variable.parameter', 'variable.other.readwrite', 'variable.other.object', 'meta.parameter'],
 
   properties: [
     'variable.other.property',
@@ -129,16 +123,9 @@ const scopeSets = {
     'punctuation.definition.group.regexp',
   ],
 
-  tags: [
-    'entity.name.tag',
-    'punctuation.definition.tag.cs',
-  ],
+  tags: ['entity.name.tag', 'punctuation.definition.tag.cs'],
 
-  attributes: [
-    'entity.other.attribute-name',
-    'meta.selector',
-    'entity.other.attribute-name.parent-selector',
-  ],
+  attributes: ['entity.other.attribute-name', 'meta.selector', 'entity.other.attribute-name.parent-selector'],
 
   punctuation: [
     'punctuation.definition.arguments',
@@ -193,10 +180,7 @@ const scopeSets = {
     'markup.quote.markdown meta.paragraph.markdown punctuation.definition.string.begin',
     'markup.quote.markdown meta.paragraph.markdown punctuation.definition.string.end',
   ],
-  markdownListMarker: [
-    'punctuation.definition.list.begin.markdown',
-    'beginning.punctuation.definition.list.markdown',
-  ],
+  markdownListMarker: ['punctuation.definition.list.begin.markdown', 'beginning.punctuation.definition.list.markdown'],
 
   diffInserted: ['markup.inserted'],
   diffRemoved: ['markup.deleted'],
@@ -231,7 +215,10 @@ export interface UiColorOptions {
  * hex prefix) but lets each character bias the peak. The ratios stay constant so
  * the relative ordering — selection > findMatch > wordHighlight — is preserved.
  */
-function attentionRamp(primaryHex: string, peak: number): {
+function attentionRamp(
+  primaryHex: string,
+  peak: number,
+): {
   selection: string
   findMatch: string
   wordHighlightStrong: string
@@ -242,13 +229,13 @@ function attentionRamp(primaryHex: string, peak: number): {
 } {
   const a = (mult: number): string => toHex(withAlpha(primaryHex, Math.min(0.95, peak * mult)))
   return {
-    selection:           a(1.00),
-    findMatch:           a(0.65),
+    selection: a(1.0),
+    findMatch: a(0.65),
     wordHighlightStrong: a(0.55),
-    findMatchHighlight:  a(0.55),
-    inactiveSelection:   a(0.42),
-    selectionHighlight:  a(0.42),
-    wordHighlight:       a(0.35),
+    findMatchHighlight: a(0.55),
+    inactiveSelection: a(0.42),
+    selectionHighlight: a(0.42),
+    wordHighlight: a(0.35),
   }
 }
 
@@ -261,15 +248,25 @@ export function deriveUiColors(
   options: UiColorOptions = {},
 ): Record<string, string> {
   const {
-    editorBackground, editorForeground, sidebarBackground, panelBackground, overlayBackground,
-    statusBarBackground, outline, outlineVariant, divider, neutralBand, cursorColor, inputSunken,
+    editorBackground,
+    editorForeground,
+    sidebarBackground,
+    panelBackground,
+    overlayBackground,
+    statusBarBackground,
+    outline,
+    outlineVariant,
+    divider,
+    neutralBand,
+    cursorColor,
+    inputSunken,
     bracketPairColors,
   } = semantic
 
   // Peak alpha for the chromatic highlight family — character-driven, mode-adjusted
   // (set by index.ts via personality.surfaceProfile). Falls back to a sensible default
   // if a caller invokes deriveUiColors directly.
-  const peakAlpha = options.peakAlpha ?? (isDarkMode ? 0.70 : 0.30)
+  const peakAlpha = options.peakAlpha ?? (isDarkMode ? 0.7 : 0.3)
   const ramp = attentionRamp(semantic.focusBorder.hex, peakAlpha)
 
   // Find-match is gold regardless of palette — the universal "highlighter pen"
@@ -308,13 +305,13 @@ export function deriveUiColors(
 
   const brightAnsi = (hex: string, isBlack = false): string => {
     const c = new Color(hex)
-    c.oklch.l = Math.min(0.95, (c.oklch.l ?? 0.5) + (isDarkMode ? (isBlack ? 0.20 : 0.10) : -0.05))
+    c.oklch.l = Math.min(0.95, (c.oklch.l ?? 0.5) + (isDarkMode ? (isBlack ? 0.2 : 0.1) : -0.05))
     return toHex(c)
   }
 
   // focusBorder applied at alpha — softens the focus glow at curved chrome corners.
   // 2026 uses ~0.70 alpha; we match.
-  const focusBorderAlpha = toHex(withAlpha(semantic.focusBorder.hex, 0.70))
+  const focusBorderAlpha = toHex(withAlpha(semantic.focusBorder.hex, 0.7))
 
   // controlBorder: a border that conveys the *boundary of an interactive control* (text
   // inputs, dropdowns, checkboxes) must meet WCAG 1.4.11 non-text contrast (3:1) against the
@@ -330,9 +327,9 @@ export function deriveUiColors(
     c.oklch.l = Math.max(0.05, Math.min(0.95, (c.oklch.l ?? 0.5) + delta))
     return toHex(c)
   }
-  const chatGradient1 = chatGradient(isDarkMode ? -0.10 : +0.10)
+  const chatGradient1 = chatGradient(isDarkMode ? -0.1 : +0.1)
   const chatGradient2 = semantic.focusBorder.hex
-  const chatGradient3 = chatGradient(isDarkMode ? +0.10 : -0.10)
+  const chatGradient3 = chatGradient(isDarkMode ? +0.1 : -0.1)
 
   // Three-step alpha ramp on a neutral foreground tone — used for minimap slider.
   const sliderAlpha = (a: number): string => toHex(withAlpha(editorForeground.hex, a))
@@ -343,8 +340,8 @@ export function deriveUiColors(
   const chartsPurpleHex = (() => {
     const c = new Color(semantic.focusBorder.hex).clone()
     c.oklch.h = 305
-    c.oklch.l = isDarkMode ? 0.72 : 0.50
-    c.oklch.c = Math.min((c.oklch.c ?? 0.10), 0.15)
+    c.oklch.l = isDarkMode ? 0.72 : 0.5
+    c.oklch.c = Math.min(c.oklch.c ?? 0.1, 0.15)
     return toHex(c)
   })()
 
@@ -391,7 +388,7 @@ export function deriveUiColors(
 
     // editorBracketMatch — when the cursor sits next to a `{`, the matching `}` gets
     // a visible chromatic background (~30% primary) and a near-invisible border.
-    'editorBracketMatch.background': toHex(withAlpha(semantic.focusBorder.hex, 0.30)),
+    'editorBracketMatch.background': toHex(withAlpha(semantic.focusBorder.hex, 0.3)),
     'editorBracketMatch.border': outlineVariant.hex,
 
     // Sticky scroll — header bands floating above the editor. Background continuous
@@ -449,16 +446,16 @@ export function deriveUiColors(
     'editorError.foreground': semantic.errorForeground.hex,
     'editorWarning.foreground': semantic.warningForeground.hex,
     'editorInfo.foreground': semantic.infoForeground.hex,
-    'errorForeground': semantic.errorForeground.hex,
+    errorForeground: semantic.errorForeground.hex,
 
     // Focus and selection — focusBorder applied at 70% alpha to soften corner glow.
-    'focusBorder': focusBorderAlpha,
-    'foreground': editorForeground.hex,
+    focusBorder: focusBorderAlpha,
+    foreground: editorForeground.hex,
     'selection.background': toHex(withAlpha(semantic.focusBorder.hex, 0.3)),
 
     // Base text / icons / links (rendered markdown in hovers, welcome page, etc.)
-    'descriptionForeground': toHex(withAlpha(editorForeground.hex, 0.7)),
-    'disabledForeground': toHex(withAlpha(editorForeground.hex, 0.4)),
+    descriptionForeground: toHex(withAlpha(editorForeground.hex, 0.7)),
+    disabledForeground: toHex(withAlpha(editorForeground.hex, 0.4)),
     'icon.foreground': editorForeground.hex,
     'textLink.foreground': semantic.infoForeground.hex,
     'textLink.activeForeground': semantic.accentColor.hex,
@@ -497,7 +494,9 @@ export function deriveUiColors(
     'statusBarItem.prominentForeground': editorForeground.hex,
     'statusBarItem.prominentHoverBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.6)),
     'statusBarItem.remoteBackground': semantic.accentColor.hex,
-    'statusBarItem.remoteForeground': toHex(getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5)),
+    'statusBarItem.remoteForeground': toHex(
+      getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5),
+    ),
 
     // Tabs — active tab merges visually with the editor (continuous surface).
     'tab.activeBackground': editorBackground.hex,
@@ -569,7 +568,9 @@ export function deriveUiColors(
     // Button — secondary now uses the real secondary role (not a fake foreground@10%),
     // giving the theme a proper two-tier button system.
     'button.background': semantic.focusBorder.hex,
-    'button.foreground': toHex(getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.focusBorder.hex), 4.5)),
+    'button.foreground': toHex(
+      getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.focusBorder.hex), 4.5),
+    ),
     'button.hoverBackground': toHex(boostChroma(new Color(semantic.focusBorder.hex), 1.1)),
     'button.secondaryBackground': semantic.secondaryContainer.hex,
     'button.secondaryForeground': semantic.onSecondaryContainer.hex,
@@ -696,8 +697,8 @@ export function deriveUiColors(
     // Scrollbar
     'scrollbar.shadow': editorBackground.hex,
     'scrollbarSlider.background': toHex(withAlpha(editorForeground.hex, isDarkMode ? 0.15 : 0.12)),
-    'scrollbarSlider.hoverBackground': toHex(withAlpha(editorForeground.hex, isDarkMode ? 0.25 : 0.20)),
-    'scrollbarSlider.activeBackground': toHex(withAlpha(semantic.focusBorder.hex, isDarkMode ? 0.50 : 0.40)),
+    'scrollbarSlider.hoverBackground': toHex(withAlpha(editorForeground.hex, isDarkMode ? 0.25 : 0.2)),
+    'scrollbarSlider.activeBackground': toHex(withAlpha(semantic.focusBorder.hex, isDarkMode ? 0.5 : 0.4)),
 
     // Settings
     'settings.modifiedItemIndicator': semantic.warningForeground.hex,
@@ -742,9 +743,13 @@ export function deriveUiColors(
     'activityBarBadge.background': semantic.primaryContainer.hex,
     'activityBarBadge.foreground': semantic.onPrimaryContainer.hex,
     'activityErrorBadge.background': semantic.errorForeground.hex,
-    'activityErrorBadge.foreground': toHex(getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.errorForeground.hex), 4.5)),
+    'activityErrorBadge.foreground': toHex(
+      getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.errorForeground.hex), 4.5),
+    ),
     'activityWarningBadge.background': semantic.warningForeground.hex,
-    'activityWarningBadge.foreground': toHex(getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.warningForeground.hex), 4.5)),
+    'activityWarningBadge.foreground': toHex(
+      getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.warningForeground.hex), 4.5),
+    ),
     'activityBarTop.foreground': editorForeground.hex,
     'activityBarTop.inactiveForeground': toHex(withAlpha(editorForeground.hex, 0.4)),
     'activityBarTop.activeBorder': semantic.accentColor.hex,
@@ -758,7 +763,7 @@ export function deriveUiColors(
     // Quick input / command palette
     'quickInput.background': overlayBackground.hex,
     'quickInput.foreground': editorForeground.hex,
-    'quickInputList.focusBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.30)),
+    'quickInputList.focusBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.3)),
     'quickInputList.focusForeground': editorForeground.hex,
     'quickInputList.focusIconForeground': semantic.accentColor.hex,
     'quickInputList.focusHighlightForeground': semantic.infoForeground.hex,
@@ -797,9 +802,9 @@ export function deriveUiColors(
     'terminal.ansiBrightWhite': brightWhiteHex(semantic.terminalAnsiWhite.hex, isDarkMode),
 
     // Minimap slider — three alpha tiers on a neutral fg tone, matches 2026.
-    'minimapSlider.background': sliderAlpha(0.20),
+    'minimapSlider.background': sliderAlpha(0.2),
     'minimapSlider.hoverBackground': sliderAlpha(0.35),
-    'minimapSlider.activeBackground': sliderAlpha(0.50),
+    'minimapSlider.activeBackground': sliderAlpha(0.5),
 
     // Sticky-scroll for non-editor surfaces (no shadow — flatten the chrome stack).
     'sideBarStickyScroll.shadow': '#00000000',
@@ -828,13 +833,17 @@ export function deriveUiColors(
     'agentsNewSessionButton.border': outlineVariant.hex,
     'agentsNewSessionButton.hoverBackground': toHex(withAlpha(editorForeground.hex, 0.08)),
     'agentsBadge.background': semantic.accentColor.hex,
-    'agentsBadge.foreground': toHex(getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5)),
+    'agentsBadge.foreground': toHex(
+      getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5),
+    ),
     'agentsUnreadBadge.background': semantic.accentColor.hex,
-    'agentsUnreadBadge.foreground': toHex(getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5)),
+    'agentsUnreadBadge.foreground': toHex(
+      getAccessibleVariant(new Color(editorForeground.hex), new Color(semantic.accentColor.hex), 4.5),
+    ),
 
     // chat.* (request bubbles + working-input gradient sweep)
     'chat.requestBubbleBackground': toHex(withAlpha(editorForeground.hex, isDarkMode ? 0.06 : 0.04)),
-    'chat.requestBubbleHoverBackground': toHex(withAlpha(editorForeground.hex, isDarkMode ? 0.10 : 0.07)),
+    'chat.requestBubbleHoverBackground': toHex(withAlpha(editorForeground.hex, isDarkMode ? 0.1 : 0.07)),
     'chat.inputWorkingBorderColor1': chatGradient1,
     'chat.inputWorkingBorderColor2': chatGradient2,
     'chat.inputWorkingBorderColor3': chatGradient3,
@@ -877,18 +886,11 @@ export function generateBaseTokenRules(
   const definitionStyle = fontStyleProfile?.definitions ?? ''
   const typeStyle = fontStyleProfile?.types ?? ''
 
-  const fs = (style: string): { fontStyle?: string } => style ? { fontStyle: style } : {}
+  const fs = (style: string): { fontStyle?: string } => (style ? { fontStyle: style } : {})
 
   // Markdown heading depth ramp: H1 most prominent, H6 quiet. Step L toward fg over 6 levels.
   const h = semantic.markdownHeadingColor.hex
-  const headingRamp: string[] = [
-    h,
-    stepL(h, -0.02),
-    stepL(h, -0.04),
-    stepL(h, -0.06),
-    stepL(h, -0.08),
-    stepL(h, -0.10),
-  ]
+  const headingRamp: string[] = [h, stepL(h, -0.02), stepL(h, -0.04), stepL(h, -0.06), stepL(h, -0.08), stepL(h, -0.1)]
 
   return [
     // Default text color (fallback)
@@ -896,14 +898,31 @@ export function generateBaseTokenRules(
 
     // Comments
     { scope: scopeSets.comments, settings: { foreground: semantic.commentColor.hex, ...fs(commentStyle) } },
-    { scope: ['string.quoted.docstring.multi', 'string.quoted.docstring.multi.python punctuation.definition.string.begin', 'string.quoted.docstring.multi.python punctuation.definition.string.end'], settings: { foreground: semantic.commentColor.hex, ...fs(commentStyle) } },
-    { scope: ['comment keyword.codetag.notation', 'comment.block.documentation keyword', 'comment.block.documentation storage.type.class'], settings: { foreground: semantic.commentColor.hex } },
+    {
+      scope: [
+        'string.quoted.docstring.multi',
+        'string.quoted.docstring.multi.python punctuation.definition.string.begin',
+        'string.quoted.docstring.multi.python punctuation.definition.string.end',
+      ],
+      settings: { foreground: semantic.commentColor.hex, ...fs(commentStyle) },
+    },
+    {
+      scope: [
+        'comment keyword.codetag.notation',
+        'comment.block.documentation keyword',
+        'comment.block.documentation storage.type.class',
+      ],
+      settings: { foreground: semantic.commentColor.hex },
+    },
     { scope: ['comment.block.documentation entity.name.type'], settings: { foreground: semantic.commentColor.hex } },
     { scope: ['comment.block.documentation variable'], settings: { foreground: semantic.commentColor.hex } },
 
     // Keywords (and storage modifiers)
     { scope: scopeSets.keywords, settings: { foreground: semantic.keywordColor.hex, ...fs(keywordStyle) } },
-    { scope: ['storage.type', 'storage.modifier'], settings: { foreground: semantic.keywordColor.hex, ...fs(keywordStyle) } },
+    {
+      scope: ['storage.type', 'storage.modifier'],
+      settings: { foreground: semantic.keywordColor.hex, ...fs(keywordStyle) },
+    },
 
     // Definitions = function declarations and calls
     { scope: scopeSets.functions, settings: { foreground: semantic.definitionColor.hex, ...fs(definitionStyle) } },
@@ -936,7 +955,10 @@ export function generateBaseTokenRules(
     { scope: scopeSets.attributes, settings: { foreground: semantic.definitionColor.hex } },
 
     // YAML tags / JSON property names
-    { scope: ['entity.name.tag.yaml', 'support.type.property-name.json'], settings: { foreground: semantic.propertyColor.hex } },
+    {
+      scope: ['entity.name.tag.yaml', 'support.type.property-name.json'],
+      settings: { foreground: semantic.propertyColor.hex },
+    },
 
     // Constants (named, non-numeric)
     { scope: scopeSets.constants, settings: { foreground: semantic.numberColor.hex } },
@@ -984,7 +1006,10 @@ export function generateBaseTokenRules(
     { scope: ['entity.name.filename'], settings: { foreground: semantic.propertyColor.hex } },
 
     // GraphQL variables
-    { scope: ['meta.selectionset.graphql variable', 'entity.name.fragment.graphql', 'variable.fragment.graphql'], settings: { foreground: semantic.propertyColor.hex } },
+    {
+      scope: ['meta.selectionset.graphql variable', 'entity.name.fragment.graphql', 'variable.fragment.graphql'],
+      settings: { foreground: semantic.propertyColor.hex },
+    },
 
     // Meta separator (markdown HR)
     { scope: ['meta.separator.markdown'], settings: { foreground: semantic.punctuationColor.hex } },
@@ -993,10 +1018,29 @@ export function generateBaseTokenRules(
     { scope: ['markup.error'], settings: { foreground: semantic.errorForeground.hex } },
 
     // Bracket punctuation — slightly more visible than regular punctuation
-    { scope: ['punctuation.definition.arguments.begin', 'punctuation.definition.arguments.end', 'punctuation.definition.entity.begin', 'punctuation.definition.entity.end', 'punctuation.section.scope.begin', 'punctuation.section.scope.end', 'storage.type.generic.java'], settings: { foreground: semantic.punctuationColor.hex } },
+    {
+      scope: [
+        'punctuation.definition.arguments.begin',
+        'punctuation.definition.arguments.end',
+        'punctuation.definition.entity.begin',
+        'punctuation.definition.entity.end',
+        'punctuation.section.scope.begin',
+        'punctuation.section.scope.end',
+        'storage.type.generic.java',
+      ],
+      settings: { foreground: semantic.punctuationColor.hex },
+    },
 
     // Template expression punctuation — pop with the accent color
-    { scope: ['punctuation.definition.template-expression.begin', 'punctuation.definition.template-expression.end', 'punctuation.section.embedded.begin', 'punctuation.section.embedded.end'], settings: { foreground: semantic.accentColor.hex } },
+    {
+      scope: [
+        'punctuation.definition.template-expression.begin',
+        'punctuation.definition.template-expression.end',
+        'punctuation.section.embedded.begin',
+        'punctuation.section.embedded.end',
+      ],
+      settings: { foreground: semantic.accentColor.hex },
+    },
 
     // Source shell variable
     { scope: ['source.shell variable.other'], settings: { foreground: semantic.variableColor.hex } },
@@ -1019,31 +1063,31 @@ export function generateSemanticTokenRules(
     style ? { foreground: hex, fontStyle: style } : hex
 
   return {
-    'class': styled(semantic.typeColor.hex, typeStyle),
-    'interface': styled(semantic.typeColor.hex, typeStyle),
-    'enum': styled(semantic.typeColor.hex, typeStyle),
-    'type': styled(semantic.typeColor.hex, typeStyle),
-    'struct': styled(semantic.typeColor.hex, typeStyle),
-    'typeParameter': styled(semantic.typeColor.hex, typeStyle),
-    'function': styled(semantic.definitionColor.hex, definitionStyle),
-    'method': styled(semantic.definitionColor.hex, definitionStyle),
-    'macro': styled(semantic.definitionColor.hex, definitionStyle),
-    'variable': semantic.variableColor.hex,
+    class: styled(semantic.typeColor.hex, typeStyle),
+    interface: styled(semantic.typeColor.hex, typeStyle),
+    enum: styled(semantic.typeColor.hex, typeStyle),
+    type: styled(semantic.typeColor.hex, typeStyle),
+    struct: styled(semantic.typeColor.hex, typeStyle),
+    typeParameter: styled(semantic.typeColor.hex, typeStyle),
+    function: styled(semantic.definitionColor.hex, definitionStyle),
+    method: styled(semantic.definitionColor.hex, definitionStyle),
+    macro: styled(semantic.definitionColor.hex, definitionStyle),
+    variable: semantic.variableColor.hex,
     'variable.readonly': semantic.accentColor.hex,
-    'parameter': semantic.variableColor.hex,
-    'property': semantic.propertyColor.hex,
-    'enumMember': semantic.numberColor.hex,
-    'namespace': styled(semantic.typeColor.hex, typeStyle),
-    'keyword': styled(semantic.keywordColor.hex, keywordStyle),
-    'modifier': styled(semantic.keywordColor.hex, keywordStyle),
-    'string': semantic.stringColor.hex,
-    'number': semantic.numberColor.hex,
-    'boolean': semantic.accentColor.hex,
-    'comment': styled(semantic.commentColor.hex, commentStyle),
-    'regexp': semantic.regexColor.hex,
-    'operator': semantic.operatorColor.hex,
-    'punctuation': semantic.punctuationColor.hex,
-    'selfKeyword': semantic.accentColor.hex,
-    'builtinConstant': semantic.accentColor.hex,
+    parameter: semantic.variableColor.hex,
+    property: semantic.propertyColor.hex,
+    enumMember: semantic.numberColor.hex,
+    namespace: styled(semantic.typeColor.hex, typeStyle),
+    keyword: styled(semantic.keywordColor.hex, keywordStyle),
+    modifier: styled(semantic.keywordColor.hex, keywordStyle),
+    string: semantic.stringColor.hex,
+    number: semantic.numberColor.hex,
+    boolean: semantic.accentColor.hex,
+    comment: styled(semantic.commentColor.hex, commentStyle),
+    regexp: semantic.regexColor.hex,
+    operator: semantic.operatorColor.hex,
+    punctuation: semantic.punctuationColor.hex,
+    selfKeyword: semantic.accentColor.hex,
+    builtinConstant: semantic.accentColor.hex,
   }
 }

@@ -1,27 +1,23 @@
-import Color from "colorjs.io";
-import { BaseColorData, colorFactory } from "./factory";
-import { ColorFormat, ColorSpace } from "./types/types";
-import { maxChromaFor } from "./ui/colorMath";
+import Color from 'colorjs.io'
+import { BaseColorData, colorFactory } from './factory'
+import { ColorFormat, ColorSpace } from './types/types'
+import { maxChromaFor } from './ui/colorMath'
 
-export function detectFormat(str: string): "hex" | undefined {
-  if (str.startsWith("#")) return "hex";
+export function detectFormat(str: string): 'hex' | undefined {
+  if (str.startsWith('#')) return 'hex'
 
   // Add more as needed
-  return undefined;
+  return undefined
 }
 
 const OKLCH_LIMITS = {
   l: { min: 0.01, max: 0.99 }, // Avoid pure black/white
-};
+}
 
 /** A color is achromatic when chroma is negligible (its hue is then meaningless / NaN). */
 export function isAchromatic(color: Color, threshold = 0.002): boolean {
-  const c = color.oklch.c ?? 0;
-  return (
-    !Number.isFinite(c) ||
-    c < threshold ||
-    !Number.isFinite(color.oklch.h ?? NaN)
-  );
+  const c = color.oklch.c ?? 0
+  return !Number.isFinite(c) || c < threshold || !Number.isFinite(color.oklch.h ?? NaN)
 }
 
 /**
@@ -29,8 +25,8 @@ export function isAchromatic(color: Color, threshold = 0.002): boolean {
  * the pervasive `?? 0` bug that silently turned every gray/neutral seed into red (hue 0).
  */
 export function safeHue(color: Color, fallback = NaN): number {
-  const h = color.oklch.h;
-  return Number.isFinite(h ?? NaN) ? (h as number) : fallback;
+  const h = color.oklch.h
+  return Number.isFinite(h ?? NaN) ? (h as number) : fallback
 }
 
 /**
@@ -38,9 +34,9 @@ export function safeHue(color: Color, fallback = NaN): number {
  * sRGB; the wider model/display spaces (p3/oklch/oklab/lch/lab) target P3 — the widest commonly
  * supported display — so P3 screens get richer palettes while sRGB output stays hue-stable.
  */
-export type DisplayGamut = "srgb" | "p3";
+export type DisplayGamut = 'srgb' | 'p3'
 export function gamutForSpace(space: ColorSpace): DisplayGamut {
-  return space === "srgb" || space === "hsl" ? "srgb" : "p3";
+  return space === 'srgb' || space === 'hsl' ? 'srgb' : 'p3'
 }
 
 /**
@@ -49,58 +45,53 @@ export function gamutForSpace(space: ColorSpace): DisplayGamut {
  * constant) so the result is realizable without the output stage having to clip and shift its
  * hue. A NaN hue (achromatic) is preserved as NaN with chroma forced to 0.
  */
-export function clampOKLCH(
-  l: number,
-  c: number,
-  h: number,
-  gamut: DisplayGamut = "srgb",
-) {
-  const L = Math.max(OKLCH_LIMITS.l.min, Math.min(OKLCH_LIMITS.l.max, l));
+export function clampOKLCH(l: number, c: number, h: number, gamut: DisplayGamut = 'srgb') {
+  const L = Math.max(OKLCH_LIMITS.l.min, Math.min(OKLCH_LIMITS.l.max, l))
   if (!Number.isFinite(h)) {
-    return { l: L, c: 0, h: NaN };
+    return { l: L, c: 0, h: NaN }
   }
-  const H = ((h % 360) + 360) % 360;
-  const maxC = maxChromaFor(L, H, gamut);
-  const C = Math.max(0, Math.min(c, maxC));
-  return { l: L, c: C, h: H };
+  const H = ((h % 360) + 360) % 360
+  const maxC = maxChromaFor(L, H, gamut)
+  const C = Math.max(0, Math.min(c, maxC))
+  return { l: L, c: C, h: H }
 }
 
 export function applyVariation(
   baseColor: Color,
   variation: { l: number; c: number },
   hue: number,
-  gamut: DisplayGamut = "srgb",
+  gamut: DisplayGamut = 'srgb',
 ): Color {
   const values = clampOKLCH(
     (baseColor.oklch.l ?? 0.5) + variation.l,
     (baseColor.oklch.c ?? 0) * variation.c,
     hue,
     gamut,
-  );
-  const result = baseColor.clone();
-  result.oklch.l = values.l;
-  result.oklch.c = values.c;
-  result.oklch.h = values.h;
-  return result;
+  )
+  const result = baseColor.clone()
+  result.oklch.l = values.l
+  result.oklch.c = values.c
+  result.oklch.h = values.h
+  return result
 }
 
 export function getRandBetween() {
-  return Math.floor(Math.random() * 100) + 1;
+  return Math.floor(Math.random() * 100) + 1
 }
 
 export function hex3to6(color: Color) {
-  const hex = color.toString({ format: "hex" }).substring(1);
+  const hex = color.toString({ format: 'hex' }).substring(1)
 
   if (hex.length === 3) {
-    const [a, b, c] = hex;
-    return a + a + b + b + c + c;
+    const [a, b, c] = hex
+    return a + a + b + b + c + c
   }
 
-  return hex;
+  return hex
 }
 
 export function createSlug(str: string) {
-  return str.split(" ")[0].toLowerCase().replace(/\W/, "-");
+  return str.split(' ')[0].toLowerCase().replace(/\W/, '-')
 }
 
 /**
@@ -110,7 +101,7 @@ export function createSlug(str: string) {
  * lighter than a blue at the same L), mislabeling high-chroma warm colors. (Audit 5.4.)
  */
 export function isLight(color: Color) {
-  return color.contrastWCAG21("#000") >= color.contrastWCAG21("#fff");
+  return color.contrastWCAG21('#000') >= color.contrastWCAG21('#fff')
 }
 
 export function buildPaletteColors(
@@ -123,7 +114,7 @@ export function buildPaletteColors(
     index === 0
       ? colorFactory(baseColor, paletteType, index, format, true)
       : colorFactory(color, paletteType, index, format),
-  );
+  )
 }
 
 /**
@@ -138,30 +129,28 @@ export function generateNeutralPalette(
   paletteType: string,
   format: ColorFormat,
 ): BaseColorData[] {
-  const base = new Color(baseColor);
-  const baseL = base.oklch.l ?? 0.5;
+  const base = new Color(baseColor)
+  const baseL = base.oklch.l ?? 0.5
   // Even lightness spread across a usable range; the base replaces its nearest slot.
-  const lightnesses = Array.from({ length: count }, (_, i) =>
-    count === 1 ? baseL : 0.2 + (0.75 * i) / (count - 1),
-  );
-  let baseSlot = 0;
-  let bestDist = Infinity;
+  const lightnesses = Array.from({ length: count }, (_, i) => (count === 1 ? baseL : 0.2 + (0.75 * i) / (count - 1)))
+  let baseSlot = 0
+  let bestDist = Infinity
   lightnesses.forEach((l, i) => {
-    const d = Math.abs(l - baseL);
+    const d = Math.abs(l - baseL)
     if (d < bestDist) {
-      bestDist = d;
-      baseSlot = i;
+      bestDist = d
+      baseSlot = i
     }
-  });
-  lightnesses[baseSlot] = baseL;
+  })
+  lightnesses[baseSlot] = baseL
 
-  const colors = lightnesses.map((l) => {
-    const c = base.clone();
-    c.oklch.l = l;
-    c.oklch.c = 0;
-    return c;
-  });
+  const colors = lightnesses.map(l => {
+    const c = base.clone()
+    c.oklch.l = l
+    c.oklch.c = 0
+    return c
+  })
   // Put the base at index 0 so callers' "index 0 is base" assumption holds.
-  [colors[0], colors[baseSlot]] = [colors[baseSlot], colors[0]];
-  return buildPaletteColors(baseColor, colors, paletteType, format);
+  ;[colors[0], colors[baseSlot]] = [colors[baseSlot], colors[0]]
+  return buildPaletteColors(baseColor, colors, paletteType, format)
 }

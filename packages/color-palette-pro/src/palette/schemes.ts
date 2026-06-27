@@ -1,4 +1,4 @@
-import { PaletteKinds, PaletteStyle } from "../types/types";
+import { PaletteKinds, PaletteStyle } from '../types/types'
 
 // ===== DECLARATIVE PALETTE SCHEMES =====
 //
@@ -19,11 +19,11 @@ import { PaletteKinds, PaletteStyle } from "../types/types";
 /** One output slot, expressed relative to the base color. */
 export interface SlotSpec {
   /** Degrees from the base hue (the scheme's geometry). */
-  hueOffset: number;
+  hueOffset: number
   /** Lightness delta from the base L (before the style's spread is applied). */
-  dL: number;
+  dL: number
   /** Multiplier on the base chroma (1 = same saturation as the base). */
-  cMul: number;
+  cMul: number
 }
 
 /**
@@ -31,7 +31,7 @@ export interface SlotSpec {
  * `code-mode` select secondary/tertiary accents by index, so the role of each slot
  * must stay put (see the comments). Slot 0 is the base color.
  */
-export const SCHEME_SLOTS: Record<Exclude<PaletteKinds, "tas">, SlotSpec[]> = {
+export const SCHEME_SLOTS: Record<Exclude<PaletteKinds, 'tas'>, SlotSpec[]> = {
   // Analogous — a 60° fan around the base, fanning lighter as it opens.
   ana: [
     { hueOffset: 0, dL: 0, cMul: 1.0 }, // base
@@ -77,7 +77,7 @@ export const SCHEME_SLOTS: Record<Exclude<PaletteKinds, "tas">, SlotSpec[]> = {
     { hueOffset: 210, dL: -0.1, cMul: 0.95 }, // split 2 pure (tertiary)
     { hueOffset: 210, dL: 0.05, cMul: 0.6 }, // split 2 muted
   ],
-};
+}
 
 /**
  * A style is a uniform shaping of any scheme's baseline slots. Material only: it shapes lightness
@@ -85,9 +85,9 @@ export const SCHEME_SLOTS: Record<Exclude<PaletteKinds, "tas">, SlotSpec[]> = {
  */
 export interface StyleShape {
   /** Scales each slot's lightness delta — the drama of the light/dark spread. */
-  lSpread: number;
+  lSpread: number
   /** Scales each slot's chroma deviation from the base (>1 = more pop + more mute). */
-  cContrast: number;
+  cContrast: number
 }
 
 export const STYLE_SHAPES: Record<PaletteStyle, StyleShape> = {
@@ -99,4 +99,4 @@ export const STYLE_SHAPES: Record<PaletteStyle, StyleShape> = {
   circle: { lSpread: 1.2, cContrast: 1.25 },
   // Diamond — luminosity-led: the most dramatic lightness range.
   diamond: { lSpread: 1.45, cContrast: 1.15 },
-};
+}

@@ -35,19 +35,19 @@
   padding: 0.4em;
 
   p {
+    overflow: hidden;
+    text-overflow: ellipsis;
     font-size: 0.65rem;
     line-height: 1.15;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 }
 
 /* UI mode — 24 × 10 semantically-grouped grid that fills the panel exactly.
    Each .palette-detail sets its own grid-column span (4/6/8/12) inline. */
 .palette-details.palette-details-ui {
-  grid-template-columns: repeat(24, 1fr);
   grid-template-rows: repeat(10, 1fr);
+  grid-template-columns: repeat(24, 1fr);
   grid-auto-flow: row;
 }
 
@@ -57,11 +57,11 @@
   overflow: hidden;
 
   p {
-    font-size: 0.6rem;
-    line-height: 1.1;
-    font-weight: 600;
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 0.6rem;
+    font-weight: 600;
+    line-height: 1.1;
+    white-space: nowrap;
   }
 }
