@@ -1,7 +1,7 @@
 import { EyedropperSampleIcon } from '@phosphor-icons/react/dist/csr/EyedropperSample'
 import { PlayIcon } from '@phosphor-icons/react/dist/csr/Play'
 import Color from 'colorjs.io'
-import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useContext, useState } from 'react'
 import { ColorSpaceAndFormat } from '@royalfig/color-palette-pro'
 import Button from '../button/Button'
 import { ColorContext } from '../ColorContext'
@@ -27,7 +27,8 @@ export function InputColorContainer({
   const context = useContext(ColorContext)
   const { showMessage } = useContext(MessageContext)
   const baseColor = context.originalColor
-  const [input, setInput] = useState(baseColor?.conversions[colorSpace.format].value)
+  const derivedInput = baseColor?.conversions[colorSpace.format].value
+  const [input, setInput] = useState(derivedInput)
   const contrast = baseColor?.contrast
   const [active, setActive] = useState(false)
 
@@ -59,9 +60,13 @@ export function InputColorContainer({
     }
   }
 
-  useEffect(() => {
-    setInput(baseColor?.conversions[colorSpace.format].value)
-  }, [colorSpace, context])
+  // Resync the editable input when the source color or format changes (render-time, no effect).
+  const syncKey = `${colorSpace.format}:${baseColor?.string}`
+  const [prevSyncKey, setPrevSyncKey] = useState(syncKey)
+  if (syncKey !== prevSyncKey) {
+    setPrevSyncKey(syncKey)
+    setInput(derivedInput)
+  }
 
   return (
     <div className="input-color-container">

@@ -41,6 +41,34 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
   // Create a stable palette key for comparison
   const paletteKey = useMemo(() => palette.map(p => p.string).join('|'), [palette])
 
+  function processResponse(
+    data: ColorNameApiResponse,
+    palette: BaseColorData[],
+    colorsToFetch: BaseColorData[],
+    baseIndex: number,
+    signal: AbortSignal,
+  ) {
+    // Extract color names from the response
+    const colorNames = data.colors.map(c => c.name)
+
+    // If we had to truncate the palette, pad with empty strings
+    if (palette.length > colorsToFetch.length) {
+      colorNames.push(...Array(palette.length - colorsToFetch.length).fill(''))
+    }
+
+    const baseColorName =
+      baseIndex !== -1 && baseIndex < colorNames.length ? colorNames[baseIndex] : colorNames[0] || 'Unknown'
+
+    if (!signal.aborted) {
+      setFetchedData({
+        colorNames,
+        paletteTitle: data.paletteTitle || 'Color Palette',
+        baseColorName,
+      })
+      setIsLoading(false)
+    }
+  }
+
   const fetchColorName = useDebouncedCallback(
     async (palette: BaseColorData[], originalColor: BaseColorData, signal: AbortSignal) => {
       try {
@@ -121,34 +149,6 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
     400, // 400ms debounce delay
   )
 
-  const processResponse = (
-    data: ColorNameApiResponse,
-    palette: BaseColorData[],
-    colorsToFetch: BaseColorData[],
-    baseIndex: number,
-    signal: AbortSignal,
-  ) => {
-    // Extract color names from the response
-    const colorNames = data.colors.map(c => c.name)
-
-    // If we had to truncate the palette, pad with empty strings
-    if (palette.length > colorsToFetch.length) {
-      colorNames.push(...Array(palette.length - colorsToFetch.length).fill(''))
-    }
-
-    const baseColorName =
-      baseIndex !== -1 && baseIndex < colorNames.length ? colorNames[baseIndex] : colorNames[0] || 'Unknown'
-
-    if (!signal.aborted) {
-      setFetchedData({
-        colorNames,
-        paletteTitle: data.paletteTitle || 'Color Palette',
-        baseColorName,
-      })
-      setIsLoading(false)
-    }
-  }
-
   useEffect(() => {
     // Abort previous request if it exists
     if (abortControllerRef.current) {
@@ -159,6 +159,8 @@ export function useFetchColorNames(palette: BaseColorData[], originalColor: Base
     const controller = new AbortController()
     abortControllerRef.current = controller
 
+    // Immediate loading feedback before the 400ms-debounced fetch runs; intentional setState in effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true)
     // setFetchedData(null) // Keep previous data while loading
     setError(null)
