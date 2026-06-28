@@ -1,5 +1,11 @@
 # @royalfig/color-palette-pro
 
+## 3.2.3
+
+### Patch Changes
+
+- 96b44b7: outline L
+
 ## 3.2.2
 
 ### Patch Changes
