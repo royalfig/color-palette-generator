@@ -257,17 +257,14 @@ const VAR_FRAME: FrameColors = {
 // on the web (it never runs in email, which is the point), anchored to the
 // .cc-code container via position:relative.
 const codeBlock = (lang: string, shikiHtml: string, { fg, outline, bg }: FrameColors) => {
-  const CONTAINER = `margin:16px 0;border:1px solid ${outline};` + `border-radius:8px;overflow:hidden;background:${bg};`
+  const CONTAINER = `border:1px solid ${outline};` + `border-radius:var(--cc-br,8px);overflow:hidden;background:${bg};`
 
   const HEADER =
-    `position:relative;padding:8px 12px;background:${bg};border-bottom:1px solid ${outline};` +
-    `color:${fg};font-family:ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;` +
+    `position:relative;padding:var(--cc-header-padding, 8px 12px);background:${bg};border-bottom:1px solid ${outline};` +
+    `color:${fg};` +
     `font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;`
 
-  const PRE_INLINE =
-    `margin:0;padding:16px;overflow-x:auto;white-space:pre;` +
-    `font-family:ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;` +
-    `font-size:13px;line-height:1.5;`
+  const PRE_INLINE = `margin:0;padding:16px;overflow-x:auto;white-space:pre;` + `font-size:13px;line-height:1.5;`
 
   // Prepend our styles onto the <pre>'s existing inline style, keeping Shiki's
   // baked background-color + token color.

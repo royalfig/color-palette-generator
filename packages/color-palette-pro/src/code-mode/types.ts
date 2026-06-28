@@ -1,5 +1,4 @@
 import Color from 'colorjs.io'
-import { PaletteKinds } from '../types/types'
 // Single source of truth for the palette color shape is factory.ts; imported for in-file use
 // and re-exported below so existing code-mode imports (`from "./types"`) keep resolving.
 import type { BaseColorData } from '../factory'

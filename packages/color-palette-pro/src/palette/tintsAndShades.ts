@@ -30,13 +30,13 @@ export function generateTintsAndShades(
       colors.push(...generateSquareStyle(baseColorObj, lightnessProgression, baseIndex))
     } else if (style === 'triangle') {
       // Perceptual compensation for Bezold-Brücke and Abney effects
-      colors.push(...generateTriangleStyle(baseColorObj, lightnessProgression, baseIndex))
+      colors.push(...generateTriangleStyle(baseColorObj, lightnessProgression))
     } else if (style === 'circle') {
       // Chroma storytelling - dark=rich, light=ethereal
-      colors.push(...generateCircleStyle(baseColorObj, lightnessProgression, baseIndex))
+      colors.push(...generateCircleStyle(baseColorObj))
     } else if (style === 'diamond') {
       // Tonal variations using color mixing
-      colors.push(...generateDiamondStyle(baseColorObj, lightnessProgression, baseIndex))
+      colors.push(...generateDiamondStyle(baseColorObj, lightnessProgression))
     }
 
     // Convert to your color factory format
@@ -79,13 +79,13 @@ function generateSquareStyle(baseColor: Color, lightnesses: number[], baseIndex:
 }
 
 // Triangle Style: Perceptual compensation
-function generateTriangleStyle(baseColor: Color, lightnesses: number[], baseIndex: number): Color[] {
+function generateTriangleStyle(baseColor: Color, lightnesses: number[]): Color[] {
   const colors: Color[] = []
   const baseChroma = baseColor.oklch.c ?? 0
   const baseHue = baseColor.oklch.h ?? 0
   const baseLightness = baseColor.oklch.l ?? 0.5
 
-  lightnesses.forEach((targetLightness, index) => {
+  lightnesses.forEach(targetLightness => {
     const color = baseColor.clone()
     const lightnessDelta = targetLightness - baseLightness
     const isShade = lightnessDelta < 0
@@ -121,7 +121,7 @@ function generateTriangleStyle(baseColor: Color, lightnesses: number[], baseInde
 // Circle style intentionally ignores the shared `lightnesses`/`baseIndex` progression: it uses
 // colorjs `steps()` toward white and black to build its own perceptually-even ramp with natural
 // chroma falloff at the extremes. The params are kept only for a uniform dispatch signature. (5.2)
-function generateCircleStyle(baseColor: Color, lightnesses: number[], baseIndex: number): Color[] {
+function generateCircleStyle(baseColor: Color): Color[] {
   const whiteSteps = baseColor.steps('white', {
     space: 'oklch',
     outputSpace: 'oklch',
@@ -142,7 +142,7 @@ function generateCircleStyle(baseColor: Color, lightnesses: number[], baseIndex:
 }
 
 // Diamond Style: Tonal variations using color mixing
-function generateDiamondStyle(baseColor: Color, lightnesses: number[], baseIndex: number): Color[] {
+function generateDiamondStyle(baseColor: Color, lightnesses: number[]): Color[] {
   const steps = baseColor.steps('gray', {
     space: 'oklch',
     outputSpace: 'oklch',

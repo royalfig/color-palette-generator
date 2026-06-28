@@ -8,7 +8,6 @@ import { PaletteKinds } from '../types/types'
 export function selectAccentColors(
   paletteType: PaletteKinds,
   palette: BaseColorData[],
-  primary: Color,
 ): { secondary: Color; tertiary: Color } {
   const safeGetColor = (index: number): Color => {
     if (!palette[index]?.color) {
