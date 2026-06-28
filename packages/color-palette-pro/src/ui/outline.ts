@@ -28,7 +28,7 @@ export function generateOutlineAndInverse(
 
   // outline-variant: Decorative dividers — subtle delta (~0.06) from surface
   const outlineVariant = outlineBase.clone()
-  outlineVariant.oklch.l = (isDarkMode ? 0.6 : 0.92) + contrastDir * treatment.outlineContrast * 1.5
+  outlineVariant.oklch.l = (isDarkMode ? 0.35 : 0.92) + contrastDir * treatment.outlineContrast * 1.5
 
   // Inverse colors (snackbars, etc.): a whisper of the brand tint so they stay in the same
   // family as the rest of the (tinted-neutral) surfaces rather than reading as a foreign pure
