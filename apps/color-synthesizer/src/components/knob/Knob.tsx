@@ -4,7 +4,6 @@ import { WaveSawtoothIcon } from '@phosphor-icons/react/dist/csr/WaveSawtooth'
 import { WaveSineIcon } from '@phosphor-icons/react/dist/csr/WaveSine'
 import { WaveTriangleIcon } from '@phosphor-icons/react/dist/csr/WaveTriangle'
 import { WaveSquareIcon } from '@phosphor-icons/react/dist/csr/WaveSquare'
-import { TriangleIcon } from '@phosphor-icons/react/dist/csr/Triangle'
 import './knob.css'
 
 const knobConfigs = [

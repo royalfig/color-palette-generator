@@ -48,7 +48,7 @@ function IconSelector({ size, messageType }: { size: number; messageType: Messag
 
 // Usage in component
 export const DisplayInfo = memo(function DisplayInfo() {
-  const { colorGamut, dynamicRange, dpr } = useDisplayCapabilities()
+  const { colorGamut, dynamicRange } = useDisplayCapabilities()
   const { message, messageType } = useContext(MessageContext)
 
   // Mapping from color gamut to human spectrum coverage

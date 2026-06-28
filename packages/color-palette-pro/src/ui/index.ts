@@ -1,12 +1,11 @@
 import Color from 'colorjs.io'
 import { BaseColorData, colorFactory } from '../factory'
 import { ColorFormat, PaletteKinds, PaletteStyle } from '../types/types'
-import { adaptPrimaryForMode, getAccessibleVariant, surfaceTreatmentFor } from './uiUtils'
-import { makeContainerForAccent, generateSurfaceColors } from './surface'
 import { selectAccentColors } from './accentColors'
-import { findLightnessFromTarget } from './uiUtils'
 import { generateOutlineAndInverse } from './outline'
 import { generateSemanticColors } from './semantic'
+import { generateSurfaceColors, makeContainerForAccent } from './surface'
+import { adaptPrimaryForMode, findLightnessFromTarget, getAccessibleVariant, surfaceTreatmentFor } from './uiUtils'
 
 // ===== MAIN PALETTE GENERATION =====
 export function generateUiColorPalette(
@@ -32,7 +31,7 @@ export function generateUiColorPalette(
   const surfaces = generateSurfaceColors(primary, isDarkMode, treatment)
 
   // Step 4: Accent colors — adapted for the current mode
-  const { secondary: secondaryRaw, tertiary: tertiaryRaw } = selectAccentColors(paletteType, palette, primary)
+  const { secondary: secondaryRaw, tertiary: tertiaryRaw } = selectAccentColors(paletteType, palette)
 
   // Secondary and Tertiary follow the same lightness targets as Primary (OKLCH L 0.4 light /
   // 0.8 dark, picked so the on-color lands on the opposite pole). We assign the target L and

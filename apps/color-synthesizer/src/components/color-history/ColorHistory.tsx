@@ -1,5 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
-import { ColorContext } from '../ColorContext'
+import { useContext } from 'react'
 import '../swatches/swatches.css'
 import { MessageContext } from '../MessageContext'
 

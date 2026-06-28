@@ -33,7 +33,6 @@ export const complementaryTemplate: CodeThemeTemplate = {
     const accentColor = adaptLightnessForText(boostChroma(c1.clone(), 1.2), isDarkMode)
 
     const baseHue = c0.oklch.h ?? 0
-    const compHue = c1.oklch.h ?? baseHue
     const variableColor = adaptLightnessForQuiet(tintTowardHue(surfaces.onSurface, baseHue, 0.4), isDarkMode)
     const propertyColor = adaptLightnessForQuiet(
       tintTowardHue(surfaces.onSurfaceVariant, baseHue, 0.5, 0.016),

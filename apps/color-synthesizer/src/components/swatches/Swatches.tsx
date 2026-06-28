@@ -65,8 +65,6 @@ const UI_LAYOUT: string[] = [
 
 export const Swatches = memo(function Swatches({
   colorSpace,
-  paletteType,
-  paletteStyle,
 }: {
   colorSpace: { space: ColorSpace; format: ColorFormat }
   paletteType: string

@@ -54,7 +54,7 @@ export function InputColorContainer({
         new Color(input)
         setColor(input)
         showMessage(`Color set`, 'success')
-      } catch (e) {
+      } catch {
         showMessage('Invalid format', 'error')
       }
     }

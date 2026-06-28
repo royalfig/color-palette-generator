@@ -52,9 +52,7 @@ function downloadPaletteAsImage(
   const rows = isUiMode ? Math.ceil(colorCount / 8) : colorCount > 6 ? 2 : 1
   const outerPadding = 60
   const width = 1920
-  const fontSize = 20
   const largeFontSize = 64
-  const textMargin = 30
   const totalSpaces = columns + 1
   const totalPadding = totalSpaces * outerPadding
   const squareSize = (width - totalPadding) / columns

@@ -1,6 +1,7 @@
 {
   "name": "color-palette-workspace",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "pnpm --reporter=append-only -r --parallel run dev",
     "build": "pnpm -r run build",

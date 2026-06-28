@@ -51,8 +51,6 @@ function getPaletteType(paletteType: PaletteKinds) {
 
 export function ColorDisplay({
   fetchedData,
-  isLoading,
-  error,
   colorSpace,
   paletteType,
   paletteStyle,

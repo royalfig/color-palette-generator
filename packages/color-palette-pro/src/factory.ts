@@ -1,4 +1,4 @@
-import Color, { Coords } from 'colorjs.io'
+import Color from 'colorjs.io'
 import { ColorFormat } from './types/types'
 function toPrecision(n: number | null, precision: number) {
   if (n === null || n === 0) {

@@ -1,7 +1,7 @@
 import Color from 'colorjs.io'
 import type { PaletteStyle } from '../types/types'
 import type { BaseColorData } from './types'
-import { AnsiSlot, ANSI_SLOTS, ANSI_DRIFT_FACTOR, ANSI_CHROMA_FOLLOW_BY_LENS, ANSI_L_SPREAD_BY_LENS } from './constants'
+import { AnsiSlot, ANSI_SLOTS, ANSI_CHROMA_FOLLOW_BY_LENS, ANSI_L_SPREAD_BY_LENS } from './constants'
 import { ensureAPCAAgainst, clipToSRGB, hueGapDeg } from './utils'
 
 export interface AnsiPalette {
@@ -47,7 +47,6 @@ export function deriveAnsiPalette(input: AnsiPaletteInput): AnsiPalette {
 
   const ansiFloor = (c: Color): Color => ensureAPCAAgainst(clipToSRGB(c), editorBg, 45)
   const ansiChromaCentre = chromaCentre
-  const ansiDriftFactor = ANSI_DRIFT_FACTOR
   const ansiChromaFollow = ANSI_CHROMA_FOLLOW_BY_LENS[style]
   const ansiLSpread = ANSI_L_SPREAD_BY_LENS[style]
   const ansiLCentre = isDarkMode ? 0.73 : 0.52
