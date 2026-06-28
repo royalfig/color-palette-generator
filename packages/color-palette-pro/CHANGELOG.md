@@ -1,5 +1,11 @@
 # @royalfig/color-palette-pro
 
+## 3.2.2
+
+### Patch Changes
+
+- 3da1ad0: Outline color mod
+
 ## 3.2.1
 
 ### Patch Changes
