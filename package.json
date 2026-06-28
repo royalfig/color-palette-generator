@@ -9,7 +9,10 @@
     "lint:css": "stylelint \"apps/**/*.css\"",
     "type-check": "pnpm -r run type-check",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm -r run build && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",
