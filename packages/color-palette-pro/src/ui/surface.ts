@@ -32,7 +32,11 @@ export function generateSurfaceColors(
   const containerC = treatment.containerChromaScale
   const proxBoost = treatment.minProximityBoost
 
-  const baseSurfaceL = isDarkMode ? 0.23 : 0.99
+  // Dark base raised 0.23 -> 0.30. At 0.23 the maximum achievable *downward* contrast is Lc 2.6,
+  // so a sunken tier (inputs, sidebar wells) was mathematically impossible — it measured Lc 1.9
+  // against the surface, i.e. invisible. The reference corpus sits in this range too: One Dark
+  // 0.293, Dracula 0.288, Nord 0.324.
+  const baseSurfaceL = isDarkMode ? 0.3 : 0.99
   const stackShift = isDarkMode ? treatment.stackLShiftDark : treatment.stackLShiftLight
   const clampL = (l: number): number => Math.max(0.02, Math.min(0.998, l))
   const surfaceL = clampL(baseSurfaceL + stackShift)

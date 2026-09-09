@@ -8,7 +8,8 @@ import {
   STRUCTURAL_ROLES,
   STRUCTURAL_C_MAX,
   COMMENT_C_MAX,
-  APCA_TARGET_LOUD,
+  APCA_TARGET_LOUD_DARK,
+  APCA_TARGET_LOUD_LIGHT,
   APCA_TARGET_QUIET,
   APCA_COMMENT_MIN,
   APCA_COMMENT_MAX_DARK,
@@ -262,7 +263,8 @@ function adjustCommentHue(syntax: SyntaxColors, bg: Color, monoIdentity = false)
  */
 function ensureRoleContrast(syntax: SyntaxColors, bg: Color, isDarkMode: boolean): SyntaxColors {
   const out = { ...syntax }
-  for (const k of LOUD_ROLES) (out as any)[k] = ensureAPCAAgainst((syntax as any)[k], bg, APCA_TARGET_LOUD)
+  const loudTarget = isDarkMode ? APCA_TARGET_LOUD_DARK : APCA_TARGET_LOUD_LIGHT
+  for (const k of LOUD_ROLES) (out as any)[k] = ensureAPCAAgainst((syntax as any)[k], bg, loudTarget)
   for (const k of [...IDENTIFIER_ROLES, ...STRUCTURAL_ROLES]) {
     ;(out as any)[k] = ensureAPCAAgainst((syntax as any)[k], bg, APCA_TARGET_QUIET)
   }
@@ -298,7 +300,7 @@ function enforceDistinction(
   const finalize = (c: Color): Color => {
     const cl = c.clone()
     cl.oklch.c = Math.min(cl.oklch.c ?? 0, maxChroma)
-    return ensureAPCAAgainst(clipToSRGB(cl), bg, APCA_TARGET_LOUD)
+    return ensureAPCAAgainst(clipToSRGB(cl), bg, isDarkMode ? APCA_TARGET_LOUD_DARK : APCA_TARGET_LOUD_LIGHT)
   }
 
   for (let pass = 0; pass < 2; pass++) {
@@ -414,9 +416,16 @@ function applyHero(syntax: SyntaxColors, band: ReadBand, bg: Color, isDarkMode: 
   hero.oklch.l = bestL
   hero.oklch.c = Math.max(hero.oklch.c ?? 0, Math.min(cap * targetRel, band.loud.cCeil))
 
-  // Moving L can break the contrast floor the earlier pass established — restore it.
-  const floored = ensureAPCAAgainst(clipToSRGB(hero), bg, APCA_TARGET_LOUD)
-  ;(out as any)[HERO_ROLE] = clipToSRGB(floored)
+  // Moving L can break the contrast floor the earlier pass established — restore it. Iterate:
+  // lifting L pushes chroma out of gamut, and mapping back in nudges L again, so a single
+  // floor-then-map pass can still land under target.
+  const target = isDarkMode ? APCA_TARGET_LOUD_DARK : APCA_TARGET_LOUD_LIGHT
+  let settled = clipToSRGB(hero)
+  for (let i = 0; i < 3; i++) {
+    if (Math.abs(bg.contrastAPCA(settled)) >= target) break
+    settled = clipToSRGB(ensureAPCAAgainst(settled, bg, target))
+  }
+  ;(out as any)[HERO_ROLE] = settled
   return out
 }
 
@@ -456,5 +465,15 @@ export function buildSyntax(raw: SyntaxColors, ctx: SyntaxBuildContext): SyntaxC
   const distinct = enforceDistinction(contrasted, bg, isDarkMode, minDeltaE, band.loud.cCeil)
 
   const heroed = applyHero(distinct, band, bg, isDarkMode)
-  return isMono ? enforceMonoHue(heroed, ctx.monoHue) : heroed
+
+  // Final floor sweep. enforceDistinction and applyHero both run *after* ensureRoleContrast and
+  // both move lightness, so either can undercut the contrast floor the earlier pass established.
+  // Re-flooring costs a little of the distinction budget but a token that is separable and
+  // unreadable is worse than one that is readable and slightly closer to its neighbour.
+  const loudTargetFinal = isDarkMode ? APCA_TARGET_LOUD_DARK : APCA_TARGET_LOUD_LIGHT
+  const settled = { ...heroed }
+  for (const k of LOUD_ROLES) {
+    ;(settled as any)[k] = clipToSRGB(ensureAPCAAgainst((heroed as any)[k], bg, loudTargetFinal))
+  }
+  return isMono ? enforceMonoHue(settled, ctx.monoHue) : settled
 }

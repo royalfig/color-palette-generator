@@ -222,8 +222,32 @@ function buildThemeData(
 
   // Editor foreground: tinted themes carry the bg hue into the fg at a whisper
   // (corpus Δhue vs bg ≤ 16°, C median ≈ 0.02); the neutral school stays at C 0.
-  // Passthrough: editor foreground is the UI on-surface text color directly.
-  const editorFg = surfaces.onSurface.clone()
+  //
+  // NOT a straight passthrough of the UI on-surface token any more. That token is solved for
+  // maximum readability of app chrome and lands near-black on a light ground (median 19.7:1,
+  // where every reference editor theme sits at 8-14.7:1). In an editor that inverts the
+  // hierarchy: plain identifiers out-contrast the syntax colours that are supposed to lead the
+  // eye (measured median loud-minus-variable APCA was -10.3 Lc). The canvas text is the
+  // *baseline*, not the loudest thing on screen, so pull it back toward the ground until it sits
+  // at the top of the corpus range rather than past it.
+  const editorFg = (() => {
+    const fg = surfaces.onSurface.clone()
+    const bg = editorBgBase
+    const TARGET = 12 // WCAG 2.1 contrast ratio; corpus runs 8-14.7:1
+    if (fg.contrastWCAG21(bg) <= TARGET) return fg
+    const bgL = bg.oklch.l ?? (isDarkMode ? 0.3 : 0.99)
+    let lo = fg.oklch.l ?? 0.5
+    let hi = bgL
+    for (let i = 0; i < 20; i++) {
+      const mid = (lo + hi) / 2
+      const probe = fg.clone()
+      probe.oklch.l = mid
+      if (probe.contrastWCAG21(bg) > TARGET) lo = mid
+      else hi = mid
+    }
+    fg.oklch.l = lo
+    return fg
+  })()
 
   // ANSI palette: resample the seed palette at the six chromatic slots + a lifted near-black
   // (see ansi.ts). Convention-placed tokens seed the candidate pool ahead of raw swatches.

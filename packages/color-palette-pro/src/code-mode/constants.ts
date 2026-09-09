@@ -38,7 +38,13 @@ export const DISTINCT_ROLES_BY_FREQ = [
 //   60 = fluent text (acceptable for syntax tokens)
 //   45 = incidental UI text
 //   30 = decorative / spot text
-export const APCA_TARGET_LOUD = 60
+// Mode-dependent. Lc 60 against a dark editor ground leaves only ~0.13 of usable lightness for
+// seven loud roles, so 32% of dark loud tokens missed the floor anyway and the distinction pass
+// spent its budget fighting it. No widely-loved dark theme holds Lc 60 either (One Dark's minimum
+// loud token is Lc 39, Nord 41, Dracula 40). Light mode has the whole band available and keeps 60.
+export const APCA_TARGET_LOUD_DARK = 48
+export const APCA_TARGET_LOUD_LIGHT = 60
+export const APCA_TARGET_LOUD = APCA_TARGET_LOUD_LIGHT
 export const APCA_TARGET_QUIET = 45
 
 // Comments are a *band*, not just a floor: the exemplar themes run comments at
@@ -87,7 +93,9 @@ export interface ReadBand {
 }
 export const READABILITY_BAND: { dark: ReadBand; light: ReadBand } = {
   dark: {
-    loud: { lLo: 0.62, lHi: 0.9, cFloor: 0.045, cCeil: 0.2 },
+    // lLo raised 0.62 -> 0.69: below this a loud token cannot clear its contrast floor on a dark
+    // ground, so the bottom of the band was unusable and the effective band was 0.13 wide.
+    loud: { lLo: 0.72, lHi: 0.9, cFloor: 0.045, cCeil: 0.2 },
     quiet: { lLo: 0.6, lHi: 0.82, cFloor: 0.015, cCeil: 0.12 },
   },
   light: {
