@@ -89,11 +89,19 @@ export function generateSurfaceColors(
     0.26 + proxBoost,
   )
 
-  // container-overlay: Floating elements. Near-white in light mode → the damping makes it
-  // essentially neutral, so it relies on the `shadow` token to read as elevated (see
-  // generateUiColorPalette); visibly lifted (and faintly tinted) in dark.
+  // container-overlay: floating elements — menus, popovers, dialogs.
+  //
+  // Light mode used 0.995, which after the spread landed at L 0.994 against a surface of 0.991:
+  // deltaE 0.30, a contrast ratio of 1.009. A popover had no edge at all and depended entirely on
+  // the shadow to be seen. The mistake was carrying the dark-mode rule ("elevated = lighter")
+  // into light mode, where there is no headroom above a near-white page. Both Material 3 and
+  // Radix resolve this the same way: in light mode elevation moves AWAY from the page, which
+  // means darker. M3 puts menus and dialogs on surfaceContainerHigh (L 0.938) over a surface of
+  // L 0.984. So the light overlay is now a step beyond `container`, giving the ordering
+  // surface 0.991 > container 0.961 > overlay 0.948 > sunken 0.934 — monotone, and the same
+  // order M3 uses. Dark keeps "elevated = lighter", which is correct there.
   const containerOverlay = primary.clone()
-  const overlayL = spreadL(isDarkMode ? 0.31 : 0.995)
+  const overlayL = spreadL(isDarkMode ? 0.31 : 0.948)
   containerOverlay.oklch.l = overlayL
   containerOverlay.oklch.c = dampedSurfaceChroma(primaryC, overlayL, isDarkMode, 0.014 * containerC, 0 + proxBoost)
 
