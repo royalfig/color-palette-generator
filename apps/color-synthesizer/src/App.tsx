@@ -135,13 +135,27 @@ export default function App() {
   )
 
   const palette = useMemo(
-    () => createPalettes(color, paletteType, paletteStyle, colorSpace, knobValues, mode === 'ui', isDarkMode),
+    () => createPalettes({
+      color,
+      palette: paletteType,
+      style: paletteStyle,
+      colorSpace,
+      modulateValues: knobValues as [number, number, number, number],
+      isUiMode: mode === 'ui',
+      isDarkMode
+    }),
     [color, paletteType, paletteStyle, colorSpace, knobValues, mode, isDarkMode],
   )
 
   const codeTheme = useMemo(() => {
     if (mode !== 'code') return undefined
-    return generateCodeTheme(new Color(color), palette, isDarkMode, paletteType, paletteStyle)
+    return generateCodeTheme({
+      baseColor: color,
+      palette,
+      isDarkMode,
+      paletteKind: paletteType,
+      paletteStyle
+    })
   }, [color, palette, paletteType, paletteStyle, mode, isDarkMode])
 
   const colorContext = useMemo(

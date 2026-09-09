@@ -9,6 +9,7 @@ import { APCA_TARGET_SELECTION_OVERLAY } from './constants'
 import { serializeAsAlacritty } from './formats/alacritty'
 import { serializeAsGhostty } from './formats/ghostty'
 import { serializeAsIterm2 } from './formats/iterm2'
+import { buildVscodeTheme, serializeAsVscode } from './formats/vscode'
 import { serializeAsWarp } from './formats/warp'
 import { serializeAsZed } from './formats/zed'
 import { intensityChromaFor } from './intensity'
@@ -17,7 +18,7 @@ import { legibleOverlayAlpha } from './overlay'
 import { getPersonalityConfig } from './personality'
 import { buildSyntax } from './syntax'
 import { analogousTemplate } from './templates/analogous'
-import { deriveUiColors, generateBaseTokenRules, generateSemanticTokenRules } from './templates/base'
+// templates/base imports removed since they are moved to vscode format
 import { complementaryTemplate } from './templates/complementary'
 import { splitComplementaryTemplate } from './templates/splitcomp'
 import { tetradicTemplate } from './templates/tetradic'
@@ -335,147 +336,122 @@ function buildThemeData(
   }
 }
 
-export function generateCodeTheme(
-  baseColor: Color,
-  palette: BaseColorData[],
-  isDarkMode: boolean,
-  paletteKind: PaletteKinds,
-  paletteStyle: PaletteStyle = 'square',
-): CodeThemeOutput {
-  const data = buildThemeData(baseColor, palette, isDarkMode, paletteKind, paletteStyle)
-  const {
-    semanticColors,
-    type,
-    name,
-    displayName,
-    description,
-    author,
-    peakAlpha,
-    inactiveSelectionStyle,
-    fontStyleProfile,
-  } = data
-  const uiColors = deriveUiColors(semanticColors, isDarkMode, {
-    peakAlpha,
-    inactiveSelectionStyle,
-  })
-  const baseTokenRules = generateBaseTokenRules(semanticColors, fontStyleProfile ?? undefined)
-  const semanticTokenRules = generateSemanticTokenRules(semanticColors, fontStyleProfile ?? undefined)
-  return {
-    $schema: 'vscode://schemas/color-theme',
-    name,
-    displayName,
-    description,
-    author,
-    type,
-    semanticHighlighting: true,
-    colors: uiColors,
-    tokenColors: baseTokenRules,
-    semanticTokenColors: semanticTokenRules,
-  }
+export interface ThemeOptions {
+  /** The base or seed color used to generate the palette (as a Color object or string). */
+  baseColor: Color | string;
+  /** The generated palette data array. */
+  palette: BaseColorData[];
+  /** Whether the theme is for dark mode (true) or light mode (false). */
+  isDarkMode: boolean;
+  /** The kind of palette being used (e.g., 'ana' for analogous, 'com' for complementary). */
+  paletteKind: PaletteKinds;
+  /** The geometric style applied to the palette (default: 'square'). */
+  paletteStyle?: PaletteStyle;
+}
+
+/**
+ * Generates a code theme object for VSCode.
+ * 
+ * @param options - Configuration options for the code theme.
+ * @returns A JSON-serializable VSCode theme object.
+ */
+export function generateCodeTheme(options: ThemeOptions): CodeThemeOutput {
+  const { baseColor, palette, isDarkMode, paletteKind, paletteStyle = 'square' } = options;
+  const color = typeof baseColor === 'string' ? new Color(baseColor) : baseColor;
+  const data = buildThemeData(color, palette, isDarkMode, paletteKind, paletteStyle);
+  return buildVscodeTheme(data);
 }
 
 // ===== UNIFIED FORMAT API =====
 
+export interface FormatThemeOptions extends ThemeOptions {
+  /** The specific editor or terminal format to generate (default: 'vscode'). */
+  format?: ThemeFormat;
+}
+
 /**
- * Generate a theme in the specified format, serialized to a string ready to write to disk.
+ * Generates a theme in the specified format, serialized to a string ready to write to disk.
  * - vscode: JSON (.json) — load via Extensions > Install from VSIX or drop in themes dir
  * - zed: JSON (.json) — place in ~/.config/zed/themes/
  * - iterm2: XML plist (.itermcolors) — import via iTerm2 > Preferences > Colors
  * - ghostty: config snippet — paste into ~/.config/ghostty/config
+ * 
+ * @param options - Configuration options including the output format.
+ * @returns The serialized theme string.
  */
-export function generateTheme(
-  baseColor: Color,
-  palette: BaseColorData[],
-  isDarkMode: boolean,
-  paletteKind: PaletteKinds,
-  paletteStyle: PaletteStyle = 'square',
-  format: ThemeFormat = 'vscode',
-): string {
-  const data = buildThemeData(baseColor, palette, isDarkMode, paletteKind, paletteStyle)
+export function generateTheme(options: FormatThemeOptions): string {
+  const { baseColor, palette, isDarkMode, paletteKind, paletteStyle = 'square', format = 'vscode' } = options;
+  const color = typeof baseColor === 'string' ? new Color(baseColor) : baseColor;
+  const data = buildThemeData(color, palette, isDarkMode, paletteKind, paletteStyle);
   switch (format) {
-    case 'vscode': {
-      const {
-        semanticColors,
-        type,
-        name,
-        displayName,
-        description,
-        author,
-        peakAlpha,
-        inactiveSelectionStyle,
-        fontStyleProfile,
-      } = data
-      const uiColors = deriveUiColors(semanticColors, isDarkMode, {
-        peakAlpha,
-        inactiveSelectionStyle,
-      })
-      const baseTokenRules = generateBaseTokenRules(semanticColors, fontStyleProfile ?? undefined)
-      const semanticTokenRules = generateSemanticTokenRules(semanticColors, fontStyleProfile ?? undefined)
-      const output: CodeThemeOutput = {
-        $schema: 'vscode://schemas/color-theme',
-        name,
-        displayName,
-        description,
-        author,
-        type,
-        semanticHighlighting: true,
-        colors: uiColors,
-        tokenColors: baseTokenRules,
-        semanticTokenColors: semanticTokenRules,
-      }
-      return JSON.stringify(output, null, 2)
-    }
+    case 'vscode':
+      return serializeAsVscode(data);
     case 'zed': {
-      const nameInfo = themeNames(paletteKind, paletteStyle)
+      const nameInfo = themeNames(paletteKind, paletteStyle);
       const zedOutput: ZedThemeOutput = {
         $schema: 'https://zed.dev/schema/themes/v0.2.0.json',
         name: nameInfo.displayName,
         author: '@royalfig',
         themes: [serializeAsZed(data)],
-      }
-      return JSON.stringify(zedOutput, null, 2)
+      };
+      return JSON.stringify(zedOutput, null, 2);
     }
     case 'iterm2':
-      return serializeAsIterm2(data)
+      return serializeAsIterm2(data);
     case 'ghostty':
-      return serializeAsGhostty(data)
+      return serializeAsGhostty(data);
     case 'warp':
-      return serializeAsWarp(data)
+      return serializeAsWarp(data);
     case 'alacritty':
-      return serializeAsAlacritty(data)
+      return serializeAsAlacritty(data);
   }
 }
 
-/** Generate dark and light variants for the given format. */
-export function generateThemePair(
-  baseColor: Color,
-  palette: BaseColorData[],
-  paletteKind: PaletteKinds,
-  paletteStyle: PaletteStyle = 'square',
-  format: ThemeFormat = 'vscode',
-): { dark: string; light: string } {
+export type ThemePairOptions = Omit<ThemeOptions, 'isDarkMode'>;
+export type FormatThemePairOptions = Omit<FormatThemeOptions, 'isDarkMode'>;
+
+/**
+ * Generates both dark and light variants of a theme in the specified format.
+ * 
+ * @param options - Configuration options for the theme pair.
+ * @returns An object containing the serialized light and dark themes.
+ */
+export function generateThemePair(options: FormatThemePairOptions): { dark: string; light: string } {
   return {
-    dark: generateTheme(baseColor, palette, true, paletteKind, paletteStyle, format),
-    light: generateTheme(baseColor, palette, false, paletteKind, paletteStyle, format),
-  }
+    dark: generateTheme({ ...options, isDarkMode: true }),
+    light: generateTheme({ ...options, isDarkMode: false }),
+  };
 }
 
-export function generateCodeThemePair(
-  baseColor: Color,
-  palette: BaseColorData[],
-  paletteKind: PaletteKinds,
-  paletteStyle: PaletteStyle = 'square',
-): { dark: CodeThemeOutput; light: CodeThemeOutput } {
+/**
+ * Generates both dark and light variants of a VSCode code theme.
+ * 
+ * @param options - Configuration options for the theme pair.
+ * @returns An object containing the raw VSCode theme objects for dark and light modes.
+ */
+export function generateCodeThemePair(options: ThemePairOptions): { dark: CodeThemeOutput; light: CodeThemeOutput } {
   return {
-    dark: generateCodeTheme(baseColor, palette, true, paletteKind, paletteStyle),
-    light: generateCodeTheme(baseColor, palette, false, paletteKind, paletteStyle),
-  }
+    dark: generateCodeTheme({ ...options, isDarkMode: true }),
+    light: generateCodeTheme({ ...options, isDarkMode: false }),
+  };
 }
 
+/**
+ * Serializes a VSCode code theme object into a formatted JSON string.
+ * 
+ * @param theme - The VSCode code theme object.
+ * @returns The serialized JSON string.
+ */
 export function serializeTheme(theme: CodeThemeOutput): string {
-  return JSON.stringify(theme, null, 2)
+  return JSON.stringify(theme, null, 2);
 }
 
+/**
+ * Serializes a pair of VSCode code themes into a formatted JSON string.
+ * 
+ * @param pair - An object containing dark and light VSCode code theme objects.
+ * @returns The serialized JSON string.
+ */
 export function serializeThemePair(pair: { dark: CodeThemeOutput; light: CodeThemeOutput }): string {
-  return JSON.stringify(pair, null, 2)
+  return JSON.stringify(pair, null, 2);
 }

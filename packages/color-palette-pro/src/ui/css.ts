@@ -3,15 +3,25 @@ import { ColorFormat, PaletteStyle } from '../types/types'
 import { generateElevationShadowVars } from './shadows'
 
 export interface GenerateCssOptions {
+  /** The color format to serialize colors into (e.g. 'hex', 'oklch'). */
   format: ColorFormat
+  /** Whether the palette is a semantic UI palette (true) or raw token palette (false). */
   isUiMode?: boolean
+  /** Whether to wrap the output in a \`:root { ... }\` block. Defaults to 'none'. */
   wrapper?: 'root' | 'none'
-  /** Emit the brand-tinted elevation shadow system (UI mode only). Defaults to on in UI mode. */
+  /** Emit the brand-tinted elevation shadow system (UI mode only). Defaults to true in UI mode. */
   shadows?: boolean
-  /** Palette style — selects the shadow profile (diamond = hard). Defaults to soft (square). */
+  /** Palette style — selects the shadow profile (diamond = hard). Defaults to soft ('square'). */
   style?: PaletteStyle
 }
 
+/**
+ * Generates CSS custom properties (variables) for a color palette.
+ * 
+ * @param palette - The array of generated color data objects.
+ * @param options - Configuration options for CSS generation.
+ * @returns A string containing the CSS custom properties.
+ */
 export function generateCssVariables(palette: BaseColorData[], options: GenerateCssOptions): string {
   const { format, isUiMode = false, wrapper = 'none', shadows = true, style = 'square' } = options
 

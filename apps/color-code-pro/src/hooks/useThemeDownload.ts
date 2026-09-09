@@ -25,14 +25,14 @@ export function useThemeDownload() {
   const downloadTheme = useCallback(
     (outputFormat: ThemeFormat) => {
       const base = palette.find(c => c.isBase)!
-      const serialized = generateTheme(
-        base.color,
+      const serialized = generateTheme({
+        baseColor: base.color,
         palette,
-        resolvedTheme === 'dark',
+        isDarkMode: resolvedTheme === 'dark',
         paletteKind,
         paletteStyle,
-        outputFormat,
-      )
+        format: outputFormat,
+      })
       const meta = FORMATS.find(f => f.value === outputFormat)!
       // Include the format in the filename so multi-downloads don't collide
       // (e.g. VS Code and Zed both emit .json).

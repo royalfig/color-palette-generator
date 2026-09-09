@@ -153,15 +153,22 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }, [baseColor])
 
   const palette = useMemo(() => {
-    return createPalettes(baseColor, paletteKind, paletteStyle, {
-      space: 'oklch',
-      format: 'hex',
+    return createPalettes({
+      color: baseColor,
+      palette: paletteKind,
+      style: paletteStyle,
+      colorSpace: { space: 'oklch', format: 'hex' },
     })
   }, [baseColor, paletteKind, paletteStyle])
 
   const themePair = useMemo(() => {
     const base = palette.find(c => c.isBase)!
-    return generateCodeThemePair(base.color, palette, paletteKind, paletteStyle)
+    return generateCodeThemePair({
+      baseColor: base.color,
+      palette,
+      paletteKind,
+      paletteStyle,
+    })
   }, [palette, paletteKind, paletteStyle])
 
   const activeTheme = resolvedTheme === 'dark' ? themePair.dark : themePair.light
@@ -171,15 +178,14 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   // so a copied block is styled without the app's runtime injection.
   const uiVarsPair = useMemo(() => {
     const make = (isDarkMode: boolean) => {
-      const uiPalette = createPalettes(
-        baseColor,
-        paletteKind,
-        paletteStyle,
-        { space: 'oklch', format: 'hex' },
-        undefined,
-        true,
+      const uiPalette = createPalettes({
+        color: baseColor,
+        palette: paletteKind,
+        style: paletteStyle,
+        colorSpace: { space: 'oklch', format: 'hex' },
+        isUiMode: true,
         isDarkMode,
-      )
+      })
       return {
         css: generateCssVariables(uiPalette, {
           format: 'hex',
@@ -204,15 +210,14 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }, [uiVarsPair])
 
   useLayoutEffect(() => {
-    const uiPalette = createPalettes(
-      baseColor,
-      paletteKind,
-      paletteStyle,
-      { space: 'oklch', format: 'hex' },
-      undefined,
-      true,
-      resolvedTheme === 'dark',
-    )
+    const uiPalette = createPalettes({
+      color: baseColor,
+      palette: paletteKind,
+      style: paletteStyle,
+      colorSpace: { space: 'oklch', format: 'hex' },
+      isUiMode: true,
+      isDarkMode: resolvedTheme === 'dark',
+    })
 
     const uiVars = generateCssVariables(uiPalette, {
       format: 'hex',

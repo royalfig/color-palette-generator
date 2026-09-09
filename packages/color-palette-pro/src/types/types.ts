@@ -1,11 +1,15 @@
+/** The mathematical palette generation scheme. */
 export type PaletteKinds = 'ana' | 'tri' | 'tet' | 'com' | 'spl' | 'tas'
 
+/** The color space used for interpolation and gamut mapping. */
 export type ColorSpace = 'srgb' | 'p3' | 'hsl' | 'lch' | 'oklch' | 'lab' | 'oklab'
 
+/** The string format for serialized output colors. */
 export type ColorFormat = 'hex' | 'rgb' | 'hsl' | 'lch' | 'oklch' | 'lab' | 'oklab' | 'p3' | 'srgb'
 
 export type ColorSpaceAndFormat = { space: ColorSpace; format: ColorFormat }
 
+/** The geometric style/profile of the palette, dictating contrast and surface behaviors. */
 export type PaletteStyle = 'square' | 'triangle' | 'circle' | 'diamond'
 
 export type PaletteMode = 'palette' | 'ui' | 'code'
