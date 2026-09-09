@@ -44,9 +44,34 @@ export function generateUiColorPalette(
     if (out.contrastWCAG21(surfaces.surface) >= 4.5) return out
     return findLightnessFromTarget(out, surfaces.surface, 4.5, targetL)
   }
+  // Secondary and tertiary previously took the SAME lightness target, which erased the only axis
+  // a single-hue palette (tints & shades) has — they came back within deltaE 0.3 of each other.
+  // Offsetting the tertiary keeps a usable difference even when both sit on one hue.
   const accentTargetL = isDarkMode ? 0.8 : 0.4
+  const tertiaryTargetL = isDarkMode ? 0.66 : 0.54
   const secondary = verifyAgainstSurface(secondaryRaw, accentTargetL)
-  const tertiary = verifyAgainstSurface(tertiaryRaw, accentTargetL)
+  let tertiary = verifyAgainstSurface(tertiaryRaw, tertiaryTargetL)
+
+  // Safety net: whatever the scheme handed us, the two accents must be usably different. Walk the
+  // tertiary's lightness (the axis that survives every palette geometry, including single-hue)
+  // until it clears the threshold or runs out of contrast-safe room.
+  const ACCENT_MIN_DELTA_E = 12
+  if (secondary.deltaEOK(tertiary) * 100 < ACCENT_MIN_DELTA_E) {
+    let best = tertiary
+    let bestD = secondary.deltaEOK(tertiary) * 100
+    for (let l = 0.24; l <= 0.92; l += 0.02) {
+      const probe = tertiary.clone()
+      probe.oklch.l = l
+      if (probe.contrastWCAG21(surfaces.surface) < 4.5) continue
+      const d = secondary.deltaEOK(probe) * 100
+      if (d > bestD) {
+        bestD = d
+        best = probe
+      }
+      if (bestD >= ACCENT_MIN_DELTA_E) break
+    }
+    tertiary = best
+  }
 
   const onSecondary = getAccessibleVariant(secondary, secondary, 4.5)
   const onTertiary = getAccessibleVariant(tertiary, tertiary, 4.5)
@@ -144,14 +169,19 @@ export function generateUiColorPalette(
     colorFactory(semantic.onError, 'on-error', 0, colorFormat, false, true),
     colorFactory(errorContainer, 'error-container', 0, colorFormat, false, true),
     colorFactory(onErrorContainer, 'on-error-container', 0, colorFormat, false, true),
+    // Text tier: the same hue at real text contrast. The solid role colours above are tuned to
+    // read as their role (amber looks amber) rather than to carry body text.
+    colorFactory(semantic.errorText, 'error-text', 0, colorFormat, false, true),
     colorFactory(semantic.success, 'success', 0, colorFormat, false, true),
     colorFactory(semantic.onSuccess, 'on-success', 0, colorFormat, false, true),
     colorFactory(successContainer, 'success-container', 0, colorFormat, false, true),
     colorFactory(onSuccessContainer, 'on-success-container', 0, colorFormat, false, true),
+    colorFactory(semantic.successText, 'success-text', 0, colorFormat, false, true),
     colorFactory(semantic.warning, 'warning', 0, colorFormat, false, true),
     colorFactory(semantic.onWarning, 'on-warning', 0, colorFormat, false, true),
     colorFactory(warningContainer, 'warning-container', 0, colorFormat, false, true),
     colorFactory(onWarningContainer, 'on-warning-container', 0, colorFormat, false, true),
+    colorFactory(semantic.warningText, 'warning-text', 0, colorFormat, false, true),
 
     // Interaction states + disabled + utility (Audit 4C/4D)
     colorFactory(primaryHover, 'primary-hover', 0, colorFormat, false, true),

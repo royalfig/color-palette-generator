@@ -21,8 +21,11 @@ export function selectAccentColors(
 
   switch (paletteType) {
     case 'com':
+      // Slots 1 and 5 are BOTH the 180 complement, so the old 1/5 pick returned two colours on
+      // one hue and secondary/tertiary collapsed. Take the complement and the light base instead,
+      // which is the only pair in a two-hue scheme that differs in hue AND lightness.
       secondaryIndex = 1
-      tertiaryIndex = 5
+      tertiaryIndex = 3
       break
     case 'spl':
       secondaryIndex = 2
@@ -41,8 +44,10 @@ export function selectAccentColors(
       tertiaryIndex = 5
       break
     case 'tas':
-      secondaryIndex = 5
-      tertiaryIndex = 6
+      // Tints & shades is a 12-step single-hue ramp: lightness is the only axis it has, so
+      // adjacent steps (the old 5/6) were all but identical. Take widely separated steps.
+      secondaryIndex = 3
+      tertiaryIndex = 9
       break
     default:
       secondaryIndex = 1

@@ -167,13 +167,21 @@ export function enforceCvdDistinctSemantics(
   success: Color,
   surface: Color | undefined,
   minDist = 14,
+  chromaRetention = 0.75,
 ): { error: Color; warning: Color; success: Color } {
   // Lightness range we may explore (kept inside legible bounds). The contrast filter below
   // further restricts this per-color so every result still clears 4.5:1 against the surface.
   const candidateLs: number[] = []
   for (let l = 0.18; l <= 0.96; l += 0.02) candidateLs.push(l)
 
-  const contrastOk = (c: Color): boolean => !surface || c.contrastWCAG21(surface) >= 4.5
+  // Matches the fill rule in semantic.ts (WCAG 1.4.11). At 4.5 this filter removed every
+  // chromatic candidate for amber on a light surface, so the search could only pick near-black.
+  // A candidate also qualifies if it keeps the role's colour identity — see semantic.ts.
+  const contrastOk = (c: Color, original: Color): boolean => {
+    if (!surface) return true
+    if (c.contrastWCAG21(surface) >= 3) return true
+    return (c.oklch.c ?? 0) / Math.max(1e-6, original.oklch.c ?? 1e-6) >= chromaRetention
+  }
 
   // Place error first (anchor), then amber, then green — green is confusable with BOTH, so it
   // gets last pick of the remaining lightness space.
@@ -185,12 +193,18 @@ export function enforceCvdDistinctSemantics(
     for (const l of candidateLs) {
       const probe = c.clone()
       probe.oklch.l = l
-      if (!contrastOk(probe)) continue
+      if (!contrastOk(probe, c)) continue
       let minD = Infinity
       for (const p of placed) minD = Math.min(minD, cvdDistance(probe, p))
       // Reward distinctness; gently prefer staying near the role's natural lightness so amber
       // stays light, error stays deep, etc. The bonus is dwarfed once a pair is below minDist.
-      const score = Math.min(minD, minDist) * 10 - Math.abs(l - targetL)
+      // The distance term was weighted x10 against an |dL| penalty that could never exceed ~0.78,
+      // so the search always ran to the far edge of the band: light-mode warning shipped as
+      // #3B2400 and success as #00240F, near-black, with chroma halved by gamut clipping — and
+      // it still failed (protan error-vs-warning ran below the target in most themes). Weighting
+      // the lightness penalty properly keeps each role near its natural value.
+      const chromaKept = (probe.oklch.c ?? 0) / Math.max(1e-6, c.oklch.c ?? 1e-6)
+      const score = Math.min(minD, minDist) - Math.abs(l - targetL) * 8 + chromaKept * 2
       if (score > bestScore) {
         bestScore = score
         best = l
