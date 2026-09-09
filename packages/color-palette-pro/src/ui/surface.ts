@@ -32,11 +32,23 @@ export function generateSurfaceColors(
   const containerC = treatment.containerChromaScale
   const proxBoost = treatment.minProximityBoost
 
-  // Dark base raised 0.23 -> 0.30. At 0.23 the maximum achievable *downward* contrast is Lc 2.6,
-  // so a sunken tier (inputs, sidebar wells) was mathematically impossible — it measured Lc 1.9
-  // against the surface, i.e. invisible. The reference corpus sits in this range too: One Dark
-  // 0.293, Dracula 0.288, Nord 0.324.
-  const baseSurfaceL = isDarkMode ? 0.3 : 0.99
+  // Dark ground. This was briefly raised to 0.30 on the theory that a sunken tier was impossible
+  // at 0.23; that was wrong twice over, so it is documented here rather than re-derived.
+  //
+  //   1. The "impossible" finding came from measuring two SURFACES with APCA. APCA is a
+  //      text-on-background model and clamps low-contrast pairs to zero, so it reports Lc 0.00
+  //      for two obviously different dark greys. Measured in deltaE — the right metric for
+  //      surface against surface — the sunken tier at L 0.23 lands at deltaE 4.85-5.66, which is
+  //      indistinguishable from what L 0.30 buys (5.58). There was never a problem to fix.
+  //   2. The supporting corpus figures (One Dark 0.293, Dracula 0.288, Nord 0.324) were the
+  //      three TINTED-background themes. The full corpus runs 0.176-0.324 with a median nearer
+  //      0.24: VS Code Dark Modern 0.239, Tokyo Night 0.226, Catppuccin Mocha 0.243, Rose Pine
+  //      0.213, Night Owl 0.193, GitHub Dark 0.176.
+  //
+  // And chroma carries visual weight: a tinted ground at L 0.30 reads darker than a neutral one
+  // at the same lightness, so square/triangle — which are deliberately neutral — looked washed
+  // out at 0.30 in a way One Dark does not. 0.23 sits with Dark Modern and Tokyo Night.
+  const baseSurfaceL = isDarkMode ? 0.23 : 0.99
   const stackShift = isDarkMode ? treatment.stackLShiftDark : treatment.stackLShiftLight
   const clampL = (l: number): number => Math.max(0.02, Math.min(0.998, l))
   const surfaceL = clampL(baseSurfaceL + stackShift)
