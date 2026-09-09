@@ -54,7 +54,21 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     boolean: { color: za(c.accentColor.hex) },
     constant: { color: za(c.numberColor.hex) },
     variable: { color: za(c.variableColor.hex) },
+    // Zed falls back to `primary` (the near-white foreground) for any unset syntax key, so an
+    // absent variable.parameter made function parameters render LOUDER than plain variables —
+    // the opposite of the intended hierarchy, and only in Zed.
+    'variable.parameter': { color: za(c.variableColor.hex) },
+    'variable.member': { color: za(c.propertyColor.hex) },
     'variable.special': { color: za(c.accentColor.hex) },
+    field: { color: za(c.propertyColor.hex) },
+    'function.method': { color: za(c.definitionColor.hex) },
+    'function.definition': { color: za(c.definitionColor.hex) },
+    'function.special': { color: za(c.accentColor.hex) },
+    'type.builtin': { color: za(c.typeColor.hex) },
+    'type.interface': { color: za(c.typeColor.hex) },
+    'constant.builtin': { color: za(c.accentColor.hex) },
+    'keyword.import': { color: za(c.keywordColor.hex), ...fs(keywordStyle) },
+    'tag.doctype': { color: za(c.commentColor.hex) },
     property: { color: za(c.propertyColor.hex) },
     attribute: { color: za(c.definitionColor.hex) },
     tag: { color: za(c.keywordColor.hex) },
@@ -229,14 +243,28 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
     'version_control.word_added': za(c.successForeground.hex, 0.35),
     'version_control.word_deleted': za(c.errorForeground.hex, 0.5),
 
-    // Players (multi-cursor / collab)
-    players: [
-      {
-        cursor: za(c.cursorColor.hex),
-        background: za(c.accentColor.hex),
-        selection: za(c.selectionTint.hex, peakAlpha),
-      },
-    ],
+    // Players (multi-cursor / collab). Zed's schema and every shipped theme provide EIGHT — one
+    // per collaborator slot — and fall back to Zed's own defaults for any that are missing, so a
+    // single entry meant multi-cursor and collaboration cursors were un-themed. The eight are
+    // walked around the hue circle from the theme's own accent so they stay in-family while
+    // remaining mutually distinguishable.
+    players: (() => {
+      const sources = [
+        c.cursorColor.hex,
+        c.accentColor.hex,
+        c.stringColor.hex,
+        c.keywordColor.hex,
+        c.typeColor.hex,
+        c.numberColor.hex,
+        c.definitionColor.hex,
+        c.regexColor.hex,
+      ]
+      return sources.map(hex => ({
+        cursor: za(hex),
+        background: za(hex),
+        selection: za(hex, peakAlpha),
+      }))
+    })(),
 
     // Terminal
     'terminal.background': za(c.editorBackground.hex),

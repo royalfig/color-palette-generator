@@ -15,7 +15,12 @@ const OKLCH_LIMITS = {
 }
 
 /** A color is achromatic when chroma is negligible (its hue is then meaningless / NaN). */
-export function isAchromatic(color: Color, threshold = 0.002): boolean {
+// Threshold raised from 0.002 to 0.012. A seed like #7d7d80 (C 0.0045) cleared the old bar and
+// went down the chromatic path, where every slot's chroma multiplier scaled a chroma of
+// essentially zero — producing six "different" swatches spread over 240 degrees of hue but
+// separated by deltaE 0.4, the smallest separation anywhere in the generator. Below this
+// threshold the neutral generator (a real lightness ramp) is the honest answer.
+export function isAchromatic(color: Color, threshold = 0.012): boolean {
   const c = color.oklch.c ?? 0
   return !Number.isFinite(c) || c < threshold || !Number.isFinite(color.oklch.h ?? NaN)
 }

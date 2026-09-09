@@ -136,6 +136,36 @@ const scopeSets = {
 
   tags: ['entity.name.tag', 'punctuation.definition.tag.cs'],
 
+  // The angle brackets and slashes themselves. Previously only the C#-specific selector existed,
+  // so every `<`, `>` and `/>` in a JSX/HTML/Vue file rendered at editor.foreground.
+  tagPunctuation: [
+    'punctuation.definition.tag',
+    'punctuation.definition.tag.begin',
+    'punctuation.definition.tag.end',
+    'punctuation.definition.tag.begin.html',
+    'punctuation.definition.tag.end.html',
+    'punctuation.definition.tag.jsx',
+    'meta.tag punctuation.definition.string',
+    'meta.jsx.children',
+    'punctuation.section.embedded',
+  ],
+
+  // Markers that structure a document but are not content: markdown emphasis/heading marks,
+  // decorators, shell sigils. These read as punctuation, not as the thing they mark.
+  markers: [
+    'punctuation.definition.heading.markdown',
+    'punctuation.definition.bold.markdown',
+    'punctuation.definition.italic.markdown',
+    'punctuation.definition.quote.begin.markdown',
+    'punctuation.definition.metadata.markdown',
+    'entity.name.function.decorator',
+    'meta.decorator punctuation.decorator',
+    'punctuation.definition.decorator',
+    'punctuation.definition.variable.shell',
+    'punctuation.definition.attribute.rust',
+    'meta.attribute.rust',
+  ],
+
   attributes: ['entity.other.attribute-name', 'meta.selector', 'entity.other.attribute-name.parent-selector'],
 
   punctuation: [
@@ -402,6 +432,50 @@ export function deriveUiColors(
     'editorBracketPairGuide.activeBackground1': bp(0),
     'editorBracketPairGuide.activeBackground2': bp(1),
     'editorBracketPairGuide.activeBackground3': bp(2),
+
+    // Bracket-pair GUIDES beyond level 3, plus the inactive tiers. VS Code falls back to a stock
+    // grey for anything unset, so a theme that stops at 3 has three coloured guides and three
+    // grey ones.
+    'editorBracketPairGuide.activeBackground4': bp(3),
+    'editorBracketPairGuide.activeBackground5': bp(4),
+    'editorBracketPairGuide.activeBackground6': bp(5),
+    'editorBracketPairGuide.background1': toHex(withAlpha(bracketPairColors[0] ?? editorForeground.hex, 0.32)),
+    'editorBracketPairGuide.background2': toHex(withAlpha(bracketPairColors[1] ?? editorForeground.hex, 0.32)),
+    'editorBracketPairGuide.background3': toHex(withAlpha(bracketPairColors[2] ?? editorForeground.hex, 0.32)),
+    'editorBracketPairGuide.background4': toHex(withAlpha(bracketPairColors[3] ?? editorForeground.hex, 0.32)),
+    'editorBracketPairGuide.background5': toHex(withAlpha(bracketPairColors[4] ?? editorForeground.hex, 0.32)),
+    'editorBracketPairGuide.background6': toHex(withAlpha(bracketPairColors[5] ?? editorForeground.hex, 0.32)),
+
+    // AI completions / inline suggestions. Unset, these render in VS Code's stock grey, which is
+    // the single most-seen unstyled surface in a 2026 editor.
+    'editorGhostText.foreground': toHex(withAlpha(editorForeground.hex, guideAlpha(38))),
+    'editorGhostText.background': '#00000000',
+    'editorGhostText.border': '#00000000',
+    'inlineEdit.originalBackground': toHex(withAlpha(semantic.errorForeground.hex, 0.1)),
+    'inlineEdit.modifiedBackground': toHex(withAlpha(semantic.successForeground.hex, 0.1)),
+
+    // Minimap marks. Only the slider was set, so find-matches and error ticks kept VS Code's
+    // default green/red regardless of the theme.
+    'minimap.findMatchHighlight': ramp.findMatch,
+    'minimap.selectionHighlight': ramp.selectionHighlight,
+    'minimap.errorHighlight': semantic.errorForeground.hex,
+    'minimap.warningHighlight': semantic.warningForeground.hex,
+    'minimap.background': editorBackground.hex,
+    'minimapGutter.addedBackground': semantic.successForeground.hex,
+    'minimapGutter.modifiedBackground': semantic.infoForeground.hex,
+    'minimapGutter.deletedBackground': semantic.errorForeground.hex,
+
+    // Merge-editor (3-way) regions; the plain merge.* keys are set further down.
+    'merge.commonContentBackground': toHex(withAlpha(editorForeground.hex, 0.08)),
+    'mergeEditor.change.background': toHex(withAlpha(semantic.successForeground.hex, 0.12)),
+    'mergeEditor.change.word.background': toHex(withAlpha(semantic.successForeground.hex, 0.22)),
+    'mergeEditor.conflict.unhandledUnfocused.border': semantic.warningForeground.hex,
+    'mergeEditor.conflict.unhandledFocused.border': semantic.errorForeground.hex,
+    'mergeEditor.conflict.handledUnfocused.border': outlineVariant.hex,
+    'mergeEditor.conflict.handledFocused.border': outline.hex,
+
+    'tree.indentGuidesStroke': toHex(withAlpha(editorForeground.hex, guideAlpha(15))),
+    'tree.inactiveIndentGuidesStroke': toHex(withAlpha(editorForeground.hex, guideAlpha(8))),
 
     // editorBracketMatch — when the cursor sits next to a `{`, the matching `}` gets
     // a visible chromatic background (~30% primary) and a near-invisible border.
@@ -994,6 +1068,8 @@ export function generateBaseTokenRules(
 
     // Tags (HTML/XML)
     { scope: scopeSets.tags, settings: { foreground: semantic.keywordColor.hex } },
+    { scope: scopeSets.tagPunctuation, settings: { foreground: semantic.punctuationColor.hex } },
+    { scope: scopeSets.markers, settings: { foreground: semantic.punctuationColor.hex } },
 
     // Markdown headings (6-level ramp)
     { scope: scopeSets.markdownH1, settings: { foreground: headingRamp[0], fontStyle: 'bold' } },

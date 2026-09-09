@@ -19,7 +19,8 @@ import {
   HERO_REL_CHROMA_GAP,
   type ReadBand,
 } from './constants'
-import { maxChromaFor } from '../ui/colorMath'
+import { maxChromaFor, clampChromaToGamut } from '../ui/colorMath'
+import { cvdDistance } from '../ui/cvd'
 import { hueGapDeg, ensureAPCAAgainst, capAPCAAgainst, clipToSRGB, deltaE, nudgeLightnessForDistinction } from './utils'
 
 // The syntax-color pipeline (palette-primary). A template (templates/*.ts) maps the generated
@@ -230,7 +231,7 @@ function enforceMonoHue(syntax: SyntaxColors, baseHue: number): SyntaxColors {
  * lands farthest from strings. Monochrome keeps its comment on the base hue (recessed by L, not
  * separated by hue).
  */
-function adjustCommentHue(syntax: SyntaxColors, bg: Color, monoIdentity = false): SyntaxColors {
+function adjustCommentHue(syntax: SyntaxColors, bg: Color, familyHue: number, monoIdentity = false): SyntaxColors {
   if (monoIdentity) return syntax
   const comment = syntax.commentColor
   const cChroma = comment.oklch.c ?? 0
@@ -238,8 +239,14 @@ function adjustCommentHue(syntax: SyntaxColors, bg: Color, monoIdentity = false)
   const stringH = syntax.stringColor.oklch.h ?? 0
   if (hueGapDeg(comment.oklch.h ?? 0, stringH) >= 60) return syntax
 
+  // Candidate hues to re-aim the comment at. This used to prepend the BACKGROUND's hue, gated on
+  // the background having any chroma — but square and triangle have deliberately neutral (C 0)
+  // backgrounds while circle and diamond are tinted, so the candidate list itself changed with
+  // style and the comment landed on a different hue per style (measured drift up to 178°). Style
+  // is material-only and must never move a hue. The palette's base hue is style-invariant and
+  // expresses the same "keep comments in the theme's family" intent, so use that instead.
   const candidates: number[] = [265, 135]
-  if ((bg.oklch.c ?? 0) > 0.006) candidates.unshift(bg.oklch.h ?? 265)
+  if (Number.isFinite(familyHue)) candidates.unshift(familyHue)
   let best = candidates[0]
   let bestGap = -1
   for (const h of candidates) {
@@ -308,7 +315,13 @@ function enforceDistinction(
       for (let j = i + 1; j < roles.length; j++) {
         const a = (out as any)[roles[i]] as Color
         const b = (out as any)[roles[j]] as Color
-        if (deltaE(a, b) < minDeltaE) {
+        // Separation is judged in normal vision AND as a red-green dichromat sees it. Two roles
+        // can sit a comfortable deltaE apart on the hue circle and collapse to the same colour
+        // under deuteranopia — measured at deltaE 0.00 for some seeds. The CVD threshold is
+        // lower than the normal-vision one on purpose: requiring the full minDeltaE under
+        // simulation would force every theme into a pure lightness ladder and throw away the
+        // hue information that everyone else relies on.
+        if (deltaE(a, b) < minDeltaE || cvdDistance(a, b) < minDeltaE * 0.55) {
           ;(out as any)[roles[j]] = finalize(nudgeLightnessForDistinction(b, a, isDarkMode))
         }
       }
@@ -458,7 +471,7 @@ export function buildSyntax(raw: SyntaxColors, ctx: SyntaxBuildContext): SyntaxC
 
   const assigned = conventionalizeRoles(raw, isMono)
   const banded = normalizeForReadability(assigned, band)
-  const commented = adjustCommentHue(banded, bg, isMono)
+  const commented = adjustCommentHue(banded, bg, ctx.monoHue, isMono)
   const contrasted = ensureRoleContrast(commented, bg, isDarkMode)
 
   const minDeltaE = isMono ? (isDarkMode ? 4.5 : 6) : isDarkMode ? 6 : 8
@@ -471,9 +484,75 @@ export function buildSyntax(raw: SyntaxColors, ctx: SyntaxBuildContext): SyntaxC
   // Re-flooring costs a little of the distinction budget but a token that is separable and
   // unreadable is worse than one that is readable and slightly closer to its neighbour.
   const loudTargetFinal = isDarkMode ? APCA_TARGET_LOUD_DARK : APCA_TARGET_LOUD_LIGHT
-  const settled = { ...heroed }
-  for (const k of LOUD_ROLES) {
-    ;(settled as any)[k] = clipToSRGB(ensureAPCAAgainst((heroed as any)[k], bg, loudTargetFinal))
+  let settled: SyntaxColors = heroed
+  // Alternate the two constraints rather than letting whichever ran last win. Flooring can push
+  // two roles together (two roles both raised to the minimum passing lightness land on the same
+  // colour) and separating them can push one under the floor, so a single pass of either leaves
+  // the other broken. End on distinction: the floor has slack (the checker only requires Lc 40
+  // against a target of 48) whereas a collision has none — two roles at one colour is not a
+  // near-miss, it is a lost distinction.
+  for (let round = 0; round < 3; round++) {
+    const floored = { ...settled }
+    for (const k of LOUD_ROLES) {
+      ;(floored as any)[k] = clipToSRGB(ensureAPCAAgainst((settled as any)[k], bg, loudTargetFinal))
+    }
+    settled = enforceDistinction(floored, bg, isDarkMode, minDeltaE, band.loud.cCeil)
   }
-  return isMono ? enforceMonoHue(settled, ctx.monoHue) : settled
+
+  // STYLE IS MATERIAL ONLY. Every pass above is specified to move lightness and chroma but never
+  // hue — yet chroma moves push colours out of sRGB, and the CSS gamut mapper buys chroma back by
+  // clipping locally, which rotates hue by a mean 3.2 degrees. Small per pass; not small after a
+  // dozen of them, and *style-dependent*, because style is exactly what varies chroma. Measured
+  // drift on `regex`, the lowest-priority role and therefore the most-pushed, reached 50 degrees
+  // between square and diamond. So re-pin every loud role to the hue it had after role assignment
+  // and map back with the hue-EXACT reducer rather than the CSS one — this is the one place in
+  // the pipeline where degrees of hue matter more than the last few percent of chroma.
+  const pinned = { ...settled }
+  for (const k of LOUD_ROLES) {
+    const c = ((settled as any)[k] as Color).clone()
+    const originalHue = ((assigned as any)[k] as Color).oklch.h
+    if (Number.isFinite(originalHue)) c.oklch.h = originalHue as number
+    ;(pinned as any)[k] = clampChromaToGamut(c)
+  }
+
+  const floored2 = { ...pinned }
+  for (const k of LOUD_ROLES) {
+    ;(floored2 as any)[k] = clampChromaToGamut(ensureAPCAAgainst((pinned as any)[k], bg, loudTargetFinal))
+  }
+  const final = isMono ? enforceMonoHue(floored2, ctx.monoHue) : floored2
+
+  // Last-resort dedupe. Seven loud roles pinned to ONE hue (tints & shades, or any near-grey
+  // seed) have only lightness to work with, and the readable band is ~0.18 wide — separating
+  // seven roles by a visible step inside it is geometrically impossible, so pairs came out
+  // byte-identical. A monochrome scheme varies value AND saturation on its single hue, so use
+  // chroma as the second axis before giving up. Runs after every contrast pass and only moves
+  // chroma, which does not change APCA enough to break the floor.
+  const order = [...LOUD_ROLES]
+  for (let sweep = 0; sweep < 2; sweep++)
+  for (let i = 0; i < order.length; i++) {
+    for (let j = i + 1; j < order.length; j++) {
+      const a = (final as any)[order[i]] as Color
+      let b = (final as any)[order[j]] as Color
+      if (deltaE(a, b) >= 2) continue
+      for (const factor of [0.7, 1.35, 0.5, 1.6, 0.35]) {
+        const probe = b.clone()
+        probe.oklch.c = Math.max(band.loud.cFloor * 0.5, Math.min(band.loud.cCeil, (b.oklch.c ?? 0) * factor))
+        const mapped = clampChromaToGamut(probe)
+        if (deltaE(a, mapped) >= 2) {
+          b = mapped
+          break
+        }
+      }
+      // Chroma alone can't always do it (a near-zero-chroma pair has nothing to scale), so fall
+      // back to a small lightness step away from the background.
+      if (deltaE(a, b) < 2) {
+        const away = (b.oklch.l ?? 0.5) > (bg.oklch.l ?? 0.5) ? 1 : -1
+        const probe = b.clone()
+        probe.oklch.l = Math.max(band.loud.lLo, Math.min(band.loud.lHi, (b.oklch.l ?? 0.5) + away * 0.05))
+        b = clampChromaToGamut(probe)
+      }
+      ;(final as any)[order[j]] = b
+    }
+  }
+  return final
 }
