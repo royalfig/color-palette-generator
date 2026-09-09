@@ -32,23 +32,23 @@ export function generateSurfaceColors(
   const containerC = treatment.containerChromaScale
   const proxBoost = treatment.minProximityBoost
 
-  // Dark ground. This was briefly raised to 0.30 on the theory that a sunken tier was impossible
-  // at 0.23; that was wrong twice over, so it is documented here rather than re-derived.
+  // Surface stack anchored on Material 3's baseline scheme, measured in OKLCH:
   //
-  //   1. The "impossible" finding came from measuring two SURFACES with APCA. APCA is a
-  //      text-on-background model and clamps low-contrast pairs to zero, so it reports Lc 0.00
-  //      for two obviously different dark greys. Measured in deltaE — the right metric for
-  //      surface against surface — the sunken tier at L 0.23 lands at deltaE 4.85-5.66, which is
-  //      indistinguishable from what L 0.30 buys (5.58). There was never a problem to fix.
-  //   2. The supporting corpus figures (One Dark 0.293, Dracula 0.288, Nord 0.324) were the
-  //      three TINTED-background themes. The full corpus runs 0.176-0.324 with a median nearer
-  //      0.24: VS Code Dark Modern 0.239, Tokyo Night 0.226, Catppuccin Mocha 0.243, Rose Pine
-  //      0.213, Night Owl 0.193, GitHub Dark 0.176.
+  //            M3 dark          M3 light
+  //   surface  #141218  0.187   #FEF7FF  0.984
+  //   +cards   #211F26  0.245   #F3EDF7  0.954   (surfaceContainer)
+  //   +float   #2B2930  0.286   #ECE6F0  0.933   (surfaceContainerHigh — menus, dialogs)
+  //   recessed #0F0D13  0.164   #E6E0E9  0.914   (Lowest in dark / Highest in light)
   //
-  // And chroma carries visual weight: a tinted ground at L 0.30 reads darker than a neutral one
-  // at the same lightness, so square/triangle — which are deliberately neutral — looked washed
-  // out at 0.30 in a way One Dark does not. 0.23 sits with Dark Modern and Tokyo Night.
-  const baseSurfaceL = isDarkMode ? 0.23 : 0.99
+  // Our tier semantics are kept: elevation moves lighter in dark and darker in light, and the
+  // sunken well recedes from the surface in both. Only the lightness values are matched to M3.
+  //
+  // History, so it is not re-derived: this was 0.23 dark, and briefly 0.30. The 0.30 experiment
+  // was justified by "at 0.23 a sunken tier is impossible (Lc 2.6)" — which came from measuring
+  // two SURFACES with APCA. APCA is a text-on-background model that clamps low-contrast pairs to
+  // zero, so it reports Lc 0.00 for two obviously different dark greys; in deltaE, the right
+  // metric here, the sunken tier was always fine. Do not use APCA to compare two surfaces.
+  const baseSurfaceL = isDarkMode ? 0.187 : 0.984
   const stackShift = isDarkMode ? treatment.stackLShiftDark : treatment.stackLShiftLight
   const clampL = (l: number): number => Math.max(0.02, Math.min(0.998, l))
   const surfaceL = clampL(baseSurfaceL + stackShift)
@@ -65,7 +65,7 @@ export function generateSurfaceColors(
   // container: Standard cards — the most tinted of the stack (furthest from paper in light mode,
   // so the damping lets the brand tint actually show here). (Audit 4B.)
   const container = primary.clone()
-  const containerL = spreadL(isDarkMode ? 0.27 : 0.96)
+  const containerL = spreadL(isDarkMode ? 0.245 : 0.954) // M3 surfaceContainer
   container.oklch.l = containerL
   // Dark containers sit at a lower (more mid) lightness, so they tolerate more chroma before
   // reading as oversaturated — give dark a higher intended so its tint matches the light card.
@@ -79,7 +79,13 @@ export function generateSurfaceColors(
 
   // container-sunken: Inset wells — recessed below surface or container
   const containerSunken = primary.clone()
-  const sunkenL = spreadL(isDarkMode ? 0.18 : 0.935)
+  // Light follows M3's surfaceContainerHighest (0.914), the most recessed light tier. Dark does
+  // NOT use M3's surfaceContainerLowest (0.164): that sits only 0.023 under the surface, because
+  // M3 has no recessed-well concept in dark — its dark text fields go LIGHTER, to
+  // surfaceContainerHighest. Our sunken tier has to read as an inset (sidebars, inputs, the code
+  // editor's chrome), so it needs a real step down. 0.148 gives deltaE ~3.5-5 against the
+  // surface at every style, where M3's own value fell to 2.25 once the style spread compressed it.
+  const sunkenL = spreadL(isDarkMode ? 0.148 : 0.914)
   containerSunken.oklch.l = sunkenL
   containerSunken.oklch.c = dampedSurfaceChroma(
     primaryC,
@@ -101,7 +107,7 @@ export function generateSurfaceColors(
   // surface 0.991 > container 0.961 > overlay 0.948 > sunken 0.934 — monotone, and the same
   // order M3 uses. Dark keeps "elevated = lighter", which is correct there.
   const containerOverlay = primary.clone()
-  const overlayL = spreadL(isDarkMode ? 0.31 : 0.948)
+  const overlayL = spreadL(isDarkMode ? 0.286 : 0.933) // M3 surfaceContainerHigh
   containerOverlay.oklch.l = overlayL
   containerOverlay.oklch.c = dampedSurfaceChroma(primaryC, overlayL, isDarkMode, 0.014 * containerC, 0 + proxBoost)
 

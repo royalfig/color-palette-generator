@@ -19,16 +19,21 @@ export function generateUiColorPalette(
   // Per-style surface material treatment — neutral (square) → brutalist (diamond).
   const treatment = surfaceTreatmentFor(paletteStyle)
 
-  const isNaturallyLight = (color.oklch.l ?? 0.5) > 0.5
-  // Naturally-light + light mode used to bias slightly darker (Tone 35); preserve that.
-  const primaryTargetL = isNaturallyLight && !isDarkMode ? 0.35 : undefined
-  const primary = adaptPrimaryForMode(color, isDarkMode, primaryTargetL)
+  // No explicit tone target: adaptPrimaryForMode now keeps the seed's own lightness whenever it
+  // already clears contrast against this mode's surface, and derives the other mode by matching
+  // the contrast ratio. The old naturally-light/light-mode bias to Tone 0.35 was part of the
+  // fixed-tone scheme that replaced the seed unconditionally, and is no longer needed.
+  // Two passes: the surface stack needs a primary for its hue/chroma tint, and the primary needs
+  // the real surface to verify contrast against. The provisional primary differs from the final
+  // one only in lightness, which surfaces do not read, so the stack is unaffected by the swap.
+  const provisionalPrimary = adaptPrimaryForMode(color, isDarkMode)
+
+  // Step 3: Surface colors (AAA contrast) — generated before accents so surface is available
+  const surfaces = generateSurfaceColors(provisionalPrimary, isDarkMode, treatment)
+  const primary = adaptPrimaryForMode(color, isDarkMode, undefined, surfaces.surface)
 
   const onPrimary = getAccessibleVariant(primary, primary, 4.5)
   const { container: primaryContainer, onContainer: onPrimaryContainer } = makeContainerForAccent(primary, isDarkMode)
-
-  // Step 3: Surface colors (AAA contrast) — generated before accents so surface is available
-  const surfaces = generateSurfaceColors(primary, isDarkMode, treatment)
 
   // Step 4: Accent colors — adapted for the current mode
   const { secondary: secondaryRaw, tertiary: tertiaryRaw } = selectAccentColors(paletteType, palette)
