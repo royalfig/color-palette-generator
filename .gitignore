@@ -32,3 +32,4 @@ packages/color-palette-pro/scripts/*.html
 generated-themes
 packages/color-palette-pro/scripts/dump*/
 packages/color-palette-pro/scripts/_audit/
+packages/color-palette-pro/scripts/catalog-*.html

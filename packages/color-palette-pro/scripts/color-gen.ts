@@ -117,7 +117,7 @@ for (const { id, name } of KINDS) {
   // palettes (current output)
   let rows = ''
   for (const style of STYLES) {
-    const pal = createPalettes(baseColor, id, style, SPACE) as BaseColorData[]
+    const pal = createPalettes({ color: baseColor, palette: id, style, colorSpace: SPACE })
     rows += `<div class="prow"><div class="styname">${style}</div>${paletteStrip(pal)}</div>`
   }
   palettesHtml += `<h3>${name}</h3>${rows}`
@@ -125,8 +125,8 @@ for (const { id, name } of KINDS) {
   // ui tokens: light + dark (polished — the real output)
   let uiBlocks = ''
   for (const style of STYLES) {
-    const light = createPalettes(baseColor, id, style, SPACE, [0, 0, 0, 0], true, false) as BaseColorData[]
-    const dark = createPalettes(baseColor, id, style, SPACE, [0, 0, 0, 0], true, true) as BaseColorData[]
+    const light = createPalettes({ color: baseColor, palette: id, style, colorSpace: SPACE, isUiMode: true, isDarkMode: false })
+    const dark = createPalettes({ color: baseColor, palette: id, style, colorSpace: SPACE, isUiMode: true, isDarkMode: true })
     uiBlocks += `<div class="uiblock"><h4>${style}</h4>
       <div class="modecol"><span class="modelab">light</span>${uiGrid(light)}</div>
       <div class="modecol"><span class="modelab">dark</span>${uiGrid(dark)}</div></div>`
@@ -136,10 +136,10 @@ for (const { id, name } of KINDS) {
   // code mode: light + dark
   let codeBlocks = ''
   for (const style of STYLES) {
-    const basePalette = createPalettes(baseColor, id, style, SPACE) as BaseColorData[]
+    const basePalette = createPalettes({ color: baseColor, palette: id, style, colorSpace: SPACE })
     const baseC = new Color(baseColor)
-    const lightTheme = generateCodeTheme(baseC, basePalette, false, id, style)
-    const darkTheme = generateCodeTheme(baseC, basePalette, true, id, style)
+    const lightTheme = generateCodeTheme({ baseColor: baseC, palette: basePalette, isDarkMode: false, paletteKind: id, paletteStyle: style })
+    const darkTheme = generateCodeTheme({ baseColor: baseC, palette: basePalette, isDarkMode: true, paletteKind: id, paletteStyle: style })
     codeBlocks += `<div class="codeblock"><h4>${style}</h4>
       <div class="codepair">${codePreview(lightTheme)}${codePreview(darkTheme)}</div></div>`
   }

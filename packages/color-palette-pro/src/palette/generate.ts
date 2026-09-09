@@ -28,17 +28,28 @@ const L_MAX = 0.92
  *   C    = baseC · (1 + (cMul−1)·cContrast)
  * then a single gamut-aware OKLCH clamp. This is the one place a derived swatch's L/C/H is decided.
  */
-function deriveSwatch(base: Color, slot: SlotSpec, shape: StyleShape, gamut: DisplayGamut): Color {
+function deriveSwatch(
+  base: Color,
+  slot: SlotSpec,
+  shape: StyleShape,
+  gamut: DisplayGamut,
+  schemeMeanL: number,
+): Color {
   const baseL = base.oklch.l ?? 0.5
   const baseC = base.oklch.c ?? 0
   const baseH = safeHue(base, 0)
 
   const h = baseH + slot.hueOffset
 
-  let l = baseL + slot.dL * shape.lSpread
-  if (l > L_MAX) l = L_MAX - (l - L_MAX) // reflect overshoot back into the band
-  if (l < L_MIN) l = L_MIN + (L_MIN - l)
-  l = Math.max(L_MIN, Math.min(L_MAX, l)) // safety clamp if the reflection overshot too
+  // Absolute target, spread around the scheme's own mean lightness. The reflection that used to
+  // handle overshoot here was removed with the switch to absolute targets: it is the one family
+  // of overflow handlers that is NOT monotone, so it folded the extreme slots back past their
+  // neighbours and inverted the intended value order in 60 of 160 palettes (the slot asked to be
+  // lightest came out darker than the slot asked to be dark). Targets are in-band by
+  // construction, so a plain clamp cannot reorder anything.
+  const target = slot.aL === 0 ? baseL : slot.aL
+  let l = schemeMeanL + (target - schemeMeanL) * shape.lSpread
+  l = Math.max(L_MIN, Math.min(L_MAX, l))
 
   const c = baseC * (1 + (slot.cMul - 1) * shape.cContrast)
 
@@ -78,10 +89,16 @@ export function generatePalette(
     const slots = SCHEME_SLOTS[scheme]
     const shape = STYLE_SHAPES[style]
 
+    // The style spreads lightness AROUND the scheme's own mean rather than around the seed, so
+    // the value structure the scheme describes survives at every style. Slot 0 contributes the
+    // seed's actual lightness, which is how the seed still colours the whole palette.
+    const baseL = base.oklch.l ?? 0.5
+    const schemeMeanL = slots.reduce((sum, sl) => sum + (sl.aL === 0 ? baseL : sl.aL), 0) / slots.length
+
     return slots.map((slot, i) =>
       i === 0
         ? colorFactory(baseColor, code, 0, format, true) // base preserved exactly (no polish)
-        : colorFactory(polishSwatch(deriveSwatch(base, slot, shape, gamut), gamut), code, i, format),
+        : colorFactory(polishSwatch(deriveSwatch(base, slot, shape, gamut, schemeMeanL), gamut), code, i, format),
     )
   } catch (e) {
     throw new Error(`Failed to generate ${code} colors for ${baseColor}`, { cause: e })

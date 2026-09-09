@@ -533,23 +533,32 @@ export function buildSyntax(raw: SyntaxColors, ctx: SyntaxBuildContext): SyntaxC
     for (let j = i + 1; j < order.length; j++) {
       const a = (final as any)[order[i]] as Color
       let b = (final as any)[order[j]] as Color
-      if (deltaE(a, b) >= 2) continue
+      // Judged in normal vision AND under simulated dichromacy — the hue-pin and this dedupe both
+      // run after enforceDistinction, so either can quietly undo the CVD separation it achieved.
+      const ok = (x: Color, y: Color): boolean => deltaE(x, y) >= 2 && cvdDistance(x, y) >= 0.6
+      if (ok(a, b)) continue
       for (const factor of [0.7, 1.35, 0.5, 1.6, 0.35]) {
         const probe = b.clone()
         probe.oklch.c = Math.max(band.loud.cFloor * 0.5, Math.min(band.loud.cCeil, (b.oklch.c ?? 0) * factor))
         const mapped = clampChromaToGamut(probe)
-        if (deltaE(a, mapped) >= 2) {
+        if (ok(a, mapped)) {
           b = mapped
           break
         }
       }
       // Chroma alone can't always do it (a near-zero-chroma pair has nothing to scale), so fall
       // back to a small lightness step away from the background.
-      if (deltaE(a, b) < 2) {
+      if (!ok(a, b)) {
+        // Lightness is the axis that survives every form of colour blindness, so it is the
+        // fallback when chroma cannot do the job.
         const away = (b.oklch.l ?? 0.5) > (bg.oklch.l ?? 0.5) ? 1 : -1
-        const probe = b.clone()
-        probe.oklch.l = Math.max(band.loud.lLo, Math.min(band.loud.lHi, (b.oklch.l ?? 0.5) + away * 0.05))
-        b = clampChromaToGamut(probe)
+        for (const step of [0.05, 0.09, 0.14]) {
+          const probe = b.clone()
+          probe.oklch.l = Math.max(band.loud.lLo, Math.min(band.loud.lHi, (b.oklch.l ?? 0.5) + away * step))
+          const mapped = clampChromaToGamut(probe)
+          b = mapped
+          if (ok(a, mapped)) break
+        }
       }
       ;(final as any)[order[j]] = b
     }
