@@ -234,7 +234,7 @@ export function serializeAsZed(data: ThemeData): ZedTheme {
       {
         cursor: za(c.cursorColor.hex),
         background: za(c.accentColor.hex),
-        selection: za(c.focusBorder.hex, peakAlpha),
+        selection: za(c.selectionTint.hex, peakAlpha),
       },
     ],
 

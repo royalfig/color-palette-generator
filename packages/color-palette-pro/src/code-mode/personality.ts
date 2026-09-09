@@ -69,11 +69,15 @@ const FONT_STYLES: Record<PaletteStyle, PersonalityFontStyleProfile> = {
 
 // Peak alpha for the unified chromatic highlight ramp. Light is roughly half of dark —
 // primary on white reads much harder than primary on near-black.
+// Starting alphas — legibleOverlayAlpha now treats these as CAPS and bisects downward until
+// every syntax token still reads on the composite, so they are the strongest a selection is ever
+// allowed to be rather than the value it will take. A given alpha buys only ~45-55% as much
+// contrast over a dark ground as over a light one, hence the modest dark numbers.
 const PEAK_ALPHA_BY_CHARACTER: Record<PaletteCharacter, { dark: number; light: number }> = {
-  serene: { dark: 0.55, light: 0.25 },
-  crisp: { dark: 0.7, light: 0.3 },
-  mono: { dark: 0.75, light: 0.32 },
-  vivid: { dark: 0.85, light: 0.4 },
+  serene: { dark: 0.45, light: 0.38 },
+  crisp: { dark: 0.5, light: 0.42 },
+  mono: { dark: 0.52, light: 0.44 },
+  vivid: { dark: 0.58, light: 0.5 },
 }
 
 // Cursor source: loud characters keep accent; calm characters use foreground (2026-style).

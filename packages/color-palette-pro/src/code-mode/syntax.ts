@@ -15,9 +15,10 @@ import {
   APCA_COMMENT_MAX_LIGHT,
   READABILITY_BAND,
   HERO_ROLE,
-  HERO_CHROMA_GAP,
+  HERO_REL_CHROMA_GAP,
   type ReadBand,
 } from './constants'
+import { maxChromaFor } from '../ui/colorMath'
 import { hueGapDeg, ensureAPCAAgainst, capAPCAAgainst, clipToSRGB, deltaE, nudgeLightnessForDistinction } from './utils'
 
 // The syntax-color pipeline (palette-primary). A template (templates/*.ts) maps the generated
@@ -113,7 +114,11 @@ function conventionalizeRoles(syntax: SyntaxColors, isMono: boolean): SyntaxColo
   // across styles (style adjusts chroma, which nudges hue ~1e-4°) — without a margin the winner of a
   // tie would flip square↔diamond and the *same* token would change hue across styles. The margin
   // makes near-ties resolve to the lowest index (the template's own order) deterministically.
-  const TIE = 2
+  // Tie margin, in degrees of hue fitness. Must sit above the gamut mapper's hue noise floor
+  // (clipToSRGB's CSS mapping moves hue by a mean 3.2°, tail to ~12°) — at TIE = 2 that noise
+  // decided ties, so the same token was permuted onto a different role between styles, which
+  // is a style-invariance violation. Style must not change hue.
+  const TIE = 8
 
   // 1. string → greenest/warmest available, but only when the template's string is violating.
   if (isViolatingString(colors[SI])) {
@@ -357,23 +362,61 @@ function enforceDistinction(
 }
 
 /**
- * Hero peak: guarantee one loud role leads the eye. The keyword (HERO_ROLE) is raised in chroma to
- * clear the rest of the loud field by HERO_CHROMA_GAP, capped at the band ceiling. Runs *last* (after
- * distinction) so the final field is the reference and the peak is never re-flattened: it only adds
- * chroma, which moves the hero *away* from its neighbours in ΔE, so it can't reintroduce a collision.
- * L is untouched, so the APCA floor still holds.
+ * Hero peak: guarantee one loud role leads the eye — the keyword (HERO_ROLE) clears the rest of the
+ * loud field in *relative* chroma (fraction of what the hue can actually hold at that lightness).
+ *
+ * The previous version asked for an absolute chroma gap inside the loud L band. sRGB's maximum
+ * chroma varies ~4× by hue, and at the band's lightness a blue or violet holds only ~C 0.08 — so
+ * the absolute ceiling was unreachable for blue, cyan and gold, the mapper deleted the boost, and
+ * the "hero" ended up the *quietest* loud token in 41% of dark themes. Chroma at high lightness is
+ * not for sale; it is bought by moving L down toward the hue's cusp. So:
+ *   1. target a relative-chroma gap over the loud field's peak,
+ *   2. if the hue can't hold that at the current L, walk L toward its cusp (staying in band) until
+ *      it can — this is what One Dark and Tokyo Night do with a blue keyword (≈L 0.66/C 0.17),
+ *   3. re-floor APCA afterwards, because step 2 moves L and can cross the contrast floor.
+ *
+ * Note this pass CAN reduce ΔE against a neighbour (the old docstring claimed otherwise and was
+ * wrong on both counts — it also claimed L was untouched). The caller re-checks distinction.
  */
-function applyHero(syntax: SyntaxColors, band: ReadBand): SyntaxColors {
+function applyHero(syntax: SyntaxColors, band: ReadBand, bg: Color, isDarkMode: boolean): SyntaxColors {
   const out = { ...syntax }
   const hero = ((syntax as any)[HERO_ROLE] as Color).clone()
-  let maxOther = 0
+  const h = hero.oklch.h ?? 0
+
+  // Peak of the rest of the loud field, expressed relative to each hue's own capacity.
+  let maxOtherRel = 0
   for (const k of LOUD_ROLES) {
     if (k === HERO_ROLE) continue
-    maxOther = Math.max(maxOther, ((syntax as any)[k] as Color).oklch.c ?? 0)
+    const c = (syntax as any)[k] as Color
+    const cap = maxChromaFor(c.oklch.l ?? 0.5, c.oklch.h ?? 0)
+    if (cap > 0) maxOtherRel = Math.max(maxOtherRel, (c.oklch.c ?? 0) / cap)
   }
-  const target = Math.min(band.loud.cCeil, Math.max(hero.oklch.c ?? 0, maxOther + HERO_CHROMA_GAP))
-  hero.oklch.c = target
-  ;(out as any)[HERO_ROLE] = clipToSRGB(hero)
+  const targetRel = Math.min(1, maxOtherRel + HERO_REL_CHROMA_GAP)
+
+  // Search the in-band lightness range for the L that best delivers the target relative chroma,
+  // preferring the smallest move from where the token already sits.
+  const startL = hero.oklch.l ?? 0.5
+  let bestL = startL
+  let bestScore = -Infinity
+  for (let i = 0; i <= 40; i++) {
+    const l = band.loud.lLo + ((band.loud.lHi - band.loud.lLo) * i) / 40
+    const cap = maxChromaFor(l, h)
+    if (cap <= 0) continue
+    const achievable = Math.min(cap * targetRel, band.loud.cCeil)
+    // Reward delivered chroma; penalise straying from the token's current lightness.
+    const score = achievable - Math.abs(l - startL) * 0.06
+    if (score > bestScore) {
+      bestScore = score
+      bestL = l
+    }
+  }
+  const cap = maxChromaFor(bestL, h)
+  hero.oklch.l = bestL
+  hero.oklch.c = Math.max(hero.oklch.c ?? 0, Math.min(cap * targetRel, band.loud.cCeil))
+
+  // Moving L can break the contrast floor the earlier pass established — restore it.
+  const floored = ensureAPCAAgainst(clipToSRGB(hero), bg, APCA_TARGET_LOUD)
+  ;(out as any)[HERO_ROLE] = clipToSRGB(floored)
   return out
 }
 
@@ -412,6 +455,6 @@ export function buildSyntax(raw: SyntaxColors, ctx: SyntaxBuildContext): SyntaxC
   const minDeltaE = isMono ? (isDarkMode ? 4.5 : 6) : isDarkMode ? 6 : 8
   const distinct = enforceDistinction(contrasted, bg, isDarkMode, minDeltaE, band.loud.cCeil)
 
-  const heroed = applyHero(distinct, band)
+  const heroed = applyHero(distinct, band, bg, isDarkMode)
   return isMono ? enforceMonoHue(heroed, ctx.monoHue) : heroed
 }

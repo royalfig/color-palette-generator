@@ -122,9 +122,23 @@ export function ensureAPCAAgainst(color: Color, bg: Color, minLc: number): Color
 }
 
 /**
- * Clip a color to the sRGB gamut and return it in OKLCH. Pipeline math (band
- * normalization, distinction nudges) must operate on realizable colors — otherwise
- * two distinct OKLCH values can collapse to near-identical hex at serialization.
+ * Gamut-map a color into sRGB and return it in OKLCH. Pipeline math (band normalization,
+ * distinction nudges) must operate on realizable colors — otherwise two distinct OKLCH values
+ * can collapse to near-identical hex at serialization.
+ *
+ * Despite the name this is NOT a clip: it uses colorjs's default `css` method (CSS Color 4
+ * gamut mapping) — a binary chroma search that also compares against a channel-clipped
+ * candidate and takes the clipped one while it stays within a just-noticeable difference.
+ * That local clipping can rotate hue, which looks alarming measured in degrees (mean 3.2°,
+ * max ~12° over the out-of-gamut band). It was measured against the hue-exact alternative
+ * (`ui/colorMath.ts` clampChromaToGamut) before being kept: the two agree to a mean ΔEOK of
+ * 1.37 — below the ~2 JND — while `css` returns MORE chroma in 5818 of 7497 out-of-gamut
+ * samples and less in zero of them. The degrees are large only where chroma is small, i.e.
+ * exactly where a hue difference is imperceptible. Pure chroma reduction is the method colorjs
+ * itself dropped as a default because it desaturates yellows.
+ *
+ * The real cost of that hue noise is downstream: any pass that *selects* or *permutes* by hue
+ * needs a tie margin wider than ~4°, or its choice flips between styles. See TIE in syntax.ts.
  */
 export function clipToSRGB(color: Color): Color {
   const srgb = color.clone().to('srgb')

@@ -89,10 +89,11 @@ function buildThemeData(
   const overlayBg = surfaces.containerOverlay.clone()
   const inputSunken = surfaces.containerSunken.clone()
 
-  // Status bar: a UI-gen passthrough — the primary-container wash (a soft branded bar), the same
-  // token the app palette uses. Replaces the old bespoke per-style status-bar logic; the bar's
-  // border falls back to the divider (no special seam).
-  const statusBarBg = makeContainerForAccent(primary, isDarkMode).container
+  // Status bar: chrome, not brand. It reads as the bottom edge of the window frame, so it
+  // inherits the same sunken container the sidebar / title bar / tab bar use rather than a
+  // branded primary-container wash — a lighter tinted bar there fights the editor for
+  // attention and breaks the frame's single plane. Border falls back to the divider.
+  const statusBarBg = sidebarBg.clone()
 
   const divider = outlineVariant.clone()
 
@@ -243,6 +244,19 @@ function buildThemeData(
     isDarkMode,
   })
 
+  // Source colour for the selection / highlight ramp. Deliberately NOT the raw focus accent:
+  // a bright accent has to be held at a very low alpha to keep glyphs readable, which makes the
+  // selection itself nearly invisible. Pulling the tint toward the editor ground first (the way
+  // VS Code's #264F78-on-#1F1F1F selection does) buys a higher alpha at the same text legibility,
+  // so the selection reads as a solid block without washing out the code inside it.
+  const selectionTint = (() => {
+    const t = uiAccent.clone()
+    const bgL = editorBgBase.oklch.l ?? (isDarkMode ? 0.2 : 0.98)
+    const l = t.oklch.l ?? 0.5
+    t.oklch.l = isDarkMode ? Math.min(l, bgL + 0.24) : Math.max(l, bgL - 0.22)
+    return t
+  })()
+
   const semanticColors: SemanticColors = {
     editorBackground: { hex: toHex(editorBgBase) },
     editorForeground: { hex: toHex(editorFg) },
@@ -251,6 +265,7 @@ function buildThemeData(
     overlayBackground: { hex: toHex(overlayBg) },
     statusBarBackground: { hex: toHex(statusBarBg) },
     focusBorder: { hex: toHex(uiAccent) },
+    selectionTint: { hex: toHex(selectionTint) },
     inputBackground: { hex: toHex(panelBg) },
     inputSunken: { hex: toHex(inputSunken) },
     divider: { hex: toHex(divider) },
@@ -312,10 +327,27 @@ function buildThemeData(
   }
 
   const peakStartAlpha = isDarkMode ? sp.peakAlpha.dark : sp.peakAlpha.light
+  // Solve the selection alpha against every token that can actually sit inside a selection —
+  // the loud syntax roles and the quiet ones — not just editorForeground, which is the token
+  // least at risk of being washed out.
   const peakAlpha = legibleOverlayAlpha(
-    semanticColors.focusBorder.hex,
+    semanticColors.selectionTint.hex,
     semanticColors.editorBackground.hex,
-    semanticColors.editorForeground.hex,
+    [
+      semanticColors.editorForeground.hex,
+      semanticColors.keywordColor.hex,
+      semanticColors.stringColor.hex,
+      semanticColors.typeColor.hex,
+      semanticColors.numberColor.hex,
+      semanticColors.definitionColor.hex,
+      semanticColors.regexColor.hex,
+      semanticColors.accentColor.hex,
+      semanticColors.variableColor.hex,
+      semanticColors.propertyColor.hex,
+      semanticColors.operatorColor.hex,
+      semanticColors.punctuationColor.hex,
+      semanticColors.commentColor.hex,
+    ],
     peakStartAlpha,
     APCA_TARGET_SELECTION_OVERLAY,
   )

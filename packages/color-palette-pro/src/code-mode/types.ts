@@ -20,6 +20,8 @@ export interface SemanticColors {
   /** Optional top-border accent for the status bar (diamond lens only). */
   statusBarBorderTop?: SemanticColor
   focusBorder: SemanticColor
+  /** Ground-pulled tint used for the selection / highlight ramp (see index.ts). */
+  selectionTint: SemanticColor
   inputBackground: SemanticColor
   /** Surface used for chat / agents input fields — sunken in dark, lifted in light. */
   inputSunken: SemanticColor

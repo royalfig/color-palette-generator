@@ -30,3 +30,5 @@ packages/color-palette-pro/scripts/*.html
 *.sw?
 
 generated-themes
+packages/color-palette-pro/scripts/dump*/
+packages/color-palette-pro/scripts/_audit/

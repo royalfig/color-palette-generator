@@ -19,12 +19,18 @@ export const LOUD_ROLES = [
 // Roles whose visual distinctness matters, ordered by typical token frequency in code.
 // Frequency-weighted enforcement: high-frequency roles anchor the lightness/chroma space and
 // less-frequent roles step around them. keyword and string dominate most languages; type is rarest.
+// Every loud role must appear here. regexColor and accentColor were previously omitted, so
+// nothing ever separated them: `accent` (which paints `this`/`true`/`null`) is derived as a
+// chroma-boosted copy of a swatch another role already uses, and the boost is clamped away by
+// normalizeForReadability — leaving an exact duplicate in ~29% of generated themes.
 export const DISTINCT_ROLES_BY_FREQ = [
   'keywordColor',
   'stringColor',
   'definitionColor',
   'numberColor',
   'typeColor',
+  'accentColor',
+  'regexColor',
 ] as const
 
 // APCA contrast targets (perceptual; Lc scale):
@@ -40,9 +46,13 @@ export const APCA_TARGET_QUIET = 45
 // We hold them slightly above the exemplar low end for readability, but cap them
 // so they never compete with code. Light bgs need more Lc for the same recessed feel.
 export const APCA_COMMENT_MIN = 30
-export const APCA_COMMENT_MAX_DARK = 44
+// Capped below APCA_TARGET_QUIET (45) — at 44 the comment ceiling sat one point under the quiet
+// floor, so comments and punctuation converged to the same colour in every dark theme measured.
+export const APCA_COMMENT_MAX_DARK = 32
 export const APCA_COMMENT_MAX_LIGHT = 52
-export const APCA_TARGET_SELECTION_OVERLAY = 30
+// Text inside a selection is still body text, not a disabled control — it was targeting the
+// decorative tier (30). VS Code Dark Modern ships a selection at alpha ~0.15 for this reason.
+export const APCA_TARGET_SELECTION_OVERLAY = 45
 
 // Quiet-role chroma tiers (measured from exemplars): identifiers (variable/property)
 // carry a real tint — Dark Modern's variable #9CDCFE is C 0.109 — while structural
@@ -61,7 +71,10 @@ export const STRUCTURAL_ROLES = ['operatorColor', 'punctuationColor'] as const
 // capped at the band ceiling. It only raises chroma — hue (palette identity) and L (contrast) are
 // untouched — so it's a prominence dial, not a restyle.
 export const HERO_ROLE = 'keywordColor' as const
-export const HERO_CHROMA_GAP = 0.045
+// Expressed as a fraction of the hue's OWN maximum chroma at the working lightness, not as an
+// absolute OKLCH chroma. sRGB max chroma varies ~4x by hue, so an absolute gap is unbuyable for
+// blue/cyan/gold in the loud band and the mapper silently deletes it. See applyHero in syntax.ts.
+export const HERO_REL_CHROMA_GAP = 0.18
 
 // Generic, mode-only readability band (palette-primary redesign). The syntax pipeline preserves
 // every token's *hue and relative chroma* from the palette; this band only governs the L window a

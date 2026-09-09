@@ -1,7 +1,13 @@
 import Color from 'colorjs.io'
 import type { PaletteStyle } from '../types/types'
 import type { BaseColorData } from './types'
-import { AnsiSlot, ANSI_SLOTS, ANSI_CHROMA_FOLLOW_BY_LENS, ANSI_L_SPREAD_BY_LENS } from './constants'
+import {
+  AnsiSlot,
+  ANSI_SLOTS,
+  ANSI_CHROMA_FOLLOW_BY_LENS,
+  ANSI_L_SPREAD_BY_LENS,
+  ANSI_DRIFT_FACTOR,
+} from './constants'
 import { ensureAPCAAgainst, clipToSRGB, hueGapDeg } from './utils'
 
 export interface AnsiPalette {
@@ -92,8 +98,20 @@ export function deriveAnsiPalette(input: AnsiPaletteInput): AnsiPalette {
     const swatchC = nearest.oklch.c ?? ansiChromaCentre
     const swatchL = nearest.oklch.l ?? ansiLCentre
 
-    // Hue: snaps exactly to the nearest palette color without any drift cap.
-    const hue = nearest.oklch.h ?? slot.hue
+    // Hue: the nearest palette member, but bounded by the slot's documented drift cap. Without
+    // the cap (it was declared, documented, and then never read) a slot snapped to whatever the
+    // palette offered — `terminal.ansiRed` averaged 53° off canonical and reached 174°, so for a
+    // teal seed `git diff` deletions rendered cyan. red/green/yellow are load-bearing for diffs,
+    // tests and warnings and get the narrowest leeway; blue/magenta/cyan are free to roam.
+    const cap = slot.drift * ANSI_DRIFT_FACTOR
+    const rawHue = nearest.oklch.h ?? slot.hue
+    const gap = hueGapDeg(rawHue, slot.hue)
+    let hue = rawHue
+    if (gap > cap) {
+      // Step `cap` degrees from the canonical hue along the shorter arc toward the palette hue.
+      const delta = ((rawHue - slot.hue + 540) % 360) - 180
+      hue = (slot.hue + Math.sign(delta) * cap + 360) % 360
+    }
 
     // Chroma: seed-driven centre pulled toward the swatch's own chroma, then shaped by the slot's
     // hue-natural chroma multiplier so the ramp isn't flat (red/green punchy, yellow/cyan softer).

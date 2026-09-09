@@ -1,6 +1,17 @@
 import Color from 'colorjs.io'
 import type { PersonalityFontStyleProfile, SemanticColors, SurfaceProfile, TokenRule } from '../types'
-import { toHex, desaturate, boostChroma, withAlpha, shiftHue, brightWhiteHex } from '../utils'
+import {
+  toHex,
+  desaturate,
+  boostChroma,
+  withAlpha,
+  shiftHue,
+  brightWhiteHex,
+  mixColors,
+  ensureAPCAAgainst,
+} from '../utils'
+import { alphaForContrastOnBg } from '../overlay'
+import { APCA_TARGET_QUIET } from '../constants'
 // Accessibility helpers come from the single canonical (ui) implementation; they return a Color,
 // so wrap each call in toHex() for the hex-string theme output.
 import { ensureContrast, getAccessibleVariant } from '../../ui/uiUtils'
@@ -267,7 +278,7 @@ export function deriveUiColors(
   // (set by index.ts via personality.surfaceProfile). Falls back to a sensible default
   // if a caller invokes deriveUiColors directly.
   const peakAlpha = options.peakAlpha ?? (isDarkMode ? 0.7 : 0.3)
-  const ramp = attentionRamp(semantic.focusBorder.hex, peakAlpha)
+  const ramp = attentionRamp(semantic.selectionTint.hex, peakAlpha)
 
   // Find-match is gold regardless of palette — the universal "highlighter pen"
   // convention (corpus findMatch hues 49–93 even in all-blue themes: Dark Modern 74,
@@ -295,12 +306,18 @@ export function deriveUiColors(
     return isDarkMode ? overlayBackground.hex : panelBackground.hex
   })()
 
-  // Bracket pairs come from the template as a 6-color harmonic spread.
-  // Apply alpha so they don't collide with text underneath.
-  const bracketAlpha = isDarkMode ? 0.55 : 0.45
+  // Bracket pairs come from the template as a 6-color harmonic spread. These are TEXT — the
+  // brackets themselves — so they ship opaque (as VS Code's own themes do) and are floored to
+  // the quiet-text contrast tier. The previous 0.55/0.45 alpha left 81% of dark themes with at
+  // least one of the six levels at Lc 0.0, i.e. invisible.
+  // Hairline chrome (guides, rulers, whitespace dots, gutter numbers) is solved to an APCA tier
+  // against the real editor background rather than carrying a fixed alpha that only worked light.
+  const guideAlpha = (targetLc: number): number =>
+    alphaForContrastOnBg(editorForeground.hex, editorBackground.hex, targetLc)
+
   const bp = (i: number): string => {
     const hex = bracketPairColors[i] ?? bracketPairColors[0] ?? editorForeground.hex
-    return toHex(withAlpha(hex, bracketAlpha))
+    return toHex(ensureAPCAAgainst(new Color(hex), new Color(editorBackground.hex), APCA_TARGET_QUIET))
   }
 
   const brightAnsi = (hex: string, isBlack = false): string => {
@@ -398,7 +415,10 @@ export function deriveUiColors(
     'editorStickyScroll.border': outlineVariant.hex,
     'editorStickyScroll.shadow': '#00000000',
 
-    'editorCodeLens.foreground': toHex(desaturate(new Color(editorForeground.hex), 0.7)),
+    // CodeLens sits above every function signature — it must recede. desaturate() moves chroma
+    // only, so this was rendering at full body-text lightness; use the comment colour, which is
+    // already solved to a recessed APCA band.
+    'editorCodeLens.foreground': semantic.commentColor.hex,
     'editorCursor.foreground': cursorColor.hex,
     'editorInlayHint.foreground': toHex(withAlpha(semantic.propertyColor.hex, 0.7)),
     'editorInlayHint.background': toHex(withAlpha(panelBackground.hex, 0.5)),
@@ -416,9 +436,9 @@ export function deriveUiColors(
     'editorGutter.modifiedBackground': toHex(withAlpha(semantic.infoForeground.hex, 0.7)),
     'editorHoverWidget.background': overlayBackground.hex,
     'editorHoverWidget.border': outlineVariant.hex,
-    'editorIndentGuide.activeBackground': toHex(withAlpha(editorForeground.hex, 0.25)),
-    'editorIndentGuide.background': toHex(withAlpha(editorForeground.hex, 0.08)),
-    'editorLineNumber.foreground': toHex(withAlpha(editorForeground.hex, isDarkMode ? 0.35 : 0.45)),
+    'editorIndentGuide.activeBackground': toHex(withAlpha(editorForeground.hex, guideAlpha(30))),
+    'editorIndentGuide.background': toHex(withAlpha(editorForeground.hex, guideAlpha(15))),
+    'editorLineNumber.foreground': toHex(withAlpha(editorForeground.hex, guideAlpha(45))),
     'editorLineNumber.activeForeground': editorForeground.hex,
     'editorLink.activeForeground': semantic.infoForeground.hex,
     'editorMarkerNavigation.background': overlayBackground.hex,
@@ -431,13 +451,13 @@ export function deriveUiColors(
     'editorOverviewRuler.modifiedForeground': toHex(withAlpha(semantic.infoForeground.hex, 0.5)),
     'editorOverviewRuler.warningForeground': toHex(withAlpha(semantic.warningForeground.hex, 0.5)),
     'editorOverviewRuler.wordHighlightForeground': semantic.infoForeground.hex,
-    'editorRuler.foreground': toHex(withAlpha(editorForeground.hex, 0.1)),
+    'editorRuler.foreground': toHex(withAlpha(editorForeground.hex, guideAlpha(15))),
     'editorSuggestWidget.background': overlayBackground.hex,
     'editorSuggestWidget.foreground': editorForeground.hex,
     'editorSuggestWidget.border': outlineVariant.hex,
     'editorSuggestWidget.selectedBackground': toHex(withAlpha(semantic.focusBorder.hex, 0.3)),
     'editorSuggestWidget.highlightForeground': semantic.infoForeground.hex,
-    'editorWhitespace.foreground': toHex(withAlpha(editorForeground.hex, 0.08)),
+    'editorWhitespace.foreground': toHex(withAlpha(editorForeground.hex, guideAlpha(15))),
     'editorWidget.background': overlayBackground.hex,
     'editorWidget.border': outlineVariant.hex,
     'editorWidget.foreground': editorForeground.hex,
@@ -506,7 +526,9 @@ export function deriveUiColors(
     'tab.border': outlineVariant.hex,
     'tab.inactiveBackground': sidebarBackground.hex,
     'tab.inactiveForeground': toHex(withAlpha(editorForeground.hex, 0.55)),
-    'tab.hoverBackground': editorBackground.hex,
+    // Was identical to tab.activeBackground, so hovering an inactive tab looked like activating
+    // it. Sit halfway between the inactive and active grounds instead.
+    'tab.hoverBackground': toHex(mixColors(new Color(sidebarBackground.hex), new Color(editorBackground.hex), 0.5)),
     'tab.hoverForeground': editorForeground.hex,
     'tab.unfocusedActiveBackground': editorBackground.hex,
     'tab.unfocusedActiveForeground': toHex(withAlpha(editorForeground.hex, 0.7)),
@@ -708,10 +730,14 @@ export function deriveUiColors(
     'settings.checkboxBorder': controlBorder,
 
     // Diff editor
-    'diffEditor.insertedTextBackground': toHex(withAlpha(semantic.successForeground.hex, 0.15)),
-    'diffEditor.removedTextBackground': toHex(withAlpha(semantic.errorForeground.hex, 0.15)),
-    'diffEditor.insertedLineBackground': toHex(withAlpha(semantic.successForeground.hex, 0.08)),
-    'diffEditor.removedLineBackground': toHex(withAlpha(semantic.errorForeground.hex, 0.08)),
+    // Asymmetric by design. With equal alphas the two grounds differed by hue alone — measured
+    // deltaE 3.03 dark / 1.63 light in normal vision (about one JND) and 0.75 under deuteranopia,
+    // so added and removed lines were the same block of colour for a red-green dichromat. The
+    // split in alpha adds a lightness difference, which survives every form of colour blindness.
+    'diffEditor.insertedTextBackground': toHex(withAlpha(semantic.successForeground.hex, 0.16)),
+    'diffEditor.removedTextBackground': toHex(withAlpha(semantic.errorForeground.hex, 0.28)),
+    'diffEditor.insertedLineBackground': toHex(withAlpha(semantic.successForeground.hex, 0.09)),
+    'diffEditor.removedLineBackground': toHex(withAlpha(semantic.errorForeground.hex, 0.17)),
     'diffEditor.diagonalFill': toHex(withAlpha(editorForeground.hex, 0.08)),
     'diffEditorOverview.insertedForeground': toHex(withAlpha(semantic.successForeground.hex, 0.5)),
     'diffEditorOverview.removedForeground': toHex(withAlpha(semantic.errorForeground.hex, 0.5)),
