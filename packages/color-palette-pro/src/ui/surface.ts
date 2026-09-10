@@ -48,7 +48,13 @@ export function generateSurfaceColors(
   // two SURFACES with APCA. APCA is a text-on-background model that clamps low-contrast pairs to
   // zero, so it reports Lc 0.00 for two obviously different dark greys; in deltaE, the right
   // metric here, the sunken tier was always fine. Do not use APCA to compare two surfaces.
-  const baseSurfaceL = isDarkMode ? 0.187 : 0.984
+  // Light is 0.991 (Radix slate1, #FCFCFD) rather than M3's 0.984. M3's value assumes the page
+  // fills the frame; in a browser the surrounding chrome is pure #FFFFFF and sits directly
+  // against the page, which is exactly the case where an off-white ground reads as dingy rather
+  // than as neutral. 0.991 more than halves the gap to white (deltaE 1.49 -> 0.88) while keeping
+  // ~0.004 of chroma headroom, so the tinted styles still work — at L 1.000 the maximum
+  // achievable chroma is exactly zero. container / overlay / sunken stay on M3's values.
+  const baseSurfaceL = isDarkMode ? 0.187 : 0.991
   const stackShift = isDarkMode ? treatment.stackLShiftDark : treatment.stackLShiftLight
   const clampL = (l: number): number => Math.max(0.02, Math.min(0.998, l))
   const surfaceL = clampL(baseSurfaceL + stackShift)
