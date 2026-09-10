@@ -122,7 +122,12 @@ export function generateSurfaceColors(
 
   const onSurface = primary.clone()
   onSurface.oklch.c = 0.01
-  onSurface.oklch.l = isDarkMode ? 0.95 : 0.1
+  // Light body text was L 0.1 — #020306, effectively pure black, 19.8:1 on the surface. The
+  // reference cluster sits at 15.8-17.1 (Material 3 16.2, Radix slate12 16.0, GitHub 15.8,
+  // Tailwind 17.1); only Apple goes to pure black. L 0.23 lands at ~16:1, in the middle of that
+  // band. Dark is left at 0.95, which already measures 16.1:1 — inside the dark reference band
+  // of 14.3-17.4 (M3 14.3, Radix 16.2, Tailwind 16.3, GitHub 17.4).
+  onSurface.oklch.l = isDarkMode ? 0.95 : 0.23
   // chromaFloor=0: body text stays near-neutral even if a fallback adjustment fires.
   const onSurfaceAdjusted = ensureContrast(onSurface, worstCaseBackground, 7.0, 0)
 
