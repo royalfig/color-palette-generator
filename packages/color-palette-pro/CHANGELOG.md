@@ -1,5 +1,11 @@
 # @royalfig/color-palette-pro
 
+## 3.3.1
+
+### Patch Changes
+
+- 1be9f3c: Update onSurface lightness value
+
 ## 3.3.0
 
 ### Minor Changes
