@@ -33,7 +33,7 @@ function sineModifier(palette: BaseColorData[], modifier: number): BaseColorData
     newColor.oklch.h = wrapHue(currentHue + hueShift)
     newColor.oklch.l = Math.max(0.05, Math.min(0.95, currentLightness + lightnessShift))
 
-    return colorFactory(newColor, color.code.split('-')[0], idx, color.colorSpace as ColorSpace, false)
+    return colorFactory(newColor, color.code.split('-')[0], idx, color.colorSpace as ColorSpace, color.isBase)
   })
 }
 
@@ -68,7 +68,7 @@ function waveModifier(palette: BaseColorData[], modifier: number): BaseColorData
     newColor.oklch.l = Math.max(0.05, Math.min(0.95, currentLightness + lightnessShift))
     newColor.oklch.c = Math.max(0, Math.min(0.4, currentChroma * chromaMultiplier))
 
-    return colorFactory(newColor, color.code.split('-')[0], idx, color.colorSpace as ColorSpace, false)
+    return colorFactory(newColor, color.code.split('-')[0], idx, color.colorSpace as ColorSpace, color.isBase)
   })
 }
 
@@ -100,7 +100,7 @@ function zapModifier(palette: BaseColorData[], modifier: number): BaseColorData[
     newColor.oklch.l = Math.max(0.05, Math.min(0.95, currentLightness + lightnessShift))
     newColor.oklch.c = Math.max(0, Math.min(0.4, currentChroma + chromaShift))
 
-    return colorFactory(newColor, color.code.split('-')[0], idx, color.colorSpace as ColorSpace, false)
+    return colorFactory(newColor, color.code.split('-')[0], idx, color.colorSpace as ColorSpace, color.isBase)
   })
 }
 
@@ -132,7 +132,7 @@ function blockModifier(palette: BaseColorData[], modifier: number): BaseColorDat
     newColor.oklch.l = Math.max(0.05, Math.min(0.95, currentLightness + lightnessShift))
     newColor.oklch.c = Math.max(0, Math.min(0.4, currentChroma + chromaShift))
 
-    return colorFactory(newColor, color.code.split('-')[0], idx, color.colorSpace as ColorSpace, false)
+    return colorFactory(newColor, color.code.split('-')[0], idx, color.colorSpace as ColorSpace, color.isBase)
   })
 }
 

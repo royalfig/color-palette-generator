@@ -57,7 +57,7 @@ function buildThemeData(
 
   const personality = getPersonalityConfig(paletteKind, paletteStyle, palette)
 
-  const rawPrimary = (palette.filter(p => p.isBase)[0].color ?? baseColor).clone()
+  const rawPrimary = (palette.find(p => p.isBase)?.color ?? baseColor).clone()
   const primary = adaptPrimaryForMode(rawPrimary, isDarkMode)
 
   // Seed-driven palette intensity (audit note 3): the base color's chroma — not the palette
