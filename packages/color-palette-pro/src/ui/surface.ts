@@ -1,5 +1,6 @@
 import Color from 'colorjs.io'
 import { SurfaceTreatment } from '../types/types'
+import type { DisplayGamut } from '../utils'
 import { DEFAULT_TREATMENT } from './uiConst'
 import { dampedSurfaceChroma, ensureContrast, getAccessibleVariant, surfaceChromaFor } from './uiUtils'
 import { findOptimalLightness } from './colorMath'
@@ -169,7 +170,11 @@ export function generateSurfaceColors(
  * reads as a tinted wash. The on-color gets boosted chroma for legibility
  * against that soft background.
  */
-export function makeContainerForAccent(accent: Color, isDarkMode: boolean): { container: Color; onContainer: Color } {
+export function makeContainerForAccent(
+  accent: Color,
+  isDarkMode: boolean,
+  gamut: DisplayGamut = 'srgb',
+): { container: Color; onContainer: Color } {
   const accentC = accent.oklch.c ?? 0
 
   const container = accent.clone()
@@ -178,7 +183,7 @@ export function makeContainerForAccent(accent: Color, isDarkMode: boolean): { co
 
   const onContainerBase = container.clone()
   onContainerBase.oklch.c = Math.min(accentC * 0.7, 0.16)
-  const onContainer = getAccessibleVariant(onContainerBase, container, 4.5)
+  const onContainer = getAccessibleVariant(onContainerBase, container, 4.5, undefined, gamut)
 
   return { container, onContainer }
 }

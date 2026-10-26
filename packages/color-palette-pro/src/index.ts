@@ -5,6 +5,7 @@ import { generatePalette } from './palette/generate'
 import { generateTintsAndShades } from './palette/tintsAndShades'
 import { ColorFormat, ColorSpace, PaletteKinds, PaletteStyle } from './types/types'
 import { generateUiColorPalette } from './ui'
+import { gamutForSpace } from './utils'
 
 export {
   generateCodeTheme,
@@ -66,7 +67,15 @@ export function createPalettes(options: CreatePalettesOptions): BaseColorData[] 
   
   if (isUiMode) {
     // Use the original user color, not the modulated palette color
-    return generateUiColorPalette(new Color(color), modulatedPalette, isDarkMode, palette, colorSpace.format, style);
+    return generateUiColorPalette(
+      new Color(color),
+      modulatedPalette,
+      isDarkMode,
+      palette,
+      colorSpace.format,
+      style,
+      gamutForSpace(colorSpace.space),
+    );
   }
   return modulatedPalette;
 }

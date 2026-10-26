@@ -1,5 +1,6 @@
 import Color from 'colorjs.io'
 import type { BaseColorData } from '../factory'
+import type { DisplayGamut } from '../utils'
 
 // ===== GAMUT-AWARE CHROMA =====
 // Real sRGB-realizable OKLCH chroma is a strong function of *both* lightness and hue
@@ -17,7 +18,7 @@ export function maxChromaFor(l: number, h: number, space: string = 'srgb'): numb
   const probe = new Color('oklch', [l, 0, h])
   if (!probe.inGamut(space as any)) return 0 // L itself out of gamut (≈ pure black/white)
   let lo = 0
-  let hi = 0.4 // safely above the sRGB OKLCH chroma maximum (~0.322 for yellow)
+  let hi = 0.5 // safely above the widest target's OKLCH chroma maximum (Rec. 2020 reaches ~0.4)
   for (let i = 0; i < 24; i++) {
     const mid = (lo + hi) / 2
     probe.oklch.c = mid
@@ -41,6 +42,29 @@ export function clampChromaToGamut(color: Color, space: string = 'srgb'): Color 
   const result = color.clone()
   result.oklch.c = Math.min(c, maxChromaFor(l, h as number, space))
   return result
+}
+
+/**
+ * WCAG contrast of `fg` on `bg` as it will actually render. In a wide gamut a token is seen in
+ * more than one form — the wide value on screens that can show it, mapped down on narrower ones,
+ * and the sRGB fallback (hex) — so the pair must pass in EVERY form, and this returns the worst.
+ * Reducing chroma at fixed L barely moves luminance, so the forms rarely differ by much, but
+ * "rarely" is not a guarantee. A Rec. 2020 token is also checked as a P3 screen would show it.
+ *
+ * The narrower forms are modelled as colorFactory makes the fallback — colorjs `toGamut()`, CSS
+ * Color 4 mapping — not as a pure chroma clamp: the CSS method finishes with a small clip that
+ * moves luminance, enough that a P3 green passing at 4.69 by chroma clamp shipped its hex at 4.48.
+ */
+export function realizedContrast(fg: Color, bg: Color, gamut: DisplayGamut = 'srgb'): number {
+  if (gamut === 'srgb') return clampChromaToGamut(fg).contrastWCAG21(clampChromaToGamut(bg))
+  const wideFg = clampChromaToGamut(fg, gamut)
+  const wideBg = clampChromaToGamut(bg, gamut)
+  let worst = wideFg.contrastWCAG21(wideBg)
+  for (const narrower of gamut === 'rec2020' ? ['p3', 'srgb'] : ['srgb']) {
+    const mapped = (c: Color): Color => c.to(narrower).toGamut()
+    worst = Math.min(worst, mapped(wideFg).contrastWCAG21(mapped(wideBg)))
+  }
+  return worst
 }
 
 export function findOptimalLightness(baseColor: Color, background: Color, minRatio: number): Color {

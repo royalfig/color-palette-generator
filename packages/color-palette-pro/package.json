@@ -32,7 +32,8 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "colorgen": "npx tsx scripts/color-gen.ts",
-    "check": "tsx scripts/check-invariants.ts"
+    "check": "tsx scripts/check-invariants.ts",
+    "check:ui": "tsx scripts/check-ui-contrast.ts"
   },
   "dependencies": {
     "colorjs.io": "^0.6.1"
