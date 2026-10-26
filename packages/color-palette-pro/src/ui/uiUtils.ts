@@ -1,6 +1,7 @@
 import Color from 'colorjs.io'
 import { ColorFormat, PaletteStyle, SurfaceTreatment } from '../types/types'
-import { clampChromaToGamut, findOptimalLightness, maxChromaFor } from './colorMath'
+import type { DisplayGamut } from '../utils'
+import { clampChromaToGamut, findOptimalLightness, maxChromaFor, realizedContrast } from './colorMath'
 import { cvdDistance } from './cvd'
 import { SURFACE_TREATMENT, DEFAULT_TREATMENT } from './uiConst'
 
@@ -8,12 +9,17 @@ import { SURFACE_TREATMENT, DEFAULT_TREATMENT } from './uiConst'
  * Searches outward from a preferred lightness until the contrast ratio is met.
  * Use this when you want to stay as close to a target tone as possible
  * (e.g. brand primary at Tone 40), rather than the minimum-satisfying L.
+ *
+ * With a `gamut`, each candidate is realized in it (chroma clamped at the candidate L) and must
+ * pass via `realizedContrast`. Without one, the raw coords are measured — the semantic colours
+ * still rely on that, as their chroma-retention check reads the unclamped chroma back.
  */
 export function findLightnessFromTarget(
   baseColor: Color,
   background: Color,
   minRatio: number,
   preferredL: number,
+  gamut?: DisplayGamut,
 ): Color {
   const backgroundL = background.oklch.l ?? 0.5
   const direction = backgroundL < 0.5 ? 1 : -1 // dark bg → go lighter; light bg → go darker
@@ -23,7 +29,10 @@ export function findLightnessFromTarget(
     const testL = preferredL + direction * step * 0.01
     if (testL < 0 || testL > 1) break
     result.oklch.l = testL
-    if (result.contrastWCAG21(background) >= minRatio) return result
+    if (gamut) {
+      const realized = clampChromaToGamut(result, gamut)
+      if (realizedContrast(realized, background, gamut) >= minRatio) return realized
+    } else if (result.contrastWCAG21(background) >= minRatio) return result
   }
 
   result.oklch.l = direction === 1 ? 0.98 : 0.02
@@ -45,6 +54,7 @@ export function getAccessibleVariant(
   background: Color,
   minRatio: number,
   chromaFloor: number = 0.06,
+  gamut: DisplayGamut = 'srgb',
 ): Color {
   // Candidate on-color at lightness `l`, keeping a scaled chroma floor so the on-color stays
   // faintly tinted where lightness allows (chroma is barely perceptible at the poles, and the
@@ -54,7 +64,11 @@ export function getAccessibleVariant(
     t.oklch.l = l
     const effectiveFloor = chromaFloor * Math.max(0, 1 - Math.abs(l - 0.5) * 2)
     t.oklch.c = Math.max(t.oklch.c ?? 0, effectiveFloor)
-    return t
+    // Near the poles the primary's own chroma is far out of gamut, and the clipped result is
+    // what both the side choice and the pass check below would measure. Unclamped, a tinted
+    // L 0.98 clipped to a yellowish light that lost to black for an amber primary, and the
+    // neutral-white candidate that would have passed was never tried.
+    return clampChromaToGamut(t, gamut)
   }
 
   // Which pole to head for. This used to be decided by `backgroundL < 0.5` in OKLCH, but the
@@ -64,8 +78,12 @@ export function getAccessibleVariant(
   // Contrast is judged on the 8-bit hex the token will actually ship as. Measuring the float
   // lets a candidate pass at 4.50 and ship at 4.33 once quantized.
   const q = (c: Color): Color => new Color(c.to('srgb').toString({ format: 'hex' }))
+  // In a wide gamut the wide value must pass as well; the hex above is only its fallback.
   const bgQ = q(background)
-  const contrast = (c: Color): number => q(c).contrastWCAG21(bgQ)
+  const contrast = (c: Color): number => {
+    const shipped = q(c).contrastWCAG21(bgQ)
+    return gamut === 'srgb' ? shipped : Math.min(shipped, realizedContrast(c, background, gamut))
+  }
 
   const darkSideBetter = contrast(at(0.02)) > contrast(at(0.98))
   // Comfortable tone first (a cleaner on-color), then the extreme, then the other side.
@@ -81,6 +99,14 @@ export function getAccessibleVariant(
     const candidate = at(bestL)
     candidate.oklch.c = (candidate.oklch.c ?? 0) * scale
     if (contrast(candidate) >= minRatio) return candidate
+  }
+  // Then the true poles, both sides. Pure white or black clears ~4.58:1 against ANY colour (the
+  // worst case is a background at the white/black luminance crossover), but L 0.02/0.98 does not:
+  // #e11d48's primary sits on that crossover and was handed a 4.46:1 on-colour. at() drops the
+  // chroma to zero there, since nothing else is in gamut.
+  for (const l of darkSideBetter ? [0, 1] : [1, 0]) {
+    const pole = at(l)
+    if (contrast(pole) >= minRatio) return pole
   }
   return findOptimalLightness(at(bestL), background, minRatio)
 }
@@ -104,11 +130,19 @@ export function ensureContrast(color: Color, background: Color, minRatio: number
  * surface (upward in dark mode, downward in light). Contrast is monotone in that direction, so a
  * bisection converges. Returns the closest achievable L if the ratio is out of reach.
  */
-function findLightnessForContrast(color: Color, surface: Color, targetRatio: number, isDarkMode: boolean): number {
+function findLightnessForContrast(
+  color: Color,
+  surface: Color,
+  targetRatio: number,
+  isDarkMode: boolean,
+  gamut: DisplayGamut,
+): number {
   const at = (l: number): number => {
     const c = color.clone()
     c.oklch.l = l
-    return c.contrastWCAG21(surface)
+    // Measure what will render: the caller may hand in a chroma that is only reachable at some
+    // lightnesses, and WCAG luminance of out-of-gamut coords is not the displayed value.
+    return realizedContrast(c, surface, gamut)
   }
   // `lo` is the failing end (at the surface), `hi` the passing extreme. Converge on the least
   // extreme lightness that still passes, i.e. the one closest to the surface.
@@ -124,41 +158,50 @@ function findLightnessForContrast(color: Color, surface: Color, targetRatio: num
 }
 
 /**
- * A seed the sRGB gamut can actually express, without throwing away its hue.
+ * A seed the target gamut can actually express, without throwing away its hue.
  *
  * Preserving the seed's lightness is the whole point of adaptPrimaryForMode, but lightness and
  * chroma are not independent: at L 1.0 the only in-gamut colour is white, so honouring the
  * lightness of `oklch(100% 0.4 120)` would return #ffffff and lose the hue entirely. Where the
  * requested chroma is unreachable at the requested lightness, move L toward the hue's cusp — the
  * least-destructive trade, since hue is the part of a brand colour people actually recognise.
+ *
+ * "Unreachable" means the in-place clamp would leave the colour close to neutral, not merely less
+ * saturated than asked. The bar used to be half the requested chroma, which also fired for
+ * ordinary mid-lightness seeds: `oklch(56% 0.28 66)` clamps in place to a clearly amber C 0.125,
+ * yet was moved to L 0.63 for C 0.14 — costing the seed its lightness, and with it the light-mode
+ * contrast it had. Holding L and H and reducing only C is the closest in-gamut colour (it is what
+ * CSS Color 4 gamut mapping does), so L moves only as far as needed to reach the floor.
  */
-function realizableSeed(primary: Color): Color {
+const MIN_REALIZABLE_CHROMA = 0.04
+function realizableSeed(primary: Color, gamut: DisplayGamut): Color {
   const c = primary.oklch.c ?? 0
   const h = primary.oklch.h ?? NaN
   const l = primary.oklch.l ?? 0.5
-  if (c <= 0.02 || !Number.isFinite(h)) return clampChromaToGamut(primary)
-  if (maxChromaFor(l, h) >= c * 0.5) return clampChromaToGamut(primary)
+  if (c <= 0.02 || !Number.isFinite(h)) return clampChromaToGamut(primary, gamut)
+  const needed = Math.min(c * 0.5, MIN_REALIZABLE_CHROMA)
+  if (maxChromaFor(l, h, gamut) >= needed) return clampChromaToGamut(primary, gamut)
 
   let bestL = l
-  let bestCap = maxChromaFor(l, h)
+  let bestCap = maxChromaFor(l, h, gamut)
   for (let step = 0.01; step <= 0.7; step += 0.01) {
     for (const cand of [l - step, l + step]) {
       if (cand < 0.05 || cand > 0.97) continue
-      const cap = maxChromaFor(cand, h)
+      const cap = maxChromaFor(cand, h, gamut)
       if (cap > bestCap) {
         bestCap = cap
         bestL = cand
       }
-      if (cap >= c * 0.5) {
+      if (cap >= needed) {
         const hit = primary.clone()
         hit.oklch.l = cand
-        return clampChromaToGamut(hit)
+        return clampChromaToGamut(hit, gamut)
       }
     }
   }
   const out = primary.clone()
   out.oklch.l = bestL
-  return clampChromaToGamut(out)
+  return clampChromaToGamut(out, gamut)
 }
 
 /**
@@ -182,12 +225,17 @@ function realizableSeed(primary: Color): Color {
  * the contrast ratio instead is hue- and chroma-aware and cannot fail by construction.
  *
  * `targetL` (used by callers that need an explicit tone) still overrides everything.
+ *
+ * `gamut` is where the primary is realized. Outside sRGB it keeps the extra chroma a wide-gamut
+ * screen can show, and every contrast check requires both the wide value and its sRGB fallback
+ * to pass (`realizedContrast`). The `targetL` path does not take a gamut and stays as it was.
  */
 export function adaptPrimaryForMode(
   primary: Color,
   isDarkMode: boolean,
   targetL?: number,
   actualSurface?: Color,
+  gamut: DisplayGamut = 'srgb',
 ): Color {
   const surfaceAt = (l: number): Color => {
     const s = primary.clone()
@@ -215,9 +263,9 @@ export function adaptPrimaryForMode(
   // quantization costs up to ~0.2 of a contrast ratio — a seed sitting exactly on 4.5 (e.g.
   // #e11d48 at 4.49) would otherwise ship at 4.31 once rounded.
   const PASS = 4.62
-  const seed = realizableSeed(primary)
-  const seedInDark = seed.contrastWCAG21(darkSurface)
-  const seedInLight = seed.contrastWCAG21(lightSurface)
+  const seed = realizableSeed(primary, gamut)
+  const seedInDark = realizedContrast(seed, darkSurface, gamut)
+  const seedInLight = realizedContrast(seed, lightSurface, gamut)
   const passesDark = seedInDark >= PASS
   const passesLight = seedInLight >= PASS
 
@@ -225,12 +273,20 @@ export function adaptPrimaryForMode(
   if ((isDarkMode && passesDark) || (!isDarkMode && passesLight)) return seed.clone()
 
   // It works in the OTHER mode: reproduce that same contrast on this side.
+  // Capped at AAA: a seed near one pole (L 0.1, or #fefefe) has ~17:1 in its native mode, and
+  // matching that on the other side lands on the opposite pole and drops all its chroma.
+  const MAX_MATCHED_RATIO = 7
   const nativeRatio = isDarkMode ? seedInLight : seedInDark
-  const ratio = passesDark || passesLight ? Math.max(PASS, nativeRatio) : PASS
+  const ratio = passesDark || passesLight ? Math.min(MAX_MATCHED_RATIO, Math.max(PASS, nativeRatio)) : PASS
 
-  const out = seed.clone()
-  out.oklch.l = findLightnessForContrast(seed, surface, ratio, isDarkMode)
-  return clampChromaToGamut(out)
+  // Carry the chroma the user ASKED for, not the seed's clamped chroma: an out-of-gamut dark seed
+  // (oklch(27% 0.28 120)) realizes only C 0.064 at its own lightness, but its other-mode tone
+  // near L 0.7 has room for twice that, and inheriting the clamp left it needlessly dull.
+  const requested = seed.clone()
+  requested.oklch.c = Math.max(seed.oklch.c ?? 0, primary.oklch.c ?? 0)
+  const out = requested.clone()
+  out.oklch.l = findLightnessForContrast(requested, surface, ratio, isDarkMode, gamut)
+  return clampChromaToGamut(out, gamut)
 }
 
 /**

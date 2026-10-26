@@ -35,13 +35,15 @@ export function safeHue(color: Color, fallback = NaN): number {
 }
 
 /**
- * The display gamut to keep generated swatches realizable in. sRGB-bound spaces (srgb/hsl) stay
- * sRGB; the wider model/display spaces (p3/oklch/oklab/lch/lab) target P3 — the widest commonly
- * supported display — so P3 screens get richer palettes while sRGB output stays hue-stable.
+ * The display gamut to keep generated swatches realizable in. A display space is its own limit:
+ * srgb/hsl stay sRGB and p3 stays P3. The unbounded model spaces (oklch/oklab/lch/lab) target
+ * Rec. 2020, the widest gamut real displays reach, rather than passing through chroma no screen
+ * can show — that would leave the gamut mapping to the browser, unverified and often hue-shifting.
  */
-export type DisplayGamut = 'srgb' | 'p3'
+export type DisplayGamut = 'srgb' | 'p3' | 'rec2020'
 export function gamutForSpace(space: ColorSpace): DisplayGamut {
-  return space === 'srgb' || space === 'hsl' ? 'srgb' : 'p3'
+  if (space === 'srgb' || space === 'hsl') return 'srgb'
+  return space === 'p3' ? 'p3' : 'rec2020'
 }
 
 /**

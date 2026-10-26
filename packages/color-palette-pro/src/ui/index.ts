@@ -1,6 +1,8 @@
 import Color from 'colorjs.io'
 import { BaseColorData, colorFactory } from '../factory'
 import { ColorFormat, PaletteKinds, PaletteStyle } from '../types/types'
+import type { DisplayGamut } from '../utils'
+import { clampChromaToGamut, realizedContrast } from './colorMath'
 import { selectAccentColors } from './accentColors'
 import { generateOutlineAndInverse } from './outline'
 import { generateSemanticColors } from './semantic'
@@ -15,6 +17,11 @@ export function generateUiColorPalette(
   paletteType: PaletteKinds,
   colorFormat: ColorFormat,
   paletteStyle: PaletteStyle = 'square',
+  // Where the brand-coloured roles (primary, secondary, tertiary and their on-/container colours)
+  // are realized. Outside sRGB they keep the chroma a wide-gamut screen can show, verified so that
+  // the sRGB fallback passes too. Surfaces, outlines and semantics are near-neutral or
+  // chroma-capped, gain nothing from it, and stay sRGB.
+  gamut: DisplayGamut = 'srgb',
 ): BaseColorData[] {
   // Per-style surface material treatment — neutral (square) → brutalist (diamond).
   const treatment = surfaceTreatmentFor(paletteStyle)
@@ -30,10 +37,14 @@ export function generateUiColorPalette(
 
   // Step 3: Surface colors (AAA contrast) — generated before accents so surface is available
   const surfaces = generateSurfaceColors(provisionalPrimary, isDarkMode, treatment)
-  const primary = adaptPrimaryForMode(color, isDarkMode, undefined, surfaces.surface)
+  const primary = adaptPrimaryForMode(color, isDarkMode, undefined, surfaces.surface, gamut)
 
-  const onPrimary = getAccessibleVariant(primary, primary, 4.5)
-  const { container: primaryContainer, onContainer: onPrimaryContainer } = makeContainerForAccent(primary, isDarkMode)
+  const onPrimary = getAccessibleVariant(primary, primary, 4.5, undefined, gamut)
+  const { container: primaryContainer, onContainer: onPrimaryContainer } = makeContainerForAccent(
+    primary,
+    isDarkMode,
+    gamut,
+  )
 
   // Step 4: Accent colors — adapted for the current mode
   const { secondary: secondaryRaw, tertiary: tertiaryRaw } = selectAccentColors(paletteType, palette)
@@ -43,51 +54,77 @@ export function generateUiColorPalette(
   // then VERIFY it against the surface, searching outward only if needed — previously the L
   // was hard-assigned with no contrast check, so these were accessible only by luck of the
   // accent's chroma. (Audit 2C.1.)
+  // The accent's chroma was realized at its palette lightness, so it is re-clamped at the new one.
+  // Verified with the same margin over 4.5 as the primary (adaptPrimaryForMode's PASS): at exactly
+  // 4.5 the float passed and the 8-bit hex shipped as low as 4.42.
+  const ACCENT_PASS = 4.62
   const verifyAgainstSurface = (c: Color, targetL: number): Color => {
     const out = c.clone()
     out.oklch.l = targetL
-    if (out.contrastWCAG21(surfaces.surface) >= 4.5) return out
-    return findLightnessFromTarget(out, surfaces.surface, 4.5, targetL)
+    const realized = clampChromaToGamut(out, gamut)
+    if (realizedContrast(realized, surfaces.surface, gamut) >= ACCENT_PASS) return realized
+    return findLightnessFromTarget(out, surfaces.surface, ACCENT_PASS, targetL, gamut)
   }
   // Secondary and tertiary previously took the SAME lightness target, which erased the only axis
   // a single-hue palette (tints & shades) has — they came back within deltaE 0.3 of each other.
   // Offsetting the tertiary keeps a usable difference even when both sit on one hue.
   const accentTargetL = isDarkMode ? 0.8 : 0.4
   const tertiaryTargetL = isDarkMode ? 0.66 : 0.54
-  const secondary = verifyAgainstSurface(secondaryRaw, accentTargetL)
-  let tertiary = verifyAgainstSurface(tertiaryRaw, tertiaryTargetL)
-
-  // Safety net: whatever the scheme handed us, the two accents must be usably different. Walk the
-  // tertiary's lightness (the axis that survives every palette geometry, including single-hue)
-  // until it clears the threshold or runs out of contrast-safe room.
+  // Safety net: whatever the scheme handed us, the three brand colours must be usably different.
+  // The accent targets above are fixed lightnesses that never look at the primary, so a seed that
+  // happens to sit near one (it keeps its own lightness now) came back with a near-duplicate
+  // accent — on a single-hue palette, or a near-grey seed, where lightness is the only axis there
+  // is. So the accents' lightness (the axis that survives every palette geometry) is searched
+  // over its contrast-safe range — both accents JOINTLY, since placing one first can leave the
+  // other no room in light mode's narrow L 0.24-0.55 band — for the most separation (capped at
+  // the threshold), then the least total movement from the targets.
   const ACCENT_MIN_DELTA_E = 12
-  if (secondary.deltaEOK(tertiary) * 100 < ACCENT_MIN_DELTA_E) {
-    let best = tertiary
-    let bestD = secondary.deltaEOK(tertiary) * 100
+  const dE = (a: Color, b: Color): number => a.deltaEOK(b) * 100
+  const placements = (c: Color): Color[] => {
+    const out = [c]
     for (let l = 0.24; l <= 0.92; l += 0.02) {
-      const probe = tertiary.clone()
-      probe.oklch.l = l
-      if (probe.contrastWCAG21(surfaces.surface) < 4.5) continue
-      const d = secondary.deltaEOK(probe) * 100
-      if (d > bestD) {
-        bestD = d
-        best = probe
-      }
-      if (bestD >= ACCENT_MIN_DELTA_E) break
+      const atL = c.clone()
+      atL.oklch.l = l
+      const probe = clampChromaToGamut(atL, gamut)
+      if (realizedContrast(probe, surfaces.surface, gamut) >= ACCENT_PASS) out.push(probe)
     }
-    tertiary = best
+    return out
+  }
+  let secondary = verifyAgainstSurface(secondaryRaw, accentTargetL)
+  let tertiary = verifyAgainstSurface(tertiaryRaw, tertiaryTargetL)
+  if (Math.min(dE(primary, secondary), dE(primary, tertiary), dE(secondary, tertiary)) < ACCENT_MIN_DELTA_E) {
+    const sL = secondary.oklch.l ?? 0
+    const tL = tertiary.oklch.l ?? 0
+    const tCandidates = placements(tertiary).map(t => ({ t, fromPrimary: dE(primary, t) }))
+    let bestScore = -1
+    let bestMove = Infinity
+    for (const s of placements(secondary)) {
+      const sFromPrimary = dE(primary, s)
+      for (const { t, fromPrimary } of tCandidates) {
+        const score = Math.min(ACCENT_MIN_DELTA_E, sFromPrimary, fromPrimary, dE(s, t))
+        const move = Math.abs((s.oklch.l ?? 0) - sL) + Math.abs((t.oklch.l ?? 0) - tL)
+        if (score > bestScore + 1e-9 || (score > bestScore - 1e-9 && move < bestMove)) {
+          bestScore = score
+          bestMove = move
+          secondary = s
+          tertiary = t
+        }
+      }
+    }
   }
 
-  const onSecondary = getAccessibleVariant(secondary, secondary, 4.5)
-  const onTertiary = getAccessibleVariant(tertiary, tertiary, 4.5)
+  const onSecondary = getAccessibleVariant(secondary, secondary, 4.5, undefined, gamut)
+  const onTertiary = getAccessibleVariant(tertiary, tertiary, 4.5, undefined, gamut)
 
   const { container: secondaryContainer, onContainer: onSecondaryContainer } = makeContainerForAccent(
     secondary,
     isDarkMode,
+    gamut,
   )
   const { container: tertiaryContainer, onContainer: onTertiaryContainer } = makeContainerForAccent(
     tertiary,
     isDarkMode,
+    gamut,
   )
 
   // Step 5: Outline and inverse colors
