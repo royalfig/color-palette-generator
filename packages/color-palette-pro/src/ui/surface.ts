@@ -102,21 +102,32 @@ export function generateSurfaceColors(
     0.26 + proxBoost,
   )
 
-  // container-overlay: floating elements — menus, popovers, dialogs.
+  // container-overlay: floating elements — menus, popovers, dialogs. It is the top of the stack
+  // in both modes: lighter than the page.
   //
-  // Light mode used 0.995, which after the spread landed at L 0.994 against a surface of 0.991:
-  // deltaE 0.30, a contrast ratio of 1.009. A popover had no edge at all and depended entirely on
-  // the shadow to be seen. The mistake was carrying the dark-mode rule ("elevated = lighter")
-  // into light mode, where there is no headroom above a near-white page. Both Material 3 and
-  // Radix resolve this the same way: in light mode elevation moves AWAY from the page, which
-  // means darker. M3 puts menus and dialogs on surfaceContainerHigh (L 0.938) over a surface of
-  // L 0.984. So the light overlay is now a step beyond `container`, giving the ordering
-  // surface 0.991 > container 0.961 > overlay 0.948 > sunken 0.934 — monotone, and the same
-  // order M3 uses. Dark keeps "elevated = lighter", which is correct there.
+  // Dark: M3 surfaceContainerHigh (0.286), ~0.1 above the surface — "elevated = lighter".
+  //
+  // Light: the panel sits ABOVE the page, toward white — 85% of the remaining headroom to L 0.999,
+  // carrying half the page's tint. Square/triangle land at #fefefe; styles that pull the page off
+  // white (circle, diamond) get a proportionally larger step and a pale wash of the page's hue
+  // (diamond: page #e4f1ff → overlay #f7fdff).
+  //
+  // History, so it is not re-derived: this was briefly M3's surfaceContainerHigh (L 0.933) in
+  // light mode too, to give popovers a fill edge against the page. That made every popover a grey
+  // panel darker than the cards (#e9e9e9 on #fcfcfc; diamond went muddy grey-blue under a tinted
+  // page), reading as a recessed well, not a floating layer. M3 only gets away with it because it
+  // uses tonal elevation everywhere. The edge of a light floating panel comes from the `shadow`
+  // token plus an `outline-variant` border — the GitHub / Radix pattern (white panel on an
+  // off-white page) — not from greying the fill.
   const containerOverlay = primary.clone()
-  const overlayL = spreadL(isDarkMode ? 0.286 : 0.933) // M3 surfaceContainerHigh
-  containerOverlay.oklch.l = overlayL
-  containerOverlay.oklch.c = dampedSurfaceChroma(primaryC, overlayL, isDarkMode, 0.014 * containerC, 0 + proxBoost)
+  if (isDarkMode) {
+    const overlayL = spreadL(0.286) // M3 surfaceContainerHigh
+    containerOverlay.oklch.l = overlayL
+    containerOverlay.oklch.c = dampedSurfaceChroma(primaryC, overlayL, isDarkMode, 0.014 * containerC, 0 + proxBoost)
+  } else {
+    containerOverlay.oklch.l = surfaceL + (0.999 - surfaceL) * 0.85
+    containerOverlay.oklch.c = (surface.oklch.c ?? 0) * 0.5
+  }
 
   // Worst-case background for contrast checking, WITHIN THE NEUTRAL SURFACE STACK:
   // Light Mode (Dark Text): Lowest contrast occurs on the darkest background (sunken)
